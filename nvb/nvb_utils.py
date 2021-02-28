@@ -176,7 +176,7 @@ def getNodeType(obj):
             return 'emitter'
         elif obj.nvb.meshtype == nvb_def.Meshtype.AABB:
             return 'aabb'
-    elif objType == 'LAMP':
+    elif objType == 'LIGHT':
         return 'light'
 
     return 'dummy'
@@ -233,7 +233,7 @@ def get_mdl_base(obj=None, scene=None):
 
 def get_fcurve(action, data_path, index=0, group_name=None):
     """Get the fcurve with specified properties or create one."""
-    fcu = action.fcurves.find(data_path, index)
+    fcu = action.fcurves.find(data_path, index=index)
     if not fcu:  # Create new Curve
         fcu = action.fcurves.new(data_path=data_path, index=index)
         if group_name:  # Add curve to group
@@ -478,32 +478,6 @@ def nwangle2euler(nwangle):
     return q.to_euler()
 
 
-def setMaterialAuroraAlpha(mat, alpha):
-    '''
-    if alpha < 1.0:
-        mat.use_transparency = True
-        tex = mat.active_texture
-        if tex:
-            mat.alpha = 0.0
-            tslotIdx = mat.active_texture_index
-            tslot    = mat.texture_slots[tslotIdx]
-            tslot.use_map_alpha = True
-            tslot.alpha_factor  = alpha
-        else:
-            mat.alpha = alpha
-    '''
-    mat.use_transparency = True
-    tex = mat.active_texture
-    if tex:
-        mat.alpha = 0.0
-        tslotIdx = mat.active_texture_index
-        tslot    = mat.texture_slots[tslotIdx]
-        tslot.use_map_alpha = True
-        tslot.alpha_factor  = alpha
-    else:
-        mat.alpha = alpha
-
-
 def getAuroraAlpha(obj):
     '''
     This will return
@@ -536,12 +510,12 @@ def setupMinimapRender(mdlroot, scene, lamp_color = (1.0, 1.0, 1.0), alpha_mode 
         if lampName in bpy.data.objects:
             minimapLamp = bpy.data.objects[lampName]
         else:
-            if lampName in bpy.data.lamps:
-                lampData = bpy.data.lamps[lampName]
+            if lampName in bpy.data.lights:
+                lampData = bpy.data.lights[lampName]
             else:
-                lampData = bpy.data.lamps.new(lampName, 'POINT')
+                lampData = bpy.data.lights.new(lampName, 'POINT')
             minimapLamp = bpy.data.objects.new(lampName , lampData)
-        scene.objects.link(minimapLamp)
+        scene.collection.objects.link(minimapLamp)
     # Adjust lamp properties
     minimapLamp.data.use_specular = False
     minimapLamp.data.color        = lamp_color
@@ -562,7 +536,7 @@ def setupMinimapRender(mdlroot, scene, lamp_color = (1.0, 1.0, 1.0), alpha_mode 
             else:
                 camData = bpy.data.cameras.new(camName)
             minimapCam = bpy.data.objects.new(camName, camData)
-        scene.objects.link(minimapCam)
+        scene.collection.objects.link(minimapCam)
     # Adjust cam properties
     minimapCam.data.type        = 'ORTHO'
     minimapCam.data.ortho_scale = 10.0
@@ -611,8 +585,8 @@ def copyAnimSceneCheck(theOriginal, newSuffix, oldSuffix = ''):
         return False
 
     objType = theOriginal.type
-    if (objType == 'LAMP'):
-        if newName in bpy.data.lamps:
+    if (objType == 'LIGHT'):
+        if newName in bpy.data.lights:
             print('Kotorblender: Duplicate lamp')
             return False
     elif (objType == 'MESH'):
@@ -671,7 +645,7 @@ def copyAnimScene(scene, theOriginal, newSuffix, oldSuffix = '', parent = None):
     # - Lamps
     # - Meshes & materials when there are alphakeys
     objType = theOriginal.type
-    if (objType == 'LAMP'):
+    if (objType == 'LIGHT'):
         data         = theOriginal.data.copy()
         data.name    = newName
         theCopy.data = data
@@ -695,7 +669,7 @@ def copyAnimScene(scene, theOriginal, newSuffix, oldSuffix = '', parent = None):
             theCopy.animation_data.action = actionCopy
 
     # Link copy to the anim scene
-    scene.objects.link(theCopy)
+    scene.collection.objects.link(theCopy)
 
     # Convert all child objects too
     for child in theOriginal.children:
