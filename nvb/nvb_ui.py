@@ -452,6 +452,10 @@ class NVB_PT_LIGHT(bpy.types.Panel):
         row.prop(obj.nvb, 'wirecolor', text='Wirecolor')
         row = box.row()
         row.prop(obj.nvb, 'lightpriority', text='Priority')
+        row = box.row()
+        row.prop(obj.nvb, 'radius', text='Radius')
+        row = box.row()
+        row.prop(obj.nvb, 'multiplier', text='Multiplier')
 
         split = box.split()
         col = split.column(align=True)

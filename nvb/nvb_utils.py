@@ -781,3 +781,10 @@ def eulerFilter(currEul, prevEul):
         return flipEul
     else:
         return eul
+
+
+def computeLightPower(light):
+    '''
+    Compute Eevee light power from Aurora light radius and multiplier
+    '''
+    light.data.energy = light.nvb.multiplier * light.nvb.radius * light.nvb.radius

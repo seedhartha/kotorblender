@@ -1853,11 +1853,9 @@ class Light(GeometryNode):
             self.color = (0.0 - self.color[0],
                           0.0 - self.color[1],
                           0.0 - self.color[2])
-        lamp.color       = self.color
-        lamp.energy      = self.multiplier
-        lamp.distance    = self.radius
-        if self.shadow == 0:
-            lamp.use_shadow = False
+
+        lamp.color = self.color
+        lamp.use_shadow = self.shadow != 0
 
         return lamp
 
@@ -1869,6 +1867,8 @@ class Light(GeometryNode):
                   'sl1': 'SOURCELIGHT1',
                   'sl2': 'SOURCELIGHT2'}
         #TODO: Check light names when exporting tiles
+        obj.nvb.multiplier    = self.multiplier
+        obj.nvb.radius        = self.radius
         obj.nvb.ambientonly   = (self.ambientonly >= 1)
         obj.nvb.lighttype     = switch.get(self.name[-3:], 'NONE')
         obj.nvb.shadow        = (self.shadow >= 1)
@@ -1890,6 +1890,7 @@ class Light(GeometryNode):
                 newItem.position   = self.flareList.positions[i]
 
         obj.nvb.flareradius = self.flareradius
+        nvb_utils.computeLightPower(obj)
 
     def addToScene(self, scene):
         if nvb_glob.minimapMode:

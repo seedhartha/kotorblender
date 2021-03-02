@@ -12,19 +12,20 @@ def KB_anim_root_obj_poll(self, object):
     return nvb_utils.ancestorNode(object, nvb_utils.isRootDummy) is not None
 
 
+def nvb_update_light_power(self, context):
+    '''
+    Compute light power based on Aurora radius and multiplier
+    '''
+    if context.object and context.object.type == 'LIGHT':
+        nvb_utils.computeLightPower(context.object)
+
+
 def nvb_update_shadow_prop(self, context):
     '''
-    Set the lamps shadow to match the aurora shadow property
+    Set the lights shadow to match the Aurora shadow property
     '''
-    select_object = context.object
-    if (select_object) and (select_object.type == 'LIGHT'):
-        try:
-            if (select_object.nvb.shadow):
-                select_object.data.shadow_method = 'RAY_SHADOW'
-            else:
-                select_object.data.shadow_method = 'NOSHADOW'
-        except:
-            pass
+    if context.object and context.object.type == 'LIGHT':
+        context.object.data.use_shadow = self.shadow != 0
 
 
 class NVB_PG_ANIMEVENT(bpy.types.PropertyGroup):
@@ -441,6 +442,10 @@ class KB_PG_OBJECT(bpy.types.PropertyGroup):
     flareradius   : bpy.props.FloatProperty(name = 'Flare Radius', default = 0.0, min = 0.0, max = 100.0)
     flareList     : bpy.props.CollectionProperty(type = NVB_PG_FLARE)
     flareListIdx  : bpy.props.IntProperty(name = "Index for flare list", default = 0)
+
+    # Point lights in Eevee do not have equivalent for Aurora light multiplier and radius
+    radius : bpy.props.FloatProperty(name = 'Radius', default = 0.0, min = 0.0, max = 10000.0, update = nvb_update_light_power)
+    multiplier : bpy.props.FloatProperty(name = 'Multiplier', default = 1.0, min = 0.0, max = 10.0, update = nvb_update_light_power)
 
     rawascii : bpy.props.StringProperty(name = 'Text node', description = 'Name of the raw text node', default = '')
 
