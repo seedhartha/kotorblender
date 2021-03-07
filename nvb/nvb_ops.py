@@ -458,7 +458,7 @@ class NVB_OP_Import(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
 
     filename_ext = '.mdl'
     filter_glob : bpy.props.StringProperty(
-            default = '*.mdl;*.mdl.ascii',
+            default = '*.mdl;*.mdl.ascii;*.lyt',
             options = {'HIDDEN'},
             )
 

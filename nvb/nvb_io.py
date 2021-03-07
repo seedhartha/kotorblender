@@ -10,33 +10,7 @@ from . import nvb_mdl
 from . import nvb_utils
 
 
-def loadMdl(operator,
-            context,
-            filepath = '',
-            importGeometry = True,
-            importWalkmesh = True,
-            importSmoothGroups = True,
-            importAnim = True,
-            materialMode = 'SIN',
-            textureSearch = False,
-            minimapMode = False,
-            minimapSkipFade = False):
-    '''
-    Called from blender ui
-    '''
-    nvb_glob.importGeometry     = importGeometry
-    nvb_glob.importSmoothGroups = importSmoothGroups
-    nvb_glob.importAnim         = importAnim
-
-
-    nvb_glob.materialMode = materialMode
-
-    nvb_glob.texturePath   = os.path.dirname(filepath)
-    nvb_glob.textureSearch = textureSearch
-
-    nvb_glob.minimapMode     = minimapMode
-    nvb_glob.minimapSkipFade = minimapSkipFade
-
+def _load_mdl(filepath, importWalkmesh, position = (0.0, 0.0, 0.0)):
     scene = bpy.context.scene
 
     # Try to load walkmeshes ... pwk (placeable) and dwk (door)
@@ -93,7 +67,7 @@ def loadMdl(operator,
     mdl = nvb_mdl.Mdl()
     #mdl.loadAscii(asciiLines)
     mdl.loadAscii(ascii_mdl)
-    mdl.importToScene(scene, wkm)
+    mdl.importToScene(scene, wkm, position)
 
     # processing to use AABB node as trimesh for walkmesh file
     if wkm is not None and wkm.walkmeshType == 'wok' and mdl.nodeDict and wkm.nodeDict:
@@ -115,6 +89,74 @@ def loadMdl(operator,
                 aabb.roomlinks = wkmesh.roomlinks
                 aabb.setRoomLinks(scene.objects[aabb.name].data)
 
+
+def _load_lyt(filepath, importWalkmesh):
+    # Read lines from LYT
+    fp = os.fsencode(filepath)
+    f = open(fp, 'r')
+    lines = [line.strip() for line in f.read().splitlines()]
+    f.close()
+
+    rooms = []
+    rooms_to_read = 0
+
+    for line in lines:
+        tokens = line.split()
+        if rooms_to_read > 0:
+            room_name = tokens[0].lower()
+            x = float(tokens[1])
+            y = float(tokens[2])
+            z = float(tokens[3])
+            rooms.append((room_name, x, y, z))
+            rooms_to_read -= 1
+            if rooms_to_read == 0:
+                break
+        elif tokens[0].startswith('roomcount'):
+            rooms_to_read = int(tokens[1])
+
+    (path, _) = os.path.split(filepath)
+
+    for room in rooms:
+        mdl_path = os.path.join(path, room[0] + '-ascii.mdl')
+        if os.path.exists(mdl_path):
+            _load_mdl(mdl_path, importWalkmesh, room[1:])
+        else:
+            print('Kotorblender - WARNING: room model not found: ' + mdl_path)
+
+
+def loadMdl(operator,
+            context,
+            filepath = '',
+            importGeometry = True,
+            importWalkmesh = True,
+            importSmoothGroups = True,
+            importAnim = True,
+            materialMode = 'SIN',
+            textureSearch = False,
+            minimapMode = False,
+            minimapSkipFade = False):
+    '''
+    Called from blender ui
+    '''
+    nvb_glob.importGeometry     = importGeometry
+    nvb_glob.importSmoothGroups = importSmoothGroups
+    nvb_glob.importAnim         = importAnim
+
+
+    nvb_glob.materialMode = materialMode
+
+    nvb_glob.texturePath   = os.path.dirname(filepath)
+    nvb_glob.textureSearch = textureSearch
+
+    nvb_glob.minimapMode     = minimapMode
+    nvb_glob.minimapSkipFade = minimapSkipFade
+
+    # Load LYT or MDL depending of file extension
+    (_, filename) = os.path.split(filepath)
+    if filename.endswith('.lyt'):
+        _load_lyt(filepath, importWalkmesh)
+    else:
+        _load_mdl(filepath, importWalkmesh)
 
     return {'FINISHED'}
 
