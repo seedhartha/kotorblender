@@ -17,10 +17,6 @@ def _get_material_name(node):
     else:
         result = "D" + nvb_utils.colorToHex(node.diffuse)
 
-    # Lightmap
-    if not nvb_utils.isNull(node.bitmap2):
-        result += "__L" + node.bitmap2
-
     # Alpha
     result += "__A" + nvb_utils.intToHex(nvb_utils.floatToByte(node.alpha))
 
@@ -32,7 +28,7 @@ def load_material(node, name):
     Get or create a material.
     """
     # If material reuse is enabled, search for existing material
-    if nvb_glob.materialMode == 'SIN':
+    if nvb_glob.materialMode == 'SIN' and node.lightmapped == 0:
         material_name = _get_material_name(node)
         if material_name in bpy.data.materials:
             material = bpy.data.materials[material_name]
