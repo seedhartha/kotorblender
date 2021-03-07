@@ -101,7 +101,7 @@ class Mdl():
             else:
                 self.animDict[anim.name] = anim
 
-    def importToScene(self, scene, wkm):
+    def importToScene(self, scene, wkm, position = (0.0, 0.0, 0.0)):
         rootDummy = None
         objIdx = 0
         if (nvb_glob.importGeometry) and self.nodeDict:
@@ -114,6 +114,7 @@ class Mdl():
             if (type(node) == nvb_node.Dummy) and \
                (nvb_utils.isNull(node.parentName)):
                 obj                    = node.addToScene(scene)
+                obj.location           = position
                 obj.nvb.dummytype      = nvb_def.Dummytype.MDLROOT
                 obj.nvb.supermodel     = self.supermodel
                 obj.nvb.classification = self.classification
