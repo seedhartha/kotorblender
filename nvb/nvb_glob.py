@@ -16,7 +16,5 @@ minimapSkipFade = False
 exportSmoothGroups = True
 exportTxi = False
 
-scene          = None
-meshConvert    = 'RENDER'
 applyModifiers = True
 

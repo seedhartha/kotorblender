@@ -14,6 +14,12 @@ def isclose(a, b, rel_tol=1e-09, abs_tol=0.0):
     return abs(a-b) <= max(rel_tol * max(abs(a), abs(b)), abs_tol)
 
 
+def isclose_3f(a, b, rel_tol=0.1):
+    return (isclose(a[0], b[0], rel_tol) and
+            isclose(a[1], b[1], rel_tol) and
+            isclose(a[2], b[2], rel_tol))
+
+
 def isNumber(s):
     try:
         float(s)
@@ -40,42 +46,6 @@ def getRealName(s):
         return [name for name in bpy.data.objects.keys() if name.lower() == s.lower()][0]
     except:
         return None
-
-
-def materialExists(diffuse = (1.0, 1.0, 1.0),
-                   specular = (1.0, 1.0, 1.0),
-                   imageName = '',
-                   alpha = 1.0):
-    '''
-    Compares the diffure, specular and image values of the material
-    to the parameters
-    '''
-    def isclose_3f(a, b, rel_tol=0.1):
-        return (isclose(a[0], b[0], rel_tol) and
-                isclose(a[1], b[1], rel_tol) and
-                isclose(a[2], b[2], rel_tol) )
-
-    for mat in bpy.data.materials:
-        eq = False
-        if not imageName:
-            # No texture
-            eq = not mat.active_texture
-            eq = eq and (mat.alpha == alpha)
-        else:
-            # Has to have a texture
-            if mat.active_texture:
-                if mat.active_texture.type == 'IMAGE':
-                    if mat.active_texture.image.name:
-                        eq = (mat.active_texture.image.name == imageName)
-                active_texslot = mat.texture_slots[mat.active_texture_index]
-                eq = eq and (active_texslot.alpha_factor == alpha)
-
-        eq = eq and isclose_3f(mat.diffuse_color, diffuse)
-        eq = eq and isclose_3f(mat.specular_color, specular)
-        if eq:
-            return mat
-
-    return None
 
 
 def isNumber(s):
@@ -176,7 +146,7 @@ def getNodeType(obj):
             return 'emitter'
         elif obj.nvb.meshtype == nvb_def.Meshtype.AABB:
             return 'aabb'
-    elif objType == 'LAMP':
+    elif objType == 'LIGHT':
         return 'light'
 
     return 'dummy'
@@ -208,11 +178,11 @@ def get_mdl_base(obj=None, scene=None):
     """
     # Use first selected object as search context if none provided
     if obj is None and scene:
-        selected_objects = [o for o in scene.objects if o.select]
+        selected_objects = [o for o in scene.collection.objects if o.select_get()]
         if len(selected_objects):
             obj = selected_objects[0]
     elif obj is None and bpy.context and bpy.context.scene:
-        selected_objects = [o for o in bpy.context.scene.objects if o.select]
+        selected_objects = [o for o in bpy.context.scene.objects if o.select_get()]
         if len(selected_objects):
             obj = selected_objects[0]
     # 1. Check the object and its parents
@@ -233,7 +203,7 @@ def get_mdl_base(obj=None, scene=None):
 
 def get_fcurve(action, data_path, index=0, group_name=None):
     """Get the fcurve with specified properties or create one."""
-    fcu = action.fcurves.find(data_path, index)
+    fcu = action.fcurves.find(data_path, index=index)
     if not fcu:  # Create new Curve
         fcu = action.fcurves.new(data_path=data_path, index=index)
         if group_name:  # Add curve to group
@@ -478,76 +448,30 @@ def nwangle2euler(nwangle):
     return q.to_euler()
 
 
-def setMaterialAuroraAlpha(mat, alpha):
-    '''
-    if alpha < 1.0:
-        mat.use_transparency = True
-        tex = mat.active_texture
-        if tex:
-            mat.alpha = 0.0
-            tslotIdx = mat.active_texture_index
-            tslot    = mat.texture_slots[tslotIdx]
-            tslot.use_map_alpha = True
-            tslot.alpha_factor  = alpha
-        else:
-            mat.alpha = alpha
-    '''
-    mat.use_transparency = True
-    tex = mat.active_texture
-    if tex:
-        mat.alpha = 0.0
-        tslotIdx = mat.active_texture_index
-        tslot    = mat.texture_slots[tslotIdx]
-        tslot.use_map_alpha = True
-        tslot.alpha_factor  = alpha
-    else:
-        mat.alpha = alpha
-
-
-def getAuroraAlpha(obj):
-    '''
-    This will return
-        1. texture_slot.alpha_factor when there is a texture
-        2. material.alpha when there is no texture
-        3. 1.0 when there is no material
-    '''
-    mat = obj.active_material
-    if mat and mat.use_transparency:
-        tex = mat.active_texture
-        if tex:
-            tslotIdx = mat.active_texture_index
-            tslot    = mat.texture_slots[tslotIdx]
-            return tslot.alpha_factor
-        else:
-            return mat.alpha
-    else:
-        return 1.0
-
-
-def setupMinimapRender(mdlroot, scene, lamp_color = (1.0, 1.0, 1.0), alpha_mode = 'TRANSPARENT'):
-    # Create the lamp if not already present in scene
-    lampName = 'MinimapLamp'
+def setupMinimapRender(mdlroot, scene, light_color = (1.0, 1.0, 1.0), alpha_mode = 'TRANSPARENT'):
+    # Create the light if not already present in scene
+    lightName = 'MinimapLight'
     camName  = 'MinimapCamera'
 
-    if lampName in scene.objects:
-        minimapLamp = scene.objects[lampName]
+    if lightName in scene.objects:
+        minimapLight = scene.objects[lightName]
     else:
         # Check if present in db
-        if lampName in bpy.data.objects:
-            minimapLamp = bpy.data.objects[lampName]
+        if lightName in bpy.data.objects:
+            minimapLight = bpy.data.objects[lightName]
         else:
-            if lampName in bpy.data.lamps:
-                lampData = bpy.data.lamps[lampName]
+            if lightName in bpy.data.lights:
+                lightData = bpy.data.lights[lightName]
             else:
-                lampData = bpy.data.lamps.new(lampName, 'POINT')
-            minimapLamp = bpy.data.objects.new(lampName , lampData)
-        scene.objects.link(minimapLamp)
-    # Adjust lamp properties
-    minimapLamp.data.use_specular = False
-    minimapLamp.data.color        = lamp_color
-    minimapLamp.data.falloff_type = 'CONSTANT'
-    minimapLamp.data.distance     = (mdlroot.nvb.minimapzoffset+20.0)*2.0
-    minimapLamp.location.z        = mdlroot.nvb.minimapzoffset+20.0
+                lightData = bpy.data.lights.new(lightName, 'POINT')
+            minimapLight = bpy.data.objects.new(lightName , lightData)
+        scene.collection.objects.link(minimapLight)
+    # Adjust light properties
+    minimapLight.data.use_specular = False
+    minimapLight.data.color        = light_color
+    minimapLight.data.falloff_type = 'CONSTANT'
+    minimapLight.data.distance     = (mdlroot.nvb.minimapzoffset+20.0)*2.0
+    minimapLight.location.z        = mdlroot.nvb.minimapzoffset+20.0
 
     # Create the cam if not already present in scene
     if camName in scene.objects:
@@ -562,7 +486,7 @@ def setupMinimapRender(mdlroot, scene, lamp_color = (1.0, 1.0, 1.0), alpha_mode 
             else:
                 camData = bpy.data.cameras.new(camName)
             minimapCam = bpy.data.objects.new(camName, camData)
-        scene.objects.link(minimapCam)
+        scene.collection.objects.link(minimapCam)
     # Adjust cam properties
     minimapCam.data.type        = 'ORTHO'
     minimapCam.data.ortho_scale = 10.0
@@ -611,9 +535,9 @@ def copyAnimSceneCheck(theOriginal, newSuffix, oldSuffix = ''):
         return False
 
     objType = theOriginal.type
-    if (objType == 'LAMP'):
-        if newName in bpy.data.lamps:
-            print('Kotorblender: Duplicate lamp')
+    if (objType == 'LIGHT'):
+        if newName in bpy.data.lights:
+            print('Kotorblender: Duplicate light')
             return False
     elif (objType == 'MESH'):
         if theOriginal.animation_data:
@@ -668,10 +592,10 @@ def copyAnimScene(scene, theOriginal, newSuffix, oldSuffix = '', parent = None):
         theCopy.nvb.rawascii = ''
 
     # We need to copy the data for:
-    # - Lamps
+    # - Lights
     # - Meshes & materials when there are alphakeys
     objType = theOriginal.type
-    if (objType == 'LAMP'):
+    if (objType == 'LIGHT'):
         data         = theOriginal.data.copy()
         data.name    = newName
         theCopy.data = data
@@ -695,7 +619,7 @@ def copyAnimScene(scene, theOriginal, newSuffix, oldSuffix = '', parent = None):
             theCopy.animation_data.action = actionCopy
 
     # Link copy to the anim scene
-    scene.objects.link(theCopy)
+    scene.collection.objects.link(theCopy)
 
     # Convert all child objects too
     for child in theOriginal.children:
@@ -731,7 +655,7 @@ def renameAnimScene(obj, newSuffix, oldSuffix = ''):
     if obj.data:
         obj.data.name = newName
     # We need to copy the data for:
-    # - Lamps
+    # - Lights
     # - Meshes & materials when there are alphakeys
     objType = obj.type
     if (objType == 'MESH'):
@@ -807,3 +731,18 @@ def eulerFilter(currEul, prevEul):
         return flipEul
     else:
         return eul
+
+
+def floatToByte(val):
+    return int(val * 255)
+
+
+def intToHex(val):
+    return "{:02X}".format(val)
+
+
+def colorToHex(color):
+    return "{}{}{}".format(
+        intToHex(floatToByte(color[0])),
+        intToHex(floatToByte(color[1])),
+        intToHex(floatToByte(color[2])))

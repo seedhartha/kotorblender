@@ -18,7 +18,7 @@ class Keys():
         self.scale          = []
         self.selfillumcolor = []
         self.alpha          = []
-        # Lights/lamps
+        # Lights
         self.color  = []
         self.radius = []
         # Emitters
@@ -1226,13 +1226,13 @@ class Animnode():
             try:
                 getattr(obj, data_path)
             except:
-                #XXX hack to get lamp data to apply and show up on correct object
+                #XXX hack to get light data to apply and show up on correct object
                 #XXX no-go because Object has 'color'
                 use_action = nvb_utils.get_action(obj.data, options['mdlname'] + '.' + obj.name)
             '''
-            if obj.type == 'LAMP' and label in ['radius', 'color']:
+            if obj.type == 'LIGHT' and label in ['radius', 'color']:
                 use_action = nvb_utils.get_action(
-                    # Lamp object, not Object object
+                    # Light object, not Object object
                     obj.data,
                     options['mdlname'] + '.' + obj.name
                 )
@@ -1340,9 +1340,9 @@ class Animnode():
             samples = self.animverts[vertIdx::numVerts]
             for sampleIdx, co in enumerate(samples):
                 frame = frameStart + (sampleIdx * sampleDistance)
-                curveX.keyframe_points.insert(frame, co[0], kfOptions)
-                curveY.keyframe_points.insert(frame, co[1], kfOptions)
-                curveZ.keyframe_points.insert(frame, co[2], kfOptions)
+                curveX.keyframe_points.insert(frame, co[0], options=kfOptions)
+                curveY.keyframe_points.insert(frame, co[1], options=kfOptions)
+                curveZ.keyframe_points.insert(frame, co[2], options=kfOptions)
 
     def create_data_uv(self, obj, anim, animlength, options={}):
         """Import animated texture coordinates."""
@@ -1396,8 +1396,8 @@ class Animnode():
             samples = self.animtverts[tvertIdx::numTVerts]
             for sampleIdx, co in enumerate(samples):
                 frame = frameStart + (sampleIdx * sampleDistance)
-                curveU.keyframe_points.insert(frame, co[0], kfOptions)
-                curveV.keyframe_points.insert(frame, co[1], kfOptions)
+                curveU.keyframe_points.insert(frame, co[0], options=kfOptions)
+                curveV.keyframe_points.insert(frame, co[1], options=kfOptions)
 
     @staticmethod
     def create_restpose(obj, frame=1):
@@ -1406,7 +1406,7 @@ class Animnode():
             """TODO: DOC."""
             # dim = len(val)
             for j in range(dim):
-                kf = fcurves[j].keyframe_points.insert(frame, val[j], {'FAST'})
+                kf = fcurves[j].keyframe_points.insert(frame, val[j], options={'FAST'})
                 kf.interpolation = 'LINEAR'
         # Get animation data
         animData = obj.animation_data
@@ -1418,28 +1418,28 @@ class Animnode():
             return  # No action = no animation = no need for rest pose
         if obj.rotation_mode == 'AXIS_ANGLE':
             dp = 'rotation_axis_angle'
-            fcu = [action.fcurves.find(dp, i) for i in range(4)]
+            fcu = [action.fcurves.find(dp, index=i) for i in range(4)]
             if fcu.count(None) < 1:
                 rr = obj.nvb.restrot
                 insert_kfp(fcu, frame, [rr[3], rr[0], rr[1], rr[2]], 4)
         elif obj.rotation_mode == 'QUATERNION':
             dp = 'rotation_quaternion'
-            fcu = [action.fcurves.find(dp, i) for i in range(4)]
+            fcu = [action.fcurves.find(dp, index=i) for i in range(4)]
             if fcu.count(None) < 1:
                 rr = obj.nvb.restrot
                 q = mathutils.Quaternion((rr[0], rr[1], rr[2]), rr[3])
                 insert_kfp(fcu, frame, [q.w, q.x, q.y, q.z], 4)
         else:
             dp = 'rotation_euler'
-            fcu = [action.fcurves.find(dp, i) for i in range(3)]
+            fcu = [action.fcurves.find(dp, index=i) for i in range(3)]
             if fcu.count(None) < 1:
                 eul = mathutils.Quaternion(obj.nvb.restrot[:3],
                                            obj.nvb.restrot[3]).to_euler()
                 insert_kfp(fcu, frame, eul, 3)
-        fcu = [action.fcurves.find('location', i) for i in range(3)]
+        fcu = [action.fcurves.find('location', index=i) for i in range(3)]
         if fcu.count(None) < 1:
             insert_kfp(fcu, frame, obj.nvb.restloc, 3)
-        fcu = [action.fcurves.find('scale', i) for i in range(3)]
+        fcu = [action.fcurves.find('scale', index=i) for i in range(3)]
         if fcu.count(None) < 1:
             insert_kfp(fcu, frame, [obj.nvb.restscl] * 3, 3)
 

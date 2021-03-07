@@ -29,13 +29,13 @@ class KB_UL_anim_events(bpy.types.UIList):
         """Draw a single animation event."""
 
         if self.layout_type in {'DEFAULT', 'COMPACT'}:
-            split = layout.split(0.7, False)
+            split = layout.split(factor=0.7, align=False)
             split.prop(item, 'name', text='', emboss=False)
             row = split.row(align=True)
             row.prop(item, 'frame', text='', emboss=False)
         elif self.layout_type in {'GRID'}:
             layout.alignment = 'CENTER'
-            layout.label('', icon='LAMP')
+            layout.label('', icon='LIGHT')
 
 
 class KB_MT_animlist_specials(bpy.types.Menu):
@@ -89,8 +89,8 @@ class NVB_PT_animlist(bpy.types.Panel):
                               mdl_base.nvb, 'animListIdx',
                               rows=7)
             col = row.column(align=True)
-            col.operator('kb.anim_new', icon='ZOOMIN', text='')
-            col.operator('kb.anim_delete', icon='ZOOMOUT', text='')
+            col.operator('kb.anim_new', icon='ADD', text='')
+            col.operator('kb.anim_delete', icon='REMOVE', text='')
             col.separator()
             col.operator('kb.anim_move',
                          icon='TRIA_UP', text='').direction = 'UP'
@@ -126,8 +126,8 @@ class NVB_PT_animlist(bpy.types.Panel):
                                   anim, 'eventList',
                                   anim, 'eventListIdx')
                 col = row.column(align=True)
-                col.operator('kb.anim_event_new', text='', icon='ZOOMIN')
-                col.operator('kb.anim_event_delete', text='', icon='ZOOMOUT')
+                col.operator('kb.anim_event_new', text='', icon='ADD')
+                col.operator('kb.anim_event_delete', text='', icon='REMOVE')
                 col.separator()
                 col.operator('kb.anim_event_move',
                              icon='TRIA_UP', text='').direction = 'UP'
@@ -136,7 +136,7 @@ class NVB_PT_animlist(bpy.types.Panel):
             layout.separator()
 
 
-class NVB_UILIST_SMOOTHGROUPS(bpy.types.Panel):
+class NVB_PT_SMOOTHGROUPS(bpy.types.Panel):
     bl_label = "Smoothgroups"
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
@@ -240,7 +240,7 @@ class NVB_UILIST_SMOOTHGROUPS(bpy.types.Panel):
         row.operator_enum('nvb.smoothgroup_generate', 'action')
 
 
-class NVB_UILIST_LIGHTFLARES(bpy.types.UIList):
+class NVB_UL_LIGHTFLARES(bpy.types.UIList):
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
 
         custom_icon = 'NONE'
@@ -254,7 +254,7 @@ class NVB_UILIST_LIGHTFLARES(bpy.types.UIList):
             layout.label('', icon = custom_icon)
 
 
-class NVB_UILIST_ANIMEVENTS(bpy.types.UIList):
+class NVB_UL_ANIMEVENTS(bpy.types.UIList):
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
 
         custom_icon = 'NONE'
@@ -268,13 +268,12 @@ class NVB_UILIST_ANIMEVENTS(bpy.types.UIList):
             layout.label('', icon = custom_icon)
 
 
-class NVB_PANEL_EMPTY(bpy.types.Panel):
+class NVB_PT_EMPTY(bpy.types.Panel):
     '''
     Property panel for additional properties needed for the mdl file
     format. This is only available for EMPTY objects.
     It is located under the object data panel in the properties window
     '''
-    bl_idname = 'nvb.propertypanel.object'
     bl_label = 'Odyssey Dummy Properties'
     bl_space_type = 'PROPERTIES'
     bl_region_type = 'WINDOW'
@@ -306,7 +305,7 @@ class NVB_PANEL_EMPTY(bpy.types.Panel):
                 sub.prop(obj.nvb, 'animname', text = '')
                 row = box.row(align = True)
                 row.prop(obj.nvb, 'newanimname', text = 'Create')
-                row.operator('nvb.animscene_add', text = '', icon='ZOOMIN')
+                row.operator('nvb.animscene_add', text = '', icon='ADD')
 
                 sep = layout.separator()
 
@@ -368,7 +367,7 @@ class NVB_PANEL_EMPTY(bpy.types.Panel):
                 row = box.row(align = True)
                 row.prop(obj.nvb, 'newanimname', text = 'Rename/Copy')
                 row.operator('nvb.animscene_rename', text = '', icon='FILE_REFRESH')
-                row.operator('nvb.animscene_add', text = '', icon='ZOOMIN')
+                row.operator('nvb.animscene_add', text = '', icon='ADD')
                 row = box.row()
                 row.prop_search(obj.nvb, 'animroot', bpy.data, 'objects', text = 'Root')
                 row = box.row()
@@ -384,8 +383,8 @@ class NVB_PANEL_EMPTY(bpy.types.Panel):
                 row = box.row()
                 row.template_list('NVB_UILIST_ANIMEVENTS', 'The_List', obj.nvb, 'eventList', obj.nvb, 'eventListIdx')
                 col = row.column(align = True)
-                col.operator('nvb.animevent_new', text = '', icon='ZOOMIN')
-                col.operator('nvb.animevent_delete', text = '', icon='ZOOMOUT')
+                col.operator('nvb.animevent_new', text = '', icon='ADD')
+                col.operator('nvb.animevent_delete', text = '', icon='REMOVE')
                 col.separator()
                 col.operator('nvb.animevent_move', icon='TRIA_UP', text = '').direction = 'UP'
                 col.operator('nvb.animevent_move', icon='TRIA_DOWN', text = '').direction = 'DOWN'
@@ -420,15 +419,14 @@ class NVB_PANEL_EMPTY(bpy.types.Panel):
             row.prop(obj.nvb, 'dummysubtype')
 
 
-class NVB_PANEL_LIGHT(bpy.types.Panel):
+class NVB_PT_LIGHT(bpy.types.Panel):
     '''
-    Property panel for additional light or lamp properties. This
+    Property panel for additional light properties. This
     holds all properties not supported by blender at the moment,
     but used by OpenGL and the aurora engine. This is only available
-    for LAMP objects.
+    for LIGHT objects.
     It is located under the object data panel in the properties window
     '''
-    bl_idname = 'nvb.propertypanel.light'
     bl_label = 'Odyssey Light Properties'
     bl_space_type = 'PROPERTIES'
     bl_region_type = 'WINDOW'
@@ -436,7 +434,7 @@ class NVB_PANEL_LIGHT(bpy.types.Panel):
 
     @classmethod
     def poll(cls, context):
-        return (context.object and context.object.type == 'LAMP')
+        return (context.object and context.object.type == 'LIGHT')
 
     def draw(self, context):
         obj    = context.object
@@ -454,6 +452,10 @@ class NVB_PANEL_LIGHT(bpy.types.Panel):
         row.prop(obj.nvb, 'wirecolor', text='Wirecolor')
         row = box.row()
         row.prop(obj.nvb, 'lightpriority', text='Priority')
+        row = box.row()
+        row.prop(obj.nvb, 'radius', text='Radius')
+        row = box.row()
+        row.prop(obj.nvb, 'multiplier', text='Multiplier')
 
         split = box.split()
         col = split.column(align=True)
@@ -477,10 +479,10 @@ class NVB_PANEL_LIGHT(bpy.types.Panel):
         sub.prop(obj.nvb, 'flareradius', text='Radius')
         row = box.row()
         row.active = obj.nvb.lensflares
-        row.template_list('NVB_UILIST_LIGHTFLARES', 'The_List', obj.nvb, 'flareList', obj.nvb, 'flareListIdx')
+        row.template_list('NVB_UL_LIGHTFLARES', 'The_List', obj.nvb, 'flareList', obj.nvb, 'flareListIdx')
         col = row.column(align = True)
-        col.operator('nvb.lightflare_new', icon='ZOOMIN', text = '')
-        col.operator('nvb.lightflare_delete', icon='ZOOMOUT', text = '')
+        col.operator('nvb.lightflare_new', icon='ADD', text = '')
+        col.operator('nvb.lightflare_delete', icon='REMOVE', text = '')
         col.separator()
         col.operator('nvb.lightflare_move', icon='TRIA_UP', text = '').direction = 'UP'
         col.operator('nvb.lightflare_move', icon='TRIA_DOWN', text = '').direction = 'DOWN'
@@ -498,9 +500,8 @@ class NVB_PANEL_LIGHT(bpy.types.Panel):
             row.prop(item, 'position')
 
 
-class NVB_PANEL_TEXTURE(bpy.types.Panel):
+class NVB_PT_TEXTURE(bpy.types.Panel):
     """Texture properties panel, mostly for managing TXI files"""
-    bl_idname = 'nvb.propertypanel.texture'
     bl_label = 'Odyssey Texture Properties'
     bl_space_type = 'PROPERTIES'
     bl_region_type = 'WINDOW'
@@ -510,7 +511,7 @@ class NVB_PANEL_TEXTURE(bpy.types.Panel):
     def poll(cls, context):
         try:
             # yes for image textures
-            return context.object.active_material.active_texture.image
+            return context.texture.image
         except:
             return False
 
@@ -541,16 +542,16 @@ class NVB_PANEL_TEXTURE(bpy.types.Panel):
 
     def draw(self, context):
         layout = self.layout
-        texture = context.object.active_material.active_texture
+        texture = context.texture
         #print(dir(context))
         #print(dir(context.object))
-        self.layout.prop(context.object.active_material.active_texture.nvb, 'bumpmapped', text='Allow Normal Mapping')
+        self.layout.prop(texture.nvb, 'bumpmapped', text='Allow Normal Mapping')
         #self.layout.prop(context.object.nvb, 'bumpmapped', text='Bumpmapped')
 
         # TXI file operations
         row = layout.row(align=True)
-        row.operator('nvb.texture_info_io', text=" Import", icon='FILESEL').action = 'LOAD'
-        row.operator('nvb.texture_info_io', text=" Export", icon='SAVE_COPY').action = 'SAVE'
+        row.operator('nvb.texture_info_io', text=" Import", icon='IMPORT').action = 'LOAD'
+        row.operator('nvb.texture_info_io', text=" Export", icon='EXPORT').action = 'SAVE'
 
         # Texture type
         if len(texture.nvb.modified_properties):
@@ -655,13 +656,12 @@ class NVB_PANEL_TEXTURE(bpy.types.Panel):
             #box.prop(texture.nvb, 'upperleftcoords')
             #box.prop(texture.nvb, 'lowerrightcoords')
 
-class NVB_PANEL_EMITTER(bpy.types.Panel):
+class NVB_PT_EMITTER(bpy.types.Panel):
     '''
     Property panel for additional properties needed for the mdl file
     format. This is only available for particle systems.
     It is located under the particle panel in the properties window
     '''
-    bl_idname      = 'nvb.propertypanel.emitter'
     bl_label       = 'Odyssey Emitter Properties'
     bl_space_type  = 'PROPERTIES'
     bl_region_type = 'WINDOW'
@@ -938,7 +938,7 @@ class NVB_PANEL_EMITTER(bpy.types.Panel):
         box = layout.row().box()
         row = box.row()
         #row.alignment = 'CENTER'
-        row.label(text="Advanced", icon='SCRIPTWIN')
+        row.label(text="Advanced", icon='PREFERENCES')
 
         # Lightning
         parent_box = box
@@ -1117,7 +1117,7 @@ class NVB_PANEL_EMITTER(bpy.types.Panel):
         '''
 
 
-class NVB_PANEL_MESH(bpy.types.Panel):
+class NVB_PT_MESH(bpy.types.Panel):
     '''
     Property panel for additional mesh properties. This
     holds all properties not supported by blender at the moment,
@@ -1125,7 +1125,6 @@ class NVB_PANEL_MESH(bpy.types.Panel):
     for MESH objects.
     It is located under the object data panel in the properties window
     '''
-    bl_idname = 'nvb.propertypanel.mesh'
     bl_label = 'Odyssey Mesh Properties'
     bl_space_type = 'PROPERTIES'
     bl_region_type = 'WINDOW'
@@ -1206,6 +1205,8 @@ class NVB_PANEL_MESH(bpy.types.Panel):
             row.label(text = 'Smoothgroups')
             row.prop(obj.nvb, 'smoothgroup', text='Smooth Group', expand = True)
 
+            # TODO: not applicable to Blender 2.8+?
+            '''
             try:
                 row = box.row()
                 row.prop(obj.active_material.active_texture.nvb, 'bumpmapped', text='Bumpmapped Texture')
@@ -1213,6 +1214,7 @@ class NVB_PANEL_MESH(bpy.types.Panel):
                 row.label(text = '(Warning: Affects all objects using texture)')
             except:
                 pass
+            '''
 
             # Additional props for danglymeshes
             if (obj.nvb.meshtype == nvb_def.Meshtype.DANGLYMESH):
@@ -1241,7 +1243,7 @@ class NVB_PANEL_MESH(bpy.types.Panel):
                 row.label(text = 'Create vertex group: ')
                 row = box.row(align = True)
                 row.prop_search(obj.nvb, 'skingroup_obj', context.scene, 'objects')
-                row.operator('nvb.skingroup_add', text = '', icon='ZOOMIN')
+                row.operator('nvb.skingroup_add', text = '', icon='ADD')
 
             # Additional props for aabb walkmeshes
             elif (obj.nvb.meshtype == nvb_def.Meshtype.AABB):

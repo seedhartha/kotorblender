@@ -15,7 +15,7 @@ class NVBCHILDREN_SMOOTHGROUP(bpy.types.Operator):
     #bl_property = 'action'
     bl_options = {'UNDO'}
 
-    action = bpy.props.StringProperty()
+    action : bpy.props.StringProperty()
 
     def execute(self, context):
         descendants = nvb_utils.searchNodeAll(
@@ -31,8 +31,8 @@ class NVBSMOOTHGROUP_TOGGLE(bpy.types.Operator):
     bl_label = "Smoothgroup toggle"
     bl_options = {'UNDO'}
 
-    sg_number = bpy.props.IntProperty()
-    activity = bpy.props.IntProperty(default=0)
+    sg_number : bpy.props.IntProperty()
+    activity : bpy.props.IntProperty(default=0)
 
     def execute(self, context):
         bm = bmesh.from_edit_mesh(context.object.data)
@@ -60,7 +60,7 @@ class NVBSMOOTHGROUP_GENERATE(bpy.types.Operator):
     bl_label = "Smoothgroup generate"
     bl_options = {'UNDO'}
 
-    action = bpy.props.EnumProperty(items=(
+    action : bpy.props.EnumProperty(items=(
         ('ALL', 'All Faces', 'Generate smoothgroups for all faces, replacing current values'),
         ('EMPTY', 'Empty Faces', 'Generate smoothgroups for all faces without current assignments'),
         ('SEL', 'Selected Faces', 'Generate smoothgroups for all selected faces, replacing current values')
@@ -81,7 +81,7 @@ class NVBSMOOTHGROUP_GENERATE(bpy.types.Operator):
         # get, or create, the smoothgroups data layer on the object mesh (not the copy)
         sg_list = ob.data.polygon_layers_int.get(nvb_def.sg_layer_name)
         if sg_list is None:
-            sg_list = ob.data.polygon_layers_int.new(nvb_def.sg_layer_name)
+            sg_list = ob.data.polygon_layers_int.new(name=nvb_def.sg_layer_name)
         #ob.data.update()
         #mesh.calc_tessface()
 
@@ -115,13 +115,14 @@ class NVBSMOOTHGROUP_SELECT(bpy.types.Operator):
     #bl_property = 'action'
     bl_options = {'UNDO'}
 
-    sg_number = bpy.props.IntProperty()
-    action = bpy.props.EnumProperty(items=(
+    sg_number : bpy.props.IntProperty()
+    action : bpy.props.EnumProperty(items=(
         ('SEL', 'Select', 'Select faces with this smoothgroup'),
         ('DESEL', 'Deselect', 'Deselect faces with this smoothgroup')
     ))
 
-    def description(self, context):
+    @classmethod
+    def description(self, context, properties):
         if self.action == 'SEL':
             return "Select faces with this smoothgroup"
         else:
@@ -155,19 +156,19 @@ class NVBTEXTURE_IO(bpy.types.Operator):
     bl_property = 'action'
     bl_options = {'UNDO'}
 
-    action = bpy.props.EnumProperty(items=(
+    action : bpy.props.EnumProperty(items=(
         ('LOAD', 'Load', 'Import TXI file for this texture'),
         ('SAVE', 'Save', 'Export TXI file for this texture')
     ))
 
     def execute(self, context):
         if self.action == 'SAVE':
-            nvb_txi.saveTxi(context.object.active_material.active_texture, self)
-            #if nvb_txi.saveTxi(context.object.active_material.active_texture):
+            nvb_txi.saveTxi(context.texture, self)
+            #if nvb_txi.saveTxi(context.texture):
             #    self.report({'INFO'}, 'Successfully saved TXI file')
         else:
-            nvb_txi.loadTxi(context.object.active_material.active_texture, self)
-            #if nvb_txi.loadTxi(context.object.active_material.active_texture):
+            nvb_txi.loadTxi(context.texture, self)
+            #if nvb_txi.loadTxi(context.texture):
             #    self.report({'INFO'}, 'Successfully loaded TXI file')
         return {'FINISHED'}
 
@@ -177,13 +178,13 @@ class NVBTEXTURE_BOX_OPS(bpy.types.Operator):
     bl_label = "Box Controls"
     bl_description = "Show/hide this property list"
 
-    boxname = bpy.props.StringProperty(default='')
+    boxname : bpy.props.StringProperty(default='')
 
     def execute(self, context):
         if self.boxname == '':
             return {'FINISHED'}
         attrname = 'box_visible_' + self.boxname
-        texture = context.object.active_material.active_texture
+        texture = context.texture
         current_state = getattr(texture.nvb, attrname)
         setattr(texture.nvb, attrname, not current_state)
         return {'FINISHED'}
@@ -267,11 +268,11 @@ class NVBTEXTURE_OPS(bpy.types.Operator):
     bl_property = 'action'
     bl_options = {'UNDO'}
 
-    action = bpy.props.EnumProperty(items=(
+    action : bpy.props.EnumProperty(items=(
         ('RESET', 'Reset', 'Reset the property to default value. This will prevent it from being written to TXI file output.'),
         ('NYI', 'Other', '')
     ))
-    propname = bpy.props.StringProperty(default='')
+    propname : bpy.props.StringProperty(default='')
 
     def execute(self, context):
         if self.propname == '':
@@ -288,7 +289,7 @@ class NVBTEXTURE_OPS(bpy.types.Operator):
             #attr_def = getattr(bpy.types.ImageTexture.nvb[1], self.propname)[1]['default']
             attr_def = getattr(bpy.types.ImageTexture.nvb[1]['type'], self.propname)[1]
             if 'default' in attr_def:
-                setattr(context.object.active_material.active_texture.nvb, self.propname, attr_def['default'])
+                setattr(context.texture.nvb, self.propname, attr_def['default'])
         return {'FINISHED'}
 
 class NVB_LIST_OT_LightFlare_New(bpy.types.Operator):
@@ -298,7 +299,7 @@ class NVB_LIST_OT_LightFlare_New(bpy.types.Operator):
     bl_label  = 'Add a new flare to a light'
 
     def execute(self, context):
-        if (context.object.type == 'LAMP'):
+        if (context.object.type == 'LIGHT'):
             context.object.nvb.flareList.add()
 
         return{'FINISHED'}
@@ -332,7 +333,7 @@ class NVB_LIST_OT_LightFlare_Move(bpy.types.Operator):
     bl_idname = 'nvb.lightflare_move'
     bl_label  = 'Move an item in the flare list'
 
-    direction = bpy.props.EnumProperty(items=(('UP', 'Up', ''), ('DOWN', 'Down', '')))
+    direction : bpy.props.EnumProperty(items=(('UP', 'Up', ''), ('DOWN', 'Down', '')))
 
     @classmethod
     def poll(self, context):
@@ -410,7 +411,7 @@ class NVB_LIST_OT_AnimEvent_Move(bpy.types.Operator):
     bl_idname = 'nvb.animevent_move'
     bl_label  = 'Move an item in the event  list'
 
-    direction = bpy.props.EnumProperty(items=(('UP', 'Up', ''), ('DOWN', 'Down', '')))
+    direction : bpy.props.EnumProperty(items=(('UP', 'Up', ''), ('DOWN', 'Down', '')))
 
     @classmethod
     def poll(self, context):
@@ -456,39 +457,39 @@ class NVB_OP_Import(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
     bl_options = {'UNDO'}
 
     filename_ext = '.mdl'
-    filter_glob = bpy.props.StringProperty(
+    filter_glob : bpy.props.StringProperty(
             default = '*.mdl;*.mdl.ascii',
             options = {'HIDDEN'},
             )
 
-    importGeometry = bpy.props.BoolProperty(
+    importGeometry : bpy.props.BoolProperty(
             name = 'Import Geometry',
             description = 'Disable if only animations are needed',
             default = True)
 
-    importWalkmesh = bpy.props.BoolProperty(
+    importWalkmesh : bpy.props.BoolProperty(
             name = 'Import Walkmesh',
             description = 'Attempt to load placeable and door walkmeshes',
             default = True)
 
-    importSmoothGroups = bpy.props.BoolProperty(
-            name = 'Import smooth groups',
+    importSmoothGroups : bpy.props.BoolProperty(
+            name = 'Import Smooth Groups',
             description = 'Import smooth groups as sharp edges',
             default = True)
 
-    importAnim = bpy.props.BoolProperty(
-            name = 'Import animations',
+    importAnim : bpy.props.BoolProperty(
+            name = 'Import Animations',
             description = 'Import animations',
             default = True)
 
-    materialMode = bpy.props.EnumProperty(
+    materialMode : bpy.props.EnumProperty(
             name = 'Materials',
             items = (('NON', 'None', 'Don\'t create materials or import textures'),
                      ('SIN', 'Single', 'Create only one material per texture, shared between objects'),
                      ('MUL', 'Multiple', 'Create a seperate material for each object')),
             default = 'SIN')
 
-    textureSearch = bpy.props.BoolProperty(
+    textureSearch : bpy.props.BoolProperty(
             name='Image search',
             description='Search for images in subdirectories' \
                         ' (Warning, may be slow)',
@@ -496,14 +497,14 @@ class NVB_OP_Import(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
             )
 
     # Hidden option, only used for batch minimap creation
-    minimapMode = bpy.props.BoolProperty(
+    minimapMode : bpy.props.BoolProperty(
             name = 'Minimap Mode',
             description = 'Ignore lights and walkmeshes',
             default = False,
             options = {'HIDDEN'},
             )
 
-    minimapSkipFade = bpy.props.BoolProperty(
+    minimapSkipFade : bpy.props.BoolProperty(
             name = 'Minimap Mode: Import Fading Objects',
             description = 'Ignore fading objects',
             default = False,
@@ -524,12 +525,12 @@ class NVB_OP_Export(bpy.types.Operator, bpy_extras.io_utils.ExportHelper):
     bl_label  = 'Export Odyssey MDL'
 
     filename_ext = '.mdl'
-    filter_glob = bpy.props.StringProperty(
+    filter_glob : bpy.props.StringProperty(
             default = '*.mdl;*.mdl.ascii',
             options = {'HIDDEN'},
             )
 
-    exports = bpy.props.EnumProperty(
+    exports : bpy.props.EnumProperty(
             name = 'Export',
             options = {'ENUM_FLAG'},
             items = (('ANIMATION', 'Animations', 'Export animations'),
@@ -538,24 +539,24 @@ class NVB_OP_Export(bpy.types.Operator, bpy_extras.io_utils.ExportHelper):
             default = {'ANIMATION', 'WALKMESH'},
             )
 
-    exportSmoothGroups = bpy.props.BoolProperty(
-            name='Export Smooth groups',
+    exportSmoothGroups : bpy.props.BoolProperty(
+            name='Export Smooth Groups',
             description='Generate smooth groups from sharp edges' \
                         '(When disabled every face belongs to the same group)',
-            default=True,
+            default=True
             )
 
-    exportTxi = bpy.props.BoolProperty(
+    exportTxi : bpy.props.BoolProperty(
             name='Export TXI files',
             description='Create TXI files containing the texture properties' \
                         '(When disabled, TXI files can be exported manually)',
             default=True,
             )
 
-    applyModifiers = bpy.props.BoolProperty(
+    applyModifiers : bpy.props.BoolProperty(
             name='Apply Modifiers',
             description='Apply Modifiers before exporting',
-            default=True,
+            default=True
             )
 
     def execute(self, context):
@@ -616,7 +617,7 @@ class NVBOBJECT_OT_RenderMinimap(bpy.types.Operator):
 
     def execute(self, context):
         '''
-        - Creates an camera and a lamp
+        - Creates an camera and a light
         - Renders Minimap
         '''
         obj   = context.object
@@ -649,7 +650,7 @@ class NVBOBJECT_OT_SkingroupAdd(bpy.types.Operator):
         if skingrName:
             if (skingrName not in obj.vertex_groups.keys()):
                 # Create the vertex group
-                vertGroup = obj.vertex_groups.new(skingrName)
+                vertGroup = obj.vertex_groups.new(name=skingrName)
                 obj.nvb.skingroup_obj = ''
 
                 self.report({'INFO'}, 'Created vertex group ' + skingrName)
