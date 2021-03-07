@@ -88,7 +88,7 @@ class NVB_OT_anim_scale(bpy.types.Operator):
     bl_idname = 'kb.anim_scale'
     bl_label = 'Scale animation'
 
-    scaleFactor = bpy.props.FloatProperty(name='scale',
+    scaleFactor : bpy.props.FloatProperty(name='scale',
                                           description='Scale the animation',
                                           min=0.1,
                                           default=1.0)
@@ -231,11 +231,11 @@ class NVB_OT_anim_crop(bpy.types.Operator):
     bl_idname = 'kb.anim_crop'
     bl_label = 'Crop animation'
 
-    cropFront = bpy.props.IntProperty(
+    cropFront : bpy.props.IntProperty(
                     name='cropFront',
                     min=0,
                     description='Insert Frames before the first keyframe')
-    cropBack = bpy.props.IntProperty(
+    cropBack : bpy.props.IntProperty(
                     name='cropBack',
                     min=0,
                     description='Insert Frames after the last keyframe')
@@ -366,11 +366,11 @@ class NVB_OT_anim_pad(bpy.types.Operator):
     bl_idname = 'kb.anim_pad'
     bl_label = 'Pad animation'
 
-    pad_front = bpy.props.IntProperty(
+    pad_front : bpy.props.IntProperty(
                     name='Pad Front',
                     min=0,
                     description='Insert Frames before the first keyframe')
-    pad_back = bpy.props.IntProperty(
+    pad_back : bpy.props.IntProperty(
                     name='Pad Back',
                     min=0,
                     description='Insert Frames after the last keyframe')
@@ -662,7 +662,7 @@ class NVB_OT_anim_move(bpy.types.Operator):
     bl_label = 'Move an animation in the list, without affecting keyframes'
     bl_options = {'UNDO'}
 
-    direction = bpy.props.EnumProperty(items=(('UP', 'Up', ''),
+    direction : bpy.props.EnumProperty(items=(('UP', 'Up', ''),
                                               ('DOWN', 'Down', '')))
 
     @classmethod
@@ -770,7 +770,7 @@ class NVB_OT_anim_event_move(bpy.types.Operator):
     bl_label = 'Move an item in the event  list'
     bl_options = {'UNDO'}
 
-    direction = bpy.props.EnumProperty(items=(('UP', 'Up', ''),
+    direction : bpy.props.EnumProperty(items=(('UP', 'Up', ''),
                                               ('DOWN', 'Down', '')))
 
     @classmethod
@@ -870,7 +870,7 @@ class NVB_OT_amt_event_delete(bpy.types.Operator):
             action = obj.animation_data.action
             # Remove the current data path for that idx
             data_path = 'nvb.amt_event_list[' + str(event_id) + '].fire'
-            fcu = action.fcurves.find(data_path, 0)
+            fcu = action.fcurves.find(data_path, index=0)
             if fcu:
                 action.fcurves.remove(fcu)
 
@@ -883,7 +883,7 @@ class NVB_OT_amt_event_delete(bpy.types.Operator):
             dp_suffix = '].fire'
             for ev_id in event_id_list:
                 data_path = dp_prefix + str(ev_id) + dp_suffix
-                fcu = action.fcurves.find(data_path, 0)
+                fcu = action.fcurves.find(data_path, index=0)
                 if fcu:
                     fcu.data_path = dp_prefix + str(ev_id-1) + dp_suffix
 

@@ -134,7 +134,6 @@ def saveMdl(operator,
     nvb_glob.exportSmoothGroups = exportSmoothGroups
     nvb_glob.exportTxi          = exportTxi
     nvb_glob.applyModifiers     = applyModifiers
-    nvb_glob.scene              = bpy.context.scene
     # temporary forced options:
     frame_set_zero              = True
 
