@@ -557,10 +557,6 @@ class Trimesh(GeometryNode):
         mesh.polygons.foreach_set('loop_start', range(0, 3 * num_faces, 3))
         mesh.polygons.foreach_set('loop_total', (3,) * num_faces)
 
-        # Special handling for converted sabermesh
-        if name.startswith('2081__'):
-            mesh.show_double_sided = True
-
         # Special handling for mesh in walkmesh files
         if self.roottype in ['pwk', 'dwk', 'wok']:
             # Create walkmesh materials
@@ -1130,7 +1126,6 @@ class Lightsaber(Trimesh):
     def createMesh(self, name):
             # Create the mesh itself
             mesh = Trimesh.createMesh(self, name)
-            mesh.show_double_sided = True
             return mesh
 
 
