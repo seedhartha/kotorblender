@@ -568,15 +568,14 @@ class Trimesh(GeometryNode):
                     material = bpy.data.materials[matName]
                 else:
                     material = bpy.data.materials.new(matName)
-                    material.diffuse_color      = wokMat[1]
-                    material.diffuse_intensity  = 1.0
+                    material.diffuse_color      = [*wokMat[1], 1.0]
                     material.specular_color     = (0.0,0.0,0.0)
                     material.specular_intensity = wokMat[2]
                 mesh.materials.append(material)
 
             # Apply the walkmesh materials to each face
-            for idx, face in enumerate(mesh.tessfaces):
-                face.material_index = self.facelist.matId[idx]
+            for idx, polygon in enumerate(mesh.polygons):
+                polygon.material_index = self.facelist.matId[idx]
 
         # Create material
         if nvb_glob.materialMode != 'NON' and self.roottype == 'mdl' and num_faces > 0:
