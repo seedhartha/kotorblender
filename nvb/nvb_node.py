@@ -748,7 +748,7 @@ class Trimesh(GeometryNode):
 
                 texture = nvb_teximage.get_texture_by_image(diffuse)
                 if texture:
-                    tangentspace = texture.nvb.bumpmapped
+                    tangentspace = 1 if texture.nvb.bumpmapped else 0
                     if nvb_glob.exportTxi and not texture.nvb.exported_in_save:
                         nvb_txi.saveTxi(texture)
                         # set this to prevent multiple export of TXI in mdl save
