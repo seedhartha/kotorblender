@@ -613,7 +613,7 @@ class Xwk(Mdl):
                 # remove pre-existing nodes that were added as part of a model
                 if node.name in scene.objects:
                     obj = scene.objects[node.name]
-                    scene.objects.unlink(obj)
+                    scene.collection.objects.unlink(obj)
                     bpy.data.objects.remove(obj)
                 obj = node.addToScene(scene)
                 # Check if such an object exists
