@@ -475,6 +475,8 @@ class Node():
         action.use_fake_user = True
 
         # If there is a texture, use texture alpha for animations
+        # TODO: upgrade for Blender 2.8+
+        '''
         if targetMaterial.active_texture:
             # Material has a texture
             # data_path = material.texture_slots[x].alpha_factor
@@ -484,6 +486,8 @@ class Node():
             # No texture.
             # data_path = material.alpha
             curve = action.fcurves.new(data_path='alpha')
+        '''
+        curve = action.fcurves.new(data_path='alpha')
 
         if self.keys.alpha:
             for index, key in enumerate(self.keys.alpha):
@@ -1139,6 +1143,8 @@ class Animnode():
 
         def data_conversion(label, mat, vals):
             if label == 'alpha':
+                # TODO: upgrade for Blender 2.8+
+                '''
                 if mat.active_texture:
                     # Material has a texture
                     tslotIdx = mat.active_texture_index
@@ -1148,6 +1154,10 @@ class Animnode():
                     # No texture
                     dp = 'alpha'
                     dp_dim = 1
+                '''
+                dp = 'alpha'
+                dp_dim = 1
+
             return vals, dp, dp_dim
 
         mat = obj.active_material
