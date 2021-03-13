@@ -1945,18 +1945,17 @@ class Aabb(Trimesh):
             self.addAABBToAscii(obj, asciiLines)
 
 
-    def createMesh(self, name):
+    def createMesh(self, name):        
         # Create the mesh itself
         mesh = bpy.data.meshes.new(name)
-        a_bmesh = bmesh.new(use_operators=False)
-        for co in self.verts:
-            a_bmesh.verts.new(co)
-        a_bmesh.verts.ensure_lookup_table()
-        for indices in self.facelist.faces:
-            face_verts = [a_bmesh.verts[i] for i in indices]
-            a_bmesh.faces.new((*face_verts, ))
-        a_bmesh.to_mesh(mesh)
-        a_bmesh.free()
+        mesh.vertices.add(len(self.verts))
+        mesh.vertices.foreach_set('co', unpack_list(self.verts))
+        num_faces = len(self.facelist.faces)
+        mesh.loops.add(3 * num_faces)
+        mesh.loops.foreach_set('vertex_index', unpack_list(self.facelist.faces))
+        mesh.polygons.add(num_faces)
+        mesh.polygons.foreach_set('loop_start', range(0, 3 * num_faces, 3))
+        mesh.polygons.foreach_set('loop_total', (3,) * num_faces)
 
         # Create materials
         for wokMat in nvb_def.wok_materials:
