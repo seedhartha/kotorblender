@@ -1945,7 +1945,7 @@ class Aabb(Trimesh):
             self.addAABBToAscii(obj, asciiLines)
 
 
-    def createMesh(self, name):        
+    def createMesh(self, name):
         # Create the mesh itself
         mesh = bpy.data.meshes.new(name)
         mesh.vertices.add(len(self.verts))
@@ -1975,6 +1975,7 @@ class Aabb(Trimesh):
         for idx, polygon in enumerate(mesh.polygons):
             polygon.material_index = self.facelist.matId[idx]
 
+        mesh.update()
         return mesh
 
 
