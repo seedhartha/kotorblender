@@ -1252,6 +1252,8 @@ class NVB_PT_MESH(bpy.types.Panel):
                 row = layout.row()
                 box = row.box()
                 row = box.row()
+                row.prop(obj.nvb, 'lytposition', text='LYT Position')
+                row = box.row()
                 row.operator('nvb.load_wok_mats', text = 'Load walkmesh materials', icon='NONE')
                 row = box.row()
                 row.label(text = '(Warning: Removes current materials)')
