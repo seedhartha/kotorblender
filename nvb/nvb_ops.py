@@ -598,8 +598,7 @@ class LoadWokMaterials(bpy.types.Operator):
                 else:
                     mat = bpy.data.materials.new(matName)
 
-                    mat.diffuse_color      = matDef[1]
-                    mat.diffuse_intensity  = 1.0
+                    mat.diffuse_color      = [*matDef[1], 1.0]
                     mat.specular_color     = (0.0,0.0,0.0)
                     mat.specular_intensity = matDef[2]
 
