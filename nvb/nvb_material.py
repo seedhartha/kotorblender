@@ -39,28 +39,44 @@ def load_material(node, name):
 
     material = bpy.data.materials.new(material_name)
 
-    # Diffuse texture
-    if not nvb_utils.isNull(node.bitmap):
+    if (not nvb_utils.isNull(node.bitmap)) or (not nvb_utils.isNull(node.bitmap2)):
         material.use_nodes = True
         links = material.node_tree.links
         links.clear()
         nodes = material.node_tree.nodes
         nodes.clear()
 
-        diffuse = nodes.new('ShaderNodeTexImage')
-        diffuse.location = (300, 0)
-        diffuse.image = nvb_teximage.load_texture_image(node.bitmap, node.tangentspace == 1)
-
         mul_alpha = nodes.new('ShaderNodeMath')
         mul_alpha.location = (600, -300)
         mul_alpha.operation = 'MULTIPLY'
+        mul_alpha.inputs[0].default_value = 1.0
         mul_alpha.inputs[1].default_value = node.alpha
 
         bsdf = nodes.new('ShaderNodeBsdfPrincipled')
         bsdf.location = (900, 0)
 
+        links.new(bsdf.inputs['Alpha'], mul_alpha.outputs[0])
+
         output = nodes.new('ShaderNodeOutputMaterial')
         output.location = (1200, 0)
+
+        links.new(output.inputs[0], bsdf.outputs[0])
+
+        mul_diffuse_by_lightmap = nodes.new('ShaderNodeVectorMath')
+        mul_diffuse_by_lightmap.location = (600, 0)
+        mul_diffuse_by_lightmap.operation = 'MULTIPLY'
+        mul_diffuse_by_lightmap.inputs[0].default_value = [1.0] * 3
+        mul_diffuse_by_lightmap.inputs[1].default_value = [1.0] * 3
+
+        links.new(bsdf.inputs['Base Color'], mul_diffuse_by_lightmap.outputs[0])
+
+        # Diffuse texture
+        if not nvb_utils.isNull(node.bitmap):
+            diffuse = nodes.new('ShaderNodeTexImage')
+            diffuse.location = (300, 0)
+            diffuse.image = nvb_teximage.load_texture_image(node.bitmap, node.tangentspace == 1)
+            links.new(mul_diffuse_by_lightmap.inputs[0], diffuse.outputs[0])
+            links.new(mul_alpha.inputs[0], diffuse.outputs[1])
 
         # Lightmap texture
         if not nvb_utils.isNull(node.bitmap2):
@@ -74,20 +90,8 @@ def load_material(node, name):
             lightmap.location = (300, -300)
             lightmap.image = nvb_teximage.load_image(node.bitmap2)
 
-            mul_diffuse_by_lightmap = nodes.new('ShaderNodeVectorMath')
-            mul_diffuse_by_lightmap.location = (600, 0)
-            mul_diffuse_by_lightmap.operation = 'MULTIPLY'
-
             links.new(lightmap.inputs[0], lightmap_uv.outputs[0])
-            links.new(mul_diffuse_by_lightmap.inputs[0], diffuse.outputs[0])
             links.new(mul_diffuse_by_lightmap.inputs[1], lightmap.outputs[0])
-            links.new(bsdf.inputs['Base Color'], mul_diffuse_by_lightmap.outputs[0])
-        else:
-            links.new(bsdf.inputs['Base Color'], diffuse.outputs[0])
-
-        links.new(mul_alpha.inputs[0], diffuse.outputs[1])
-        links.new(bsdf.inputs['Alpha'], mul_alpha.outputs[0])
-        links.new(bsdf.outputs[0], output.inputs[0])
     else:
         material.diffuse_color = [*node.diffuse, 1.0]
 

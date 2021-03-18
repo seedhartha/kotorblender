@@ -869,14 +869,18 @@ class Trimesh(GeometryNode):
 
         # Add faces and corresponding tverts and shading groups
         smgroups_layer = mesh.polygon_layers_int.get(nvb_def.sg_layer_name)
+
+        uv_layer = None
+        uv_layer_lm = None
         if len(mesh.uv_layers) > 0:
-            uv_layer = mesh.uv_layers[0]
-        else:
-            uv_layer = None
-        if len(mesh.uv_layers) > 1:
+            # AABB nodes only have lightmap UV
+            if mesh.uv_layers[0].name.endswith('_lm'):
+                uv_layer_lm = mesh.uv_layers[0]
+            else:
+                uv_layer = mesh.uv_layers[0]
+        if uv_layer_lm is None and len(mesh.uv_layers) > 1:
             uv_layer_lm = mesh.uv_layers[1]
-        else:
-            uv_layer_lm = None
+
         for i in range(len(mesh.polygons)):
             polygon = mesh.polygons[i]
             smGroup = smoothGroups[i]
@@ -1938,11 +1942,29 @@ class Aabb(Trimesh):
                                            str(round(color[1], 2)) + ' ' +
                                            str(round(color[2], 2))  )
         asciiLines.append('  ambient 1.0 1.0 1.0')
-        asciiLines.append('  diffuse 1.0 1.0 1.0')
-        asciiLines.append('  bitmap NULL')
+        self.addMaterialDataToAscii(obj, asciiLines)
         Trimesh.addMeshDataToAscii(self, obj, asciiLines, simple)
         if self.roottype != 'wok':
             self.addAABBToAscii(obj, asciiLines)
+
+
+    def addMaterialDataToAscii(self, obj, asciiLines):
+        asciiLines.append('  diffuse 1.0 1.0 1.0')
+
+        lm_image_name = nvb_def.null
+        if obj.nvb.lightmapped:
+            # AABB nodes have multiple materials - select the last one
+            output = nvb_material.get_output_material_node(obj.material_slots[-1].material)
+            shader = nvb_material.get_bsdf_principled_node(output)
+            lightmap = nvb_material.get_lightmap_image(shader)
+            if lightmap:
+                lm_image_name = nvb_utils.getImageFilename(lightmap)
+
+        asciiLines.append('  bitmap ' + nvb_def.null)
+        asciiLines.append('  bitmap2 ' + lm_image_name)
+
+        lightmapped = 1 if lm_image_name != nvb_def.null else 0
+        asciiLines.append('  lightmapped ' + str(lightmapped))
 
 
     def createMesh(self, name):
@@ -1974,6 +1996,27 @@ class Aabb(Trimesh):
         # Apply the walkmesh materials to each face
         for idx, polygon in enumerate(mesh.polygons):
             polygon.material_index = self.facelist.matId[idx]
+
+        # Create material
+        if nvb_glob.materialMode != 'NON' and self.roottype == 'mdl' and num_faces > 0:
+            material = nvb_material.load_material(self, name)
+            mesh.materials.append(material)
+
+            # Create UV map
+            if len(self.tverts) > 0:
+                uv = unpack_list([self.tverts[i] for indices in self.facelist.uvIdx for i in indices])
+                uv_layer = mesh.uv_layers.new(name=name+'.uv', do_init=False)
+                uv_layer.data.foreach_set('uv', uv)
+
+            # Create lightmap UV map
+            if len(self.tverts1) > 0:
+                if len(self.texindices1) > 0:
+                    uv = unpack_list([self.tverts1[i] for indices in self.texindices1 for i in indices])
+                else:
+                    uv = unpack_list([self.tverts1[i] for indices in self.facelist.uvIdx for i in indices])
+
+                uv_layer = mesh.uv_layers.new(name=name+'_lm.uv', do_init=False)
+                uv_layer.data.foreach_set('uv', uv)
 
         mesh.update()
         return mesh
