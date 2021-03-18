@@ -117,7 +117,10 @@ def _load_lyt(filepath, importWalkmesh):
     (path, _) = os.path.split(filepath)
 
     for room in rooms:
-        mdl_path = os.path.join(path, room[0] + '-ascii.mdl')
+        # MDLedit appends .ascii extension to decompiled models - try that first
+        mdl_path = os.path.join(path, room[0] + '.mdl.ascii')
+        if not os.path.exists(mdl_path):
+            mdl_path = os.path.join(path, room[0] + '-ascii.mdl')
         if os.path.exists(mdl_path):
             _load_mdl(mdl_path, importWalkmesh, room[1:])
         else:
