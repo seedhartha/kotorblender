@@ -330,6 +330,8 @@ class NVB_PT_EMPTY(bpy.types.Panel):
                 sep = layout.separator()
 
                 # Minimap Helper.
+                # TODO: uncomment when compatible with Blender 2.8
+                '''
                 row = layout.row()
                 box = row.box()
                 box.label(text = 'Minimap Helper')
@@ -339,6 +341,7 @@ class NVB_PT_EMPTY(bpy.types.Panel):
                 row.prop(obj.nvb, 'minimapsize', text = 'Minimap size')
                 row = box.row()
                 row.operator('nvb.render_minimap', text = 'Render Minimap', icon='NONE')
+                '''
 
                 # All Children Settings Helper
                 row = layout.row()
