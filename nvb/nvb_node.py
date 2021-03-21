@@ -1104,8 +1104,6 @@ class Danglymesh(Trimesh):
                 weight = round(vg.weight * 255, 3)
             asciiLines.append('    {}'.format(weight))
 
-        bpy.data.meshes.remove(mesh)
-
 
     def addDataToAscii(self, obj, asciiLines, classification = nvb_def.Classification.UNKNOWN, simple = False, nameDict=None):
         Trimesh.addDataToAscii(self, obj, asciiLines, classification, nameDict=nameDict)
