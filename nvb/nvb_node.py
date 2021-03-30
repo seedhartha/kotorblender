@@ -626,7 +626,7 @@ class Trimesh(GeometryNode):
         mesh.update()
         return mesh
 
-    def setRoomLinks(self, mesh):
+    def setRoomLinks(self, mesh, skipNonWalkable=True):
         #if len(self.roomlinks) < 1:
         #    return
         if not 'RoomLinks' in mesh.vertex_colors:
@@ -643,7 +643,7 @@ class Trimesh(GeometryNode):
             #for idx in range(0, faceIdx - 1):
                 #if mesh.polygons[faceIdx].material_index == 7:
                 #if face.material_index != 7:
-                if face.material_index not in nvb_def.WkmMaterial.NONWALKABLE:
+                if skipNonWalkable and (face.material_index not in nvb_def.WkmMaterial.NONWALKABLE):
                     if realIdx == faceIdx:
                         faceIdx = face_idx
                         break
@@ -2016,8 +2016,9 @@ class Aabb(Trimesh):
                 uv_layer = mesh.uv_layers.new(name=name+'_lm.uv', do_init=False)
                 uv_layer.data.foreach_set('uv', uv)
 
+        # If there are room links in MDL, then this model is from MDLedit, and we must NOT skip non-walkable faces
         if self.roottype == 'mdl' and len(self.roomlinks):
-            self.setRoomLinks(mesh)
+            self.setRoomLinks(mesh, False)
 
         mesh.update()
         return mesh
