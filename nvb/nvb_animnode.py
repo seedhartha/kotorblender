@@ -130,12 +130,12 @@ class Node():
         "birthrate": {
             "values": 1,
             "axes": 1,
-            "conversion":int,
+            "conversion":float,
         },
         "m_fRandomBirthRate": {
             "values": 1,
             "axes": 1,
-            "conversion":int,
+            "conversion":float,
         },
         "bounce_co": {
             "values": 1,
