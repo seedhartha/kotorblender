@@ -449,18 +449,18 @@ class NVB_LIST_OT_AnimEvent_Move(bpy.types.Operator):
         return{'FINISHED'}
 
 
-class NVB_OP_Import(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
+class NVB_OP_ImportMDL(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
     '''Import Odyssey Engine model (.mdl)'''
 
-    bl_idname  = 'kb.mdlimport'
-    bl_label   = 'Import Odyssey MDL'
+    bl_idname = 'kb.mdlimport'
+    bl_label = 'Import Odyssey MDL'
     bl_options = {'UNDO'}
 
     filename_ext = '.mdl'
+
     filter_glob : bpy.props.StringProperty(
-            default = '*.mdl;*.mdl.ascii;*.lyt',
-            options = {'HIDDEN'},
-            )
+            default = '*.mdl;*.mdl.ascii',
+            options = {'HIDDEN'})
 
     importGeometry : bpy.props.BoolProperty(
             name = 'Import Geometry',
@@ -493,8 +493,7 @@ class NVB_OP_Import(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
             name='Image search',
             description='Search for images in subdirectories' \
                         ' (Warning, may be slow)',
-            default=False,
-            )
+            default=False)
 
     # Hidden option, only used for batch minimap creation
     minimapMode : bpy.props.BoolProperty(
@@ -512,23 +511,70 @@ class NVB_OP_Import(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
             )
 
     def execute(self, context):
-        keywords = self.as_keywords(ignore=('filter_glob',
-                                            'check_existing',
-                                            ))
-        return nvb_io.loadMdl(self, context, **keywords)
+        return nvb_io.loadMdl(self, context, **self.as_keywords(ignore=('filter_glob',)))
 
 
-class NVB_OP_Export(bpy.types.Operator, bpy_extras.io_utils.ExportHelper):
+class NVB_OP_ImportLYT(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
+    '''Import Odyssey Engine layout (.lyt)'''
+
+    bl_idname = 'kb.lytimport'
+    bl_label = 'Import Odyssey LYT'
+    bl_options = {'UNDO'}
+
+    filename_ext = '.lyt'
+
+    filter_glob : bpy.props.StringProperty(
+        default='*.lyt',
+        options={'HIDDEN'})
+
+    importGeometry : bpy.props.BoolProperty(
+            name = 'Import Geometry',
+            description = 'Disable if only animations are needed',
+            default = True)
+
+    importWalkmesh : bpy.props.BoolProperty(
+            name = 'Import Walkmesh',
+            description = 'Attempt to load placeable and door walkmeshes',
+            default = True)
+
+    importSmoothGroups : bpy.props.BoolProperty(
+            name = 'Import Smooth Groups',
+            description = 'Import smooth groups as sharp edges',
+            default = True)
+
+    importAnim : bpy.props.BoolProperty(
+            name = 'Import Animations',
+            description = 'Import animations',
+            default = True)
+
+    materialMode : bpy.props.EnumProperty(
+            name = 'Materials',
+            items = (('NON', 'None', 'Don\'t create materials or import textures'),
+                     ('SIN', 'Single', 'Create only one material per texture, shared between objects'),
+                     ('MUL', 'Multiple', 'Create a seperate material for each object')),
+            default = 'SIN')
+
+    textureSearch : bpy.props.BoolProperty(
+            name='Image search',
+            description='Search for images in subdirectories' \
+                        ' (Warning, may be slow)',
+            default=False)
+
+    def execute(self, context):
+        return nvb_io.loadLyt(self, context, **self.as_keywords(ignore=('filter_glob',)))
+
+
+class NVB_OP_ExportMDL(bpy.types.Operator, bpy_extras.io_utils.ExportHelper):
     '''Export Odyssey Engine model (.mdl)'''
 
     bl_idname = 'kb.mdlexport'
     bl_label  = 'Export Odyssey MDL'
 
     filename_ext = '.mdl'
+
     filter_glob : bpy.props.StringProperty(
             default = '*.mdl;*.mdl.ascii',
-            options = {'HIDDEN'},
-            )
+            options = {'HIDDEN'})
 
     exports : bpy.props.EnumProperty(
             name = 'Export',
@@ -536,34 +582,27 @@ class NVB_OP_Export(bpy.types.Operator, bpy_extras.io_utils.ExportHelper):
             items = (('ANIMATION', 'Animations', 'Export animations'),
                      ('WALKMESH', 'Walkmesh', 'Attempt to create walkmesh file (.pwk, .dwk or .wok depending on classification)'),
                      ),
-            default = {'ANIMATION', 'WALKMESH'},
-            )
+            default = {'ANIMATION', 'WALKMESH'})
 
     exportSmoothGroups : bpy.props.BoolProperty(
             name='Export Smooth Groups',
             description='Generate smooth groups from sharp edges' \
                         '(When disabled every face belongs to the same group)',
-            default=True
-            )
+            default=True)
 
     exportTxi : bpy.props.BoolProperty(
             name='Export TXI files',
             description='Create TXI files containing the texture properties' \
                         '(When disabled, TXI files can be exported manually)',
-            default=True,
-            )
+            default=True)
 
     applyModifiers : bpy.props.BoolProperty(
             name='Apply Modifiers',
             description='Apply Modifiers before exporting',
-            default=True
-            )
+            default=True)
 
     def execute(self, context):
-        keywords = self.as_keywords(ignore=('filter_glob',
-                                            'check_existing',
-                                            ))
-        return nvb_io.saveMdl(self, context, **keywords)
+        return nvb_io.saveMdl(self, context, **self.as_keywords(ignore=('filter_glob','check_existing')))
 
 
 class LoadWokMaterials(bpy.types.Operator):
@@ -744,3 +783,31 @@ class NVBOBJECT_OT_AnimsceneAdd(bpy.types.Operator):
 
         self.report({'INFO'}, 'New animation ' + newAnimName)
         return{'FINISHED'}
+
+
+class NVB_OP_ExportLYT(bpy.types.Operator, bpy_extras.io_utils.ExportHelper):
+    '''Export Odyssey Engine layout (.lyt)'''
+
+    bl_idname = 'kb.lytexport'
+    bl_label  = 'Export Odyssey LYT'
+
+    filename_ext = '.lyt'
+
+    filter_glob : bpy.props.StringProperty(
+            default = '*.lyt',
+            options = {'HIDDEN'})
+
+    def execute(self, context):
+        with open(self.filepath, 'w') as f:
+            # Only export selected objects
+            num_objects = len(bpy.context.selected_objects)
+            f.write('beginlayout\n')
+            f.write('  roomcount {}\n'.format(num_objects))
+            for o in bpy.context.selected_objects:
+                f.write('    {} {:.7f} {:.7f} {:.7f}\n'.format(o.name, *o.location))
+            f.write('  trackcount 0\n')
+            f.write('  obstaclecount 0\n')
+            f.write('  doorhookcount 0\n')
+            f.write('donelayout\n')
+
+        return {'FINISHED'}
