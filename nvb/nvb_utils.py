@@ -465,7 +465,7 @@ def setupMinimapRender(mdlroot, scene, light_color = (1.0, 1.0, 1.0), alpha_mode
             else:
                 lightData = bpy.data.lights.new(lightName, 'POINT')
             minimapLight = bpy.data.objects.new(lightName , lightData)
-        scene.collection.objects.link(minimapLight)
+        bpy.context.collection.objects.link(minimapLight)
     # Adjust light properties
     # TODO: rewrite for Blender 2.8
     #minimapLight.data.use_specular = False
@@ -487,7 +487,7 @@ def setupMinimapRender(mdlroot, scene, light_color = (1.0, 1.0, 1.0), alpha_mode
             else:
                 camData = bpy.data.cameras.new(camName)
             minimapCam = bpy.data.objects.new(camName, camData)
-        scene.collection.objects.link(minimapCam)
+        bpy.context.collection.objects.link(minimapCam)
     # Adjust cam properties
     minimapCam.data.type        = 'ORTHO'
     minimapCam.data.ortho_scale = 10.0
@@ -621,7 +621,7 @@ def copyAnimScene(scene, theOriginal, newSuffix, oldSuffix = '', parent = None):
             theCopy.animation_data.action = actionCopy
 
     # Link copy to the anim scene
-    scene.collection.objects.link(theCopy)
+    bpy.context.collection.objects.link(theCopy)
 
     # Convert all child objects too
     for child in theOriginal.children:

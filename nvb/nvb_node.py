@@ -143,7 +143,7 @@ class GeometryNode():
     def addToScene(self, scene):
         obj = bpy.data.objects.new(self.name, None)
         self.setObjectData(obj)
-        scene.collection.objects.link(obj)
+        bpy.context.collection.objects.link(obj)
         return obj
 
     def getAdjustedMatrix(self, obj):
@@ -726,7 +726,7 @@ class Trimesh(GeometryNode):
         mesh = self.createMesh(self.name)
         obj  = bpy.data.objects.new(self.name, mesh)
         self.setObjectData(obj)
-        scene.collection.objects.link(obj)
+        bpy.context.collection.objects.link(obj)
         return obj
 
 
@@ -1548,7 +1548,7 @@ class Emitter(GeometryNode):
         obj  = bpy.data.objects.new(self.name, mesh)
 
         self.setObjectData(obj)
-        scene.collection.objects.link(obj)
+        bpy.context.collection.objects.link(obj)
         return obj
 
 
@@ -1768,7 +1768,7 @@ class Light(GeometryNode):
         light = self.createLight(self.name)
         obj  = bpy.data.objects.new(self.name, light)
         self.setObjectData(obj)
-        scene.collection.objects.link(obj)
+        bpy.context.collection.objects.link(obj)
         return obj
 
     def addFlaresToAscii(self, obj, asciiLines):
@@ -2032,5 +2032,5 @@ class Aabb(Trimesh):
         mesh = self.createMesh(self.name)
         obj = bpy.data.objects.new(self.name, mesh)
         self.setObjectData(obj)
-        scene.collection.objects.link(obj)
+        bpy.context.collection.objects.link(obj)
         return obj
