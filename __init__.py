@@ -66,12 +66,20 @@ import addon_utils
 import bpy
 
 
-def menu_func_export(self, context):
-    self.layout.operator(nvb_ops.NVB_OP_Export.bl_idname, text="Odyssey (KotOR) (.mdl)")
+def menu_func_import_mdl(self, context):
+    self.layout.operator(nvb_ops.NVB_OP_ImportMDL.bl_idname, text="KotOR Model (.mdl)")
 
 
-def menu_func_import(self, context):
-    self.layout.operator(nvb_ops.NVB_OP_Import.bl_idname, text="Odyssey (KotOR) (.mdl)")
+def menu_func_import_lyt(self, context):
+    self.layout.operator(nvb_ops.NVB_OP_ImportLYT.bl_idname, text="KotOR Layout (.lyt)")
+
+
+def menu_func_export_mdl(self, context):
+    self.layout.operator(nvb_ops.NVB_OP_ExportMDL.bl_idname, text="KotOR Model (.mdl)")
+
+
+def menu_func_export_lyt(self, context):
+    self.layout.operator(nvb_ops.NVB_OP_ExportLYT.bl_idname, text="KotOR Layout (.lyt)")
 
 
 classes = (
@@ -91,8 +99,10 @@ classes = (
     nvb_ops.NVB_LIST_OT_LightFlare_Delete,
     nvb_ops.NVB_LIST_OT_LightFlare_Move,
     nvb_ops.NVB_LIST_OT_LightFlare_New,
-    nvb_ops.NVB_OP_Export,
-    nvb_ops.NVB_OP_Import,
+    nvb_ops.NVB_OP_ExportLYT,
+    nvb_ops.NVB_OP_ExportMDL,
+    nvb_ops.NVB_OP_ImportLYT,
+    nvb_ops.NVB_OP_ImportMDL,
     nvb_ops.NVBCHILDREN_SMOOTHGROUP,
     nvb_ops.NVBOBJECT_OT_AnimsceneAdd,
     nvb_ops.NVBOBJECT_OT_AnimsceneRename,
@@ -147,13 +157,17 @@ def register():
     bpy.types.Object.nvb = bpy.props.PointerProperty(type=nvb_props.KB_PG_OBJECT)
     bpy.types.ImageTexture.nvb = bpy.props.PointerProperty(type=nvb_props.KB_PG_TEXTURE)
 
-    bpy.types.TOPBAR_MT_file_import.append(menu_func_import)
-    bpy.types.TOPBAR_MT_file_export.append(menu_func_export)
+    bpy.types.TOPBAR_MT_file_import.append(menu_func_import_mdl)
+    bpy.types.TOPBAR_MT_file_import.append(menu_func_import_lyt)
+    bpy.types.TOPBAR_MT_file_export.append(menu_func_export_mdl)
+    bpy.types.TOPBAR_MT_file_export.append(menu_func_export_lyt)
 
 
 def unregister():
-    bpy.types.TOPBAR_MT_file_export.remove(menu_func_export)
-    bpy.types.TOPBAR_MT_file_import.remove(menu_func_import)
+    bpy.types.TOPBAR_MT_file_export.remove(menu_func_export_lyt)
+    bpy.types.TOPBAR_MT_file_export.remove(menu_func_export_mdl)
+    bpy.types.TOPBAR_MT_file_import.remove(menu_func_import_lyt)
+    bpy.types.TOPBAR_MT_file_import.remove(menu_func_import_mdl)
 
     # gracefully co-exist with neverblender, within reason.
     # if neverblender is enabled and disabled while kotorblender

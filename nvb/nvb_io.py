@@ -10,13 +10,13 @@ from . import nvb_mdl
 from . import nvb_utils
 
 
-def _load_mdl(filepath, importWalkmesh, position = (0.0, 0.0, 0.0)):
+def _load_mdl(filepath, position = (0.0, 0.0, 0.0)):
     scene = bpy.context.scene
 
     # Try to load walkmeshes ... pwk (placeable) and dwk (door)
     # If the files are and the option is activated we'll import them
     wkm = None
-    if importWalkmesh:
+    if nvb_glob.importWalkmesh:
         filetypes = ['pwk', 'dwk', 'wok']
         (wkmPath, wkmFilename) = os.path.split(filepath)
         using_extra_extension = False
@@ -90,7 +90,36 @@ def _load_mdl(filepath, importWalkmesh, position = (0.0, 0.0, 0.0)):
                 aabb.setRoomLinks(scene.objects[aabb.name].data)
 
 
-def _load_lyt(filepath, importWalkmesh):
+def loadMdl(operator,
+            context,
+            filepath = '',
+            importGeometry = True,
+            importWalkmesh = True,
+            importSmoothGroups = True,
+            importAnim = True,
+            materialMode = 'SIN',
+            textureSearch = False,
+            minimapMode = False,
+            minimapSkipFade = False):
+    '''
+    Called from blender ui
+    '''
+    nvb_glob.importGeometry = importGeometry
+    nvb_glob.importSmoothGroups = importSmoothGroups
+    nvb_glob.importAnim = importAnim
+    nvb_glob.importWalkmesh = importWalkmesh
+    nvb_glob.materialMode = materialMode
+    nvb_glob.texturePath = os.path.dirname(filepath)
+    nvb_glob.textureSearch = textureSearch
+    nvb_glob.minimapMode = minimapMode
+    nvb_glob.minimapSkipFade = minimapSkipFade
+
+    _load_mdl(filepath)
+
+    return {'FINISHED'}
+
+
+def _load_lyt(filepath):
     # Read lines from LYT
     fp = os.fsencode(filepath)
     f = open(fp, 'r')
@@ -122,12 +151,12 @@ def _load_lyt(filepath, importWalkmesh):
         if not os.path.exists(mdl_path):
             mdl_path = os.path.join(path, room[0] + '-ascii.mdl')
         if os.path.exists(mdl_path):
-            _load_mdl(mdl_path, importWalkmesh, room[1:])
+            _load_mdl(mdl_path, room[1:])
         else:
             print('Kotorblender - WARNING: room model not found: ' + mdl_path)
 
 
-def loadMdl(operator,
+def loadLyt(operator,
             context,
             filepath = '',
             importGeometry = True,
@@ -135,31 +164,19 @@ def loadMdl(operator,
             importSmoothGroups = True,
             importAnim = True,
             materialMode = 'SIN',
-            textureSearch = False,
-            minimapMode = False,
-            minimapSkipFade = False):
+            textureSearch = False):
     '''
     Called from blender ui
     '''
-    nvb_glob.importGeometry     = importGeometry
+    nvb_glob.importGeometry = importGeometry
     nvb_glob.importSmoothGroups = importSmoothGroups
-    nvb_glob.importAnim         = importAnim
-
-
+    nvb_glob.importAnim = importAnim
+    nvb_glob.importWalkmesh = importWalkmesh
     nvb_glob.materialMode = materialMode
-
-    nvb_glob.texturePath   = os.path.dirname(filepath)
+    nvb_glob.texturePath = os.path.dirname(filepath)
     nvb_glob.textureSearch = textureSearch
 
-    nvb_glob.minimapMode     = minimapMode
-    nvb_glob.minimapSkipFade = minimapSkipFade
-
-    # Load LYT or MDL depending of file extension
-    (_, filename) = os.path.split(filepath)
-    if filename.endswith('.lyt'):
-        _load_lyt(filepath, importWalkmesh)
-    else:
-        _load_mdl(filepath, importWalkmesh)
+    _load_lyt(filepath)
 
     return {'FINISHED'}
 
