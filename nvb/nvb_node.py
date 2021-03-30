@@ -2016,6 +2016,9 @@ class Aabb(Trimesh):
                 uv_layer = mesh.uv_layers.new(name=name+'_lm.uv', do_init=False)
                 uv_layer.data.foreach_set('uv', uv)
 
+        if self.roottype == 'mdl' and len(self.roomlinks):
+            self.setRoomLinks(mesh)
+
         mesh.update()
         return mesh
 
