@@ -27,6 +27,7 @@ class Mdl():
         self.ignorefog      = False
         self.compress_quats = False
         self.headlink       = False
+        self.lytposition    = None
 
         self.animations = []
 
@@ -134,6 +135,12 @@ class Mdl():
                 obj = node.addToScene(scene)
                 obj.nvb.imporder = objIdx
                 objIdx += 1
+
+                # If LYT position is specified, set it for the AABB node
+                if self.lytposition and node.nodetype == 'aabb':
+                    node.lytposition = self.lytposition
+                    obj.nvb.lytposition = self.lytposition
+
                 if (nvb_utils.isNull(node.parentName)):
                     # Node without parent and not the mdl root.
                     raise nvb_def.MalformedMdlFile(node.name + ' has no parent.')
@@ -327,6 +334,8 @@ class Mdl():
                     print("Kotorblender: WARNING - Unable to read \
                            animationscale. \
                            Using default value " + self.animscale)
+            elif label == 'layoutposition':
+                self.lytposition = [float(x) for x in line[1:]]
 
 
     def geometryToAscii(self, bObject, asciiLines, simple = False, nameDict = None):
