@@ -548,7 +548,7 @@ class NVB_PT_TEXTURE(bpy.types.Panel):
         texture = context.texture
         #print(dir(context))
         #print(dir(context.object))
-        self.layout.prop(texture.nvb, 'bumpmapped', text='Allow Normal Mapping')
+        #self.layout.prop(texture.nvb, 'bumpmapped', text='Allow Normal Mapping')
         #self.layout.prop(context.object.nvb, 'bumpmapped', text='Bumpmapped')
 
         # TXI file operations
@@ -1163,17 +1163,27 @@ class NVB_PT_MESH(bpy.types.Panel):
             box = row.box()
 
             row = box.row()
+            row.prop_search(obj.nvb, 'bitmap', bpy.data, 'images', text='Bitmap')
+            row = box.row()
+            row.prop_search(obj.nvb, 'bitmap2', bpy.data, 'images', text='Lightmap')
+            row = box.row()
+            row.prop(obj.nvb, 'alpha', text='Alpha')
+
+            row = box.row()
             row.prop(obj.nvb, 'wirecolor', text='Wirecolor')
             row = box.row()
             row.prop(obj.nvb, 'selfillumcolor', text='Selfillum. color')
             row = box.row()
-            row.prop(obj.nvb, 'ambientcolor', text='Ambient')
+            row.prop(obj.nvb, 'diffusecolor', text='Diffuse color')
+            row = box.row()
+            row.prop(obj.nvb, 'ambientcolor', text='Ambient color')
 
             split = box.split()
             col = split.column()
             col.prop(obj.nvb, 'render', text='Render')
             col.prop(obj.nvb, 'shadow', text='Shadow')
             col.prop(obj.nvb, 'lightmapped', text='Lightmapped')
+            col.prop(obj.nvb, 'tangentspace', text='Tangentspace')
             col = split.column()
             col.prop(obj.nvb, 'beaming', text='Beaming')
             col.prop(obj.nvb, 'inheritcolor', text='Inherit Color')
@@ -1207,6 +1217,8 @@ class NVB_PT_MESH(bpy.types.Panel):
             row = box.row()
             row.label(text = 'Smoothgroups')
             row.prop(obj.nvb, 'smoothgroup', text='Smooth Group', expand = True)
+            row = box.row()
+            row.operator('kb.rebuild_material_nodes')
 
             # TODO: not applicable to Blender 2.8+?
             '''

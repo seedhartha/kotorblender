@@ -64,7 +64,6 @@ class KB_PG_TEXTURE(bpy.types.PropertyGroup):
     This class defines all additional properties needed by the txi file
     format. It hold the properties for image textures.
     '''
-    bumpmapped : bpy.props.BoolProperty(default=False)
 
     class PropListItem(bpy.types.PropertyGroup):
         name : bpy.props.StringProperty(name='Property Name')
@@ -80,8 +79,6 @@ class KB_PG_TEXTURE(bpy.types.PropertyGroup):
     box_visible_procedural : bpy.props.BoolProperty(default=False)
     box_visible_general    : bpy.props.BoolProperty(default=False)
     box_visible_font       : bpy.props.BoolProperty(default=False)
-    # IO coordination
-    exported_in_save       : bpy.props.BoolProperty(default=False)
 
     def prop_update(self, context):
         """
@@ -381,10 +378,14 @@ class KB_PG_OBJECT(bpy.types.PropertyGroup):
                                                          ],
                                             default = 'AUTO')
 
+    bitmap           : bpy.props.StringProperty(name = 'Diffuse Texture')
+    bitmap2          : bpy.props.StringProperty(name = 'Lightmap Texture')
+    alpha            : bpy.props.FloatProperty(name = 'Alpha', default = 1.0, min = 0.0, max = 1.0)
     shadow           : bpy.props.BoolProperty(name = 'Shadow', description = 'Whether to cast shadows', default = True, update=nvb_update_shadow_prop)
     render           : bpy.props.BoolProperty(name = 'Render', description = 'Whether to render this object in the scene', default = True)
     lightmapped      : bpy.props.BoolProperty(name = 'Lightmapped', description = 'Whether this object has shading baked into a lightmap', default = False)
     beaming          : bpy.props.BoolProperty(name = 'beaming', description = 'Object casts beams (?)', default = False)
+    tangentspace     : bpy.props.BoolProperty(name = 'tangentspace', description = 'Allow Normal Mapping', default = False)
     inheritcolor     : bpy.props.BoolProperty(name = 'Inheritcolor', description = 'Unused (?)', default = False)
     rotatetexture    : bpy.props.BoolProperty(name = 'Rotatetexture', description = 'Automatically rotates texture to prevent seams', default = False)
     m_bIsBackgroundGeometry : bpy.props.BoolProperty(name='Background Geometry', description="Lower detail or fewer mipmaps (?)", default=False, options=set())
@@ -402,6 +403,12 @@ class KB_PG_OBJECT(bpy.types.PropertyGroup):
                                                      description = 'Makes the object seem to glow but does not emit light',
                                                      subtype = 'COLOR_GAMMA',
                                                      default = (0.0, 0.0, 0.0),
+                                                     min = 0.0, max = 1.0,
+                                                     soft_min = 0.0, soft_max = 1.0)
+    diffusecolor     : bpy.props.FloatVectorProperty(name = 'Diffusecolor',
+                                                     description = 'Diffuse color',
+                                                     subtype = 'COLOR_GAMMA',
+                                                     default = (1.0, 1.0, 1.0),
                                                      min = 0.0, max = 1.0,
                                                      soft_min = 0.0, soft_max = 1.0)
     ambientcolor     : bpy.props.FloatVectorProperty(name = 'Ambientcolor',

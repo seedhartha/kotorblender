@@ -14,7 +14,6 @@ minimapSkipFade = False
 
 # Export
 exportSmoothGroups = True
-exportTxi = False
 
 applyModifiers = True
 

@@ -38,7 +38,12 @@ def load_material(node, name):
         material_name = name
 
     material = bpy.data.materials.new(material_name)
+    rebuild_material(material, node)
 
+    return material
+
+
+def rebuild_material(material, node):
     if (not nvb_utils.isNull(node.bitmap)) or (not nvb_utils.isNull(node.bitmap2)):
         material.use_nodes = True
         links = material.node_tree.links
@@ -74,7 +79,7 @@ def load_material(node, name):
         if not nvb_utils.isNull(node.bitmap):
             diffuse = nodes.new('ShaderNodeTexImage')
             diffuse.location = (300, 0)
-            diffuse.image = nvb_teximage.load_texture_image(node.bitmap, node.tangentspace == 1)
+            diffuse.image = nvb_teximage.load_texture_image(node.bitmap)
             links.new(mul_diffuse_by_lightmap.inputs[0], diffuse.outputs[0])
             links.new(mul_alpha.inputs[0], diffuse.outputs[1])
 
@@ -84,7 +89,7 @@ def load_material(node, name):
 
             lightmap_uv = nodes.new('ShaderNodeUVMap')
             lightmap_uv.location = (0, -300)
-            lightmap_uv.uv_map = name+'_lm.uv'
+            lightmap_uv.uv_map = 'UVMap_lm'
 
             lightmap = nodes.new('ShaderNodeTexImage')
             lightmap.location = (300, -300)
@@ -93,78 +98,5 @@ def load_material(node, name):
             links.new(lightmap.inputs[0], lightmap_uv.outputs[0])
             links.new(mul_diffuse_by_lightmap.inputs[1], lightmap.outputs[0])
     else:
+        material.use_nodes = False
         material.diffuse_color = [*node.diffuse, 1.0]
-
-    return material
-
-
-def get_output_material_node(material):
-    """
-    Searches for Material Output node in the materials node tree.
-    """
-    if material.use_nodes:
-        return next(node for node in material.node_tree.nodes if node.bl_idname == 'ShaderNodeOutputMaterial')
-    else:
-        return None
-
-
-def get_bsdf_principled_node(parent):
-    """
-    Searches for Principled BSDF node starting from the Material Output.
-    """
-    if parent and parent.inputs[0].is_linked:
-        node = parent.inputs[0].links[0].from_node
-        if node.bl_idname == 'ShaderNodeBsdfPrincipled':
-            return node
-
-    return None
-
-
-def get_diffuse_image(parent):
-    """
-    Searches for a diffuse texture image starting from the shader node.
-    """
-    if parent:
-        color_input = parent.inputs['Base Color']
-        if color_input.is_linked:
-            # Assume that VectorMath input means Diffuse+Lightmap setup, Diffuse only otherwise
-            node = color_input.links[0].from_node
-            if node.bl_idname == 'ShaderNodeVectorMath':
-                if node.inputs[0].is_linked:
-                    node = node.inputs[0].links[0].from_node
-                    if node.bl_idname == 'ShaderNodeTexImage':
-                        return node.image
-            elif node.bl_idname == 'ShaderNodeTexImage':
-                return node.image
-
-    return None
-
-
-def get_aurora_alpha(parent):
-    """
-    Searches for Aurora alpha value starting from the shader node.
-    """
-    if parent:
-        alpha_input = parent.inputs['Alpha']
-        if alpha_input.is_linked:
-            node = alpha_input.links[0].from_node
-            if node.bl_idname == 'ShaderNodeMath':
-                return node.inputs[1].default_value
-
-    return 1.0
-
-
-def get_lightmap_image(parent):
-    """
-    Searches for a lightmap texture image starting from the shader node.
-    """
-    if parent:
-        color_input = parent.inputs['Base Color']
-        if color_input.is_linked:
-            node = color_input.links[0].from_node
-            if node.bl_idname == 'ShaderNodeVectorMath' and node.inputs[1].is_linked:
-                node = node.inputs[1].links[0].from_node
-                if node.bl_idname == 'ShaderNodeTexImage':
-                    return node.image
-
-    return None
