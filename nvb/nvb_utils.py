@@ -177,14 +177,9 @@ def get_mdl_base(obj=None, scene=None):
     Method to find the best MDL root dummy based on user intent
     """
     # Use first selected object as search context if none provided
-    if obj is None and scene:
-        selected_objects = [o for o in scene.collection.objects if o.select_get()]
-        if len(selected_objects):
-            obj = selected_objects[0]
-    elif obj is None and bpy.context and bpy.context.scene:
-        selected_objects = [o for o in bpy.context.scene.objects if o.select_get()]
-        if len(selected_objects):
-            obj = selected_objects[0]
+    if obj is None:
+        if len(bpy.context.selected_objects):
+            obj = bpy.context.selected_objects[0]
     # 1. Check the object and its parents
     match = get_obj_mdl_base(obj)
     if match:
