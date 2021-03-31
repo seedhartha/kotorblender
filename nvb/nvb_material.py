@@ -51,42 +51,43 @@ def rebuild_material(material, node):
         nodes = material.node_tree.nodes
         nodes.clear()
 
-        mul_alpha = nodes.new('ShaderNodeMath')
-        mul_alpha.location = (600, -300)
-        mul_alpha.operation = 'MULTIPLY'
-        mul_alpha.inputs[0].default_value = 1.0
-        mul_alpha.inputs[1].default_value = node.alpha
-
-        bsdf = nodes.new('ShaderNodeBsdfPrincipled')
-        bsdf.location = (900, 0)
-
-        links.new(bsdf.inputs['Alpha'], mul_alpha.outputs[0])
-
         output = nodes.new('ShaderNodeOutputMaterial')
         output.location = (1200, 0)
 
-        links.new(output.inputs[0], bsdf.outputs[0])
+        # Shader node
+        selfillumed = not nvb_utils.isclose_3f(node.selfillumcolor, [0.0] * 3)
+        if selfillumed:
+            shader = nodes.new('ShaderNodeEmission')
+        else:
+            shader = nodes.new('ShaderNodeBsdfPrincipled')
+        shader.location = (900, 0)
 
+        # Multiply diffuse by lightmap node
         mul_diffuse_by_lightmap = nodes.new('ShaderNodeVectorMath')
         mul_diffuse_by_lightmap.location = (600, 0)
         mul_diffuse_by_lightmap.operation = 'MULTIPLY'
         mul_diffuse_by_lightmap.inputs[0].default_value = [1.0] * 3
         mul_diffuse_by_lightmap.inputs[1].default_value = [1.0] * 3
 
-        links.new(bsdf.inputs['Base Color'], mul_diffuse_by_lightmap.outputs[0])
+        # Alpha node
+        mul_alpha = nodes.new('ShaderNodeMath')
+        mul_alpha.location = (600, -300)
+        mul_alpha.operation = 'MULTIPLY'
+        mul_alpha.inputs[0].default_value = 1.0
+        mul_alpha.inputs[1].default_value = node.alpha
 
-        # Diffuse texture
-        if not nvb_utils.isNull(node.bitmap):
+        # Diffuse texture node
+        has_diffuse = not nvb_utils.isNull(node.bitmap)
+        if has_diffuse:
             diffuse = nodes.new('ShaderNodeTexImage')
             diffuse.location = (300, 0)
             diffuse.image = nvb_teximage.load_texture_image(node.bitmap)
             links.new(mul_diffuse_by_lightmap.inputs[0], diffuse.outputs[0])
             links.new(mul_alpha.inputs[0], diffuse.outputs[1])
 
-        # Lightmap texture
-        if not nvb_utils.isNull(node.bitmap2):
-            material.shadow_method = 'NONE'
-
+        # Lightmap texture node
+        has_lightmap = not nvb_utils.isNull(node.bitmap2)
+        if has_lightmap:
             lightmap_uv = nodes.new('ShaderNodeUVMap')
             lightmap_uv.location = (0, -300)
             lightmap_uv.uv_map = 'UVMap_lm'
@@ -95,8 +96,17 @@ def rebuild_material(material, node):
             lightmap.location = (300, -300)
             lightmap.image = nvb_teximage.load_image(node.bitmap2)
 
+            material.shadow_method = 'NONE'
             links.new(lightmap.inputs[0], lightmap_uv.outputs[0])
             links.new(mul_diffuse_by_lightmap.inputs[1], lightmap.outputs[0])
+
+        if selfillumed:
+            links.new(shader.inputs['Color'], mul_diffuse_by_lightmap.outputs[0])
+        else:
+            links.new(shader.inputs['Base Color'], mul_diffuse_by_lightmap.outputs[0])
+            links.new(shader.inputs['Alpha'], mul_alpha.outputs[0])
+
+        links.new(output.inputs[0], shader.outputs[0])
     else:
         material.use_nodes = False
         material.diffuse_color = [*node.diffuse, 1.0]
