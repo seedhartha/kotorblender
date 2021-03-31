@@ -76,6 +76,10 @@ def menu_func_import_lyt(self, context):
     self.layout.operator(nvb_ops.NVB_OP_ImportLYT.bl_idname, text="KotOR Layout (.lyt)")
 
 
+def menu_func_import_pth(self, context):
+    self.layout.operator(nvb_ops_path.KB_OT_import_path.bl_idname, text="KotOR Path (.pth)")
+
+
 def menu_func_export_mdl(self, context):
     self.layout.operator(nvb_ops.NVB_OP_ExportMDL.bl_idname, text="KotOR Model (.mdl)")
 
@@ -140,6 +144,7 @@ classes = (
 
     nvb_ops_path.KB_OT_add_connection,
     nvb_ops_path.KB_OT_export_path,
+    nvb_ops_path.KB_OT_import_path,
     nvb_ops_path.KB_OT_remove_connection,
 
     nvb_ui.NVB_PT_animlist,
@@ -172,6 +177,7 @@ def register():
 
     bpy.types.TOPBAR_MT_file_import.append(menu_func_import_mdl)
     bpy.types.TOPBAR_MT_file_import.append(menu_func_import_lyt)
+    bpy.types.TOPBAR_MT_file_import.append(menu_func_import_pth)
     bpy.types.TOPBAR_MT_file_export.append(menu_func_export_mdl)
     bpy.types.TOPBAR_MT_file_export.append(menu_func_export_lyt)
     bpy.types.TOPBAR_MT_file_export.append(menu_func_export_pth)
@@ -181,6 +187,7 @@ def unregister():
     bpy.types.TOPBAR_MT_file_export.remove(menu_func_export_pth)
     bpy.types.TOPBAR_MT_file_export.remove(menu_func_export_lyt)
     bpy.types.TOPBAR_MT_file_export.remove(menu_func_export_mdl)
+    bpy.types.TOPBAR_MT_file_import.remove(menu_func_import_pth)
     bpy.types.TOPBAR_MT_file_import.remove(menu_func_import_lyt)
     bpy.types.TOPBAR_MT_file_import.remove(menu_func_import_mdl)
 
