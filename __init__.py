@@ -41,6 +41,7 @@ if 'bpy' in locals():
     importlib.reload(nvb.nvb_mdl)
     importlib.reload(nvb.nvb_node)
     importlib.reload(nvb.nvb_ops_anim)
+    importlib.reload(nvb.nvb_ops_path)
     importlib.reload(nvb.nvb_ops)
     importlib.reload(nvb.nvb_props)
     importlib.reload(nvb.nvb_teximage)
@@ -57,6 +58,7 @@ else:
     from kotorblender.nvb import nvb_node
     from kotorblender.nvb import nvb_ops
     from kotorblender.nvb import nvb_ops_anim
+    from kotorblender.nvb import nvb_ops_path
     from kotorblender.nvb import nvb_props
     from kotorblender.nvb import nvb_teximage
     from kotorblender.nvb import nvb_ui
@@ -82,12 +84,17 @@ def menu_func_export_lyt(self, context):
     self.layout.operator(nvb_ops.NVB_OP_ExportLYT.bl_idname, text="KotOR Layout (.lyt)")
 
 
+def menu_func_export_pth(self, context):
+    self.layout.operator(nvb_ops_path.KB_OT_export_path.bl_idname, text="KotOR Path (.pth)")
+
+
 classes = (
     nvb_props.NVB_PG_ANIMEVENT,
     nvb_props.NVB_PG_FLARE,
 
     nvb_props.KB_PG_animevent,
     nvb_props.KB_PG_anim,
+    nvb_props.KB_PG_OBJECT.PathConnection,
     nvb_props.KB_PG_OBJECT,
     nvb_props.KB_PG_TEXTURE.PropListItem,
     nvb_props.KB_PG_TEXTURE,
@@ -131,11 +138,16 @@ classes = (
     nvb_ops_anim.NVB_OT_anim_pad,
     nvb_ops_anim.NVB_OT_anim_scale,
 
+    nvb_ops_path.KB_OT_add_connection,
+    nvb_ops_path.KB_OT_export_path,
+    nvb_ops_path.KB_OT_remove_connection,
+
     nvb_ui.NVB_PT_animlist,
     nvb_ui.NVB_PT_EMITTER,
     nvb_ui.NVB_PT_EMPTY,
     nvb_ui.NVB_PT_LIGHT,
     nvb_ui.NVB_PT_MESH,
+    nvb_ui.NVB_PT_PathPoint,
     nvb_ui.NVB_PT_SMOOTHGROUPS,
     nvb_ui.NVB_PT_TEXTURE,
     nvb_ui.NVB_UL_ANIMEVENTS,
@@ -144,6 +156,7 @@ classes = (
     nvb_ui.KB_MT_animlist_specials,
     nvb_ui.KB_UL_anim_events,
     nvb_ui.KB_UL_anims,
+    nvb_ui.KB_UL_path_points
 )
 
 def register():
@@ -161,9 +174,11 @@ def register():
     bpy.types.TOPBAR_MT_file_import.append(menu_func_import_lyt)
     bpy.types.TOPBAR_MT_file_export.append(menu_func_export_mdl)
     bpy.types.TOPBAR_MT_file_export.append(menu_func_export_lyt)
+    bpy.types.TOPBAR_MT_file_export.append(menu_func_export_pth)
 
 
 def unregister():
+    bpy.types.TOPBAR_MT_file_export.remove(menu_func_export_pth)
     bpy.types.TOPBAR_MT_file_export.remove(menu_func_export_lyt)
     bpy.types.TOPBAR_MT_file_export.remove(menu_func_export_mdl)
     bpy.types.TOPBAR_MT_file_import.remove(menu_func_import_lyt)
