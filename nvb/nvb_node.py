@@ -585,7 +585,7 @@ class Trimesh(GeometryNode):
             # Create UV map
             if len(self.tverts) > 0:
                 uv = unpack_list([self.tverts[i] for indices in self.facelist.uvIdx for i in indices])
-                uv_layer = mesh.uv_layers.new(name=name+'.uv', do_init=False)
+                uv_layer = mesh.uv_layers.new(name='UVMap', do_init=False)
                 uv_layer.data.foreach_set('uv', uv)
 
             # Create lightmap UV map
@@ -595,7 +595,7 @@ class Trimesh(GeometryNode):
                 else:
                     uv = unpack_list([self.tverts1[i] for indices in self.facelist.uvIdx for i in indices])
 
-                uv_layer = mesh.uv_layers.new(name=name+'_lm.uv', do_init=False)
+                uv_layer = mesh.uv_layers.new(name='UVMap_lm', do_init=False)
                 uv_layer.data.foreach_set('uv', uv)
 
         # Import smooth groups as sharp edges
@@ -696,10 +696,14 @@ class Trimesh(GeometryNode):
         GeometryNode.setObjectData(self, obj)
 
         obj.nvb.meshtype         = self.meshtype
+        obj.nvb.bitmap           = self.bitmap if not nvb_utils.isNull(self.bitmap) else ''
+        obj.nvb.bitmap2          = self.bitmap2 if not nvb_utils.isNull(self.bitmap2) else ''
+        obj.nvb.alpha            = self.alpha
         obj.nvb.lightmapped      = (self.lightmapped == 1)
         obj.nvb.render           = (self.render == 1)
         obj.nvb.shadow           = (self.shadow == 1)
         obj.nvb.beaming          = (self.beaming == 1)
+        obj.nvb.tangentspace     = (self.tangentspace == 1)
         obj.nvb.inheritcolor     = (self.inheritcolor == 1)
         obj.nvb.rotatetexture    = (self.rotatetexture == 1)
         obj.nvb.m_bIsBackgroundGeometry = (self.m_bIsBackgroundGeometry == 1)
@@ -714,6 +718,7 @@ class Trimesh(GeometryNode):
         obj.nvb.uvjitterspeed    = self.uvjitterspeed
         obj.nvb.transparencyhint = self.transparencyhint
         obj.nvb.selfillumcolor   = self.selfillumcolor
+        obj.nvb.diffusecolor     = self.diffuse
         obj.nvb.ambientcolor     = self.ambient
         obj.nvb.lytposition      = self.lytposition
 
@@ -731,52 +736,20 @@ class Trimesh(GeometryNode):
 
 
     def addMaterialDataToAscii(self, obj, asciiLines):
-        # Check if this object has a material assigned to it
-        material = obj.active_material
-        if material:
-            color = material.diffuse_color
-            asciiLines.append('  diffuse ' +    str(round(color[0], 2)) + ' ' +
-                                                str(round(color[1], 2)) + ' ' +
-                                                str(round(color[2], 2))  )
+        asciiLines.append('  alpha ' + str(round(obj.nvb.alpha, 2)))
 
-            output = nvb_material.get_output_material_node(material)
-            shader = nvb_material.get_bsdf_principled_node(output)
-            diffuse = nvb_material.get_diffuse_image(shader)
-            if diffuse:
-                imgName = nvb_utils.getImageFilename(diffuse)
+        asciiLines.append('  diffuse ' + str(round(obj.nvb.diffusecolor[0], 2)) + ' ' +
+                                         str(round(obj.nvb.diffusecolor[1], 2)) + ' ' +
+                                         str(round(obj.nvb.diffusecolor[2], 2)))
 
-                texture = nvb_teximage.get_texture_by_image(diffuse)
-                if texture:
-                    tangentspace = 1 if texture.nvb.bumpmapped else 0
-                    if nvb_glob.exportTxi and not texture.nvb.exported_in_save:
-                        nvb_txi.saveTxi(texture)
-                        # set this to prevent multiple export of TXI in mdl save
-                        texture.nvb.exported_in_save = True
-                else:
-                    tangentspace = 0
+        tangentspace = 1 if obj.nvb.tangentspace else 0
+        asciiLines.append('  tangentspace ' + str(tangentspace))
 
-                asciiLines.append('  tangentspace ' + str(tangentspace))
-            else:
-                imgName = nvb_def.null
-                asciiLines.append('  tangentspace 0')
+        imgName = obj.nvb.bitmap if obj.nvb.bitmap else nvb_def.null
+        asciiLines.append('  bitmap ' + imgName)
 
-            asciiLines.append('  bitmap ' + imgName)
-            asciiLines.append('  alpha ' + str(round(nvb_material.get_aurora_alpha(shader), 2)))
-
-            if obj.nvb.lightmapped:
-                lightmap = nvb_material.get_lightmap_image(shader)
-                if lightmap:
-                    imgName = nvb_utils.getImageFilename(lightmap)
-            else:
-                imgName = nvb_def.null
-
-            asciiLines.append('  bitmap2 ' + imgName)
-        else:
-            # No material, set some default values
-            asciiLines.append('  diffuse 1.0 1.0 1.0')
-            asciiLines.append('  alpha 1.0')
-            asciiLines.append('  bitmap ' + nvb_def.null)
-            asciiLines.append('  tangentspace 0')
+        imgName = obj.nvb.bitmap2 if obj.nvb.bitmap2 else nvb_def.null
+        asciiLines.append('  bitmap2 ' + imgName)
 
 
     def addUVToList(self, uv, uvList, vert, vertList):
@@ -1949,19 +1922,12 @@ class Aabb(Trimesh):
     def addMaterialDataToAscii(self, obj, asciiLines):
         asciiLines.append('  diffuse 1.0 1.0 1.0')
 
-        lm_image_name = nvb_def.null
-        if obj.nvb.lightmapped:
-            # AABB nodes have multiple materials - select the last one
-            output = nvb_material.get_output_material_node(obj.material_slots[-1].material)
-            shader = nvb_material.get_bsdf_principled_node(output)
-            lightmap = nvb_material.get_lightmap_image(shader)
-            if lightmap:
-                lm_image_name = nvb_utils.getImageFilename(lightmap)
+        imgName = obj.nvb.bitmap2 if obj.nvb.bitmap2 else nvb_def.null
 
         asciiLines.append('  bitmap ' + nvb_def.null)
-        asciiLines.append('  bitmap2 ' + lm_image_name)
+        asciiLines.append('  bitmap2 ' + imgName)
 
-        lightmapped = 1 if lm_image_name != nvb_def.null else 0
+        lightmapped = 1 if obj.nvb.lightmapped else 0
         asciiLines.append('  lightmapped ' + str(lightmapped))
 
 
@@ -2003,7 +1969,7 @@ class Aabb(Trimesh):
             # Create UV map
             if len(self.tverts) > 0:
                 uv = unpack_list([self.tverts[i] for indices in self.facelist.uvIdx for i in indices])
-                uv_layer = mesh.uv_layers.new(name=name+'.uv', do_init=False)
+                uv_layer = mesh.uv_layers.new(name='UVMap', do_init=False)
                 uv_layer.data.foreach_set('uv', uv)
 
             # Create lightmap UV map
@@ -2013,7 +1979,7 @@ class Aabb(Trimesh):
                 else:
                     uv = unpack_list([self.tverts1[i] for indices in self.facelist.uvIdx for i in indices])
 
-                uv_layer = mesh.uv_layers.new(name=name+'_lm.uv', do_init=False)
+                uv_layer = mesh.uv_layers.new(name='UVMap_lm', do_init=False)
                 uv_layer.data.foreach_set('uv', uv)
 
         # If there are room links in MDL, then this model is from MDLedit, and we must NOT skip non-walkable faces

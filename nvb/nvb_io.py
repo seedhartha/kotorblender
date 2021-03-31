@@ -186,7 +186,6 @@ def saveMdl(operator,
          filepath = '',
          exports = {'ANIMATION', 'WALKMESH'},
          exportSmoothGroups = True,
-         exportTxi = True,
          applyModifiers = True,
          ):
     '''
@@ -194,22 +193,12 @@ def saveMdl(operator,
     '''
     nvb_glob.exports            = exports
     nvb_glob.exportSmoothGroups = exportSmoothGroups
-    nvb_glob.exportTxi          = exportTxi
     nvb_glob.applyModifiers     = applyModifiers
     # temporary forced options:
     frame_set_zero              = True
 
     if bpy.ops.object.mode_set.poll():
         bpy.ops.object.mode_set(mode='OBJECT')
-
-    # reset exported status to false because save operation about to begin
-    if exportTxi:
-        for texture in bpy.data.textures:
-            try:
-                if texture.type == 'IMAGE' and texture.image:
-                    texture.nvb.exported_in_save = False
-            except:
-                pass
 
     # Set frame to zero, if specified in options
     frame_set_current = None
@@ -269,14 +258,6 @@ def saveMdl(operator,
                 wkmFilepath = os.path.join(wkmPath, os.path.splitext(wkmFilename)[0] + '.' + wkmType)
                 with open(os.fsencode(wkmFilepath), 'w') as f:
                     f.write('\n'.join(asciiLines))
-        # reset exported status to false because save operation is concluding
-        if exportTxi:
-            for texture in bpy.data.textures:
-                try:
-                    if texture.type == 'IMAGE' and texture.image:
-                        texture.nvb.exported_in_save = False
-                except:
-                    pass
 
     # Return frame to pre-export, if specified in options
     if frame_set_current is not None and bpy.context.scene:

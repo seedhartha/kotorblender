@@ -35,7 +35,7 @@ def load_image(name):
         return _create_image(name, nvb_glob.texturePath)
 
 
-def load_texture_image(name, bumpmapped=False):
+def load_texture_image(name):
     """
     Get or create a texture data-block by name.
 
@@ -47,7 +47,6 @@ def load_texture_image(name, bumpmapped=False):
         texture = bpy.data.textures.new(name, type='IMAGE')
         texture.image = _create_image(name, nvb_glob.texturePath)
         texture.use_fake_user = True
-        texture.nvb.bumpmapped = bumpmapped
         nvb_txi.loadTxi(texture)
 
     return texture.image

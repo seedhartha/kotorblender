@@ -1,13 +1,10 @@
+import bmesh
 import bpy
 import bpy_extras
-import bmesh
+from mathutils import Matrix, Quaternion, Vector
 
-from . import nvb_def
-from . import nvb_utils
-from . import nvb_io
-from . import nvb_txi
+from . import nvb_def, nvb_io, nvb_material, nvb_txi, nvb_utils
 
-from mathutils import Matrix, Vector, Quaternion
 
 class NVBCHILDREN_SMOOTHGROUP(bpy.types.Operator):
     bl_idname = "nvb.children_smoothgroup"
@@ -590,12 +587,6 @@ class NVB_OP_ExportMDL(bpy.types.Operator, bpy_extras.io_utils.ExportHelper):
                         '(When disabled every face belongs to the same group)',
             default=True)
 
-    exportTxi : bpy.props.BoolProperty(
-            name='Export TXI files',
-            description='Create TXI files containing the texture properties' \
-                        '(When disabled, TXI files can be exported manually)',
-            default=True)
-
     applyModifiers : bpy.props.BoolProperty(
             name='Apply Modifiers',
             description='Apply Modifiers before exporting',
@@ -809,5 +800,18 @@ class NVB_OP_ExportLYT(bpy.types.Operator, bpy_extras.io_utils.ExportHelper):
             f.write('  obstaclecount 0\n')
             f.write('  doorhookcount 0\n')
             f.write('donelayout\n')
+
+        return {'FINISHED'}
+
+
+class KB_OT_rebuild_material_nodes(bpy.types.Operator):
+    '''Rebuild material node tree of this object.'''
+
+    bl_idname = 'kb.rebuild_material_nodes'
+    bl_label = "Rebuild Material Nodes"
+
+    def execute(self, context):
+        if context.object and (context.object.type == 'MESH') and (context.object.nvb.meshtype != nvb_def.Meshtype.EMITTER):
+            nvb_material.rebuild_material(context.object.active_material, context.object.nvb)
 
         return {'FINISHED'}

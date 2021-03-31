@@ -127,6 +127,8 @@ classes = (
     nvb_ops.NVBTEXTURE_IO,
     nvb_ops.NVBTEXTURE_OPS,
 
+    nvb_ops.KB_OT_rebuild_material_nodes,
+
     nvb_ops_anim.NVB_OT_amt_event_delete,
     nvb_ops_anim.NVB_OT_amt_event_new,
     nvb_ops_anim.NVB_OT_anim_clone,
