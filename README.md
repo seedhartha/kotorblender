@@ -11,18 +11,18 @@ This add-on is a fork of KotORBlender, upgraded to support Blender 2.8+. KotORBl
 ## Installation
 
 1. Clone this repository or donwload a ZIP release
-2. Copy or unpack the *kotorblender* folder into Blender addons directory, e.g. "C:/Users/USERNAME/AppData/Roaming/Blender Foundation/Blender/BLENDER_VERSION/scripts/addons"
+2. Copy or unpack the **kotorblender** folder into Blender addons directory, e.g. "C:/Users/USERNAME/AppData/Roaming/Blender Foundation/Blender/BLENDER_VERSION/scripts/addons"
 3. Enable the add-on in Blender Preferences via Edit → Preferences → Add-ons
 
 ## Usage
 
 1. Extract MDL, MDX, WOK, and, optionally, TPC and LYT files to a single directory (Kotor Tool, reone-tools, etc.)
 2. Convert TPC files to TGA/TXI (reone-tools)
-3. Convert binary MDL to ASCII MDL using MDLops (preferably) or MDLedit
+3. Convert binary MDL to ASCII MDL using MDLops or MDLedit
 4. Import ASCII MDL into Blender via File → Import → KotOR Model (.mdl)
 5. Create/modify models
 6. Export ASCII MDL via File → Export → KotOR Model (.mdl)
-7. Convert ASCII MDL to binary MDL using MDLedit (preferably) or MDLops
+7. Convert ASCII MDL to binary MDL using MDLops or MDLedit
 
 ## Trivia
 
@@ -39,7 +39,7 @@ This add-on is a fork of KotORBlender, upgraded to support Blender 2.8+. KotORBl
 ### Known Issues
 
 - You cannot have neverblender and kotorblender *enabled* at the same time
-- Armature management for animating is not working yet
+- MDLedit has problems reading `color` and `selfillumcolor` controllers from ASCII MDL
 
 ## License
 
