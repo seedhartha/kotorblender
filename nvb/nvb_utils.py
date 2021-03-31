@@ -748,3 +748,7 @@ def colorToHex(color):
         intToHex(floatToByte(color[0])),
         intToHex(floatToByte(color[1])),
         intToHex(floatToByte(color[2])))
+
+
+def isPathPoint(object):
+    return object and (object.type == 'EMPTY') and (object.nvb.dummytype == nvb_def.Dummytype.PATHPOINT)

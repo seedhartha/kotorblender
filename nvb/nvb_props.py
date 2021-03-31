@@ -309,7 +309,8 @@ class KB_PG_OBJECT(bpy.types.PropertyGroup):
                                                  (nvb_def.Dummytype.MDLROOT,   'MDL Rootdummy',       'All children are considered part of a mdl',                  2), \
                                                  (nvb_def.Dummytype.PWKROOT,   'PWK Rootdummy',       'All children are considered part of a placeable walkmesh',   3), \
                                                  (nvb_def.Dummytype.REFERENCE, 'Reference node',      'Used in spells. Points to "fx_ref" by default',              4), \
-                                                 (nvb_def.Dummytype.PATCH,     'Patch node',          'Used in spells. Unknown purpose. ',                          5) ],
+                                                 (nvb_def.Dummytype.PATCH,     'Patch node',          'Used in spells. Unknown purpose. ',                          5), \
+                                                 (nvb_def.Dummytype.PATHPOINT, 'Path point',          'Used when exporting paths',                                  6)],
                                         default = nvb_def.Dummytype.NONE)
     # For MDL Rootdummy
     supermodel     : bpy.props.StringProperty(name = 'Supermodel', description = 'Name of the model to inherit animations from', default = nvb_def.null)
@@ -581,3 +582,11 @@ class KB_PG_OBJECT(bpy.types.PropertyGroup):
     splat : bpy.props.BoolProperty(name="Splat", description="Splat", default = False, options=set())
     inherit_part : bpy.props.BoolProperty(name="Part", description="???", default = False, options=set())
     depth_texture : bpy.props.BoolProperty(name="Use Depth Texture", description="Use Depth Texture", default = False, options=set())
+
+    # Path points
+
+    class PathConnection(bpy.types.PropertyGroup):
+        point : bpy.props.StringProperty(name='Point')
+
+    path_connections : bpy.props.CollectionProperty(type=PathConnection)
+    active_path_connection : bpy.props.IntProperty()

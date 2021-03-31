@@ -6,6 +6,7 @@ This add-on is a fork of KotORBlender, upgraded to support Blender 2.8+. KotORBl
 
 - Import & export ASCII MDL models: geometry, materials, animations, walkmeshes and TXI files
 - Import & export LYT files
+- Export ASCII PTH files
 
 ## Installation
 

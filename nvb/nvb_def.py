@@ -144,8 +144,9 @@ class Dummytype():
     PWKROOT   = 'PWK'
     REFERENCE = 'REF'
     PATCH     = 'PAT'
+    PATHPOINT = 'PTH'
 
-    ALL = {NONE, DWKROOT, MDLROOT, PWKROOT, REFERENCE, PATCH}
+    ALL = {NONE, DWKROOT, MDLROOT, PWKROOT, REFERENCE, PATCH, PATHPOINT}
 
 
 class Classification():
