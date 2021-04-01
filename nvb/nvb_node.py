@@ -1963,9 +1963,6 @@ class Aabb(Trimesh):
 
         # Create material
         if nvb_glob.materialMode != 'NON' and self.roottype == 'mdl' and num_faces > 0:
-            material = nvb_material.load_material(self, name)
-            mesh.materials.append(material)
-
             # Create UV map
             if len(self.tverts) > 0:
                 uv = unpack_list([self.tverts[i] for indices in self.facelist.uvIdx for i in indices])
