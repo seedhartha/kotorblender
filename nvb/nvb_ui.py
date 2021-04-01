@@ -1163,7 +1163,7 @@ class NVB_PT_MESH(bpy.types.Panel):
             box = row.box()
 
             row = box.row()
-            row.prop_search(obj.nvb, 'bitmap', bpy.data, 'images', text='Bitmap')
+            row.prop_search(obj.nvb, 'bitmap', bpy.data, 'images', text='Diffuse map')
             row = box.row()
             row.prop_search(obj.nvb, 'bitmap2', bpy.data, 'images', text='Lightmap')
             row = box.row()
