@@ -48,7 +48,7 @@ class KB_OT_import_path(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
         lines = [line.strip().split() for line in open(self.filepath, 'r')]
 
         basename = os.path.basename(self.filepath)
-        pathname = os.path.splitext(basename)[0]
+        pathname = 'Path_' + os.path.splitext(basename)[0]
         if pathname in bpy.data.objects:
             path_object = bpy.data.objects[pathname]
         else:
