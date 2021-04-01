@@ -1161,38 +1161,37 @@ class NVB_PT_MESH(bpy.types.Panel):
         else: # Trimesh, danglymesh, skin
             row = layout.row()
             box = row.box()
+            row = box.row()
+            row.prop_search(obj.nvb, 'bitmap', bpy.data, 'images')
+            row = box.row()
+            row.prop_search(obj.nvb, 'bitmap2', bpy.data, 'images')
+            row = box.row()
+            row.prop(obj.nvb, 'diffusecolor')
+            row = box.row()
+            row.prop(obj.nvb, 'ambientcolor')
+            row = box.row()
+            row.prop(obj.nvb, 'selfillumcolor')
+            row = box.row()
+            row.prop(obj.nvb, 'wirecolor')
+            row = box.row()
+            row.prop(obj.nvb, 'alpha')
+            row = box.row()
+            row.operator('kb.rebuild_material_nodes')
 
-            row = box.row()
-            row.prop_search(obj.nvb, 'bitmap', bpy.data, 'images', text='Diffuse map')
-            row = box.row()
-            row.prop_search(obj.nvb, 'bitmap2', bpy.data, 'images', text='Lightmap')
-            row = box.row()
-            row.prop(obj.nvb, 'alpha', text='Alpha')
-
-            row = box.row()
-            row.prop(obj.nvb, 'wirecolor', text='Wirecolor')
-            row = box.row()
-            row.prop(obj.nvb, 'selfillumcolor', text='Selfillum. color')
-            row = box.row()
-            row.prop(obj.nvb, 'diffusecolor', text='Diffuse color')
-            row = box.row()
-            row.prop(obj.nvb, 'ambientcolor', text='Ambient color')
-
+            row = layout.row()
+            box = row.box()
             split = box.split()
             col = split.column()
             col.prop(obj.nvb, 'render', text='Render')
             col.prop(obj.nvb, 'shadow', text='Shadow')
             col.prop(obj.nvb, 'lightmapped', text='Lightmapped')
             col.prop(obj.nvb, 'tangentspace', text='Tangentspace')
+            col.prop(obj.nvb, 'm_bIsBackgroundGeometry', text='Background Geometry')
             col = split.column()
             col.prop(obj.nvb, 'beaming', text='Beaming')
             col.prop(obj.nvb, 'inheritcolor', text='Inherit Color')
             col.prop(obj.nvb, 'rotatetexture', text='Rotate Texture')
-
-            row = box.row()
-            row.prop(obj.nvb, 'm_bIsBackgroundGeometry', text='Background Geometry')
-            row = box.row()
-            row.prop(obj.nvb, 'hologram_donotdraw')
+            col.prop(obj.nvb, 'hologram_donotdraw')
             row = box.row()
             row.prop(obj.nvb, 'transparencyhint', text='Transparency Hint')
             row = box.row()
@@ -1213,23 +1212,9 @@ class NVB_PT_MESH(bpy.types.Panel):
                 row.prop(obj.nvb, 'dirt_texture')
                 row = box.row()
                 row.prop(obj.nvb, 'dirt_worldspace')
-
             row = box.row()
             row.label(text = 'Smoothgroups')
             row.prop(obj.nvb, 'smoothgroup', text='Smooth Group', expand = True)
-            row = box.row()
-            row.operator('kb.rebuild_material_nodes')
-
-            # TODO: not applicable to Blender 2.8+?
-            '''
-            try:
-                row = box.row()
-                row.prop(obj.active_material.active_texture.nvb, 'bumpmapped', text='Bumpmapped Texture')
-                row = box.row()
-                row.label(text = '(Warning: Affects all objects using texture)')
-            except:
-                pass
-            '''
 
             # Additional props for danglymeshes
             if (obj.nvb.meshtype == nvb_def.Meshtype.DANGLYMESH):
@@ -1270,8 +1255,6 @@ class NVB_PT_MESH(bpy.types.Panel):
                 row.prop(obj.nvb, 'lytposition', text='LYT Position')
                 row = box.row()
                 row.operator('nvb.load_wok_mats', text = 'Load walkmesh materials', icon='NONE')
-                row = box.row()
-                row.label(text = '(Warning: Removes current materials)')
 
 
 class KB_UL_path_points(bpy.types.UIList):

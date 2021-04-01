@@ -378,8 +378,8 @@ class KB_PG_OBJECT(bpy.types.PropertyGroup):
                                                          ],
                                             default = 'AUTO')
 
-    bitmap           : bpy.props.StringProperty(name = 'Diffuse Texture')
-    bitmap2          : bpy.props.StringProperty(name = 'Lightmap Texture')
+    bitmap           : bpy.props.StringProperty(name = 'Diffuse map')
+    bitmap2          : bpy.props.StringProperty(name = 'Lightmap')
     alpha            : bpy.props.FloatProperty(name = 'Alpha', default = 1.0, min = 0.0, max = 1.0)
     shadow           : bpy.props.BoolProperty(name = 'Shadow', description = 'Whether to cast shadows', default = True, update=nvb_update_shadow_prop)
     render           : bpy.props.BoolProperty(name = 'Render', description = 'Whether to render this object in the scene', default = True)
@@ -399,25 +399,23 @@ class KB_PG_OBJECT(bpy.types.PropertyGroup):
     uvjitter         : bpy.props.FloatProperty(name="Jitter Amount", description="UV animation jitter quantity", default=0.0, options=set())
     uvjitterspeed    : bpy.props.FloatProperty(name="Jitter Speed", description="UV animation jitter speed", default=0.0, options=set())
     transparencyhint : bpy.props.IntProperty(name = 'Transparency Hint', default = 0, min = 0, max = 32)
-    selfillumcolor   : bpy.props.FloatVectorProperty(name = 'Selfilluminationcolor',
+    selfillumcolor   : bpy.props.FloatVectorProperty(name = 'Self-illum. color',
                                                      description = 'Makes the object seem to glow but does not emit light',
                                                      subtype = 'COLOR_GAMMA',
                                                      default = (0.0, 0.0, 0.0),
                                                      min = 0.0, max = 1.0,
                                                      soft_min = 0.0, soft_max = 1.0)
-    diffusecolor     : bpy.props.FloatVectorProperty(name = 'Diffusecolor',
-                                                     description = 'Diffuse color',
+    diffusecolor     : bpy.props.FloatVectorProperty(name = 'Diffuse color',
                                                      subtype = 'COLOR_GAMMA',
                                                      default = (1.0, 1.0, 1.0),
                                                      min = 0.0, max = 1.0,
                                                      soft_min = 0.0, soft_max = 1.0)
-    ambientcolor     : bpy.props.FloatVectorProperty(name = 'Ambientcolor',
-                                                     description = 'Ambient color',
+    ambientcolor     : bpy.props.FloatVectorProperty(name = 'Ambient color',
                                                      subtype = 'COLOR_GAMMA',
                                                      default = (1.0, 1.0, 1.0),
                                                      min = 0.0, max = 1.0,
                                                      soft_min = 0.0, soft_max = 1.0)
-    lytposition      : bpy.props.FloatVectorProperty(name = 'Layout Position',
+    lytposition      : bpy.props.FloatVectorProperty(name = 'LYT Position',
                                                      description = 'Room position in LYT file.',
                                                      subtype = 'XYZ',
                                                      default = (0.0, 0.0, 0.0))
