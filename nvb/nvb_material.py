@@ -94,7 +94,7 @@ def rebuild_material(material, node):
 
             lightmap = nodes.new('ShaderNodeTexImage')
             lightmap.location = (300, -300)
-            lightmap.image = nvb_teximage.load_image(node.bitmap2)
+            lightmap.image = nvb_teximage.load_texture_image(node.bitmap2)
 
             material.shadow_method = 'NONE'
             links.new(lightmap.inputs[0], lightmap_uv.outputs[0])

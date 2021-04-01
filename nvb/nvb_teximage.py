@@ -25,16 +25,6 @@ def _create_image(name, path):
     return image
 
 
-def load_image(name):
-    """
-    Get or create an image data-block by name.
-    """
-    if name in bpy.data.images:
-        return bpy.data.images[name]
-    else:
-        return _create_image(name, nvb_glob.texturePath)
-
-
 def load_texture_image(name):
     """
     Get or create a texture data-block by name.
@@ -50,10 +40,3 @@ def load_texture_image(name):
         nvb_txi.loadTxi(texture)
 
     return texture.image
-
-def get_texture_by_image(image):
-    for tex in bpy.data.textures:
-        if tex.type == 'IMAGE' and tex.image == image:
-            return tex
-
-    return None
