@@ -790,15 +790,27 @@ class NVB_OP_ExportLYT(bpy.types.Operator, bpy_extras.io_utils.ExportHelper):
 
     def execute(self, context):
         with open(self.filepath, 'w') as f:
-            # Only export selected objects
-            num_objects = len(bpy.context.selected_objects)
+            rooms = []
+            others = []
+
+            objects = bpy.context.selected_objects if len(bpy.context.selected_objects) > 0 else bpy.context.collection.objects
+            for obj in objects:
+                if obj.type == 'EMPTY':
+                    if obj.nvb.dummytype == nvb_def.Dummytype.MDLROOT:
+                        rooms.append(obj)
+                    else:
+                        others.append(obj)
+
             f.write('beginlayout\n')
-            f.write('  roomcount {}\n'.format(num_objects))
-            for o in bpy.context.selected_objects:
-                f.write('    {} {:.7f} {:.7f} {:.7f}\n'.format(o.name, *o.location))
+            f.write('  roomcount {}\n'.format(len(rooms)))
+            for room in rooms:
+                f.write('    {} {:.7f} {:.7f} {:.7f}\n'.format(room.name, *room.location))
             f.write('  trackcount 0\n')
             f.write('  obstaclecount 0\n')
             f.write('  doorhookcount 0\n')
+            f.write('  othercount {}\n'.format(len(others)))
+            for other in others:
+                f.write('    {} {:.7f} {:.7f} {:.7f}\n'.format(other.name, *other.location))
             f.write('donelayout\n')
 
         return {'FINISHED'}
