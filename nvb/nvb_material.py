@@ -11,7 +11,7 @@ def _get_material_name(node):
     """
     Get material name of the model node.
     """
-    # Diffuse texture or diffuse color
+    # Diffuse map or diffuse color
     if not nvb_utils.isNull(node.bitmap):
         result = "D" + node.bitmap
     else:
@@ -76,7 +76,7 @@ def rebuild_material(material, node):
         mul_alpha.inputs[0].default_value = 1.0
         mul_alpha.inputs[1].default_value = node.alpha
 
-        # Diffuse texture node
+        # Diffuse map node
         has_diffuse = not nvb_utils.isNull(node.bitmap)
         if has_diffuse:
             diffuse = nodes.new('ShaderNodeTexImage')
@@ -85,7 +85,7 @@ def rebuild_material(material, node):
             links.new(mul_diffuse_by_lightmap.inputs[0], diffuse.outputs[0])
             links.new(mul_alpha.inputs[0], diffuse.outputs[1])
 
-        # Lightmap texture node
+        # Lightmap node
         has_lightmap = not nvb_utils.isNull(node.bitmap2)
         if has_lightmap:
             lightmap_uv = nodes.new('ShaderNodeUVMap')
