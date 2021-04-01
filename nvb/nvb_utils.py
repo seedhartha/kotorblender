@@ -747,3 +747,16 @@ def colorToHex(color):
 
 def isPathPoint(object):
     return object and (object.type == 'EMPTY') and (object.nvb.dummytype == nvb_def.Dummytype.PATHPOINT)
+
+
+def getMdlRoot(object):
+    '''
+    :returns: MDL root object for the specified object.
+    '''
+    if (object.type == 'EMPTY') and (object.nvb.dummytype == nvb_def.Dummytype.MDLROOT):
+        return object
+
+    if not object.parent:
+        return None
+
+    return getMdlRoot(object.parent)
