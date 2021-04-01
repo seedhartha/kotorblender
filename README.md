@@ -16,6 +16,8 @@ This add-on is a fork of KotORBlender, upgraded to support Blender 2.8+. KotORBl
 
 ## Usage
 
+### Modelling
+
 1. Extract MDL, MDX, WOK, and, optionally, TPC and LYT files to a single directory (Kotor Tool, reone-tools, etc.)
 2. Convert TPC files to TGA/TXI (reone-tools)
 3. Convert binary MDL to ASCII MDL using MDLops or MDLedit
@@ -24,11 +26,32 @@ This add-on is a fork of KotORBlender, upgraded to support Blender 2.8+. KotORBl
 6. Export ASCII MDL via File → Export → KotOR Model (.mdl)
 7. Convert ASCII MDL to binary MDL using MDLops or MDLedit
 
+### Baking Lightmaps
+
+1. Select lightmapped objects and enter Edit mode
+2. UV Unwrap Faces via UV → Lightmap Pack
+3. For each lightmapped object:
+    1. Select lightmap UV Map in Object Data Properties
+    2. Select lightmap texture node in material node tree
+    3. Remove a link between lightmap texture node and Multiply node
+4. In Render Properties
+    1. Set Render Engine to Cycles
+    2. Set Margin to a lower number, e.g. 1
+    3. Press the Bake button
+
+### Editing Paths
+
+1. Extract PTH file from the module's RIM file, e.g. "modules/danm13_s.rim" (Kotor Tool, reone-tools, etc.)
+2. Convert binary PTH to ASCII PTH using reone-tools: `reone-tools --to-ascii m13aa.pth`
+3. Import ASCII PTH into Blender via File → Import → KotOR Path (.pth)
+4. Create/move path points, or modify path connections via Object Properties
+5. Export ASCII PTH via File → Export → KotOR Path (.pth)
+6. Convert ASCII PTH to binary PTH using reone-tools: `reone-tools --to-pth m13aa-ascii.pth`
+
 ## Trivia
 
 - Check "Image search" when importing to recursively search for textures in subdirectories
 - Only selected objects are exported, unless none are selected, in which case all objects will be exported
-- It is possible to bake lightmaps using the Cycles rendering engine
 
 ## Compatibility
 
