@@ -1,8 +1,9 @@
+import os
+
 import bpy
 import bpy_extras
 
-from . import nvb_def
-from . import nvb_utils
+from . import nvb_def, nvb_utils
 
 
 class KB_OT_add_connection(bpy.types.Operator):
@@ -46,13 +47,22 @@ class KB_OT_import_path(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
     def execute(self, context):
         lines = [line.strip().split() for line in open(self.filepath, 'r')]
 
+        basename = os.path.basename(self.filepath)
+        pathname = os.path.splitext(basename)[0]
+        if pathname in bpy.data.objects:
+            path_object = bpy.data.objects[pathname]
+        else:
+            path_object = bpy.data.objects.new(pathname, None)
+            bpy.context.collection.objects.link(path_object)
+
         # First pass: read points, create point objects
         for line in lines:
             if len(line) == 5:
-                an_object = bpy.data.objects.new(line[0], None)
-                an_object.location = [float(x) for x in line[1:4]]
-                an_object.nvb.dummytype = nvb_def.Dummytype.PATHPOINT
-                bpy.context.collection.objects.link(an_object)
+                point_object = bpy.data.objects.new(line[0], None)
+                point_object.parent = path_object
+                point_object.location = [float(x) for x in line[1:4]]
+                point_object.nvb.dummytype = nvb_def.Dummytype.PATHPOINT
+                bpy.context.collection.objects.link(point_object)
 
         # Second pass: read connections, append to point objects
         point = None
