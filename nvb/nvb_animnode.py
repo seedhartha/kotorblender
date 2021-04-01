@@ -902,7 +902,6 @@ class Animnode():
         self.parent = nvb_def.null
 
         self.emitter_data = dict()
-        self.material_data = dict()
         self.object_data = dict()
 
         # Animesh Data
@@ -915,7 +914,7 @@ class Animnode():
 
     def __bool__(self):
         """Return false if the node is empty, i.e. no anims attached."""
-        return self.object_data or self.material_data or self.emitter_data
+        return self.object_data or self.emitter_data
 
     @staticmethod
     def insert_kfp(frames, values, action, dp, dp_dim, action_group=None):
@@ -1046,9 +1045,6 @@ class Animnode():
                     else:
                         # object property
                         attr_type = Node.KEY_TYPE[attr_name]
-                    #XXX material data assignment currently bit of a hack
-                    if 'objdata' in attr_type and attr_type['objdata'] is None:
-                        key_data = self.material_data
                     numVals = attr_type['values']
                     numKeys = 0
                     if key_type:
@@ -1095,45 +1091,6 @@ class Animnode():
                         break
                 '''
 
-    def create_data_material(self, obj, anim, options={}):
-        """Creates animations in material actions."""
-
-        def data_conversion(label, mat, vals):
-            if label == 'alpha':
-                # TODO: upgrade for Blender 2.8+
-                '''
-                if mat.active_texture:
-                    # Material has a texture
-                    tslotIdx = mat.active_texture_index
-                    dp = 'texture_slots[' + str(tslotIdx) + '].alpha_factor'
-                    dp_dim = 1
-                else:
-                    # No texture
-                    dp = 'alpha'
-                    dp_dim = 1
-                '''
-                dp = 'alpha'
-                dp_dim = 1
-
-            return vals, dp, dp_dim
-
-        mat = obj.active_material
-        if not mat:
-            return
-        #fps = options.scene.render.fps
-        fps = nvb_def.fps
-        frame_start = anim.frameStart
-        action = nvb_utils.get_action(mat, mat.name)
-        for label, (data, data_path, data_dim) in self.material_data.items():
-            frames = [fps * d[0] + frame_start for d in data]
-            if not data_path:  # Needs conversion
-                values, dp, dp_dim = data_conversion(
-                    label, mat, [d[1:data_dim+1] for d in data])
-            else:
-                values = [d[1:data_dim+1] for d in data]
-                dp = data_path
-                dp_dim = data_dim
-            Animnode.insert_kfp(frames, values, action, dp, dp_dim)
 
     def create_data_object(self, obj, anim, options={}):
         """Creates animations in object actions."""
@@ -1414,8 +1371,6 @@ class Animnode():
         """TODO:Doc."""
         if self.object_data:
             self.create_data_object(obj, anim, options)
-        if self.material_data:
-            self.create_data_material(obj, anim, options)
         if self.emitter_data:
             self.create_data_emitter(obj, anim, options)
         if self.uvdata:
