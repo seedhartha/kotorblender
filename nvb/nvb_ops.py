@@ -791,6 +791,7 @@ class NVB_OP_ExportLYT(bpy.types.Operator, bpy_extras.io_utils.ExportHelper):
     def execute(self, context):
         with open(self.filepath, 'w') as f:
             rooms = []
+            doors = []
             others = []
 
             objects = bpy.context.selected_objects if len(bpy.context.selected_objects) > 0 else bpy.context.collection.objects
@@ -798,19 +799,27 @@ class NVB_OP_ExportLYT(bpy.types.Operator, bpy_extras.io_utils.ExportHelper):
                 if obj.type == 'EMPTY':
                     if obj.nvb.dummytype == nvb_def.Dummytype.MDLROOT:
                         rooms.append(obj)
+                    elif obj.name.lower().startswith('door'):
+                        doors.append(obj)
                     else:
                         others.append(obj)
 
             f.write('beginlayout\n')
             f.write('  roomcount {}\n'.format(len(rooms)))
             for room in rooms:
-                f.write('    {} {:.7f} {:.7f} {:.7f}\n'.format(room.name, *room.location))
+                f.write('    {} {:.7g} {:.7g} {:.7g}\n'.format(room.name, *room.location))
             f.write('  trackcount 0\n')
             f.write('  obstaclecount 0\n')
-            f.write('  doorhookcount 0\n')
+            f.write('  doorhookcount {}\n'.format(len(doors)))
+            for door in doors:
+                parent = nvb_utils.getMdlRoot(door)
+                orientation = door.rotation_euler.to_quaternion()
+                f.write('    {} {} {:.7g} {:.7g} {:.7g} {:.7g} {:.7g} {:.7g} {:.7g}\n'.format(parent.name if parent else 'NULL', door.name, *door.matrix_world.translation, *orientation))
             f.write('  othercount {}\n'.format(len(others)))
             for other in others:
-                f.write('    {} {:.7f} {:.7f} {:.7f}\n'.format(other.name, *other.location))
+                parent = nvb_utils.getMdlRoot(other)
+                orientation = other.rotation_euler.to_quaternion()
+                f.write('    {} {} {:.7g} {:.7g} {:.7g} {:.7g} {:.7g} {:.7g} {:.7g}\n'.format(parent.name if parent else 'NULL', other.name, *other.matrix_world.translation, *orientation))
             f.write('donelayout\n')
 
         return {'FINISHED'}
