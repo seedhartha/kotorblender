@@ -96,7 +96,7 @@ class Node():
         'alpha': {
             'values': 1,
             'axes': 1,
-            'objdata': None,
+            'objdata': 'nvb.alpha',
         },
         'selfillumcolor': {
             'values': 3,
@@ -465,40 +465,6 @@ class Node():
                     self.parseKeysIncompat(asciiBlock[idx:idx+numKeys+1])
                     self.isEmpty = False
 
-    def addAnimToMaterial(self, targetMaterial, animName = ''):
-        if not self.requiresUniqueData():
-            return
-
-        #actionName           = animName + '.' + targetMaterial.name
-        actionName           = targetMaterial.name
-        action               = bpy.data.actions.new(name=actionName)
-        action.use_fake_user = True
-
-        # If there is a texture, use texture alpha for animations
-        # TODO: upgrade for Blender 2.8+
-        '''
-        if targetMaterial.active_texture:
-            # Material has a texture
-            # data_path = material.texture_slots[x].alpha_factor
-            tslotIdx = targetMaterial.active_texture_index
-            curve    = action.fcurves.new(data_path='texture_slots[' + str(tslotIdx) + '].alpha_factor')
-        else:
-            # No texture.
-            # data_path = material.alpha
-            curve = action.fcurves.new(data_path='alpha')
-        '''
-        curve = action.fcurves.new(data_path='alpha')
-
-        if self.keys.alpha:
-            for index, key in enumerate(self.keys.alpha):
-                self.addKeyframeToCurve(curve, self.keys.alpha, index, 1, 1)
-                #curve.keyframe_points.insert(nvb_utils.nwtime2frame(key[0]), key[1])
-        elif self.alpha is not None:
-            curve.keyframe_points.insert(0, self.alpha)
-
-        targetMaterial.animation_data_create()
-        targetMaterial.animation_data.action = action
-
 
     def addKeyframeToCurve(self, curve, key_coll, key_idx, value_idx, num_values):
         '''
@@ -591,10 +557,6 @@ class Node():
             txt.write(self.keys.rawascii)
             targetObject.nvb.rawascii = txt.name
 
-        # For Materials: Add animation for materials (only alpha atm)
-        if targetObject.active_material:
-            self.addAnimToMaterial(targetObject.active_material, animName)
-
         targetObject.animation_data_create()
         targetObject.animation_data.action = action
 
@@ -607,11 +569,6 @@ class Node():
             dataPath = fcurve.data_path
             name     = ''
             #print(dataPath)
-            # handle material property alpha separately
-            if dataPath.endswith('alpha_factor') or \
-               dataPath.endswith('alpha'):
-                name = 'alphakey'
-                ktype = Node.KEY_TYPE['alpha']
             for keyname in Node.KEY_TYPE.keys():
                 ktype = Node.KEY_TYPE[keyname]
                 if ktype['objdata'] is not None and \
