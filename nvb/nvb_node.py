@@ -718,8 +718,8 @@ class Trimesh(GeometryNode):
         obj.nvb.uvjitterspeed    = self.uvjitterspeed
         obj.nvb.transparencyhint = self.transparencyhint
         obj.nvb.selfillumcolor   = self.selfillumcolor
-        obj.nvb.diffusecolor     = self.diffuse
-        obj.nvb.ambientcolor     = self.ambient
+        obj.nvb.diffuse          = self.diffuse
+        obj.nvb.ambient          = self.ambient
         obj.nvb.lytposition      = self.lytposition
 
 
@@ -738,9 +738,9 @@ class Trimesh(GeometryNode):
     def addMaterialDataToAscii(self, obj, asciiLines):
         asciiLines.append('  alpha ' + str(round(obj.nvb.alpha, 2)))
 
-        asciiLines.append('  diffuse ' + str(round(obj.nvb.diffusecolor[0], 2)) + ' ' +
-                                         str(round(obj.nvb.diffusecolor[1], 2)) + ' ' +
-                                         str(round(obj.nvb.diffusecolor[2], 2)))
+        asciiLines.append('  diffuse ' + str(round(obj.nvb.diffuse[0], 2)) + ' ' +
+                                         str(round(obj.nvb.diffuse[1], 2)) + ' ' +
+                                         str(round(obj.nvb.diffuse[2], 2)))
 
         tangentspace = 1 if obj.nvb.tangentspace else 0
         asciiLines.append('  tangentspace ' + str(tangentspace))
@@ -955,7 +955,7 @@ class Trimesh(GeometryNode):
     def addDataToAscii(self, obj, asciiLines, classification = nvb_def.Classification.UNKNOWN, simple = False, nameDict=None):
         GeometryNode.addDataToAscii(self, obj, asciiLines, classification, simple, nameDict=nameDict)
 
-        color = obj.nvb.ambientcolor
+        color = obj.nvb.ambient
         asciiLines.append('  ambient ' +    str(round(color[0], 2)) + ' ' +
                                             str(round(color[1], 2)) + ' ' +
                                             str(round(color[2], 2))  )
