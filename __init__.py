@@ -69,11 +69,11 @@ import bpy
 
 
 def menu_func_import_mdl(self, context):
-    self.layout.operator(nvb_ops.NVB_OP_ImportMDL.bl_idname, text="KotOR Model (.mdl)")
+    self.layout.operator(nvb_ops.NVB_OT_ImportMDL.bl_idname, text="KotOR Model (.mdl)")
 
 
 def menu_func_import_lyt(self, context):
-    self.layout.operator(nvb_ops.NVB_OP_ImportLYT.bl_idname, text="KotOR Layout (.lyt)")
+    self.layout.operator(nvb_ops.NVB_OT_ImportLYT.bl_idname, text="KotOR Layout (.lyt)")
 
 
 def menu_func_import_pth(self, context):
@@ -81,11 +81,11 @@ def menu_func_import_pth(self, context):
 
 
 def menu_func_export_mdl(self, context):
-    self.layout.operator(nvb_ops.NVB_OP_ExportMDL.bl_idname, text="KotOR Model (.mdl)")
+    self.layout.operator(nvb_ops.NVB_OT_ExportMDL.bl_idname, text="KotOR Model (.mdl)")
 
 
 def menu_func_export_lyt(self, context):
-    self.layout.operator(nvb_ops.NVB_OP_ExportLYT.bl_idname, text="KotOR Layout (.lyt)")
+    self.layout.operator(nvb_ops.NVB_OT_ExportLYT.bl_idname, text="KotOR Layout (.lyt)")
 
 
 def menu_func_export_pth(self, context):
@@ -110,10 +110,10 @@ classes = (
     nvb_ops.NVB_LIST_OT_LightFlare_Delete,
     nvb_ops.NVB_LIST_OT_LightFlare_Move,
     nvb_ops.NVB_LIST_OT_LightFlare_New,
-    nvb_ops.NVB_OP_ExportLYT,
-    nvb_ops.NVB_OP_ExportMDL,
-    nvb_ops.NVB_OP_ImportLYT,
-    nvb_ops.NVB_OP_ImportMDL,
+    nvb_ops.NVB_OT_ExportLYT,
+    nvb_ops.NVB_OT_ExportMDL,
+    nvb_ops.NVB_OT_ImportLYT,
+    nvb_ops.NVB_OT_ImportMDL,
     nvb_ops.NVBCHILDREN_SMOOTHGROUP,
     nvb_ops.NVBOBJECT_OT_AnimsceneAdd,
     nvb_ops.NVBOBJECT_OT_AnimsceneRename,
