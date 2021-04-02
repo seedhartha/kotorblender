@@ -6,7 +6,7 @@ import os
 from . import nvb_def
 
 
-def isNull(s):
+def is_null(s):
     return (not s or s.lower() == nvb_def.null.lower())
 
 
@@ -20,7 +20,7 @@ def isclose_3f(a, b, rel_tol=0.1):
             isclose(a[2], b[2], rel_tol))
 
 
-def isNumber(s):
+def is_number(s):
     try:
         float(s)
     except ValueError:
@@ -29,7 +29,7 @@ def isNumber(s):
         return True
 
 
-def getName(s):
+def get_name(s):
     """
     To be able to switch to case sensitive and back
     Still not certain mdl node names are case sensitive
@@ -37,7 +37,7 @@ def getName(s):
     #return s.lower()
     return s
 
-def getRealName(s):
+def get_real_name(s):
     """
     Do a case insensitive search through existing objects,
     returning name or None if not found
@@ -48,22 +48,13 @@ def getRealName(s):
         return None
 
 
-def isNumber(s):
-    try:
-        float(s)
-    except ValueError:
-        return False
-    else:
-        return True
-
-
-def getValidExports(rootDummy, validExports):
+def get_valid_exports(rootDummy, validExports):
     validExports.append(rootDummy.name)
     for child in rootDummy.children:
-        getValidExports(child, validExports)
+        get_valid_exports(child, validExports)
 
 
-def getAnimationRootdummy(animScene):
+def get_animation_root_dummy(animScene):
     if animScene:
         for obj in animScene.objects:
             if obj.type == 'EMPTY':
@@ -72,24 +63,24 @@ def getAnimationRootdummy(animScene):
     return None
 
 
-def ancestorNode(obj, test):
+def ancestor_node(obj, test):
     try:
         if test(obj):
             return obj
     except:
         pass
     if obj is not None and obj.parent:
-        return ancestorNode(obj.parent, test)
+        return ancestor_node(obj.parent, test)
     return None
 
 
-def searchNode(obj, test):
+def search_node(obj, test):
     try:
         if obj and test(obj):
             return obj
         match = None
         for child in obj.children:
-            match = searchNode(child, test)
+            match = search_node(child, test)
             if match is not None:
                 return match
     except:
@@ -97,10 +88,10 @@ def searchNode(obj, test):
     return None
 
 
-def searchNodeAll(obj, test):
+def search_node_all(obj, test):
     nodes = []
     for child in obj.children:
-        nodes.extend(searchNodeAll(child, test))
+        nodes.extend(search_node_all(child, test))
     try:
         if obj and test(obj):
             nodes.append(obj)
@@ -109,15 +100,15 @@ def searchNodeAll(obj, test):
     return nodes
 
 
-def searchNodeInModel(obj, test):
+def search_node_in_model(obj, test):
     """
     Helper to search through entire model from any starting point in hierarchy;
     walks up to model root and performs find-one search.
     """
-    return searchNode(ancestorNode(obj, isRootDummy), test)
+    return search_node(ancestor_node(obj, is_root_dummy), test)
 
 
-def isRootDummy(obj, dummytype = nvb_def.Dummytype.MDLROOT):
+def is_root_dummy(obj, dummytype = nvb_def.Dummytype.MDLROOT):
     if not obj:
         return False
     return (obj.type == 'EMPTY') and \
@@ -125,7 +116,7 @@ def isRootDummy(obj, dummytype = nvb_def.Dummytype.MDLROOT):
            (not obj.nvb.isanimation)
 
 
-def getNodeType(obj):
+def get_node_type(obj):
     """
     Get the node type (dummy, trimesh, skin, ...) of the blender object
     """
@@ -157,11 +148,11 @@ def get_children_recursive(obj, obj_list):
     Helper following neverblender naming, compatibility layer
     Get all descendent nodes under obj in a flat list
     """
-    obj_list.extend(searchNodeAll(obj, lambda o: o is not None))
+    obj_list.extend(search_node_all(obj, lambda o: o is not None))
 
 
 def is_mdl_base(obj):
-    return isRootDummy(obj)
+    return is_root_dummy(obj)
 
 
 def get_obj_mdl_base(obj):
@@ -169,7 +160,7 @@ def get_obj_mdl_base(obj):
     Helper following neverblender naming, compatibility layer
     Get ancestor-or-self MDL root
     """
-    return ancestorNode(obj, isRootDummy)
+    return ancestor_node(obj, is_root_dummy)
 
 
 def get_mdl_base(obj=None, scene=None):
@@ -309,7 +300,7 @@ def toggle_anim_focus(scene, mdl_base):
     scene.frame_current = scene.frame_start
 
 
-def checkAnimBounds(mdl_base):
+def check_anim_bounds(mdl_base):
     """
     Check for animations of this mdl base.
 
@@ -331,7 +322,7 @@ def chunker(seq, size):
     return (seq[pos:pos + size] for pos in range(0, len(seq), size))
 
 
-def getImageFilename(image):
+def get_image_filename(image):
     """
     Returns the image name without the file extension.
     """
@@ -344,22 +335,22 @@ def getImageFilename(image):
     return filename
 
 
-def getShagrId(shagrName):
+def get_shagr_id(shagrName):
     return  int(shagrName[-4:])
 
 
-def getShagrName(shagrId):
+def get_shagr_name(shagrId):
     return  nvb_def.shagrPrefix + "{0:0>4}".format(shagrId)
 
 
-def isShagr(vgroup):
+def is_shagr(vgroup):
     """
     Determines wether vertex_group ist a shading group or not
     """
     return (nvb_def.shagrPrefix in vgroup.name)
 
 
-def setObjectRotationAurora(obj, nwangle):
+def set_object_rotation_aurora(obj, nwangle):
     rotMode = obj.rotation_mode
     if   rotMode == "QUATERNION":
         q = mathutils.Quaternion((nwangle[0], nwangle[1], nwangle[2]), nwangle[3])
@@ -375,7 +366,7 @@ def setObjectRotationAurora(obj, nwangle):
         obj.rotation_euler = eul
 
 
-def getAuroraRotFromObject(obj):
+def get_aurora_rot_from_object(obj):
     """
     Get the rotation from an object as Axis Angle in the format used by NWN
     NWN uses     [X, Y, Z, Angle]
@@ -399,7 +390,7 @@ def getAuroraRotFromObject(obj):
     return [0.0, 0.0, 0.0, 0.0]
 
 
-def getAuroraRotFromMatrix(matrix):
+def get_aurora_rot_from_matrix(matrix):
     """
     Get the rotation from a 4x4 matrix as Axis Angle in the format used by NWN
     NWN uses     [X, Y, Z, Angle]
@@ -409,7 +400,7 @@ def getAuroraRotFromMatrix(matrix):
     return [q.axis[0], q.axis[1], q.axis[2], q.angle]
 
 
-def getAuroraScale(obj):
+def get_aurora_scale(obj):
     """
     If the scale is uniform, i.e, x=y=z, we will return
     the value. Else we'll return 1.
@@ -442,7 +433,7 @@ def nwangle2euler(nwangle):
     return q.to_euler()
 
 
-def setupMinimapRender(mdlroot, scene, light_color = (1.0, 1.0, 1.0), alpha_mode = 'TRANSPARENT'):
+def setup_minimap_render(mdlroot, scene, light_color = (1.0, 1.0, 1.0), alpha_mode = 'TRANSPARENT'):
     # Create the light if not already present in scene
     lightName = 'MinimapLight'
     camName  = 'MinimapCamera'
@@ -503,7 +494,7 @@ def setupMinimapRender(mdlroot, scene, light_color = (1.0, 1.0, 1.0), alpha_mode
     scene.render.image_settings.file_format = 'TARGA_RAW'
 
 
-def copyAnimSceneCheck(theOriginal, newSuffix, oldSuffix = ''):
+def copy_anim_scene_check(theOriginal, newSuffix, oldSuffix = ''):
     """
     Checks if it possible to copy the object and it's children with the suffix
     It would be impossible if:
@@ -551,12 +542,12 @@ def copyAnimSceneCheck(theOriginal, newSuffix, oldSuffix = ''):
 
     valid = True
     for child in theOriginal.children:
-        valid = valid and copyAnimSceneCheck(child, newSuffix, oldSuffix)
+        valid = valid and copy_anim_scene_check(child, newSuffix, oldSuffix)
 
     return valid
 
 
-def copyAnimScene(scene, theOriginal, newSuffix, oldSuffix = '', parent = None):
+def copy_anim_scene(scene, theOriginal, newSuffix, oldSuffix = '', parent = None):
     """
     Copy object and all it's children to scene.
     For object with simple (position, rotation) or no animations we
@@ -619,13 +610,13 @@ def copyAnimScene(scene, theOriginal, newSuffix, oldSuffix = '', parent = None):
 
     # Convert all child objects too
     for child in theOriginal.children:
-        copyAnimScene(scene, child, newSuffix, oldSuffix, theCopy)
+        copy_anim_scene(scene, child, newSuffix, oldSuffix, theCopy)
 
     # Return the copied rootDummy
     return theCopy
 
 
-def renameAnimScene(obj, newSuffix, oldSuffix = ''):
+def rename_anim_scene(obj, newSuffix, oldSuffix = ''):
     """
     Copy object and all it's children to scene.
     For object with simple (position, rotation) or no animations we
@@ -669,13 +660,13 @@ def renameAnimScene(obj, newSuffix, oldSuffix = ''):
 
     # Convert all child objects too
     for child in obj.children:
-        renameAnimScene(child, newSuffix, oldSuffix)
+        rename_anim_scene(child, newSuffix, oldSuffix)
 
     # Return the renamed rootDummy
     return obj
 
 
-def createHookModifiers(obj):
+def create_hook_modifiers(obj):
     skingrName = ''
     for vg in obj.vertex_groups:
         if vg.name in bpy.data.objects:
@@ -684,7 +675,7 @@ def createHookModifiers(obj):
             mod.vertex_group = vg
 
 
-def eulerFilter(currEul, prevEul):
+def euler_filter(currEul, prevEul):
 
     def distance(a, b):
         return abs(a[0] - b[0]) + abs(a[1] - b[1]) + abs(a[2] - b[2])
@@ -697,7 +688,7 @@ def eulerFilter(currEul, prevEul):
         f[2] += math.pi
         return f
 
-    def flipDiff(a, b):
+    def flip_diff(a, b):
         while abs(a - b) > math.pi:
             if a < b:
                 b -= 2 * math.pi
@@ -710,15 +701,15 @@ def eulerFilter(currEul, prevEul):
         return currEul
 
     eul = currEul.copy()
-    eul[0] = flipDiff(prevEul[0], eul[0])
-    eul[1] = flipDiff(prevEul[1], eul[1])
-    eul[2] = flipDiff(prevEul[2], eul[2])
+    eul[0] = flip_diff(prevEul[0], eul[0])
+    eul[1] = flip_diff(prevEul[1], eul[1])
+    eul[2] = flip_diff(prevEul[2], eul[2])
 
     # Flip current euler
     flipEul = flip(eul)
-    flipEul[0] = flipDiff(prevEul[0], flipEul[0])
-    flipEul[1] = flipDiff(prevEul[1], flipEul[1])
-    flipEul[2] = flipDiff(prevEul[2], flipEul[2])
+    flipEul[0] = flip_diff(prevEul[0], flipEul[0])
+    flipEul[1] = flip_diff(prevEul[1], flipEul[1])
+    flipEul[2] = flip_diff(prevEul[2], flipEul[2])
 
     currDist = distance(prevEul, eul)
     flipDist = distance(prevEul, flipEul)
@@ -729,26 +720,26 @@ def eulerFilter(currEul, prevEul):
         return eul
 
 
-def floatToByte(val):
+def float_to_byte(val):
     return int(val * 255)
 
 
-def intToHex(val):
+def int_to_hex(val):
     return "{:02X}".format(val)
 
 
-def colorToHex(color):
+def color_to_hex(color):
     return "{}{}{}".format(
-        intToHex(floatToByte(color[0])),
-        intToHex(floatToByte(color[1])),
-        intToHex(floatToByte(color[2])))
+        int_to_hex(float_to_byte(color[0])),
+        int_to_hex(float_to_byte(color[1])),
+        int_to_hex(float_to_byte(color[2])))
 
 
-def isPathPoint(object):
+def is_path_point(object):
     return object and (object.type == 'EMPTY') and (object.nvb.dummytype == nvb_def.Dummytype.PATHPOINT)
 
 
-def getMdlRoot(object):
+def get_mdl_root(object):
     """
     :returns: MDL root object for the specified object.
     """
@@ -758,4 +749,4 @@ def getMdlRoot(object):
     if not object.parent:
         return None
 
-    return getMdlRoot(object.parent)
+    return get_mdl_root(object.parent)

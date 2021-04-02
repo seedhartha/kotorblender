@@ -42,6 +42,6 @@ def load_texture_image(name):
         texture = bpy.data.textures.new(name, type='IMAGE')
         texture.image = image
         texture.use_fake_user = True
-        nvb_txi.loadTxi(texture)
+        nvb_txi.load_txi(texture)
 
     return texture.image

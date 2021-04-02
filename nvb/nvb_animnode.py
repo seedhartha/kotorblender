@@ -72,7 +72,7 @@ class Keys():
         # Unknown. Import as text
         self.rawascii = ''
 
-    def hasAlpha(self):
+    def has_alpha(self):
         return len(self.alpha) > 0
 
 
@@ -334,17 +334,17 @@ class Node():
         """
         return not self.isEmpty
 
-    def requiresUniqueData(self):
-        return self.keys.hasAlpha()
+    def requires_unique_data(self):
+        return self.keys.has_alpha()
 
-    def parseKeys9f(self, asciiBlock, keyList):
+    def parse_keys_9f(self, asciiBlock, keyList):
         """
         Parse animation keys containing 9 floats (not counting the time value)
         """
         nvb_parse._f(asciiBlock, keyList, 10)
         self.isEmpty = False
 
-    def parseKeys3f(self, asciiBlock, keyList):
+    def parse_keys_3f(self, asciiBlock, keyList):
         """
         Parse animation keys containing 3 floats (not counting the time value)
         """
@@ -352,7 +352,7 @@ class Node():
         self.isEmpty = False
 
 
-    def parseKeys4f(self, asciiBlock, keyList):
+    def parse_keys_4f(self, asciiBlock, keyList):
         """
         Parse animation keys containing 4 floats (not counting the time value)
         """
@@ -360,7 +360,7 @@ class Node():
         self.isEmpty = False
 
 
-    def parseKeys1f(self, asciiBlock, keyList):
+    def parse_keys_1f(self, asciiBlock, keyList):
         """
         Parse animation keys containing 1 float (not counting the time value)
         """
@@ -368,7 +368,7 @@ class Node():
         self.isEmpty = False
 
 
-    def parseKeysIncompat(self, asciiBlock):
+    def parse_keys_incompat(self, asciiBlock):
         """
         Parse animation keys incompatible with blender. They will be saved
         as plain text.
@@ -378,18 +378,18 @@ class Node():
         self.isEmpty = False
 
     @staticmethod
-    def findEnd(asciiBlock):
+    def find_end(asciiBlock):
         """
         We don't know when a list of keys of keys will end. We'll have to
         search for the first non-numeric value
         """
-        l_isNumber = nvb_utils.isNumber
-        return next((i for i, v in enumerate(asciiBlock) if len(v) and not l_isNumber(v[0])), -1)
+        l_is_number = nvb_utils.is_number
+        return next((i for i, v in enumerate(asciiBlock) if len(v) and not l_is_number(v[0])), -1)
 
-    def loadAscii(self, asciiBlock):
+    def load_ascii(self, asciiBlock):
         l_float    = float
         l_int      = int
-        l_isNumber = nvb_utils.isNumber
+        l_is_number = nvb_utils.is_number
         for idx, line in enumerate(asciiBlock):
             try:
                 label = line[0].lower()
@@ -398,7 +398,7 @@ class Node():
                 continue
             if label == 'node':
                 self.nodeType = line[1].lower()
-                self.name = nvb_utils.getName(line[2])
+                self.name = nvb_utils.get_name(line[2])
             elif label == 'endnode':
                 return
             elif label == 'endlist':
@@ -406,7 +406,7 @@ class Node():
                 # the end of a key list
                 pass
             elif label == 'parent':
-                self.parentName = nvb_utils.getName(line[1])
+                self.parentName = nvb_utils.get_name(line[1])
             elif label in self.KEY_TYPE.keys() or \
                  label in (attr + 'key' for attr in self.KEY_TYPE.keys()) or \
                  label in (attr + 'bezierkey' for attr in self.KEY_TYPE.keys()):
@@ -421,7 +421,7 @@ class Node():
                 if key_type:
                     if key_type == 'bezierkey':
                         numVals *= 3
-                    numKeys = type(self).findEnd(asciiBlock[idx+1:])
+                    numKeys = type(self).find_end(asciiBlock[idx+1:])
                     subblock = asciiBlock[idx+1:idx+numKeys+1]
                 else:
                     numKeys = 1
@@ -444,7 +444,7 @@ class Node():
                 if key_type:
                     if key_type == 'bezierkey':
                         numVals *= 3
-                    numKeys = type(self).findEnd(asciiBlock[idx+1:])
+                    numKeys = type(self).find_end(asciiBlock[idx+1:])
                     subblock = asciiBlock[idx+1:idx+numKeys+1]
                 else:
                     numKeys = 1
@@ -459,14 +459,14 @@ class Node():
                 self.isEmpty = False
             # Some unknown text.
             # Probably keys for emitters = incompatible with blender. Import as text.
-            elif not l_isNumber(line[0]):
-                numKeys = type(self).findEnd(asciiBlock[idx+1:])
+            elif not l_is_number(line[0]):
+                numKeys = type(self).find_end(asciiBlock[idx+1:])
                 if numKeys:
-                    self.parseKeysIncompat(asciiBlock[idx:idx+numKeys+1])
+                    self.parse_keys_incompat(asciiBlock[idx:idx+numKeys+1])
                     self.isEmpty = False
 
 
-    def addKeyframeToCurve(self, curve, key_coll, key_idx, value_idx, num_values):
+    def add_keyframe_to_curve(self, curve, key_coll, key_idx, value_idx, num_values):
         """
         Add Keyframe to animation F-Curve, in bezier or linear style
         """
@@ -488,7 +488,7 @@ class Node():
                 kfp.handle_right[:] = [ cp2frame, key[value_idx + (2 * num_values)] + key[value_idx] ]
 
 
-    def addAnimToObject(self, targetObject, animName = ''):
+    def add_anim_to_object(self, targetObject, animName = ''):
         """
         Add the animations in this node to target object
         """
@@ -517,7 +517,7 @@ class Node():
                 if attrname == 'orientation':
                     # orientation is special
                     eul   = nvb_utils.nwangle2euler(key[1:5])
-                    currEul = nvb_utils.eulerFilter(eul, prevEul)
+                    currEul = nvb_utils.euler_filter(eul, prevEul)
                     prevEul = currEul
                     kfs = []
                     for x in range(0, key_type['axes']):
@@ -526,8 +526,8 @@ class Node():
                 else:
                     # handle each axis, matching values to curves
                     for x in range(0, key_type['axes']):
-                        # handle key/bezierkey for all types in addKeyframeToCurve
-                        self.addKeyframeToCurve(
+                        # handle key/bezierkey for all types in add_keyframe_to_curve
+                        self.add_keyframe_to_curve(
                             curves[x], getattr(self.keys, attrname), index,
                             min(x + 1, key_type['values']), key_type['values'])
         # test for all key types, if present, create timelines for them
@@ -546,8 +546,8 @@ class Node():
                 frame = nvb_utils.nwtime2frame(key[0])
                 # handle each axis, matching values to curves
                 for x in range(0, key_type['axes']):
-                    # handle key/bezierkey for all types in addKeyframeToCurve
-                    self.addKeyframeToCurve(
+                    # handle key/bezierkey for all types in add_keyframe_to_curve
+                    self.add_keyframe_to_curve(
                         curves[x], getattr(self.keys, propname), index,
                         min(x + 1, key_type['values']), key_type['values'])
 
@@ -562,7 +562,7 @@ class Node():
 
 
     @staticmethod
-    def getKeysFromAction(anim, action, keyDict):
+    def get_keys_from_action(anim, action, keyDict):
         for fcurve in action.fcurves:
             # Get the sub dict for this particlar type of fcurve
             axis     = fcurve.array_index
@@ -657,7 +657,7 @@ class Node():
                 keys[frame] = values
 
 
-    def addKeysToAsciiIncompat(self, obj, asciiLines):
+    def add_keys_to_ascii_incompat(self, obj, asciiLines):
         return Node.generate_ascii_keys_incompat(obj, asciiLines)
 
     @staticmethod
@@ -681,7 +681,7 @@ class Node():
             else:
                 # We'll take everything that doesn't start with a #
                 if label[0] != '#':
-                    if nvb_utils.isNumber(label):
+                    if nvb_utils.is_number(label):
                         asciiLines.append('      ' + ' '.join(line))
                     else:
                         asciiLines.append('    ' + ' '.join(line))
@@ -695,19 +695,19 @@ class Node():
         if animObj.animation_data:
             action = animObj.animation_data.action
             if action:
-                Node.getKeysFromAction(anim, action, keyDict)
+                Node.get_keys_from_action(anim, action, keyDict)
 
         # Material/ texture data (= texture alpha_factor)
         if animObj.active_material and animObj.active_material.animation_data:
             action = animObj.active_material.animation_data.action
             if action:
-                Node.getKeysFromAction(anim, action, keyDict)
+                Node.get_keys_from_action(anim, action, keyDict)
 
         # Light Data
         if animObj.data and animObj.data.animation_data:
             action = animObj.data.animation_data.action
             if action:
-                Node.getKeysFromAction(anim, action, keyDict)
+                Node.get_keys_from_action(anim, action, keyDict)
 
         l_str   = str
         l_round = round
@@ -776,7 +776,7 @@ class Node():
 
 
     @staticmethod
-    def getOriginalName(nodeName, animName):
+    def get_original_name(nodeName, animName):
         """
         A bit messy due to compatibility concerns
         """
@@ -797,7 +797,7 @@ class Node():
         return nodeName
 
     @staticmethod
-    def exportNeeded(animObj, anim):
+    def export_needed(animObj, anim):
         """
         Test whether this node should be included in exported ASCII model
         """
@@ -832,38 +832,38 @@ class Node():
                 # this node has animation controllers, include it
                 #XXX match actual controllers sometime
                 # (current will match ANY animation)
-                #print('exportNeeded for ' + animObj.name)
+                #print('export_needed for ' + animObj.name)
                 return True
         # if any children of this node will be included, this node must be
         for child in animObj.children:
-            if Node.exportNeeded(child, anim):
-                print('exportNeeded as parent for ' + animObj.name)
+            if Node.export_needed(child, anim):
+                print('export_needed as parent for ' + animObj.name)
                 return True
         # no reason to include this node
         return False
 
-    def toAscii(self, animObj, asciiLines, animName):
-        originalName = Node.getOriginalName(animObj.name, animName)
+    def to_ascii(self, animObj, asciiLines, animName):
+        originalName = Node.get_original_name(animObj.name, animName)
         originalObj  = bpy.data.objects[originalName]
 
         # test whether this node should be exported,
         # previous behavior was to export all nodes for all animations
-        if not Node.exportNeeded(animObj):
+        if not Node.export_needed(animObj):
             return
 
         originalParent = nvb_def.null
         if animObj.parent:
-            originalParent = Node.getOriginalName(animObj.parent.name, animName)
+            originalParent = Node.get_original_name(animObj.parent.name, animName)
 
         if originalObj.nvb.meshtype == nvb_def.Meshtype.EMITTER:
             asciiLines.append('  node emitter ' + originalName)
             asciiLines.append('    parent ' + originalParent)
-            #self.addKeysToAsciiIncompat(animObj, asciiLines)
+            #self.add_keys_to_ascii_incompat(animObj, asciiLines)
         else:
             asciiLines.append('  node dummy ' + originalName)
             asciiLines.append('    parent ' + originalParent)
         self.addKeysToAscii(animObj, originalObj, asciiLines)
-        self.addKeysToAsciiIncompat(animObj, asciiLines)
+        self.add_keys_to_ascii_incompat(animObj, asciiLines)
         asciiLines.append('  endnode')
 
 import copy
@@ -975,9 +975,9 @@ class Animnode():
             We don't know when a list of keys of keys will end. We'll have to
             search for the first non-numeric value
             """
-            l_isNumber = nvb_utils.isNumber
+            l_is_number = nvb_utils.is_number
             return next((i for i, v in enumerate(ascii_lines)
-                         if not l_isNumber(v[0])), -1)
+                         if not l_is_number(v[0])), -1)
 
         self.nodeidx = nodeidx
         '''
@@ -987,14 +987,14 @@ class Animnode():
             [type(self).object_properties, self.object_data]]
         '''
         key_data = {}
-        l_isNumber = nvb_utils.isNumber
+        l_is_number = nvb_utils.is_number
         for i, line in enumerate(ascii_lines):
             try:
                 label = line[0].lower()
             except (IndexError, AttributeError):
                 continue  # Probably empty line, skip it
             else:
-                if l_isNumber(label):
+                if l_is_number(label):
                     continue
             if label == 'node':
                 self.nodetype = line[1].lower()
@@ -1050,7 +1050,7 @@ class Animnode():
                     if key_type:
                         if key_type == 'bezierkey':
                             numVals *= 3
-                        numKeys = Node.findEnd(ascii_lines[i+1:])
+                        numKeys = Node.find_end(ascii_lines[i+1:])
                         subblock = ascii_lines[i + 1:i + numKeys + 1]
                     else:
                         numKeys = 1
@@ -1118,7 +1118,7 @@ class Animnode():
                     for v in vals:
                         quat = mathutils.Quaternion(v[0:3], v[3])
                         eul = quat.to_euler('XYZ', prev_eul)
-                        #  eul = nvb_utils.eulerFilter(quat.to_euler(),
+                        #  eul = nvb_utils.euler_filter(quat.to_euler(),
                         #  prev_eul)
                         new_values.append(eul)
                         prev_eul = eul
@@ -1380,22 +1380,22 @@ class Animnode():
 
     @staticmethod
     def generate_ascii(obj, anim, asciiLines, options={}):
-        if not obj or not Node.exportNeeded(obj, anim):
+        if not obj or not Node.export_needed(obj, anim):
             return
         # Type + Name
-        #node_type = nvb_utils.getNodeType(obj)
+        #node_type = nvb_utils.get_node_type(obj)
         #node_name = nvb_utils.generate_node_name(obj, options.strip_trailing)
         node_type = "dummy"
         if obj.nvb.meshtype == nvb_def.Meshtype.EMITTER:
             node_type = "emitter"
-        node_name = Node.getOriginalName(obj.name, anim.name)
+        node_name = Node.get_original_name(obj.name, anim.name)
         asciiLines.append('  node ' + node_type + ' ' + node_name)
         # Parent
         #parent_name = nvb_utils.generate_node_name(obj.parent,
         #                                           options.strip_trailing)
         parent_name = nvb_def.null
         if obj.parent:
-            parent_name = Node.getOriginalName(obj.parent.name, anim.name)
+            parent_name = Node.get_original_name(obj.parent.name, anim.name)
         asciiLines.append('    parent ' + parent_name)
         Node.generate_ascii_keys(obj, anim, asciiLines, options)
         #Node.generate_ascii_keys_incompat(obj, anim, asciiLines, options)

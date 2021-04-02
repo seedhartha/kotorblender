@@ -12,7 +12,7 @@ class KB_OT_add_connection(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        return nvb_utils.isPathPoint(context.object)
+        return nvb_utils.is_path_point(context.object)
 
     def execute(self, context):
         context.object.nvb.path_connections.add()
@@ -25,7 +25,7 @@ class KB_OT_remove_connection(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        return nvb_utils.isPathPoint(context.object) and (len(context.object.nvb.path_connections) > 0)
+        return nvb_utils.is_path_point(context.object) and (len(context.object.nvb.path_connections) > 0)
 
     def execute(self, context):
         context.object.nvb.path_connections.remove(context.object.nvb.active_path_connection)
@@ -95,7 +95,7 @@ class KB_OT_export_path(bpy.types.Operator, bpy_extras.io_utils.ExportHelper):
     def execute(self, context):
         with open(self.filepath, 'w') as f:
             for o in bpy.data.objects:
-                if nvb_utils.isPathPoint(o):
+                if nvb_utils.is_path_point(o):
                     f.write('{} {:.7g} {:.7g} {:.7g} {}\n'.format(o.name, *o.location, len(o.nvb.path_connections)))
                     for conn in o.nvb.path_connections:
                         f.write('  {}\n'.format(conn.point))

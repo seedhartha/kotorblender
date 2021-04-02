@@ -715,16 +715,16 @@ class NVB_PT_emitter(bpy.types.Panel):
         row = box.row()
         row.prop(obj.nvb, 'render_emitter')
         if obj.nvb.update == 'Lightning' or \
-           not nvb_utils.isNull(obj.nvb.chunkName):
+           not nvb_utils.is_null(obj.nvb.chunkName):
             row.enabled = False
         row = box.row()
         row.prop(obj.nvb, 'blend')
-        if not nvb_utils.isNull(obj.nvb.chunkName):
+        if not nvb_utils.is_null(obj.nvb.chunkName):
             row.enabled = False
         row = box.row()
         row.prop(obj.nvb, 'spawntype')
         if obj.nvb.update != 'Fountain' or \
-           not nvb_utils.isNull(obj.nvb.chunkName):
+           not nvb_utils.is_null(obj.nvb.chunkName):
             row.enabled = False
             row.enabled = False
             # not allowed in draw context ... fun
@@ -895,11 +895,11 @@ class NVB_PT_emitter(bpy.types.Panel):
         row.label(text="Texture / Chunk", icon='TEXTURE')
         row = box.row()
         row.prop(obj.nvb, 'texture')
-        if not nvb_utils.isNull(obj.nvb.chunkName):
+        if not nvb_utils.is_null(obj.nvb.chunkName):
             row.enabled = False
         row = box.row()
         row.prop(obj.nvb, 'twosidedtex')
-        if not nvb_utils.isNull(obj.nvb.chunkName):
+        if not nvb_utils.is_null(obj.nvb.chunkName):
             row.enabled = False
 
         box.separator()
@@ -910,7 +910,7 @@ class NVB_PT_emitter(bpy.types.Panel):
         row.label(text="Grid")
         row.prop(obj.nvb, 'xgrid', text="X")
         row.prop(obj.nvb, 'ygrid', text="Y")
-        if not nvb_utils.isNull(obj.nvb.chunkName):
+        if not nvb_utils.is_null(obj.nvb.chunkName):
             row.enabled = False
         row = box.row()
         row.prop(obj.nvb, 'fps')
@@ -1270,7 +1270,7 @@ class NVB_PT_path_point(bpy.types.Panel):
 
     @classmethod
     def poll(cls, context):
-        return nvb_utils.isPathPoint(context.object)
+        return nvb_utils.is_path_point(context.object)
 
     def draw(self, context):
         row = self.layout.row()

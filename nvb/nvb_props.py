@@ -5,7 +5,7 @@ from . import nvb_def, nvb_light, nvb_txi, nvb_utils
 
 
 def KB_anim_root_obj_poll(self, object):
-    return nvb_utils.ancestorNode(object, nvb_utils.isRootDummy) is not None
+    return nvb_utils.ancestor_node(object, nvb_utils.is_root_dummy) is not None
 
 
 def nvb_update_light_power(self, context):
@@ -214,7 +214,7 @@ def nvb_update_emitter_prop(self, context):
         obj.nvb.render_emitter = 'Linked'
     if obj.nvb.update != 'Explosion':
         obj.nvb.loop = False
-    if not nvb_utils.isNull(obj.nvb.chunkName):
+    if not nvb_utils.is_null(obj.nvb.chunkName):
         obj.nvb.render_emitter = 'Normal'
         obj.nvb.blend = 'Normal'
     if obj.nvb.p2p_type == 'Bezier':

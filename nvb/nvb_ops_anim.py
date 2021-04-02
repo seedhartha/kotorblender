@@ -154,7 +154,7 @@ class NVB_OT_anim_scale(bpy.types.Operator):
     def execute(self, context):
         """TODO:DOC."""
         mdl_base = nvb_utils.get_obj_mdl_base(context.object)
-        if not nvb_utils.checkAnimBounds(mdl_base):
+        if not nvb_utils.check_anim_bounds(mdl_base):
             self.report({'INFO'}, 'Error: Nested animations.')
             return {'CANCELLED'}
         anim = mdl_base.nvb.animList[mdl_base.nvb.animListIdx]
@@ -248,7 +248,7 @@ class NVB_OT_anim_crop(bpy.types.Operator):
             return (len(rootDummy.nvb.animList) > 0)
         return False
 
-    def cropFrames(self, target, animStart, animEnd):
+    def crop_frames(self, target, animStart, animEnd):
         """TODO:DOC."""
         if target.animation_data and target.animation_data.action:
             # Grab some values for speed
@@ -287,7 +287,7 @@ class NVB_OT_anim_crop(bpy.types.Operator):
     def execute(self, context):
         """TODO:DOC."""
         mdl_base = nvb_utils.get_obj_mdl_base(context.object)
-        if not nvb_utils.checkAnimBounds(mdl_base):
+        if not nvb_utils.check_anim_bounds(mdl_base):
             self.report({'INFO'}, 'Failure: Convoluted animations.')
             return {'CANCELLED'}
         animList = mdl_base.nvb.animList
@@ -308,18 +308,18 @@ class NVB_OT_anim_crop(bpy.types.Operator):
         nvb_utils.get_children_recursive(mdl_base, obj_list)
         for obj in obj_list:
             # Objects animation
-            self.cropFrames(obj, animStart, animEnd)
+            self.crop_frames(obj, animStart, animEnd)
             # Material animation
             if obj.active_material:
-                self.cropFrames(obj.active_material, animStart, animEnd)
+                self.crop_frames(obj.active_material, animStart, animEnd)
             # Shape key animation
             #XXX Aurora animated mesh support
             #if obj.data and obj.data.shape_keys:
-            #    self.cropFrames(obj.data.shape_keys, animStart, animEnd)
+            #    self.crop_frames(obj.data.shape_keys, animStart, animEnd)
             # Emitter animation
             part_sys = obj.particle_systems.active
             if part_sys:
-                self.cropFrames(part_sys.settings, animStart, animEnd)
+                self.crop_frames(part_sys.settings, animStart, animEnd)
         # Update the animations in the list
         for a in mdl_base.nvb.animList:
             if a.frameStart > animStart:
@@ -401,7 +401,7 @@ class NVB_OT_anim_pad(bpy.types.Operator):
     def execute(self, context):
         """TODO:DOC."""
         mdl_base = nvb_utils.get_obj_mdl_base(context.object)
-        if not nvb_utils.checkAnimBounds(mdl_base):
+        if not nvb_utils.check_anim_bounds(mdl_base):
             self.report({'INFO'}, 'Failure: Convoluted animations.')
             return {'CANCELLED'}
         anim = mdl_base.nvb.animList[mdl_base.nvb.animListIdx]
@@ -610,7 +610,7 @@ class NVB_OT_anim_moveback(bpy.types.Operator):
     def execute(self, context):
         """Move the animation."""
         mdl_base = nvb_utils.get_obj_mdl_base(context.object)
-        if not nvb_utils.checkAnimBounds(mdl_base):
+        if not nvb_utils.check_anim_bounds(mdl_base):
             self.report({'INFO'}, 'Failure: Convoluted animations.')
             return {'CANCELLED'}
         anim_list = mdl_base.nvb.animList

@@ -33,9 +33,9 @@ def _load_mdl(filepath, position = (0.0, 0.0, 0.0)):
             try:
                 asciiLines = [line.strip().split() for line in open(fp, 'r')]
                 wkm = nvb_mdl.Xwk(wkmType)
-                wkm.loadAscii(asciiLines)
+                wkm.load_ascii(asciiLines)
                 # adding walkmesh to scene has to be done within mdl import now
-                #wkm.importToScene(scene)
+                #wkm.import_to_scene(scene)
             except IOError:
                 print(
                     "Kotorblender - WARNING: No walkmesh found {}".format(
@@ -65,9 +65,9 @@ def _load_mdl(filepath, position = (0.0, 0.0, 0.0)):
 
     print('Importing: ' + filepath)
     mdl = nvb_mdl.Mdl()
-    #mdl.loadAscii(asciiLines)
-    mdl.loadAscii(ascii_mdl)
-    mdl.importToScene(scene, wkm, position)
+    #mdl.load_ascii(asciiLines)
+    mdl.load_ascii(ascii_mdl)
+    mdl.import_to_scene(scene, wkm, position)
 
     # processing to use AABB node as trimesh for walkmesh file
     if wkm is not None and wkm.walkmeshType == 'wok' and mdl.nodeDict and wkm.nodeDict:
@@ -83,14 +83,14 @@ def _load_mdl(filepath, position = (0.0, 0.0, 0.0)):
                 wkmesh = node
         if aabb and wkmesh:
             #print(aabb.lytposition)
-            aabb.computeLayoutPosition(wkmesh)
+            aabb.compute_layout_position(wkmesh)
             #print(aabb.lytposition)
             if len(wkmesh.roomlinks):
                 aabb.roomlinks = wkmesh.roomlinks
-                aabb.setRoomLinks(scene.objects[aabb.name].data)
+                aabb.set_room_links(scene.objects[aabb.name].data)
 
 
-def loadMdl(operator,
+def load_mdl(operator,
             context,
             filepath = '',
             importGeometry = True,
@@ -156,7 +156,7 @@ def _load_lyt(filepath):
             print('Kotorblender - WARNING: room model not found: ' + mdl_path)
 
 
-def loadLyt(operator,
+def load_lyt(operator,
             context,
             filepath = '',
             importGeometry = True,
@@ -181,7 +181,7 @@ def loadLyt(operator,
     return {'FINISHED'}
 
 
-def saveMdl(operator,
+def save_mdl(operator,
          context,
          filepath = '',
          exports = {'ANIMATION', 'WALKMESH'},
@@ -215,13 +215,13 @@ def saveMdl(operator,
         print('Kotorblender: Exporting ' + mdlRoot.name)
         mdl = nvb_mdl.Mdl()
         asciiLines = []
-        mdl.generateAscii(asciiLines, mdlRoot)
+        mdl.generate_ascii(asciiLines, mdlRoot)
         with open(os.fsencode(filepath), 'w') as f:
             f.write('\n'.join(asciiLines))
 
         if 'WALKMESH' in exports:
             wkmRoot = None
-            aabb = nvb_utils.searchNode(mdlRoot, lambda x: x.nvb.meshtype == nvb_def.Meshtype.AABB)
+            aabb = nvb_utils.search_node(mdlRoot, lambda x: x.nvb.meshtype == nvb_def.Meshtype.AABB)
             if aabb is not None:
                 wkm     = nvb_mdl.Wok()
                 wkmRoot = aabb
@@ -248,7 +248,7 @@ def saveMdl(operator,
 
             if wkmRoot:
                 asciiLines = []
-                wkm.generateAscii(asciiLines, wkmRoot)
+                wkm.generate_ascii(asciiLines, wkmRoot)
 
                 (wkmPath, wkmFilename) = os.path.split(filepath)
                 wkmType = wkm.walkmeshType
