@@ -405,12 +405,12 @@ class KB_PG_OBJECT(bpy.types.PropertyGroup):
                                                      default = (0.0, 0.0, 0.0),
                                                      min = 0.0, max = 1.0,
                                                      soft_min = 0.0, soft_max = 1.0)
-    diffusecolor     : bpy.props.FloatVectorProperty(name = 'Diffuse color',
+    diffuse          : bpy.props.FloatVectorProperty(name = 'Diffuse color',
                                                      subtype = 'COLOR_GAMMA',
                                                      default = (1.0, 1.0, 1.0),
                                                      min = 0.0, max = 1.0,
                                                      soft_min = 0.0, soft_max = 1.0)
-    ambientcolor     : bpy.props.FloatVectorProperty(name = 'Ambient color',
+    ambient          : bpy.props.FloatVectorProperty(name = 'Ambient color',
                                                      subtype = 'COLOR_GAMMA',
                                                      default = (1.0, 1.0, 1.0),
                                                      min = 0.0, max = 1.0,
