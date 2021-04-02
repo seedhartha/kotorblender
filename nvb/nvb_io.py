@@ -101,9 +101,9 @@ def loadMdl(operator,
             textureSearch = False,
             minimapMode = False,
             minimapSkipFade = False):
-    '''
+    """
     Called from blender ui
-    '''
+    """
     nvb_glob.importGeometry = importGeometry
     nvb_glob.importSmoothGroups = importSmoothGroups
     nvb_glob.importAnim = importAnim
@@ -165,9 +165,9 @@ def loadLyt(operator,
             importAnim = True,
             materialMode = 'SIN',
             textureSearch = False):
-    '''
+    """
     Called from blender ui
-    '''
+    """
     nvb_glob.importGeometry = importGeometry
     nvb_glob.importSmoothGroups = importSmoothGroups
     nvb_glob.importAnim = importAnim
@@ -188,9 +188,9 @@ def saveMdl(operator,
          exportSmoothGroups = True,
          applyModifiers = True,
          ):
-    '''
+    """
     Called from blender ui
-    '''
+    """
     nvb_glob.exports            = exports
     nvb_glob.exportSmoothGroups = exportSmoothGroups
     nvb_glob.applyModifiers     = applyModifiers

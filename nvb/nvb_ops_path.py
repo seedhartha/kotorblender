@@ -33,7 +33,7 @@ class KB_OT_remove_connection(bpy.types.Operator):
 
 
 class KB_OT_import_path(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
-    '''Import Odyssey Engine path (.pth)'''
+    """Import Odyssey Engine path (.pth)"""
 
     bl_idname = 'kb.pthimport'
     bl_label  = 'Import Odyssey PTH'
@@ -81,7 +81,7 @@ class KB_OT_import_path(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
 
 
 class KB_OT_export_path(bpy.types.Operator, bpy_extras.io_utils.ExportHelper):
-    '''Export Odyssey Engine path (.pth)'''
+    """Export Odyssey Engine path (.pth)"""
 
     bl_idname = 'kb.pthexport'
     bl_label  = 'Export Odyssey PTH'

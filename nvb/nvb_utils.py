@@ -30,18 +30,18 @@ def isNumber(s):
 
 
 def getName(s):
-    '''
+    """
     To be able to switch to case sensitive and back
     Still not certain mdl node names are case sensitive
-    '''
+    """
     #return s.lower()
     return s
 
 def getRealName(s):
-    '''
+    """
     Do a case insensitive search through existing objects,
     returning name or None if not found
-    '''
+    '"""''
     try:
         return [name for name in bpy.data.objects.keys() if name.lower() == s.lower()][0]
     except:
@@ -110,10 +110,10 @@ def searchNodeAll(obj, test):
 
 
 def searchNodeInModel(obj, test):
-    '''
+    """
     Helper to search through entire model from any starting point in hierarchy;
     walks up to model root and performs find-one search.
-    '''
+    """
     return searchNode(ancestorNode(obj, isRootDummy), test)
 
 
@@ -126,9 +126,9 @@ def isRootDummy(obj, dummytype = nvb_def.Dummytype.MDLROOT):
 
 
 def getNodeType(obj):
-    '''
+    """
     Get the node type (dummy, trimesh, skin, ...) of the blender object
-    '''
+    """
     objType  = obj.type
     if objType == 'EMPTY':
         if   obj.nvb.dummytype == nvb_def.Dummytype.PATCH:
@@ -332,10 +332,9 @@ def chunker(seq, size):
 
 
 def getImageFilename(image):
-    '''
+    """
     Returns the image name without the file extension.
-
-    '''
+    """
     # Try getting the image name from the image source path
     filename = os.path.splitext(os.path.basename(image.filepath))[0]
     if (filename == ''):
@@ -354,9 +353,9 @@ def getShagrName(shagrId):
 
 
 def isShagr(vgroup):
-    '''
+    """
     Determines wether vertex_group ist a shading group or not
-    '''
+    """
     return (nvb_def.shagrPrefix in vgroup.name)
 
 
@@ -377,13 +376,13 @@ def setObjectRotationAurora(obj, nwangle):
 
 
 def getAuroraRotFromObject(obj):
-    '''
+    """
     Get the rotation from an object as Axis Angle in the format used by NWN
     NWN uses     [X, Y, Z, Angle]
     Blender uses [Angle, X, Y, Z]
     Depending on rotation_mode we have to get the rotation from different
     attributes
-    '''
+    """
     rotMode = obj.rotation_mode
 
     if   rotMode == "QUATERNION":
@@ -401,20 +400,20 @@ def getAuroraRotFromObject(obj):
 
 
 def getAuroraRotFromMatrix(matrix):
-    '''
+    """
     Get the rotation from a 4x4 matrix as Axis Angle in the format used by NWN
     NWN uses     [X, Y, Z, Angle]
     Blender uses [Angle, X, Y, Z]
-    '''
+    """
     q = matrix.to_quaternion()
     return [q.axis[0], q.axis[1], q.axis[2], q.angle]
 
 
 def getAuroraScale(obj):
-    '''
+    """
     If the scale is uniform, i.e, x=y=z, we will return
     the value. Else we'll return 1.
-    '''
+    """
     scale = obj.scale
     if (scale[0] == scale[1] == scale[2]):
         return scale[0]
@@ -423,9 +422,9 @@ def getAuroraScale(obj):
 
 
 def nwtime2frame(time, fps = nvb_def.fps):
-    '''
+    """
     For animations: Convert key time to frame number
-    '''
+    """
     return round(fps*time)
 
 
@@ -505,12 +504,12 @@ def setupMinimapRender(mdlroot, scene, light_color = (1.0, 1.0, 1.0), alpha_mode
 
 
 def copyAnimSceneCheck(theOriginal, newSuffix, oldSuffix = ''):
-    '''
+    """
     Checks if it possible to copy the object and it's children with the suffix
     It would be impossible if:
         - An object with the same name already exists
         - Object data with the same name already exists
-    '''
+    """
     oldName = theOriginal.name
     newName = 'ERROR'
     if oldSuffix:
@@ -558,12 +557,12 @@ def copyAnimSceneCheck(theOriginal, newSuffix, oldSuffix = ''):
 
 
 def copyAnimScene(scene, theOriginal, newSuffix, oldSuffix = '', parent = None):
-    '''
+    """
     Copy object and all it's children to scene.
     For object with simple (position, rotation) or no animations we
     create a linked copy.
     For alpha animation we'll need to copy the data too.
-    '''
+    """
     oldName = theOriginal.name
     newName = 'ERROR'
     if oldSuffix:
@@ -627,12 +626,12 @@ def copyAnimScene(scene, theOriginal, newSuffix, oldSuffix = '', parent = None):
 
 
 def renameAnimScene(obj, newSuffix, oldSuffix = ''):
-    '''
+    """
     Copy object and all it's children to scene.
     For object with simple (position, rotation) or no animations we
     create a linked copy.
     For alpha animation we'll need to copy the data too.
-    '''
+    """
     oldName = obj.name
     newName = 'ERROR'
     if oldSuffix:
@@ -750,9 +749,9 @@ def isPathPoint(object):
 
 
 def getMdlRoot(object):
-    '''
+    """
     :returns: MDL root object for the specified object.
-    '''
+    """
     if (object.type == 'EMPTY') and (object.nvb.dummytype == nvb_def.Dummytype.MDLROOT):
         return object
 
