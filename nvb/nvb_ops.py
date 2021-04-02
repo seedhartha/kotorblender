@@ -170,7 +170,7 @@ class NVBTEXTURE_IO(bpy.types.Operator):
         return {'FINISHED'}
 
 class NVBTEXTURE_BOX_OPS(bpy.types.Operator):
-    ''' Hide/show Texture Info sub-groups'''
+    """ Hide/show Texture Info sub-groups"""
     bl_idname = "nvb.texture_info_box_ops"
     bl_label = "Box Controls"
     bl_description = "Show/hide this property list"
@@ -290,7 +290,7 @@ class NVBTEXTURE_OPS(bpy.types.Operator):
         return {'FINISHED'}
 
 class NVB_LIST_OT_LightFlare_New(bpy.types.Operator):
-    ''' Add a new item to the flare list '''
+    """ Add a new item to the flare list """
 
     bl_idname = 'nvb.lightflare_new'
     bl_label  = 'Add a new flare to a light'
@@ -303,14 +303,14 @@ class NVB_LIST_OT_LightFlare_New(bpy.types.Operator):
 
 
 class NVB_LIST_OT_LightFlare_Delete(bpy.types.Operator):
-    ''' Delete the selected item from the flare list '''
+    """ Delete the selected item from the flare list """
 
     bl_idname = 'nvb.lightflare_delete'
     bl_label = 'Deletes a flare from the light'
 
     @classmethod
     def poll(self, context):
-        ''' Enable only if the list isn't empty '''
+        """ Enable only if the list isn't empty """
         return len(context.object.nvb.flareList) > 0
 
     def execute(self, context):
@@ -325,7 +325,7 @@ class NVB_LIST_OT_LightFlare_Delete(bpy.types.Operator):
 
 
 class NVB_LIST_OT_LightFlare_Move(bpy.types.Operator):
-    ''' Move an item in the flare list '''
+    """ Move an item in the flare list """
 
     bl_idname = 'nvb.lightflare_move'
     bl_label  = 'Move an item in the flare list'
@@ -369,7 +369,7 @@ class NVB_LIST_OT_LightFlare_Move(bpy.types.Operator):
 
 
 class NVB_LIST_OT_AnimEvent_New(bpy.types.Operator):
-    ''' Add a new item to the event list '''
+    """ Add a new item to the event list """
 
     bl_idname = 'nvb.animevent_new'
     bl_label  = 'Add a new event to an animation'
@@ -381,14 +381,14 @@ class NVB_LIST_OT_AnimEvent_New(bpy.types.Operator):
 
 
 class NVB_LIST_OT_AnimEvent_Delete(bpy.types.Operator):
-    ''' Delete the selected item from the event list '''
+    """ Delete the selected item from the event list """
 
     bl_idname = 'nvb.animevent_delete'
     bl_label = 'Deletes an event from an animation'
 
     @classmethod
     def poll(self, context):
-        ''' Enable only if the list isn't empty '''
+        """ Enable only if the list isn't empty """
         return len(context.object.nvb.eventList) > 0
 
     def execute(self, context):
@@ -403,7 +403,7 @@ class NVB_LIST_OT_AnimEvent_Delete(bpy.types.Operator):
 
 
 class NVB_LIST_OT_AnimEvent_Move(bpy.types.Operator):
-    ''' Move an item in the event list '''
+    """ Move an item in the event list """
 
     bl_idname = 'nvb.animevent_move'
     bl_label  = 'Move an item in the event  list'
@@ -447,7 +447,7 @@ class NVB_LIST_OT_AnimEvent_Move(bpy.types.Operator):
 
 
 class NVB_OT_ImportMDL(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
-    '''Import Odyssey Engine model (.mdl)'''
+    """Import Odyssey Engine model (.mdl)"""
 
     bl_idname = 'kb.mdlimport'
     bl_label = 'Import Odyssey MDL'
@@ -512,7 +512,7 @@ class NVB_OT_ImportMDL(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
 
 
 class NVB_OT_ImportLYT(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
-    '''Import Odyssey Engine layout (.lyt)'''
+    """Import Odyssey Engine layout (.lyt)"""
 
     bl_idname = 'kb.lytimport'
     bl_label = 'Import Odyssey LYT'
@@ -562,7 +562,7 @@ class NVB_OT_ImportLYT(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
 
 
 class NVB_OT_ExportMDL(bpy.types.Operator, bpy_extras.io_utils.ExportHelper):
-    '''Export Odyssey Engine model (.mdl)'''
+    """Export Odyssey Engine model (.mdl)"""
 
     bl_idname = 'kb.mdlexport'
     bl_label  = 'Export Odyssey MDL'
@@ -597,18 +597,18 @@ class NVB_OT_ExportMDL(bpy.types.Operator, bpy_extras.io_utils.ExportHelper):
 
 
 class LoadWokMaterials(bpy.types.Operator):
-    '''
+    """
     Load all materials for aabb walkmeshes for the selected object. Current
     material slots will be deleted.
-    '''
+    """
     bl_idname = "nvb.load_wok_mats"
     bl_label  = "Load walkmesh materials"
 
     def execute(self, context):
-        '''
+        """
         - Deletes all current materials
         - adds walkmesh materials
-        '''
+        """
         selected_object = context.object
         if (selected_object) and (selected_object.type == 'MESH'):
             object_mesh = selected_object.data
@@ -645,10 +645,10 @@ class NVBOBJECT_OT_RenderMinimap(bpy.types.Operator):
     bl_label  = "Render Minimap"
 
     def execute(self, context):
-        '''
+        """
         - Creates an camera and a light
         - Renders Minimap
-        '''
+        """
         obj   = context.object
         scene = bpy.context.scene
         if obj and (obj.type == 'EMPTY'):
@@ -777,7 +777,7 @@ class NVBOBJECT_OT_AnimsceneAdd(bpy.types.Operator):
 
 
 class NVB_OT_ExportLYT(bpy.types.Operator, bpy_extras.io_utils.ExportHelper):
-    '''Export Odyssey Engine layout (.lyt)'''
+    """Export Odyssey Engine layout (.lyt)"""
 
     bl_idname = 'kb.lytexport'
     bl_label  = 'Export Odyssey LYT'
@@ -826,7 +826,7 @@ class NVB_OT_ExportLYT(bpy.types.Operator, bpy_extras.io_utils.ExportHelper):
 
 
 class KB_OT_rebuild_material_nodes(bpy.types.Operator):
-    '''Rebuild material node tree of this object.'''
+    """Rebuild material node tree of this object."""
 
     bl_idname = 'kb.rebuild_material_nodes'
     bl_label = "Rebuild Material Nodes"

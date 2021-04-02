@@ -140,8 +140,8 @@ class Animation():
                     raise nvb_def.MalformedMdlFile('Unexpected "endnode"')
 
     def loadAscii(self, ascii_data):
-        self.getAnimFromAscii([l.strip().split() for l in ascii_data.splitlines()])
         """Load an animation from a block from an ascii mdl file."""
+        self.getAnimFromAscii([l.strip().split() for l in ascii_data.splitlines()])
         animNodesStart = ascii_data.find('node ')
         if (animNodesStart > -1):
             self.loadAsciiAnimHeader(ascii_data[:animNodesStart-1])

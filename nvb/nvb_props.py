@@ -14,17 +14,17 @@ def nvb_update_light_power(self, context):
 
 
 def nvb_update_shadow_prop(self, context):
-    '''
+    """
     Set the lights shadow to match the Aurora shadow property
-    '''
+    """
     if context.object and context.object.type == 'LIGHT':
         context.object.data.use_shadow = self.shadow != 0
 
 
 class NVB_PG_ANIMEVENT(bpy.types.PropertyGroup):
-    '''
+    """
     Properties for a single event in the even list
-    '''
+    """
 
     name : bpy.props.StringProperty(
            name = 'Name',
@@ -38,9 +38,9 @@ class NVB_PG_ANIMEVENT(bpy.types.PropertyGroup):
 
 
 class NVB_PG_FLARE(bpy.types.PropertyGroup):
-    '''
+    """
     Properties for a single flare in the flare list
-    '''
+    """
 
     texture : bpy.props.StringProperty(name = 'Texture',
                                        description = 'Texture name',
@@ -60,10 +60,10 @@ class NVB_PG_FLARE(bpy.types.PropertyGroup):
 
 
 class KB_PG_TEXTURE(bpy.types.PropertyGroup):
-    '''
+    """
     This class defines all additional properties needed by the txi file
     format. It hold the properties for image textures.
-    '''
+    """
 
     class PropListItem(bpy.types.PropertyGroup):
         name : bpy.props.StringProperty(name='Property Name')
@@ -271,10 +271,10 @@ class KB_PG_anim(bpy.types.PropertyGroup):
 
 
 class KB_PG_OBJECT(bpy.types.PropertyGroup):
-    '''
+    """
     This class defines all additional properties needed by the mdl file
     format. It hold the properties for meshes, lights and empties.
-    '''
+    """
 
     # For all objects
     wirecolor : bpy.props.FloatVectorProperty(name = 'Wirecolor',

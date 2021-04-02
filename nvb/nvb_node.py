@@ -220,9 +220,6 @@ class GeometryNode():
 
 
 class Dummy(GeometryNode):
-    '''
-
-    '''
     def __init__(self, name = 'UNNAMED'):
         GeometryNode.__init__(self, name)
         self.nodetype  = 'dummy'
@@ -763,11 +760,11 @@ class Trimesh(GeometryNode):
 
 
     def getExportMesh(self, obj):
-        '''
+        """
         Get the export mesh for an object,
         This mesh has modifiers applied as requested.
         TODO: retain the mesh across contexts instead of recreating every time.
-        '''
+        """
         if obj is None:
             return None
 
@@ -992,9 +989,6 @@ class Trimesh(GeometryNode):
 
 
 class Danglymesh(Trimesh):
-    """
-
-    """
     def __init__(self, name = 'UNNAMED'):
         Trimesh.__init__(self, name)
         self.nodetype = 'danglymesh'
@@ -1038,11 +1032,11 @@ class Danglymesh(Trimesh):
             self.addUnparsedToRaw(asciiNode)
 
     def addConstraintsToObject(self, obj):
-        '''
+        """
         Creates a vertex group for the object to contain the vertex
         weights for the danglymesh. The weights are called "constraints"
         in NWN. Range is [0.0, 255.0] as opposed to [0.0, 1.0] in Blender
-        '''
+        """
         vgroup = obj.vertex_groups.new(name='constraints')
         for vertexIdx, constraint in enumerate(self.constraints):
             weight = constraint/255
@@ -1088,9 +1082,6 @@ class Danglymesh(Trimesh):
 
 
 class Lightsaber(Trimesh):
-    """
-
-    """
     def __init__(self, name = 'UNNAMED'):
         Trimesh.__init__(self, name)
         self.nodetype = 'lightsaber'
@@ -1787,10 +1778,10 @@ class Light(GeometryNode):
 
 
 class Aabb(Trimesh):
-    '''
+    """
     No need to import Aaabb's. Aabb nodes in mdl files will be
     treated as trimeshes
-    '''
+    """
     def __init__(self, name = 'UNNAMED'):
         Trimesh.__init__(self, name)
         self.nodetype = 'aabb'

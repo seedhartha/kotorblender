@@ -329,60 +329,60 @@ class Node():
         self.isEmpty = True
 
     def __bool__(self):
-        '''
+        """
         Return false if the node is empty, i.e. it has no anims attached
-        '''
+        """
         return not self.isEmpty
 
     def requiresUniqueData(self):
         return self.keys.hasAlpha()
 
     def parseKeys9f(self, asciiBlock, keyList):
-        '''
+        """
         Parse animation keys containing 9 floats (not counting the time value)
-        '''
+        """
         nvb_parse._f(asciiBlock, keyList, 10)
         self.isEmpty = False
 
     def parseKeys3f(self, asciiBlock, keyList):
-        '''
+        """
         Parse animation keys containing 3 floats (not counting the time value)
-        '''
+        """
         nvb_parse.f4(asciiBlock, keyList)
         self.isEmpty = False
 
 
     def parseKeys4f(self, asciiBlock, keyList):
-        '''
+        """
         Parse animation keys containing 4 floats (not counting the time value)
-        '''
+        """
         nvb_parse.f5(asciiBlock, keyList)
         self.isEmpty = False
 
 
     def parseKeys1f(self, asciiBlock, keyList):
-        '''
+        """
         Parse animation keys containing 1 float (not counting the time value)
-        '''
+        """
         nvb_parse.f2(asciiBlock, keyList)
         self.isEmpty = False
 
 
     def parseKeysIncompat(self, asciiBlock):
-        '''
+        """
         Parse animation keys incompatible with blender. They will be saved
         as plain text.
-        '''
+        """
         for line in asciiBlock:
             self.keys.rawascii = self.keys.rawascii + '\n' + ' '.join(line)
         self.isEmpty = False
 
     @staticmethod
     def findEnd(asciiBlock):
-        '''
+        """
         We don't know when a list of keys of keys will end. We'll have to
         search for the first non-numeric value
-        '''
+        """
         l_isNumber = nvb_utils.isNumber
         return next((i for i, v in enumerate(asciiBlock) if len(v) and not l_isNumber(v[0])), -1)
 
@@ -467,9 +467,9 @@ class Node():
 
 
     def addKeyframeToCurve(self, curve, key_coll, key_idx, value_idx, num_values):
-        '''
+        """
         Add Keyframe to animation F-Curve, in bezier or linear style
-        '''
+        """
         key = key_coll[key_idx]
         frame = nvb_utils.nwtime2frame(key[0])
         kfp = curve.keyframe_points.insert(frame, key[value_idx])
@@ -489,9 +489,9 @@ class Node():
 
 
     def addAnimToObject(self, targetObject, animName = ''):
-        '''
+        """
         Add the animations in this node to target object
-        '''
+        """
         #actionName           = animName + '.' + targetObject.name
         actionName           = targetObject.name
         action               = bpy.data.actions.new(name=actionName)
@@ -777,9 +777,9 @@ class Node():
 
     @staticmethod
     def getOriginalName(nodeName, animName):
-        '''
+        """
         A bit messy due to compatibility concerns
-        '''
+        """
         if nodeName.endswith(animName):
             orig = nodeName[:len(nodeName)-len(animName)]
             if orig.endswith('.'):
@@ -798,9 +798,9 @@ class Node():
 
     @staticmethod
     def exportNeeded(animObj, anim):
-        '''
+        """
         Test whether this node should be included in exported ASCII model
-        '''
+        """
         # this is the root node, must be included
         if animObj.parent is None:
             return True

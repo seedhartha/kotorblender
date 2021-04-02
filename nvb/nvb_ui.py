@@ -269,11 +269,11 @@ class NVB_UL_ANIMEVENTS(bpy.types.UIList):
 
 
 class NVB_PT_EMPTY(bpy.types.Panel):
-    '''
+    """
     Property panel for additional properties needed for the mdl file
     format. This is only available for EMPTY objects.
     It is located under the object data panel in the properties window
-    '''
+    """
     bl_label = 'Odyssey Dummy Properties'
     bl_space_type = 'PROPERTIES'
     bl_region_type = 'WINDOW'
@@ -423,13 +423,13 @@ class NVB_PT_EMPTY(bpy.types.Panel):
 
 
 class NVB_PT_LIGHT(bpy.types.Panel):
-    '''
+    """
     Property panel for additional light properties. This
     holds all properties not supported by blender at the moment,
     but used by OpenGL and the aurora engine. This is only available
     for LIGHT objects.
     It is located under the object data panel in the properties window
-    '''
+    """
     bl_label = 'Odyssey Light Properties'
     bl_space_type = 'PROPERTIES'
     bl_region_type = 'WINDOW'
@@ -660,11 +660,11 @@ class NVB_PT_TEXTURE(bpy.types.Panel):
             #box.prop(texture.nvb, 'lowerrightcoords')
 
 class NVB_PT_EMITTER(bpy.types.Panel):
-    '''
+    """
     Property panel for additional properties needed for the mdl file
     format. This is only available for particle systems.
     It is located under the particle panel in the properties window
-    '''
+    """
     bl_label       = 'Odyssey Emitter Properties'
     bl_space_type  = 'PROPERTIES'
     bl_region_type = 'WINDOW'
@@ -1121,13 +1121,13 @@ class NVB_PT_EMITTER(bpy.types.Panel):
 
 
 class NVB_PT_MESH(bpy.types.Panel):
-    '''
+    """
     Property panel for additional mesh properties. This
     holds all properties not supported by blender at the moment,
     but used by OpenGL and the aurora engine. This is only available
     for MESH objects.
     It is located under the object data panel in the properties window
-    '''
+    """
     bl_label = 'Odyssey Mesh Properties'
     bl_space_type = 'PROPERTIES'
     bl_region_type = 'WINDOW'
