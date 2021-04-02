@@ -17,13 +17,13 @@
 # ##### END GPL LICENSE BLOCK #####
 
 bl_info = {
-    "name": "KotORBlender",
+    "name": "KotorBlender",
     "author": "Attila Gyoerkoes & J.W. Brandon & Vsevolod Kremianskii",
     "version": (2, 0, 0),
     "blender": (2, 80, 0),
     "location": "File > Import-Export, Object Properties",
     "description": "Import, export and edit Odyssey (KotOR) ASCII MDL format",
-    'warning': "cannot be used with Neverblender enabled",
+    'warning': "cannot be used with NeverBlender enabled",
     "wiki_url": ""
                 "",
     "tracker_url": "",
@@ -169,7 +169,7 @@ classes = (
 def register():
     (load_dflt, nvb_loaded) = addon_utils.check('neverblender')
     if nvb_loaded:
-        raise Exception('Do not enable both KotORBlender and Neverblender at the same time!')
+        raise Exception('Do not enable both KotorBlender and NeverBlender at the same time!')
 
     for cls in classes:
         bpy.utils.register_class(cls)
