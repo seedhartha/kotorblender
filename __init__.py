@@ -69,11 +69,11 @@ import bpy
 
 
 def menu_func_import_mdl(self, context):
-    self.layout.operator(nvb_ops.NVB_OT_ImportMDL.bl_idname, text="KotOR Model (.mdl)")
+    self.layout.operator(nvb_ops.NVB_OT_import_mdl.bl_idname, text="KotOR Model (.mdl)")
 
 
 def menu_func_import_lyt(self, context):
-    self.layout.operator(nvb_ops.NVB_OT_ImportLYT.bl_idname, text="KotOR Layout (.lyt)")
+    self.layout.operator(nvb_ops.NVB_OT_import_lyt.bl_idname, text="KotOR Layout (.lyt)")
 
 
 def menu_func_import_pth(self, context):
@@ -81,11 +81,11 @@ def menu_func_import_pth(self, context):
 
 
 def menu_func_export_mdl(self, context):
-    self.layout.operator(nvb_ops.NVB_OT_ExportMDL.bl_idname, text="KotOR Model (.mdl)")
+    self.layout.operator(nvb_ops.NVB_OT_export_mdl.bl_idname, text="KotOR Model (.mdl)")
 
 
 def menu_func_export_lyt(self, context):
-    self.layout.operator(nvb_ops.NVB_OT_ExportLYT.bl_idname, text="KotOR Layout (.lyt)")
+    self.layout.operator(nvb_ops.NVB_OT_export_lyt.bl_idname, text="KotOR Layout (.lyt)")
 
 
 def menu_func_export_pth(self, context):
@@ -93,41 +93,48 @@ def menu_func_export_pth(self, context):
 
 
 classes = (
+    nvb_props.KB_PG_OBJECT.PathConnection,
+    nvb_props.KB_PG_TEXTURE.PropListItem,
+
+    # Property Groups
+
     nvb_props.NVB_PG_ANIMEVENT,
     nvb_props.NVB_PG_FLARE,
 
     nvb_props.KB_PG_animevent,
     nvb_props.KB_PG_anim,
-    nvb_props.KB_PG_OBJECT.PathConnection,
     nvb_props.KB_PG_OBJECT,
-    nvb_props.KB_PG_TEXTURE.PropListItem,
     nvb_props.KB_PG_TEXTURE,
 
-    nvb_ops.LoadWokMaterials,
-    nvb_ops.NVB_LIST_OT_AnimEvent_Delete,
-    nvb_ops.NVB_LIST_OT_AnimEvent_Move,
-    nvb_ops.NVB_LIST_OT_AnimEvent_New,
-    nvb_ops.NVB_LIST_OT_LightFlare_Delete,
-    nvb_ops.NVB_LIST_OT_LightFlare_Move,
-    nvb_ops.NVB_LIST_OT_LightFlare_New,
-    nvb_ops.NVB_OT_ExportLYT,
-    nvb_ops.NVB_OT_ExportMDL,
-    nvb_ops.NVB_OT_ImportLYT,
-    nvb_ops.NVB_OT_ImportMDL,
-    nvb_ops.NVBCHILDREN_SMOOTHGROUP,
-    nvb_ops.NVBOBJECT_OT_AnimsceneAdd,
-    nvb_ops.NVBOBJECT_OT_AnimsceneRename,
-    nvb_ops.NVBOBJECT_OT_RenderMinimap,
-    nvb_ops.NVBOBJECT_OT_SkingroupAdd,
-    nvb_ops.NVBSKIN_BONE_OPS,
-    nvb_ops.NVBSMOOTHGROUP_GENERATE,
-    nvb_ops.NVBSMOOTHGROUP_SELECT,
-    nvb_ops.NVBSMOOTHGROUP_TOGGLE,
-    nvb_ops.NVBTEXTURE_BOX_OPS,
-    nvb_ops.NVBTEXTURE_IO,
-    nvb_ops.NVBTEXTURE_OPS,
+    # Operators
+
+    nvb_ops.KB_OT_load_wok_materials,
+    nvb_ops.NVB_OT_delete_animevent,
+    nvb_ops.NVB_OT_move_animevent,
+    nvb_ops.NVB_OT_new_animevent,
+    nvb_ops.NVB_OT_delete_lightflare,
+    nvb_ops.NVB_OT_move_lightflare,
+    nvb_ops.NVB_OT_new_lightflare,
+    nvb_ops.NVB_OT_export_lyt,
+    nvb_ops.NVB_OT_export_mdl,
+    nvb_ops.NVB_OT_import_lyt,
+    nvb_ops.NVB_OT_import_mdl,
+    nvb_ops.NVB_OT_children_smoothgroup,
+    nvb_ops.NVB_OT_add_animscene,
+    nvb_ops.NVB_OT_rename_animscene,
+    nvb_ops.NVB_OT_render_minimap,
+    nvb_ops.NVB_OT_add_skingroup,
+    nvb_ops.NVB_OT_skin_bone_ops,
+    nvb_ops.NVB_OT_generate_smoothgroup,
+    nvb_ops.NVB_OT_select_smoothgroup,
+    nvb_ops.NVB_OT_toggle_smoothgroup,
+    nvb_ops.NVB_OT_texture_box_ops,
+    nvb_ops.NVB_OT_texture_io,
+    nvb_ops.NVB_OT_texture_ops,
 
     nvb_ops.KB_OT_rebuild_material_nodes,
+
+    # Animation Operators
 
     nvb_ops_anim.NVB_OT_amt_event_delete,
     nvb_ops_anim.NVB_OT_amt_event_new,
@@ -144,23 +151,33 @@ classes = (
     nvb_ops_anim.NVB_OT_anim_pad,
     nvb_ops_anim.NVB_OT_anim_scale,
 
+    # Path Operators
+
     nvb_ops_path.KB_OT_add_connection,
     nvb_ops_path.KB_OT_export_path,
     nvb_ops_path.KB_OT_import_path,
     nvb_ops_path.KB_OT_remove_connection,
 
+    # Panels
+
     nvb_ui.NVB_PT_animlist,
-    nvb_ui.NVB_PT_EMITTER,
-    nvb_ui.NVB_PT_EMPTY,
-    nvb_ui.NVB_PT_LIGHT,
-    nvb_ui.NVB_PT_MESH,
-    nvb_ui.NVB_PT_PathPoint,
-    nvb_ui.NVB_PT_SMOOTHGROUPS,
-    nvb_ui.NVB_PT_TEXTURE,
-    nvb_ui.NVB_UL_ANIMEVENTS,
-    nvb_ui.NVB_UL_LIGHTFLARES,
+    nvb_ui.NVB_PT_emitter,
+    nvb_ui.NVB_PT_empty,
+    nvb_ui.NVB_PT_light,
+    nvb_ui.NVB_PT_mesh,
+    nvb_ui.NVB_PT_path_point,
+    nvb_ui.NVB_PT_smoothgroups,
+    nvb_ui.NVB_PT_texture,
+
+    # Menus
 
     nvb_ui.KB_MT_animlist_specials,
+
+    # UI Lists
+
+    nvb_ui.NVB_UL_animevents,
+    nvb_ui.NVB_UL_lightflares,
+
     nvb_ui.KB_UL_anim_events,
     nvb_ui.KB_UL_anims,
     nvb_ui.KB_UL_path_points

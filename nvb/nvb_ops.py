@@ -6,7 +6,7 @@ from mathutils import Matrix, Quaternion, Vector
 from . import nvb_def, nvb_io, nvb_material, nvb_txi, nvb_utils
 
 
-class NVBCHILDREN_SMOOTHGROUP(bpy.types.Operator):
+class NVB_OT_children_smoothgroup(bpy.types.Operator):
     bl_idname = "nvb.children_smoothgroup"
     bl_label = "Smoothgroup settings on descendants"
     #bl_property = 'action'
@@ -23,7 +23,7 @@ class NVBCHILDREN_SMOOTHGROUP(bpy.types.Operator):
         return {'FINISHED'}
 
 
-class NVBSMOOTHGROUP_TOGGLE(bpy.types.Operator):
+class NVB_OT_toggle_smoothgroup(bpy.types.Operator):
     bl_idname = "nvb.smoothgroup_toggle"
     bl_label = "Smoothgroup toggle"
     bl_options = {'UNDO'}
@@ -52,7 +52,7 @@ class NVBSMOOTHGROUP_TOGGLE(bpy.types.Operator):
         return {'FINISHED'}
 
 
-class NVBSMOOTHGROUP_GENERATE(bpy.types.Operator):
+class NVB_OT_generate_smoothgroup(bpy.types.Operator):
     bl_idname = "nvb.smoothgroup_generate"
     bl_label = "Smoothgroup generate"
     bl_options = {'UNDO'}
@@ -106,7 +106,7 @@ class NVBSMOOTHGROUP_GENERATE(bpy.types.Operator):
         return {'FINISHED'}
 
 
-class NVBSMOOTHGROUP_SELECT(bpy.types.Operator):
+class NVB_OT_select_smoothgroup(bpy.types.Operator):
     bl_idname = "nvb.smoothgroup_select"
     bl_label = "Smoothgroup select"
     #bl_property = 'action'
@@ -147,7 +147,7 @@ class NVBSMOOTHGROUP_SELECT(bpy.types.Operator):
         return {'FINISHED'}
 
 
-class NVBTEXTURE_IO(bpy.types.Operator):
+class NVB_OT_texture_io(bpy.types.Operator):
     bl_idname = "nvb.texture_info_io"
     bl_label = "Texture Info"
     bl_property = 'action'
@@ -169,7 +169,7 @@ class NVBTEXTURE_IO(bpy.types.Operator):
             #    self.report({'INFO'}, 'Successfully loaded TXI file')
         return {'FINISHED'}
 
-class NVBTEXTURE_BOX_OPS(bpy.types.Operator):
+class NVB_OT_texture_box_ops(bpy.types.Operator):
     """ Hide/show Texture Info sub-groups"""
     bl_idname = "nvb.texture_info_box_ops"
     bl_label = "Box Controls"
@@ -186,7 +186,7 @@ class NVBTEXTURE_BOX_OPS(bpy.types.Operator):
         setattr(texture.nvb, attrname, not current_state)
         return {'FINISHED'}
 
-class NVBSKIN_BONE_OPS(bpy.types.Operator):
+class NVB_OT_skin_bone_ops(bpy.types.Operator):
     bl_idname = "nvb.armature"
     bl_label = "Armature Operations"
     #bl_property = 'action'
@@ -259,7 +259,7 @@ class NVBSKIN_BONE_OPS(bpy.types.Operator):
         '''
         return {'FINISHED'}
 
-class NVBTEXTURE_OPS(bpy.types.Operator):
+class NVB_OT_texture_ops(bpy.types.Operator):
     bl_idname = "nvb.texture_info_ops"
     bl_label = "Texture Info Operations"
     bl_property = 'action'
@@ -289,7 +289,7 @@ class NVBTEXTURE_OPS(bpy.types.Operator):
                 setattr(context.texture.nvb, self.propname, attr_def['default'])
         return {'FINISHED'}
 
-class NVB_LIST_OT_LightFlare_New(bpy.types.Operator):
+class NVB_OT_new_lightflare(bpy.types.Operator):
     """ Add a new item to the flare list """
 
     bl_idname = 'nvb.lightflare_new'
@@ -302,7 +302,7 @@ class NVB_LIST_OT_LightFlare_New(bpy.types.Operator):
         return{'FINISHED'}
 
 
-class NVB_LIST_OT_LightFlare_Delete(bpy.types.Operator):
+class NVB_OT_delete_lightflare(bpy.types.Operator):
     """ Delete the selected item from the flare list """
 
     bl_idname = 'nvb.lightflare_delete'
@@ -324,7 +324,7 @@ class NVB_LIST_OT_LightFlare_Delete(bpy.types.Operator):
         return{'FINISHED'}
 
 
-class NVB_LIST_OT_LightFlare_Move(bpy.types.Operator):
+class NVB_OT_move_lightflare(bpy.types.Operator):
     """ Move an item in the flare list """
 
     bl_idname = 'nvb.lightflare_move'
@@ -368,7 +368,7 @@ class NVB_LIST_OT_LightFlare_Move(bpy.types.Operator):
         return{'FINISHED'}
 
 
-class NVB_LIST_OT_AnimEvent_New(bpy.types.Operator):
+class NVB_OT_new_animevent(bpy.types.Operator):
     """ Add a new item to the event list """
 
     bl_idname = 'nvb.animevent_new'
@@ -380,7 +380,7 @@ class NVB_LIST_OT_AnimEvent_New(bpy.types.Operator):
         return{'FINISHED'}
 
 
-class NVB_LIST_OT_AnimEvent_Delete(bpy.types.Operator):
+class NVB_OT_delete_animevent(bpy.types.Operator):
     """ Delete the selected item from the event list """
 
     bl_idname = 'nvb.animevent_delete'
@@ -402,7 +402,7 @@ class NVB_LIST_OT_AnimEvent_Delete(bpy.types.Operator):
         return{'FINISHED'}
 
 
-class NVB_LIST_OT_AnimEvent_Move(bpy.types.Operator):
+class NVB_OT_move_animevent(bpy.types.Operator):
     """ Move an item in the event list """
 
     bl_idname = 'nvb.animevent_move'
@@ -446,7 +446,7 @@ class NVB_LIST_OT_AnimEvent_Move(bpy.types.Operator):
         return{'FINISHED'}
 
 
-class NVB_OT_ImportMDL(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
+class NVB_OT_import_mdl(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
     """Import Odyssey Engine model (.mdl)"""
 
     bl_idname = 'kb.mdlimport'
@@ -511,7 +511,7 @@ class NVB_OT_ImportMDL(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
         return nvb_io.loadMdl(self, context, **self.as_keywords(ignore=('filter_glob',)))
 
 
-class NVB_OT_ImportLYT(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
+class NVB_OT_import_lyt(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
     """Import Odyssey Engine layout (.lyt)"""
 
     bl_idname = 'kb.lytimport'
@@ -561,7 +561,7 @@ class NVB_OT_ImportLYT(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
         return nvb_io.loadLyt(self, context, **self.as_keywords(ignore=('filter_glob',)))
 
 
-class NVB_OT_ExportMDL(bpy.types.Operator, bpy_extras.io_utils.ExportHelper):
+class NVB_OT_export_mdl(bpy.types.Operator, bpy_extras.io_utils.ExportHelper):
     """Export Odyssey Engine model (.mdl)"""
 
     bl_idname = 'kb.mdlexport'
@@ -596,7 +596,7 @@ class NVB_OT_ExportMDL(bpy.types.Operator, bpy_extras.io_utils.ExportHelper):
         return nvb_io.saveMdl(self, context, **self.as_keywords(ignore=('filter_glob','check_existing')))
 
 
-class LoadWokMaterials(bpy.types.Operator):
+class KB_OT_load_wok_materials(bpy.types.Operator):
     """
     Load all materials for aabb walkmeshes for the selected object. Current
     material slots will be deleted.
@@ -640,7 +640,7 @@ class LoadWokMaterials(bpy.types.Operator):
         return {'FINISHED'}
 
 
-class NVBOBJECT_OT_RenderMinimap(bpy.types.Operator):
+class NVB_OT_render_minimap(bpy.types.Operator):
     bl_idname = "nvb.render_minimap"
     bl_label  = "Render Minimap"
 
@@ -668,7 +668,7 @@ class NVBOBJECT_OT_RenderMinimap(bpy.types.Operator):
         return {'FINISHED'}
 
 
-class NVBOBJECT_OT_SkingroupAdd(bpy.types.Operator):
+class NVB_OT_add_skingroup(bpy.types.Operator):
     bl_idname = "nvb.skingroup_add"
     bl_label  = "Add new Skingroup"
 
@@ -692,7 +692,7 @@ class NVBOBJECT_OT_SkingroupAdd(bpy.types.Operator):
             return {'CANCELLED'}
 
 
-class NVBOBJECT_OT_AnimsceneRename(bpy.types.Operator):
+class NVB_OT_rename_animscene(bpy.types.Operator):
     bl_idname = "nvb.animscene_rename"
     bl_label  = "Rename animation scene"
 
@@ -731,7 +731,7 @@ class NVBOBJECT_OT_AnimsceneRename(bpy.types.Operator):
         return{'FINISHED'}
 
 
-class NVBOBJECT_OT_AnimsceneAdd(bpy.types.Operator):
+class NVB_OT_add_animscene(bpy.types.Operator):
     bl_idname = "nvb.animscene_add"
     bl_label  = "Add animation scene"
 
@@ -776,7 +776,7 @@ class NVBOBJECT_OT_AnimsceneAdd(bpy.types.Operator):
         return{'FINISHED'}
 
 
-class NVB_OT_ExportLYT(bpy.types.Operator, bpy_extras.io_utils.ExportHelper):
+class NVB_OT_export_lyt(bpy.types.Operator, bpy_extras.io_utils.ExportHelper):
     """Export Odyssey Engine layout (.lyt)"""
 
     bl_idname = 'kb.lytexport'

@@ -136,7 +136,7 @@ class NVB_PT_animlist(bpy.types.Panel):
             layout.separator()
 
 
-class NVB_PT_SMOOTHGROUPS(bpy.types.Panel):
+class NVB_PT_smoothgroups(bpy.types.Panel):
     bl_label = "Smoothgroups"
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
@@ -240,7 +240,7 @@ class NVB_PT_SMOOTHGROUPS(bpy.types.Panel):
         row.operator_enum('nvb.smoothgroup_generate', 'action')
 
 
-class NVB_UL_LIGHTFLARES(bpy.types.UIList):
+class NVB_UL_lightflares(bpy.types.UIList):
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
 
         custom_icon = 'NONE'
@@ -254,7 +254,7 @@ class NVB_UL_LIGHTFLARES(bpy.types.UIList):
             layout.label('', icon = custom_icon)
 
 
-class NVB_UL_ANIMEVENTS(bpy.types.UIList):
+class NVB_UL_animevents(bpy.types.UIList):
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
 
         custom_icon = 'NONE'
@@ -268,7 +268,7 @@ class NVB_UL_ANIMEVENTS(bpy.types.UIList):
             layout.label('', icon = custom_icon)
 
 
-class NVB_PT_EMPTY(bpy.types.Panel):
+class NVB_PT_empty(bpy.types.Panel):
     """
     Property panel for additional properties needed for the mdl file
     format. This is only available for EMPTY objects.
@@ -422,7 +422,7 @@ class NVB_PT_EMPTY(bpy.types.Panel):
             row.prop(obj.nvb, 'dummysubtype')
 
 
-class NVB_PT_LIGHT(bpy.types.Panel):
+class NVB_PT_light(bpy.types.Panel):
     """
     Property panel for additional light properties. This
     holds all properties not supported by blender at the moment,
@@ -482,7 +482,7 @@ class NVB_PT_LIGHT(bpy.types.Panel):
         sub.prop(obj.nvb, 'flareradius', text='Radius')
         row = box.row()
         row.active = obj.nvb.lensflares
-        row.template_list('NVB_UL_LIGHTFLARES', 'The_List', obj.nvb, 'flareList', obj.nvb, 'flareListIdx')
+        row.template_list('NVB_UL_lightflares', 'The_List', obj.nvb, 'flareList', obj.nvb, 'flareListIdx')
         col = row.column(align = True)
         col.operator('nvb.lightflare_new', icon='ADD', text = '')
         col.operator('nvb.lightflare_delete', icon='REMOVE', text = '')
@@ -503,7 +503,7 @@ class NVB_PT_LIGHT(bpy.types.Panel):
             row.prop(item, 'position')
 
 
-class NVB_PT_TEXTURE(bpy.types.Panel):
+class NVB_PT_texture(bpy.types.Panel):
     """Texture properties panel, mostly for managing TXI files"""
     bl_label = 'Odyssey Texture Properties'
     bl_space_type = 'PROPERTIES'
@@ -659,7 +659,7 @@ class NVB_PT_TEXTURE(bpy.types.Panel):
             #box.prop(texture.nvb, 'upperleftcoords')
             #box.prop(texture.nvb, 'lowerrightcoords')
 
-class NVB_PT_EMITTER(bpy.types.Panel):
+class NVB_PT_emitter(bpy.types.Panel):
     """
     Property panel for additional properties needed for the mdl file
     format. This is only available for particle systems.
@@ -1120,7 +1120,7 @@ class NVB_PT_EMITTER(bpy.types.Panel):
         '''
 
 
-class NVB_PT_MESH(bpy.types.Panel):
+class NVB_PT_mesh(bpy.types.Panel):
     """
     Property panel for additional mesh properties. This
     holds all properties not supported by blender at the moment,
@@ -1262,7 +1262,7 @@ class KB_UL_path_points(bpy.types.UIList):
         layout.prop_search(item, 'point', bpy.data, 'objects')
 
 
-class NVB_PT_PathPoint(bpy.types.Panel):
+class NVB_PT_path_point(bpy.types.Panel):
     bl_label = 'Odyssey Path Point'
     bl_space_type = 'PROPERTIES'
     bl_region_type = 'WINDOW'
