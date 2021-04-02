@@ -52,6 +52,7 @@ This add-on is a fork of KotorBlender, upgraded to support Blender 2.8+. KotorBl
 
 - Check "Image search" when importing to recursively search for textures in subdirectories
 - Only selected objects are exported, unless none are selected, in which case all objects will be exported
+- When baking lightmaps, disable rendering of unwanted objects, such as walkmeshes and path points
 
 ## Compatibility
 
