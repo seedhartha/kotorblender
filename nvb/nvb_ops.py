@@ -833,6 +833,17 @@ class KB_OT_rebuild_material_nodes(bpy.types.Operator):
 
     def execute(self, context):
         if context.object and (context.object.type == 'MESH') and (context.object.nvb.meshtype != nvb_def.Meshtype.EMITTER):
-            nvb_material.rebuild_material(context.object.active_material, context.object.nvb)
+            # Create a material if it does not exist
+            mesh = context.object.data
+            if len(mesh.materials) == 0:
+                if context.object.name in bpy.data.materials:
+                    material = bpy.data.materials[context.object.name]
+                else:
+                    material = bpy.data.materials.new(context.object.name)
+                mesh.materials.append(material)
+            else:
+                material = context.object.active_material
+
+            nvb_material.rebuild_material(material, context.object.nvb)
 
         return {'FINISHED'}
