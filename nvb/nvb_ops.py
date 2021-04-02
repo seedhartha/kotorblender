@@ -446,7 +446,7 @@ class NVB_LIST_OT_AnimEvent_Move(bpy.types.Operator):
         return{'FINISHED'}
 
 
-class NVB_OP_ImportMDL(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
+class NVB_OT_ImportMDL(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
     '''Import Odyssey Engine model (.mdl)'''
 
     bl_idname = 'kb.mdlimport'
@@ -511,7 +511,7 @@ class NVB_OP_ImportMDL(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
         return nvb_io.loadMdl(self, context, **self.as_keywords(ignore=('filter_glob',)))
 
 
-class NVB_OP_ImportLYT(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
+class NVB_OT_ImportLYT(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
     '''Import Odyssey Engine layout (.lyt)'''
 
     bl_idname = 'kb.lytimport'
@@ -561,7 +561,7 @@ class NVB_OP_ImportLYT(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
         return nvb_io.loadLyt(self, context, **self.as_keywords(ignore=('filter_glob',)))
 
 
-class NVB_OP_ExportMDL(bpy.types.Operator, bpy_extras.io_utils.ExportHelper):
+class NVB_OT_ExportMDL(bpy.types.Operator, bpy_extras.io_utils.ExportHelper):
     '''Export Odyssey Engine model (.mdl)'''
 
     bl_idname = 'kb.mdlexport'
@@ -776,7 +776,7 @@ class NVBOBJECT_OT_AnimsceneAdd(bpy.types.Operator):
         return{'FINISHED'}
 
 
-class NVB_OP_ExportLYT(bpy.types.Operator, bpy_extras.io_utils.ExportHelper):
+class NVB_OT_ExportLYT(bpy.types.Operator, bpy_extras.io_utils.ExportHelper):
     '''Export Odyssey Engine layout (.lyt)'''
 
     bl_idname = 'kb.lytexport'
