@@ -12,13 +12,13 @@ def _get_material_name(node):
     Get material name of the model node.
     """
     # Diffuse map or diffuse color
-    if not nvb_utils.isNull(node.bitmap):
+    if not nvb_utils.is_null(node.bitmap):
         result = "D" + node.bitmap
     else:
-        result = "D" + nvb_utils.colorToHex(node.diffuse)
+        result = "D" + nvb_utils.color_to_hex(node.diffuse)
 
     # Alpha
-    result += "__A" + nvb_utils.intToHex(nvb_utils.floatToByte(node.alpha))
+    result += "__A" + nvb_utils.int_to_hex(nvb_utils.float_to_byte(node.alpha))
 
     return result
 
@@ -44,7 +44,7 @@ def load_material(node, name):
 
 
 def rebuild_material(material, node):
-    if (not nvb_utils.isNull(node.bitmap)) or (not nvb_utils.isNull(node.bitmap2)):
+    if (not nvb_utils.is_null(node.bitmap)) or (not nvb_utils.is_null(node.bitmap2)):
         material.use_nodes = True
         links = material.node_tree.links
         links.clear()
@@ -77,7 +77,7 @@ def rebuild_material(material, node):
         mul_alpha.inputs[1].default_value = node.alpha
 
         # Diffuse map node
-        has_diffuse = not nvb_utils.isNull(node.bitmap)
+        has_diffuse = not nvb_utils.is_null(node.bitmap)
         if has_diffuse:
             diffuse = nodes.new('ShaderNodeTexImage')
             diffuse.location = (300, 0)
@@ -86,7 +86,7 @@ def rebuild_material(material, node):
             links.new(mul_alpha.inputs[0], diffuse.outputs[1])
 
         # Lightmap node
-        has_lightmap = not nvb_utils.isNull(node.bitmap2)
+        has_lightmap = not nvb_utils.is_null(node.bitmap2)
         if has_lightmap:
             lightmap_uv = nodes.new('ShaderNodeUVMap')
             lightmap_uv.location = (0, -300)

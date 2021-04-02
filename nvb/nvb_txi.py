@@ -142,7 +142,7 @@ float_tokens = [
     "spacingB"
 ]
 
-def loadTxi(imagetexture, operator=None):
+def load_txi(imagetexture, operator=None):
     try:
         filepath = imagetexture.image.filepath
     except:
@@ -196,7 +196,7 @@ def loadTxi(imagetexture, operator=None):
 
     return True
 
-def saveTxi(imagetexture, operator=None):
+def save_txi(imagetexture, operator=None):
     try:
         if imagetexture.image.filepath.startswith("//") and \
            not bpy.context.blend_data.is_saved:

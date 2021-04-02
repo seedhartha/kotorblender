@@ -15,7 +15,7 @@ class NVB_OT_children_smoothgroup(bpy.types.Operator):
     action : bpy.props.StringProperty()
 
     def execute(self, context):
-        descendants = nvb_utils.searchNodeAll(
+        descendants = nvb_utils.search_node_all(
             context.object, lambda o: o.type == 'MESH'
         )
         for d in descendants:
@@ -160,12 +160,12 @@ class NVB_OT_texture_io(bpy.types.Operator):
 
     def execute(self, context):
         if self.action == 'SAVE':
-            nvb_txi.saveTxi(context.texture, self)
-            #if nvb_txi.saveTxi(context.texture):
+            nvb_txi.save_txi(context.texture, self)
+            #if nvb_txi.save_txi(context.texture):
             #    self.report({'INFO'}, 'Successfully saved TXI file')
         else:
-            nvb_txi.loadTxi(context.texture, self)
-            #if nvb_txi.loadTxi(context.texture):
+            nvb_txi.load_txi(context.texture, self)
+            #if nvb_txi.load_txi(context.texture):
             #    self.report({'INFO'}, 'Successfully loaded TXI file')
         return {'FINISHED'}
 
@@ -508,7 +508,7 @@ class NVB_OT_import_mdl(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
             )
 
     def execute(self, context):
-        return nvb_io.loadMdl(self, context, **self.as_keywords(ignore=('filter_glob',)))
+        return nvb_io.load_mdl(self, context, **self.as_keywords(ignore=('filter_glob',)))
 
 
 class NVB_OT_import_lyt(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
@@ -558,7 +558,7 @@ class NVB_OT_import_lyt(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
             default=False)
 
     def execute(self, context):
-        return nvb_io.loadLyt(self, context, **self.as_keywords(ignore=('filter_glob',)))
+        return nvb_io.load_lyt(self, context, **self.as_keywords(ignore=('filter_glob',)))
 
 
 class NVB_OT_export_mdl(bpy.types.Operator, bpy_extras.io_utils.ExportHelper):
@@ -593,7 +593,7 @@ class NVB_OT_export_mdl(bpy.types.Operator, bpy_extras.io_utils.ExportHelper):
             default=True)
 
     def execute(self, context):
-        return nvb_io.saveMdl(self, context, **self.as_keywords(ignore=('filter_glob','check_existing')))
+        return nvb_io.save_mdl(self, context, **self.as_keywords(ignore=('filter_glob','check_existing')))
 
 
 class KB_OT_load_wok_materials(bpy.types.Operator):
@@ -653,7 +653,7 @@ class NVB_OT_render_minimap(bpy.types.Operator):
         scene = bpy.context.scene
         if obj and (obj.type == 'EMPTY'):
             if (obj.nvb.dummytype == nvb_def.Dummytype.MDLROOT):
-                nvb_utils.setupMinimapRender(obj, scene)
+                nvb_utils.setup_minimap_render(obj, scene)
                 bpy.ops.render.render(use_viewport = True)
                 #bpy.ops.render.view_show()
 
@@ -709,10 +709,10 @@ class NVB_OT_rename_animscene(bpy.types.Operator):
         # Check if there is already a scene with this animation name
         if (newAnimName  != ''):
             if (newAnimName not in bpy.data.scenes):
-                if nvb_utils.copyAnimSceneCheck(obj, newAnimName, oldAnimName):
+                if nvb_utils.copy_anim_scene_check(obj, newAnimName, oldAnimName):
                     sourceScene.name = newAnimName
 
-                    animRootDummy = nvb_utils.renameAnimScene(obj, newAnimName, oldAnimName)
+                    animRootDummy = nvb_utils.rename_anim_scene(obj, newAnimName, oldAnimName)
                     animRootDummy.nvb.animname    = newAnimName
                     animRootDummy.nvb.newanimname = ''
 
@@ -748,7 +748,7 @@ class NVB_OT_add_animscene(bpy.types.Operator):
         # Check if there is already a scene with this animation name
         if (newAnimName  != ''):
             if (newAnimName not in bpy.data.scenes):
-                if nvb_utils.copyAnimSceneCheck(obj, newAnimName, oldAnimName):
+                if nvb_utils.copy_anim_scene_check(obj, newAnimName, oldAnimName):
                     # Create the scene
                     newScene = bpy.data.scenes.new(newAnimName)
                     # Set fps
@@ -756,7 +756,7 @@ class NVB_OT_add_animscene(bpy.types.Operator):
                     newScene.frame_start = sourceScene.frame_start
                     newScene.frame_end   = sourceScene.frame_end
 
-                    animRootDummy = nvb_utils.copyAnimScene(newScene, obj, newAnimName, oldAnimName)
+                    animRootDummy = nvb_utils.copy_anim_scene(newScene, obj, newAnimName, oldAnimName)
                     animRootDummy.nvb.isanimation = True
                     animRootDummy.nvb.animname    = newAnimName
                     animRootDummy.nvb.newanimname = ''
@@ -812,12 +812,12 @@ class NVB_OT_export_lyt(bpy.types.Operator, bpy_extras.io_utils.ExportHelper):
             f.write('  obstaclecount 0\n')
             f.write('  doorhookcount {}\n'.format(len(doors)))
             for door in doors:
-                parent = nvb_utils.getMdlRoot(door)
+                parent = nvb_utils.get_mdl_root(door)
                 orientation = door.rotation_euler.to_quaternion()
                 f.write('    {} {} {:.7g} {:.7g} {:.7g} {:.7g} {:.7g} {:.7g} {:.7g}\n'.format(parent.name if parent else 'NULL', door.name, *door.matrix_world.translation, *orientation))
             f.write('  othercount {}\n'.format(len(others)))
             for other in others:
-                parent = nvb_utils.getMdlRoot(other)
+                parent = nvb_utils.get_mdl_root(other)
                 orientation = other.rotation_euler.to_quaternion()
                 f.write('    {} {} {:.7g} {:.7g} {:.7g} {:.7g} {:.7g} {:.7g} {:.7g}\n'.format(parent.name if parent else 'NULL', other.name, *other.matrix_world.translation, *orientation))
             f.write('donelayout\n')
