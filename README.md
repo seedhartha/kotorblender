@@ -1,6 +1,6 @@
-# KotORBlender
+# KotorBlender
 
-This add-on is a fork of KotORBlender, upgraded to support Blender 2.8+. KotORBlender is in turn based on NeverBlender, forked from version 1.23a.
+This add-on is a fork of KotorBlender, upgraded to support Blender 2.8+. KotorBlender is in turn based on NeverBlender, forked from version 1.23a.
 
 ## Features
 

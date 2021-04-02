@@ -1220,7 +1220,7 @@ class Animnode():
         # Sanity check: Number of animtverts = number verts * numSamples
         numVerts = len(obj.data.vertices)
         if (len(self.animverts) != numVerts * numSamples):
-            print("Neverblender: WARNING - animvert sample size mismatch: " +
+            print("NeverBlender: WARNING - animvert sample size mismatch: " +
                   obj.name)
             return
         sampleDistance = fps * self.sampleperiod
@@ -1292,7 +1292,7 @@ class Animnode():
         # Sanity check: Number of animtverts = number tverts * numSamples
         numTVerts = len(tvert_order)
         if (len(self.animtverts) != numTVerts * numSamples):
-            print("Neverblender: WARNING - animtvert sample size mismatch: " +
+            print("NeverBlender: WARNING - animtvert sample size mismatch: " +
                   obj.name)
             return
         sampleDistance = fps * self.sampleperiod

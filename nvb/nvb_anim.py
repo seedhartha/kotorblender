@@ -147,7 +147,7 @@ class Animation():
             self.loadAsciiAnimHeader(ascii_data[:animNodesStart-1])
             self.loadAsciiAnimNodes(ascii_data[animNodesStart:])
         else:
-            print('Neverblender - WARNING: Failed to load an animation.')
+            print('NeverBlender - WARNING: Failed to load an animation.')
 
 
     def loadAsciiAnimHeader(self, ascii_data):
