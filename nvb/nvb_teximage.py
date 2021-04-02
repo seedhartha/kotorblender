@@ -34,8 +34,13 @@ def load_texture_image(name):
     if name in bpy.data.textures:
         texture = bpy.data.textures[name]
     else:
+        if name in bpy.data.images:
+            image = bpy.data.images[name]
+        else:
+            image = _create_image(name, nvb_glob.texturePath)
+
         texture = bpy.data.textures.new(name, type='IMAGE')
-        texture.image = _create_image(name, nvb_glob.texturePath)
+        texture.image = image
         texture.use_fake_user = True
         nvb_txi.loadTxi(texture)
 
