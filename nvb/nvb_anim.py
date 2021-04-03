@@ -1,11 +1,10 @@
 """TODO: DOC."""
 
 import collections
+
 import bpy
 
-from . import nvb_def
-from . import nvb_utils
-from . import nvb_animnode
+from . import nvb_animnode, nvb_def, nvb_utils
 
 
 class Animation():

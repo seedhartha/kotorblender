@@ -1,8 +1,7 @@
-import bpy
 import bmesh
+import bpy
 
-from . import nvb_def
-from . import nvb_utils
+from . import nvb_def, nvb_utils
 
 
 class KB_UL_anims(bpy.types.UIList):

@@ -2,12 +2,10 @@
 
 import os
 import re
+
 import bpy
 
-from . import nvb_glob
-from . import nvb_def
-from . import nvb_mdl
-from . import nvb_utils
+from . import nvb_def, nvb_glob, nvb_mdl, nvb_utils
 
 
 def _load_mdl(filepath, position = (0.0, 0.0, 0.0)):

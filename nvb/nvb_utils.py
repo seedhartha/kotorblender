@@ -1,7 +1,8 @@
 ﻿import math
-import mathutils
-import bpy
 import os
+
+import bpy
+import mathutils
 
 from . import nvb_def
 

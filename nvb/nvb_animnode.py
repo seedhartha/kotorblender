@@ -1,14 +1,13 @@
 """TODO: DOC."""
 
-import mathutils
 import collections
-import bpy
 import re
-from math import sqrt,asin,cos
+from math import asin, cos, sqrt
 
-from . import nvb_def
-from . import nvb_utils
-from . import nvb_parse
+import bpy
+import mathutils
+
+from . import nvb_def, nvb_parse, nvb_utils
 
 
 class Keys():
@@ -869,6 +868,7 @@ class Node():
 import copy
 
 from . import nvb_node
+
 
 class Animnode():
     """TODO: DOC."""
