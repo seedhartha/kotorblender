@@ -169,6 +169,7 @@ class NVB_OT_texture_io(bpy.types.Operator):
             #    self.report({'INFO'}, 'Successfully loaded TXI file')
         return {'FINISHED'}
 
+
 class NVB_OT_texture_box_ops(bpy.types.Operator):
     """ Hide/show Texture Info sub-groups"""
     bl_idname = "nvb.texture_info_box_ops"
@@ -185,6 +186,7 @@ class NVB_OT_texture_box_ops(bpy.types.Operator):
         current_state = getattr(texture.nvb, attrname)
         setattr(texture.nvb, attrname, not current_state)
         return {'FINISHED'}
+
 
 class NVB_OT_skin_bone_ops(bpy.types.Operator):
     bl_idname = "nvb.armature"
@@ -229,6 +231,7 @@ class NVB_OT_skin_bone_ops(bpy.types.Operator):
         #for name, obj in context.scene.objects.items():
         return {'FINISHED'}
 
+
 class NVB_OT_texture_ops(bpy.types.Operator):
     bl_idname = "nvb.texture_info_ops"
     bl_label = "Texture Info Operations"
@@ -258,6 +261,7 @@ class NVB_OT_texture_ops(bpy.types.Operator):
             if 'default' in attr_def:
                 setattr(context.texture.nvb, self.propname, attr_def['default'])
         return {'FINISHED'}
+
 
 class NVB_OT_new_lightflare(bpy.types.Operator):
     """ Add a new item to the flare list """

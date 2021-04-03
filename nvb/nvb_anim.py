@@ -20,11 +20,9 @@ class Animation():
         if ascii_data:
             self.load_ascii(ascii_data)
 
-
     @staticmethod
     def create_rest_pose(obj, frame=1):
         nvb_animnode.Animnode.create_restpose(obj, frame)
-
 
     def create(self, mdl_base, options={}):
         """Create animations with a list of imported objects."""
@@ -69,7 +67,6 @@ class Animation():
                 if options.get("anim_restpose"):
                     Animation.create_rest_pose(obj, new_anim.frameStart-5)
 
-
     def get_anim_node(self, nodeName, parentName = nvb_def.null):
         key = parentName + nodeName
         if key in self.nodeList:
@@ -89,7 +86,6 @@ class Animation():
 
     def add_event(self, event):
         self.eventList.append(event)
-
 
     def add_events_to_object(self, rootDummy):
         for event in self.eventList:
@@ -143,7 +139,6 @@ class Animation():
         else:
             print("NeverBlender - WARNING: Failed to load an animation.")
 
-
     def load_ascii_anim_header(self, ascii_data):
         ascii_lines = [l.strip().split() for l in ascii_data.splitlines()]
         for line in ascii_lines:
@@ -190,7 +185,6 @@ class Animation():
         for (imporder, child) in childList:
             self.anim_node_to_ascii(child, asciiLines)
 
-
     @staticmethod
     def generate_ascii_nodes(obj, anim, ascii_lines, options):
         nvb_animnode.Animnode.generate_ascii(obj, anim, ascii_lines, options)
@@ -202,7 +196,6 @@ class Animation():
         children.sort(key=lambda c: c.nvb.imporder)
         for c in children:
             Animation.generate_ascii_nodes(c, anim, ascii_lines, options)
-
 
     @staticmethod
     def generate_ascii(animRootDummy, anim, ascii_lines, options):

@@ -38,6 +38,7 @@ def get_name(s):
     #return s.lower()
     return s
 
+
 def get_real_name(s):
     """
     Do a case insensitive search through existing objects,

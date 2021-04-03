@@ -348,7 +348,6 @@ class Node():
         nvb_parse.f4(asciiBlock, keyList)
         self.isEmpty = False
 
-
     def parse_keys_4f(self, asciiBlock, keyList):
         """
         Parse animation keys containing 4 floats (not counting the time value)
@@ -356,14 +355,12 @@ class Node():
         nvb_parse.f5(asciiBlock, keyList)
         self.isEmpty = False
 
-
     def parse_keys_1f(self, asciiBlock, keyList):
         """
         Parse animation keys containing 1 float (not counting the time value)
         """
         nvb_parse.f2(asciiBlock, keyList)
         self.isEmpty = False
-
 
     def parse_keys_incompat(self, asciiBlock):
         """
@@ -462,7 +459,6 @@ class Node():
                     self.parse_keys_incompat(asciiBlock[idx:idx+numKeys+1])
                     self.isEmpty = False
 
-
     def add_keyframe_to_curve(self, curve, key_coll, key_idx, value_idx, num_values):
         """
         Add Keyframe to animation F-Curve, in bezier or linear style
@@ -483,7 +479,6 @@ class Node():
                 nextframe = nvb_utils.nwtime2frame(key_coll[key_idx + 1][0])
                 cp2frame = frame + ((nextframe - frame) / 3.0)
                 kfp.handle_right[:] = [ cp2frame, key[value_idx + (2 * num_values)] + key[value_idx] ]
-
 
     def add_anim_to_object(self, targetObject, animName = ''):
         """
@@ -556,7 +551,6 @@ class Node():
 
         targetObject.animation_data_create()
         targetObject.animation_data.action = action
-
 
     @staticmethod
     def get_keys_from_action(anim, action, keyDict):
@@ -653,7 +647,6 @@ class Node():
                         #values.extend([ 0.0, 0.0 ])
                 keys[frame] = values
 
-
     def add_keys_to_ascii_incompat(self, obj, asciiLines):
         return Node.generate_ascii_keys_incompat(obj, asciiLines)
 
@@ -682,7 +675,6 @@ class Node():
                         asciiLines.append('      ' + ' '.join(line))
                     else:
                         asciiLines.append('    ' + ' '.join(line))
-
 
     @staticmethod
     def generate_ascii_keys(animObj, anim, asciiLines, options={}):
@@ -770,7 +762,6 @@ class Node():
                     # right control point(s)
                     s += (' {: .7g}' * ktype['values']).format(*key[ktype['axes'] + 1::2])
                 asciiLines.append(s)
-
 
     @staticmethod
     def get_original_name(nodeName, animName):
@@ -1059,7 +1050,6 @@ class Animnode():
                         numVals
                     ]
 
-
     def create_data_object(self, obj, anim, options={}):
         """Creates animations in object actions."""
         def data_conversion(label, obj, vals, options={}):
@@ -1155,7 +1145,6 @@ class Animnode():
             #print(dp)
             Animnode.insert_kfp(frames, values, action, dp, dp_dim,
                                 'Odyssey Emitter')
-
 
     def create_data_shape(self, obj, anim, animlength, options={}):
         """Import animated vertices as shapekeys."""
