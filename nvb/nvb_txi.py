@@ -141,6 +141,7 @@ float_tokens = [
     "spacingB"
 ]
 
+
 def load_txi(imagetexture, operator=None):
     try:
         filepath = imagetexture.image.filepath
@@ -194,6 +195,7 @@ def load_txi(imagetexture, operator=None):
         operator.report({'INFO'}, "Imported {}".format(os.path.basename(filepath)))
 
     return True
+
 
 def save_txi(imagetexture, operator=None):
     try:

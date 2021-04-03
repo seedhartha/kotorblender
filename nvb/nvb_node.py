@@ -50,38 +50,30 @@ class GeometryNode():
         self.parsed_lines = [];
         self.rawascii         = '' # unprocessed directives
 
-
-
     def __eq__(self, other):
         if isinstance(other, Base):
             return self.name == other.name
 
-
     def __ne__(self, other):
         return not self.__eq__(self, other)
 
-
     def __str__(self):
         return 'node ' + self.nodetype + ' ' + self.name
-
 
     def parse1f(self, asciiBlock, floatList):
         l_float = float
         for line in asciiBlock:
             floatList.append(l_float(line[0]))
 
-
     def parse2f(self, asciiBlock, floatList):
         l_float = float
         for line in asciiBlock:
             floatList.append( (l_float(line[0]), l_float(line[1])) )
 
-
     def parse3f(self, asciiBlock, floatList):
         l_float = float
         for line in asciiBlock:
             floatList.append( (l_float(line[0]), l_float(line[1]), l_float(line[2])) )
-
 
     def load_ascii(self, asciiNode):
         l_float = float
@@ -137,7 +129,6 @@ class GeometryNode():
             txt = bpy.data.texts.new(obj.name)
             txt.write(self.rawascii)
             obj.nvb.rawascii = txt.name
-
 
     def add_to_scene(self, scene):
         obj = bpy.data.objects.new(self.name, None)
@@ -317,13 +308,11 @@ class Reference(GeometryNode):
         if (self.nodetype == 'reference'):
             self.add_unparsed_to_raw(asciiNode)
 
-
     def set_object_data(self, obj):
         GeometryNode.set_object_data(self, obj)
         obj.nvb.dummytype    = self.dummytype
         obj.nvb.refmodel     = self.refmodel
         obj.nvb.reattachable = (self.reattachable == 1)
-
 
     def add_data_to_ascii(self, obj, asciiLines, classification = nvb_def.Classification.UNKNOWN, simple = False, nameDict=None):
         GeometryNode.add_data_to_ascii(self, obj, asciiLines, classification, nameDict=nameDict)
@@ -504,7 +493,6 @@ class Trimesh(GeometryNode):
                     self.parsed_lines.extend(range(idx,idx+numVals+1))
         if (self.nodetype == 'trimesh'):
             self.add_unparsed_to_raw(asciiNode)
-
 
     def parse_face_list(self, asciiFaces):
         l_int = int
@@ -695,7 +683,6 @@ class Trimesh(GeometryNode):
         obj.nvb.ambient          = self.ambient
         obj.nvb.lytposition      = self.lytposition
 
-
     def add_to_scene(self, scene):
         if nvb_glob.minimapMode and not self.render:
             # Fading objects won't be imported in minimap mode
@@ -706,7 +693,6 @@ class Trimesh(GeometryNode):
         self.set_object_data(obj)
         bpy.context.collection.objects.link(obj)
         return obj
-
 
     def add_material_data_to_ascii(self, obj, asciiLines):
         asciiLines.append('  alpha ' + str(round(obj.nvb.alpha, 2)))
@@ -724,7 +710,6 @@ class Trimesh(GeometryNode):
         imgName = obj.nvb.bitmap2 if obj.nvb.bitmap2 else nvb_def.null
         asciiLines.append('  bitmap2 ' + imgName)
 
-
     def add_uv_to_list(self, uv, uvList, vert, vertList):
         """Helper function to keep UVs unique."""
         if uv in uvList and vert in vertList:
@@ -733,7 +718,6 @@ class Trimesh(GeometryNode):
             uvList.append(uv)
             vertList.append(vert)
             return (len(uvList)-1)
-
 
     def get_export_mesh(self, obj):
         """
@@ -771,7 +755,6 @@ class Trimesh(GeometryNode):
         bm.free()
 
         return mesh
-
 
     def add_mesh_data_to_ascii(self, obj, asciiLines, simple = False):
         mesh = self.get_export_mesh(obj)
@@ -924,7 +907,6 @@ class Trimesh(GeometryNode):
                 for link in self.roomlinks:
                     asciiLines.append("    {:d} {:d}".format(link[0], link[1]))
 
-
     def add_data_to_ascii(self, obj, asciiLines, classification = nvb_def.Classification.UNKNOWN, simple = False, nameDict=None):
         GeometryNode.add_data_to_ascii(self, obj, asciiLines, classification, simple, nameDict=nameDict)
 
@@ -975,7 +957,6 @@ class Danglymesh(Trimesh):
         self.displacement = 1.0
         self.constraints  = []
 
-
     def load_ascii(self, asciiNode):
         Trimesh.load_ascii(self, asciiNode)
 
@@ -1019,7 +1000,6 @@ class Danglymesh(Trimesh):
             vgroup.add([vertexIdx], weight, 'REPLACE')
         obj.nvb.constraints = vgroup.name
 
-
     def set_object_data(self, obj):
         Trimesh.set_object_data(self, obj)
 
@@ -1027,7 +1007,6 @@ class Danglymesh(Trimesh):
         obj.nvb.tightness    = self.tightness
         obj.nvb.displacement = self.displacement
         self.add_constraints_to_object(obj)
-
 
     def add_constraints_to_ascii(self, obj, asciiLines):
         vgroupName = obj.nvb.constraints
@@ -1046,7 +1025,6 @@ class Danglymesh(Trimesh):
                     continue
                 weight = round(vg.weight * 255, 3)
             asciiLines.append("    {}".format(weight))
-
 
     def add_data_to_ascii(self, obj, asciiLines, classification = nvb_def.Classification.UNKNOWN, simple = False, nameDict=None):
         Trimesh.add_data_to_ascii(self, obj, asciiLines, classification, nameDict=nameDict)
@@ -1100,7 +1078,6 @@ class Skinmesh(Trimesh):
         if (self.nodetype == 'skin'):
             self.add_unparsed_to_raw(asciiNode)
 
-
     def get_weights_from_ascii(self, asciiBlock):
         lfloat = float
         lchunker = nvb_utils.chunker
@@ -1114,7 +1091,6 @@ class Skinmesh(Trimesh):
                 memberships.append([chunk[0], lfloat(chunk[1])])
 
             self.weights.append(memberships)
-
 
     def add_skin_groups_to_object(self, obj):
         skinGroupDict = {}
@@ -1180,7 +1156,6 @@ class Skinmesh(Trimesh):
                 print("Kotorblender - WARNING: Missing vertex weight in " + obj.name)
                 line = 'ERROR: no weight'
             asciiLines.append(line)
-
 
     def add_data_to_ascii(self, obj, asciiLines, classification = nvb_def.Classification.UNKNOWN, simple = False, nameDict=None):
         Trimesh.add_data_to_ascii(self, obj, asciiLines, classification, nameDict=nameDict)
@@ -1356,7 +1331,6 @@ class Emitter(GeometryNode):
         # unidentified stuff
         self.rawascii = ''
 
-
     def load_ascii(self, asciiNode):
         l_float = float
         l_is_number = nvb_utils.is_number
@@ -1425,12 +1399,10 @@ class Emitter(GeometryNode):
         a_bmesh.free()
         return mesh
 
-
     def add_raw_ascii(self, obj):
         txt = bpy.data.texts.new(obj.name)
         txt.write(self.rawascii)
         obj.nvb.rawascii = txt.name
-
 
     def set_object_data(self, obj):
         GeometryNode.set_object_data(self, obj)
@@ -1477,7 +1449,6 @@ class Emitter(GeometryNode):
 
         #self.add_raw_ascii(obj)
 
-
     def add_to_scene(self, scene):
         if nvb_glob.minimapMode:
             # We don't need emitters in minimap mode
@@ -1490,7 +1461,6 @@ class Emitter(GeometryNode):
         self.set_object_data(obj)
         bpy.context.collection.objects.link(obj)
         return obj
-
 
     def add_data_to_ascii(self, obj, asciiLines, classification = nvb_def.Classification.UNKNOWN, simple = False, nameDict=None):
         GeometryNode.add_data_to_ascii(self, obj, asciiLines, classification, simple, nameDict=nameDict)
@@ -1858,7 +1828,6 @@ class Aabb(Trimesh):
                                   ' ' +
                                   str(node[6]) )
 
-
     def add_data_to_ascii(self, obj, asciiLines, classification = nvb_def.Classification.UNKNOWN, simple = False, nameDict=None):
         if obj.parent and nameDict and obj.parent.name in nameDict:
             asciiLines.append('  parent ' + nameDict[obj.parent.name])
@@ -1885,7 +1854,6 @@ class Aabb(Trimesh):
         if self.roottype != 'wok':
             self.add_aabb_to_ascii(obj, asciiLines)
 
-
     def add_material_data_to_ascii(self, obj, asciiLines):
         asciiLines.append('  diffuse 1.0 1.0 1.0')
 
@@ -1896,7 +1864,6 @@ class Aabb(Trimesh):
 
         lightmapped = 1 if obj.nvb.lightmapped else 0
         asciiLines.append('  lightmapped ' + str(lightmapped))
-
 
     def create_mesh(self, name):
         # Create the mesh itself
@@ -1952,7 +1919,6 @@ class Aabb(Trimesh):
 
         mesh.update()
         return mesh
-
 
     def add_to_scene(self, scene):
         if nvb_glob.minimapMode:

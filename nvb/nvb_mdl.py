@@ -28,7 +28,6 @@ class Mdl():
 
         self.mdlnodes = []
 
-
     def load_ascii_node(self, asciiBlock):
         if asciiBlock is None:
             raise nvb_def.MalformedMdlFile("Empty Node")
@@ -209,7 +208,6 @@ class Mdl():
         for a in anims:
             a.create(mdl_base, options)
 
-
     def load_ascii(self, ascii_block):
         geom_start = ascii_block.find("node ")
         anim_start = ascii_block.find("newanim ")
@@ -228,7 +226,6 @@ class Mdl():
         # Import Animations
         if nvb_glob.importAnim and (anim_start > 0):
             self.read_ascii_anims(ascii_block[anim_start:])
-
 
     def read_ascii_anims(self, ascii_block):
         """Load all animations from an ascii mdl block."""
@@ -330,7 +327,6 @@ class Mdl():
             elif label == 'layoutposition':
                 self.lytposition = [float(x) for x in line[1:]]
 
-
     def geometry_to_ascii(self, bObject, asciiLines, simple = False, nameDict = None):
 
         nodeType = nvb_utils.get_node_type(bObject)
@@ -358,14 +354,12 @@ class Mdl():
         for (imporder, child) in childList:
             self.geometry_to_ascii(child, asciiLines, simple, nameDict=nameDict)
 
-
     def generate_ascii_animations(self, ascii_lines, rootDummy, options={}):
         if rootDummy.nvb.animList:
             for anim in rootDummy.nvb.animList:
                 print("export animation " + anim.name)
                 nvb_anim.Animation.generate_ascii(rootDummy, anim,
                                                  ascii_lines, options)
-
 
     def generate_ascii(self, asciiLines, rootDummy, exports = {'ANIMATION', 'WALKMESH'}):
         self.name           = rootDummy.name
@@ -461,6 +455,7 @@ class Mdl():
         # The End
         asciiLines.append('donemodel ' + self.name)
         asciiLines.append('')
+
 
 class Xwk(Mdl):
     def __init__(self, wkmType = 'pwk'):
