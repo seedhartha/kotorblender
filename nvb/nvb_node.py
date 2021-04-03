@@ -183,15 +183,7 @@ class GeometryNode():
         rot = nvb_utils.get_aurora_rot_from_object(obj)
         s = "  orientation {: .7g} {: .7g} {: .7g} {: .7g}".format(round(rot[0], 7), round(rot[1], 7), round(rot[2], 7), round(rot[3], 7))
         asciiLines.append(s)
-        '''
-        loc = obj.location
-        s = '  position {: .7g} {: .7g} {: .7g}'.format(round(loc[0], 7), round(loc[1], 7), round(loc[2], 7))
-        asciiLines.append(s)
 
-        rot = nvb_utils.get_aurora_rot_from_object(obj)
-        s = '  orientation {: .7g} {: .7g} {: .7g} {: .7g}'.format(round(rot[0], 7), round(rot[1], 7), round(rot[2], 7), round(rot[3], 7))
-        asciiLines.append(s)
-        '''
         color = obj.nvb.wirecolor
         asciiLines.append('  wirecolor ' + str(round(color[0], 2)) + ' ' +
                                            str(round(color[1], 2)) + ' ' +
@@ -257,10 +249,6 @@ class Dummy(GeometryNode):
         # scale = round(nvb_utils.get_aurora_scale(obj), 3)
         # Scaling fix
         asciiLines.append('  scale 1.0')
-        '''
-        if (scale != 1.0):
-            asciiLines.append('  scale ' + str(scale))
-        '''
 
         # Scaling fix
         transmat = self.get_adjusted_matrix(obj)
@@ -271,15 +259,6 @@ class Dummy(GeometryNode):
         rot = nvb_utils.euler2nwangle(transmat.to_euler('XYZ'))
         s = "  orientation {: .7g} {: .7g} {: .7g} {: .7g}".format(round(rot[0], 7), round(rot[1], 7), round(rot[2], 7), round(rot[3], 7))
         asciiLines.append(s)
-        '''
-        loc = obj.location
-        s = '  position {: .7g} {: .7g} {: .7g}'.format(round(loc[0], 7), round(loc[1], 7), round(loc[2], 7))
-        asciiLines.append(s)
-
-        rot = nvb_utils.get_aurora_rot_from_object(obj)
-        s = '  orientation {: .7g} {: .7g} {: .7g} {: .7g}'.format(round(rot[0], 7), round(rot[1], 7), round(rot[2], 7), round(rot[3], 7))
-        asciiLines.append(s)
-        '''
 
         color = obj.nvb.wirecolor
         asciiLines.append('  wirecolor ' + str(round(color[0], 2)) + ' ' +

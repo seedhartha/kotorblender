@@ -731,10 +731,6 @@ class NVB_PT_emitter(bpy.types.Panel):
 
         box.separator()
 
-        '''
-        box.prop(obj.nvb, "")
-        '''
-
         row = box.row()
         row.label(text="Emitter Size (cm)")
         row = box.row(align=True)
@@ -1045,78 +1041,11 @@ class NVB_PT_emitter(bpy.types.Panel):
         #col.prop(obj, 'normal_factor')
         #col.prop(obj, 'factor_random')
 
-        '''
-        split = layout.split()
-        col = split.column(align=True)
-        col.prop(obj.nvb, 'lifeexp')
-
-        col = split.column(align=True)
-        col.prop(obj, 'mass')
-        '''
-
         #row = layout.row()
         #col = row.column()
         #col.prop(obj.effector_weights, 'wind')
         #col.prop(obj.effector_weights, 'drag')
         #col.prop(obj.effector_weights, 'gravity')
-        '''
-        layout.separator()
-
-        # Chunk
-        row = layout.row()
-        box = row.box()
-        box.label(text='Chunk')
-        row = box.row()
-        row.prop(obj.nvb, 'chunkname', text = 'Name')
-
-        layout.separator()
-
-        # Particle properties
-        row = layout.row()
-        box = row.box()
-        box.label(text='Animation: ')
-        split = box.split()
-        col = split.column(align=True)
-        col.prop(obj.nvb, 'colorstart', text='')
-        col.prop(obj.nvb, 'colorend', text='')
-
-        col = split.column(align=True)
-        col.prop(obj.nvb, 'alphastart')
-        col.prop(obj.nvb, 'alphaend')
-
-        split = box.split()
-        col = split.column(align=True)
-        col.prop(obj.nvb, 'sizestart')
-        col.prop(obj.nvb, 'sizeend')
-
-        col = split.column(align=True)
-        col.prop(obj.nvb, 'sizestart_y')
-        col.prop(obj.nvb, 'sizeend_y')
-
-        layout.separator()
-
-
-        # Misc props
-        row = layout.row()
-        box = row.box()
-        box.label(text='Misc. properties: ')
-        row = box.row()
-        row.prop(obj.nvb, 'fps')
-        split = box.split()
-        col = split.column()
-        col.prop(obj.nvb, 'istinted')
-        col.prop(obj.nvb, 'random')
-
-        layout.separator()
-
-
-
-        # Bounce
-        row = layout.row()
-        box = row.box()
-        box.label(text = 'Bounce: ')
-        factor_but(box, obj.nvb, 'bounce', 'bounce_co', 'Coeff.')
-        '''
 
 
 class NVB_PT_mesh(bpy.types.Panel):

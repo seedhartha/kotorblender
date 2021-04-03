@@ -42,7 +42,7 @@ def get_real_name(s):
     """
     Do a case insensitive search through existing objects,
     returning name or None if not found
-    '"""''
+    """
     try:
         return [name for name in bpy.data.objects.keys() if name.lower() == s.lower()][0]
     except:

@@ -353,10 +353,6 @@ class Mdl():
 
         node.to_ascii(bObject, asciiLines, self.classification, simple, nameDict=nameDict)
 
-        '''
-        for child in bObject.children:
-            self.geometry_to_ascii(child, asciiLines, simple)
-        '''
         childList = []
         for child in bObject.children:
             childList.append((child.nvb.imporder, child))
