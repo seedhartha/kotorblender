@@ -1,5 +1,3 @@
-"""TODO: DOC."""
-
 def _i(asciiBlock, intList, numVals, initialFloat=True):
     """Parse a float and integers into a numVals tuple into intList"""
     l_float = float
@@ -60,7 +58,6 @@ def i3(asciiBlock, intList, initialFloat=True):
     _i(asciiBlock, intList, 3, initialFloat)
 
 def txt(asciiBlock, txtBlock):
-    """TODO: DOC."""
     # txtBlock = ['\n'+' '.join(l) for l in aciiBlock]
     for line in asciiBlock:
         txtBlock = txtBlock + '\n' + ' '.join(line)

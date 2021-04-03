@@ -1,5 +1,3 @@
-"""TODO: DOC."""
-
 import collections
 
 import bpy
@@ -8,8 +6,6 @@ from . import nvb_animnode, nvb_def, nvb_utils
 
 
 class Animation():
-    """TODO: DOC."""
-
     def __init__(self, name = 'UNNAMED', ascii_data=None):
         self.name      = name
         self.length    = 1.0
@@ -27,7 +23,6 @@ class Animation():
 
     @staticmethod
     def create_rest_pose(obj, frame=1):
-        """TODO: DOC."""
         nvb_animnode.Animnode.create_restpose(obj, frame)
 
 
@@ -150,7 +145,6 @@ class Animation():
 
 
     def load_ascii_anim_header(self, ascii_data):
-        """TODO: DOC."""
         ascii_lines = [l.strip().split() for l in ascii_data.splitlines()]
         for line in ascii_lines:
             try:
@@ -172,7 +166,6 @@ class Animation():
                 self.events.append((float(line[1]), line[2]))
 
     def load_ascii_anim_nodes(self, ascii_data):
-        """TODO: DOC."""
         dlm = 'node '
         node_list = [dlm + s for s in ascii_data.split(dlm) if s != '']
         for idx, ascii_node in enumerate(node_list):
@@ -200,7 +193,6 @@ class Animation():
 
     @staticmethod
     def generate_ascii_nodes(obj, anim, ascii_lines, options):
-        """TODO: Doc."""
         nvb_animnode.Animnode.generate_ascii(obj, anim, ascii_lines, options)
 
         # Sort children to restore original order before import

@@ -1,5 +1,3 @@
-"""TODO: DOC."""
-
 import os
 import re
 

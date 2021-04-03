@@ -1,4 +1,3 @@
-"""TODO: DOC."""
 import re
 
 import bmesh
@@ -333,8 +332,6 @@ class Reference(GeometryNode):
 
 
 class Trimesh(GeometryNode):
-    """TODO: Doc."""
-
     def __init__(self, name = 'UNNAMED'):
         GeometryNode.__init__(self, name)
         self.nodetype = 'trimesh'
