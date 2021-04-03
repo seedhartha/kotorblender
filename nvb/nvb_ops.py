@@ -805,21 +805,21 @@ class NVB_OT_export_lyt(bpy.types.Operator, bpy_extras.io_utils.ExportHelper):
                         others.append(obj)
 
             f.write('beginlayout\n')
-            f.write('  roomcount {}\n'.format(len(rooms)))
+            f.write("  roomcount {}\n".format(len(rooms)))
             for room in rooms:
-                f.write('    {} {:.7g} {:.7g} {:.7g}\n'.format(room.name, *room.location))
+                f.write("    {} {:.7g} {:.7g} {:.7g}\n".format(room.name, *room.location))
             f.write('  trackcount 0\n')
             f.write('  obstaclecount 0\n')
-            f.write('  doorhookcount {}\n'.format(len(doors)))
+            f.write("  doorhookcount {}\n".format(len(doors)))
             for door in doors:
                 parent = nvb_utils.get_mdl_root(door)
                 orientation = door.rotation_euler.to_quaternion()
-                f.write('    {} {} {:.7g} {:.7g} {:.7g} {:.7g} {:.7g} {:.7g} {:.7g}\n'.format(parent.name if parent else 'NULL', door.name, *door.matrix_world.translation, *orientation))
-            f.write('  othercount {}\n'.format(len(others)))
+                f.write("    {} {} {:.7g} {:.7g} {:.7g} {:.7g} {:.7g} {:.7g} {:.7g}\n".format(parent.name if parent else 'NULL', door.name, *door.matrix_world.translation, *orientation))
+            f.write("  othercount {}\n".format(len(others)))
             for other in others:
                 parent = nvb_utils.get_mdl_root(other)
                 orientation = other.rotation_euler.to_quaternion()
-                f.write('    {} {} {:.7g} {:.7g} {:.7g} {:.7g} {:.7g} {:.7g} {:.7g}\n'.format(parent.name if parent else 'NULL', other.name, *other.matrix_world.translation, *orientation))
+                f.write("    {} {} {:.7g} {:.7g} {:.7g} {:.7g} {:.7g} {:.7g} {:.7g}\n".format(parent.name if parent else 'NULL', other.name, *other.matrix_world.translation, *orientation))
             f.write('donelayout\n')
 
         return {'FINISHED'}

@@ -137,7 +137,7 @@ class Animation():
                     self.add_ascii_node(asciiBlock[blockStart:idx+1])
                     blockStart = -1
                 elif (label == 'node'):
-                    raise nvb_def.MalformedMdlFile('Unexpected "endnode"')
+                    raise nvb_def.MalformedMdlFile("Unexpected 'endnode'")
 
     def load_ascii(self, ascii_data):
         """Load an animation from a block from an ascii mdl file."""
@@ -147,7 +147,7 @@ class Animation():
             self.load_ascii_anim_header(ascii_data[:animNodesStart-1])
             self.load_ascii_anim_nodes(ascii_data[animNodesStart:])
         else:
-            print('NeverBlender - WARNING: Failed to load an animation.')
+            print("NeverBlender - WARNING: Failed to load an animation.")
 
 
     def load_ascii_anim_header(self, ascii_data):

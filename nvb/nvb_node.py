@@ -176,12 +176,12 @@ class GeometryNode():
         # Scaling fix
         transmat = self.get_adjusted_matrix(obj)
         loc = transmat.to_translation()
-        s = '  position {: .7g} {: .7g} {: .7g}'.format(round(loc[0], 7), round(loc[1], 7), round(loc[2], 7))
+        s = "  position {: .7g} {: .7g} {: .7g}".format(round(loc[0], 7), round(loc[1], 7), round(loc[2], 7))
         asciiLines.append(s)
 
         #rot = nvb_utils.euler2nwangle(transmat.to_euler('XYZ'))
         rot = nvb_utils.get_aurora_rot_from_object(obj)
-        s = '  orientation {: .7g} {: .7g} {: .7g} {: .7g}'.format(round(rot[0], 7), round(rot[1], 7), round(rot[2], 7), round(rot[3], 7))
+        s = "  orientation {: .7g} {: .7g} {: .7g} {: .7g}".format(round(rot[0], 7), round(rot[1], 7), round(rot[2], 7), round(rot[3], 7))
         asciiLines.append(s)
         '''
         loc = obj.location
@@ -265,11 +265,11 @@ class Dummy(GeometryNode):
         # Scaling fix
         transmat = self.get_adjusted_matrix(obj)
         loc = transmat.to_translation()
-        s = '  position {: .7g} {: .7g} {: .7g}'.format(round(loc[0], 7), round(loc[1], 7), round(loc[2], 7))
+        s = "  position {: .7g} {: .7g} {: .7g}".format(round(loc[0], 7), round(loc[1], 7), round(loc[2], 7))
         asciiLines.append(s)
 
         rot = nvb_utils.euler2nwangle(transmat.to_euler('XYZ'))
-        s = '  orientation {: .7g} {: .7g} {: .7g} {: .7g}'.format(round(rot[0], 7), round(rot[1], 7), round(rot[2], 7), round(rot[3], 7))
+        s = "  orientation {: .7g} {: .7g} {: .7g} {: .7g}".format(round(rot[0], 7), round(rot[1], 7), round(rot[2], 7), round(rot[3], 7))
         asciiLines.append(s)
         '''
         loc = obj.location
@@ -946,7 +946,7 @@ class Trimesh(GeometryNode):
             if len(self.roomlinks):
                 asciiLines.append('  roomlinks ' + str(len(self.roomlinks)))
                 for link in self.roomlinks:
-                    asciiLines.append('    {:d} {:d}'.format(link[0], link[1]))
+                    asciiLines.append("    {:d} {:d}".format(link[0], link[1]))
 
 
     def add_data_to_ascii(self, obj, asciiLines, classification = nvb_def.Classification.UNKNOWN, simple = False, nameDict=None):
@@ -1060,7 +1060,7 @@ class Danglymesh(Trimesh):
         mesh = self.get_export_mesh(obj)
 
         asciiLines.append(
-            '  constraints {}'.format(len(mesh.vertices))
+            "  constraints {}".format(len(mesh.vertices))
         )
         for v in mesh.vertices:
             # In case vertex is not weighted with dangly constraint
@@ -1069,7 +1069,7 @@ class Danglymesh(Trimesh):
                 if vg.group != vgroup.index:
                     continue
                 weight = round(vg.weight * 255, 3)
-            asciiLines.append('    {}'.format(weight))
+            asciiLines.append("    {}".format(weight))
 
 
     def add_data_to_ascii(self, obj, asciiLines, classification = nvb_def.Classification.UNKNOWN, simple = False, nameDict=None):
@@ -1201,7 +1201,7 @@ class Skinmesh(Trimesh):
                     line += '  ' + w[0] + ' ' + str(round(w[1], 6))
             else:
                 # No weights for this vertex ... this is a problem
-                print('Kotorblender - WARNING: Missing vertex weight in ' + obj.name)
+                print("Kotorblender - WARNING: Missing vertex weight in " + obj.name)
                 line = 'ERROR: no weight'
             asciiLines.append(line)
 
@@ -1542,12 +1542,12 @@ class Emitter(GeometryNode):
                 continue
             else:
                 value = str(value)
-            asciiLines.append('  {} {}'.format(attrname, value))
+            asciiLines.append("  {} {}".format(attrname, value))
 
         return
         # this is now handled by geometry node class...
         if obj.nvb.rawascii not in bpy.data.texts:
-            print('Kotorblender - WARNING: No emitter data for ' + obj.name)
+            print("Kotorblender - WARNING: No emitter data for " + obj.name)
             return
         txt      = bpy.data.texts[obj.nvb.rawascii]
         txtLines = [l.split() for l in txt.as_string().split('\n')]
@@ -1842,7 +1842,7 @@ class Aabb(Trimesh):
                 faceIdx += 1
             else:
                 # Ngon or no polygon at all (This should never be the case with tessfaces)
-                print('Kotorblender - WARNING: Ngon in walkmesh. Unable to generate aabb.')
+                print("Kotorblender - WARNING: Ngon in walkmesh. Unable to generate aabb.")
                 return
 
         aabbTree = []

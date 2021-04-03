@@ -36,13 +36,13 @@ class Mdl():
 
     def load_ascii_node(self, asciiBlock):
         if asciiBlock is None:
-            raise nvb_def.MalformedMdlFile('Empty Node')
+            raise nvb_def.MalformedMdlFile("Empty Node")
 
         nodeType = ''
         try:
             nodeType = asciiBlock[0][1].lower()
         except (IndexError, AttributeError):
-            raise nvb_def.MalformedMdlFile('Invalid node type')
+            raise nvb_def.MalformedMdlFile("Invalid node type")
 
         switch = {
             nvb_def.Nodetype.DUMMY:      nvb_node.Dummy,
@@ -59,7 +59,7 @@ class Mdl():
         try:
             node = switch[nodeType]()
         except KeyError:
-            raise nvb_def.MalformedMdlFile('Invalid node type')
+            raise nvb_def.MalformedMdlFile("Invalid node type")
 
         # tell the node if it is part of a walkmesh (mdl is default)
         if isinstance(self, Xwk):
@@ -73,7 +73,7 @@ class Mdl():
 
     def load_ascii_animation(self, asciiBlock):
         if asciiBlock is None:
-            raise nvb_def.MalformedMdlFile('Empty Animation')
+            raise nvb_def.MalformedMdlFile("Empty Animation")
 
         animation = nvb_anim.Animation()
         animation.get_anim_from_ascii(asciiBlock)
@@ -98,7 +98,7 @@ class Mdl():
     def add_animation(self, anim):
         if anim:
             if anim.name in self.animDict:
-                print('Kotorblender - WARNING: Animation name conflict.')
+                print("Kotorblender - WARNING: Animation name conflict.")
             else:
                 self.animDict[anim.name] = anim
 
@@ -129,7 +129,7 @@ class Mdl():
                 obj.nvb.imporder = objIdx
                 objIdx += 1
             else:
-                raise nvb_def.MalformedMdlFile('First node has to be a dummy without a parent.')
+                raise nvb_def.MalformedMdlFile("First node has to be a dummy without a parent.")
 
             for (nodeKey, node) in it:
                 obj = node.add_to_scene(scene)
@@ -167,7 +167,7 @@ class Mdl():
                         # taking into account blender .001 suffix naming scheme,
                         # note: only searching 001-030
                         found = False
-                        for altname in [node.parentName + '.{:03d}'.format(i) for i in range(1,30)]:
+                        for altname in [node.parentName + ".{:03d}".format(i) for i in range(1,30)]:
                             if altname in bpy.data.objects and \
                                nvb_utils.ancestor_node(
                                    bpy.data.objects[altname],
@@ -222,9 +222,9 @@ class Mdl():
         geom_end   = ascii_block.find("endmodelgeom ")
 
         if (anim_start > 0) and (geom_start > anim_start):
-            raise nvb_def.MalformedMdlFile('Animations before geometry')
+            raise nvb_def.MalformedMdlFile("Animations before geometry")
         if (geom_start < 0):
-            raise nvb_def.MalformedMdlFile('Unable to find geometry')
+            raise nvb_def.MalformedMdlFile("Unable to find geometry")
 
         self.read_ascii_header(ascii_block[:geom_start-1])
         # Import Geometry
@@ -261,11 +261,11 @@ class Mdl():
             try:  # Read node type
                 node_type = ascii_lines[0][1].lower()
             except (IndexError, AttributeError):
-                raise nvb_def.MalformedMdlFile('Unable to read node type')
+                raise nvb_def.MalformedMdlFile("Unable to read node type")
             try:  # Read node name
                 node_name = ascii_lines[0][2].lower()
             except (IndexError, AttributeError):
-                raise nvb_def.MalformedMdlFile('Unable to read node name')
+                raise nvb_def.MalformedMdlFile("Unable to read node name")
             #try:  # Create (node) object
             #    node = Mdl.nodelookup[node_type](node_name)
             #except KeyError:
@@ -353,7 +353,7 @@ class Mdl():
         try:
             node = switch[nodeType]()
         except KeyError:
-            raise nvb_def.MalformedMdlFile('Invalid node type')
+            raise nvb_def.MalformedMdlFile("Invalid node type")
 
         node.to_ascii(bObject, asciiLines, self.classification, simple, nameDict=nameDict)
 
@@ -373,7 +373,7 @@ class Mdl():
     def generate_ascii_animations(self, ascii_lines, rootDummy, options={}):
         if rootDummy.nvb.animList:
             for anim in rootDummy.nvb.animList:
-                print('export animation ' + anim.name)
+                print("export animation " + anim.name)
                 nvb_anim.Animation.generate_ascii(rootDummy, anim,
                                                  ascii_lines, options)
 
@@ -461,7 +461,7 @@ class Mdl():
                 lytposition = (rootDummy.location[0],
                                rootDummy.location[1],
                                rootDummy.location[2])
-            asciiLines.append('  layoutposition {: .7g} {: .7g} {: .7g}'.format(*lytposition))
+            asciiLines.append("  layoutposition {: .7g} {: .7g} {: .7g}".format(*lytposition))
         self.geometry_to_ascii(rootDummy, asciiLines, False, nameDict=object_name_map)
         asciiLines.append('endmodelgeom ' + self.name)
         # Animations

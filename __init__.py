@@ -23,7 +23,7 @@ bl_info = {
     "blender": (2, 80, 0),
     "location": "File > Import-Export, Object Properties",
     "description": "Import, export and edit Odyssey (KotOR) ASCII MDL format",
-    'warning': "cannot be used with NeverBlender enabled",
+    "warning": "cannot be used with NeverBlender enabled",
     "wiki_url": ""
                 "",
     "tracker_url": "",
@@ -186,7 +186,7 @@ classes = (
 def register():
     (load_dflt, nvb_loaded) = addon_utils.check('neverblender')
     if nvb_loaded:
-        raise Exception('Do not enable both KotorBlender and NeverBlender at the same time!')
+        raise Exception("Do not enable both KotorBlender and NeverBlender at the same time!")
 
     for cls in classes:
         bpy.utils.register_class(cls)

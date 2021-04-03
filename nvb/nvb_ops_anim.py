@@ -504,10 +504,10 @@ class NVB_OT_anim_new(bpy.types.Operator):
         # Create an unique name
         name_list = [an.name for an in mdl_base.nvb.animList]
         name_idx = 0
-        new_name = 'anim.{:0>3d}'.format(name_idx)
+        new_name = "anim.{:0>3d}".format(name_idx)
         while new_name in name_list:
             name_idx += 1
-            new_name = 'anim.{:0>3d}'.format(name_idx)
+            new_name = "anim.{:0>3d}".format(name_idx)
         anim.name = new_name
         return {'FINISHED'}
 
@@ -833,10 +833,10 @@ class NVB_OT_amt_event_new(bpy.types.Operator):
         # Create an unique name
         name_list = [ev.name for ev in event_list]
         name_idx = 0
-        new_name = 'event.{:0>3d}'.format(name_idx)
+        new_name = "event.{:0>3d}".format(name_idx)
         while new_name in name_list:
             name_idx += 1
-            new_name = 'event.{:0>3d}'.format(name_idx)
+            new_name = "event.{:0>3d}".format(name_idx)
         # Add new event
         nvb_utils.amt_event_list_item_create(amt, new_name)
         if amt.animation_data and amt.animation_data.action:

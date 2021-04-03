@@ -96,8 +96,8 @@ class KB_OT_export_path(bpy.types.Operator, bpy_extras.io_utils.ExportHelper):
         with open(self.filepath, 'w') as f:
             for o in bpy.data.objects:
                 if nvb_utils.is_path_point(o):
-                    f.write('{} {:.7g} {:.7g} {:.7g} {}\n'.format(o.name, *o.location, len(o.nvb.path_connections)))
+                    f.write("{} {:.7g} {:.7g} {:.7g} {}\n".format(o.name, *o.location, len(o.nvb.path_connections)))
                     for conn in o.nvb.path_connections:
-                        f.write('  {}\n'.format(conn.point))
+                        f.write("  {}\n".format(conn.point))
 
         return {'FINISHED'}
