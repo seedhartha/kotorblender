@@ -2,7 +2,7 @@ import mathutils
 
 def generate_tree(aabb_tree, face_list, rlevel = 0):
     if (rlevel > 128):
-        print('WARNING: Error generating aabb. Recursion level exceeds 128')
+        print("WARNING: Error generating aabb. Recursion level exceeds 128")
         aabb_tree = []
         return
 
@@ -104,7 +104,7 @@ def generate_tree(aabb_tree, face_list, rlevel = 0):
                     # We have tried all axes, but
                     # the tree degenerates with each of them
                     # Just take the degenerate one
-                    print('WARNING: Error generating aabb. Split problem.')
+                    print("WARNING: Error generating aabb. Split problem.")
                     aabb_tree = []
                     return
 

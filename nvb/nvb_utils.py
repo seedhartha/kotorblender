@@ -511,20 +511,20 @@ def copy_anim_scene_check(theOriginal, newSuffix, oldSuffix = ''):
         else:
             newName = oldName.partition('.')[0]
             if not newName:
-                print('Kotorblender: Unable to generate new name')
+                print("Kotorblender: Unable to generate new name")
                 return False
         newName = newName + '.' + newSuffix
     else:
         newName = oldName + '.' + newSuffix
 
     if newName in bpy.data.objects:
-        print('Kotorblender: Duplicate object')
+        print("Kotorblender: Duplicate object")
         return False
 
     objType = theOriginal.type
     if (objType == 'LIGHT'):
         if newName in bpy.data.lights:
-            print('Kotorblender: Duplicate light')
+            print("Kotorblender: Duplicate light")
             return False
     elif (objType == 'MESH'):
         if theOriginal.animation_data:
@@ -533,11 +533,11 @@ def copy_anim_scene_check(theOriginal, newSuffix, oldSuffix = ''):
                 dataPath = fcurve.data_path
                 if dataPath.endswith('alpha_factor'):
                     if newName in bpy.data.materials:
-                        print('Kotorblender: Duplicate Material')
+                        print("Kotorblender: Duplicate Material")
                         return False
 
         if newName in bpy.data.actions:
-            print('Kotorblender: Duplicate Action')
+            print("Kotorblender: Duplicate Action")
             return False
 
     valid = True

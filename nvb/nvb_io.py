@@ -63,7 +63,7 @@ def _load_mdl(filepath, position = (0.0, 0.0, 0.0)):
     # prepare the old style data
     asciiLines = [line.strip().split() for line in ascii_mdl.splitlines()]
 
-    print('Importing: ' + filepath)
+    print("Importing: " + filepath)
     mdl = nvb_mdl.Mdl()
     #mdl.load_ascii(asciiLines)
     mdl.load_ascii(ascii_mdl)
@@ -153,7 +153,7 @@ def _load_lyt(filepath):
         if os.path.exists(mdl_path):
             _load_mdl(mdl_path, room[1:])
         else:
-            print('Kotorblender - WARNING: room model not found: ' + mdl_path)
+            print("Kotorblender - WARNING: room model not found: " + mdl_path)
 
 
 def load_lyt(operator,
@@ -212,7 +212,7 @@ def save_mdl(operator,
 
     mdlRoot = nvb_utils.get_mdl_base(scene=bpy.context.scene)
     if mdlRoot:
-        print('Kotorblender: Exporting ' + mdlRoot.name)
+        print("Kotorblender: Exporting " + mdlRoot.name)
         mdl = nvb_mdl.Mdl()
         asciiLines = []
         mdl.generate_ascii(asciiLines, mdlRoot)

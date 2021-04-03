@@ -722,7 +722,7 @@ class Node():
             # using a bezierkey
             if bezname in keyDict and len(keyDict[bezname]):
                 keyname = bezname
-            asciiLines.append('    {} {}'.format(keyname, l_str(len(keyDict[keyname]))))
+            asciiLines.append("    {} {}".format(keyname, l_str(len(keyDict[keyname]))))
             for frame, key in keyDict[keyname].items():
                 # convert raw frame number to animation-relative time
                 time = l_round(nvb_utils.frame2nwtime(frame - anim.frameStart), 5)
@@ -749,7 +749,7 @@ class Node():
             # using a bezierkey
             if bezname in keyDict and len(keyDict[bezname]):
                 keyname = bezname
-            asciiLines.append('    {} {}'.format(keyname, l_str(len(keyDict[keyname]))))
+            asciiLines.append("    {} {}".format(keyname, l_str(len(keyDict[keyname]))))
             for frame, key in keyDict[keyname].items():
                 # convert raw frame number to animation-relative time
                 time = l_round(nvb_utils.frame2nwtime(frame - anim.frameStart), 5)
@@ -837,7 +837,7 @@ class Node():
         # if any children of this node will be included, this node must be
         for child in animObj.children:
             if Node.export_needed(child, anim):
-                print('export_needed as parent for ' + animObj.name)
+                print("export_needed as parent for " + animObj.name)
                 return True
         # no reason to include this node
         return False
@@ -1190,7 +1190,7 @@ class Animnode():
             frames = [fps * d[0] + frame_start for d in data]
             values = [d[1:data_dim+1] for d in data]
             #dp = data_path
-            dp = 'nvb.{}'.format(label)
+            dp = "nvb.{}".format(label)
             dp_dim = data_dim
             #print(dp)
             Animnode.insert_kfp(frames, values, action, dp, dp_dim,
