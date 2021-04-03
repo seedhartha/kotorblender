@@ -92,8 +92,8 @@ def load_mdl(operator,
             importGeometry = True,
             importWalkmesh = True,
             importSmoothGroups = True,
+            importMaterials = True,
             importAnim = True,
-            materialMode = 'SIN',
             textureSearch = False,
             minimapMode = False,
             minimapSkipFade = False):
@@ -101,10 +101,10 @@ def load_mdl(operator,
     Called from blender ui
     """
     nvb_glob.importGeometry = importGeometry
-    nvb_glob.importSmoothGroups = importSmoothGroups
-    nvb_glob.importAnim = importAnim
     nvb_glob.importWalkmesh = importWalkmesh
-    nvb_glob.materialMode = materialMode
+    nvb_glob.importSmoothGroups = importSmoothGroups
+    nvb_glob.importMaterials = importMaterials
+    nvb_glob.importAnim = importAnim
     nvb_glob.texturePath = os.path.dirname(filepath)
     nvb_glob.textureSearch = textureSearch
     nvb_glob.minimapMode = minimapMode
@@ -158,17 +158,17 @@ def load_lyt(operator,
             importGeometry = True,
             importWalkmesh = True,
             importSmoothGroups = True,
+            importMaterials = True,
             importAnim = True,
-            materialMode = 'SIN',
             textureSearch = False):
     """
     Called from blender ui
     """
     nvb_glob.importGeometry = importGeometry
-    nvb_glob.importSmoothGroups = importSmoothGroups
-    nvb_glob.importAnim = importAnim
     nvb_glob.importWalkmesh = importWalkmesh
-    nvb_glob.materialMode = materialMode
+    nvb_glob.importSmoothGroups = importSmoothGroups
+    nvb_glob.importMaterials = importMaterials
+    nvb_glob.importAnim = importAnim
     nvb_glob.texturePath = os.path.dirname(filepath)
     nvb_glob.textureSearch = textureSearch
 
