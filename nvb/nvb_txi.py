@@ -1,9 +1,8 @@
 """TXI texture properties file support"""
-import bpy
-
 import os
-
 from datetime import datetime
+
+import bpy
 
 # these should probably live in nvb_def sometime,
 # and separate lists is not necessarily a great way to do it,

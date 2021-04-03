@@ -1,17 +1,13 @@
 """TODO: DOC."""
-import os
 import collections
 import enum
+import os
 import re
 from datetime import datetime
 
 import bpy
 
-from . import nvb_node
-from . import nvb_anim
-from . import nvb_glob
-from . import nvb_def
-from . import nvb_utils
+from . import nvb_anim, nvb_def, nvb_glob, nvb_node, nvb_utils
 
 
 class Mdl():
