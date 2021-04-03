@@ -750,7 +750,6 @@ class NVB_OT_anim_event_delete(bpy.types.Operator):
         return False
 
     def execute(self, context):
-        """TODO: DOC."""
         mdl_base = nvb_utils.get_obj_mdl_base(context.object)
         anim = mdl_base.nvb.animList[mdl_base.nvb.animListIdx]
         eventList = anim.eventList
@@ -788,7 +787,6 @@ class NVB_OT_anim_event_move(bpy.types.Operator):
         return False
 
     def execute(self, context):
-        """TODO: DOC."""
         mdl_base = nvb_utils.get_obj_mdl_base(context.object)
         anim = mdl_base.nvb.animList[mdl_base.nvb.animListIdx]
         eventList = anim.eventList

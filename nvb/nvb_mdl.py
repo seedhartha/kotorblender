@@ -1,4 +1,3 @@
-"""TODO: DOC."""
 import collections
 import enum
 import os
@@ -198,7 +197,6 @@ class Mdl():
 
     @staticmethod
     def create_animations(animationlist, mdl_base):
-        """TODO: DOC."""
         options = {
             "anim_restpose": 1
         }
@@ -272,7 +270,6 @@ class Mdl():
             nodelist.append(node)
 
     def read_ascii_header(self, ascii_block):
-        """TODO: DOC."""
         ascii_lines = [l.strip().split() for l in ascii_block.splitlines()]
         for line in ascii_lines:
             try:

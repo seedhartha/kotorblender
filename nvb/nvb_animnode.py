@@ -1,5 +1,3 @@
-"""TODO: DOC."""
-
 import collections
 import re
 from math import asin, cos, sqrt
@@ -871,8 +869,6 @@ from . import nvb_node
 
 
 class Animnode():
-    """TODO: DOC."""
-
     # Keys that go into particle system settings
     #emitter_properties = nvb_node.Emitter.property_dict
     # Keys that go directly into objects
@@ -895,7 +891,6 @@ class Animnode():
                                      ' {:>4.2f}')}
 
     def __init__(self, name='UNNAMED'):
-        """TODO: DOC."""
         self.nodeidx = -1
         self.nodetype = nvb_def.Nodetype.DUMMY
         self.name = name
@@ -918,7 +913,6 @@ class Animnode():
 
     @staticmethod
     def insert_kfp(frames, values, action, dp, dp_dim, action_group=None):
-        """TODO: DOC."""
         if not frames or not values:
             return
         fcu = [nvb_utils.get_fcurve(action, dp, i, action_group)
@@ -968,7 +962,6 @@ class Animnode():
         list(map(lambda c: c.update(), fcu))
 
     def load_ascii(self, ascii_lines, nodeidx=-1):
-        """TODO: DOC."""
         def find_end(ascii_lines):
             """Find the end of a key list.
 
@@ -1286,9 +1279,7 @@ class Animnode():
 
     @staticmethod
     def create_restpose(obj, frame=1):
-        """TODO: DOC."""
         def insert_kfp(fcurves, frame, val, dim):
-            """TODO: DOC."""
             # dim = len(val)
             for j in range(dim):
                 kf = fcurves[j].keyframe_points.insert(frame, val[j], options={'FAST'})
