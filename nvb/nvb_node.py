@@ -538,26 +538,21 @@ class Trimesh(GeometryNode):
             for idx, polygon in enumerate(mesh.polygons):
                 polygon.material_index = self.facelist.matId[idx]
 
-        # Create material
-        if nvb_glob.materialMode != 'NON' and self.roottype == 'mdl' and num_faces > 0:
-            material = nvb_material.load_material(self, name)
-            mesh.materials.append(material)
+        # Create UV map
+        if len(self.tverts) > 0:
+            uv = unpack_list([self.tverts[i] for indices in self.facelist.uvIdx for i in indices])
+            uv_layer = mesh.uv_layers.new(name='UVMap', do_init=False)
+            uv_layer.data.foreach_set('uv', uv)
 
-            # Create UV map
-            if len(self.tverts) > 0:
-                uv = unpack_list([self.tverts[i] for indices in self.facelist.uvIdx for i in indices])
-                uv_layer = mesh.uv_layers.new(name='UVMap', do_init=False)
-                uv_layer.data.foreach_set('uv', uv)
+        # Create lightmap UV map
+        if len(self.tverts1) > 0:
+            if len(self.texindices1) > 0:
+                uv = unpack_list([self.tverts1[i] for indices in self.texindices1 for i in indices])
+            else:
+                uv = unpack_list([self.tverts1[i] for indices in self.facelist.uvIdx for i in indices])
 
-            # Create lightmap UV map
-            if len(self.tverts1) > 0:
-                if len(self.texindices1) > 0:
-                    uv = unpack_list([self.tverts1[i] for indices in self.texindices1 for i in indices])
-                else:
-                    uv = unpack_list([self.tverts1[i] for indices in self.facelist.uvIdx for i in indices])
-
-                uv_layer = mesh.uv_layers.new(name='UVMap_lm', do_init=False)
-                uv_layer.data.foreach_set('uv', uv)
+            uv_layer = mesh.uv_layers.new(name='UVMap_lm', do_init=False)
+            uv_layer.data.foreach_set('uv', uv)
 
         # Import smooth groups as sharp edges
         if nvb_glob.importSmoothGroups:
@@ -688,9 +683,14 @@ class Trimesh(GeometryNode):
             # Fading objects won't be imported in minimap mode
             # We may need it for the tree stucture, so import it as an empty
             return Dummy.add_to_scene(self, scene)
+
         mesh = self.create_mesh(self.name)
         obj  = bpy.data.objects.new(self.name, mesh)
         self.set_object_data(obj)
+
+        if nvb_glob.importMaterials and self.roottype == 'mdl':
+            nvb_material.rebuild_material(obj)
+
         bpy.context.collection.objects.link(obj)
         return obj
 
@@ -1895,23 +1895,21 @@ class Aabb(Trimesh):
         for idx, polygon in enumerate(mesh.polygons):
             polygon.material_index = self.facelist.matId[idx]
 
-        # Create material
-        if nvb_glob.materialMode != 'NON' and self.roottype == 'mdl' and num_faces > 0:
-            # Create UV map
-            if len(self.tverts) > 0:
-                uv = unpack_list([self.tverts[i] for indices in self.facelist.uvIdx for i in indices])
-                uv_layer = mesh.uv_layers.new(name='UVMap', do_init=False)
-                uv_layer.data.foreach_set('uv', uv)
+        # Create UV map
+        if len(self.tverts) > 0:
+            uv = unpack_list([self.tverts[i] for indices in self.facelist.uvIdx for i in indices])
+            uv_layer = mesh.uv_layers.new(name='UVMap', do_init=False)
+            uv_layer.data.foreach_set('uv', uv)
 
-            # Create lightmap UV map
-            if len(self.tverts1) > 0:
-                if len(self.texindices1) > 0:
-                    uv = unpack_list([self.tverts1[i] for indices in self.texindices1 for i in indices])
-                else:
-                    uv = unpack_list([self.tverts1[i] for indices in self.facelist.uvIdx for i in indices])
+        # Create lightmap UV map
+        if len(self.tverts1) > 0:
+            if len(self.texindices1) > 0:
+                uv = unpack_list([self.tverts1[i] for indices in self.texindices1 for i in indices])
+            else:
+                uv = unpack_list([self.tverts1[i] for indices in self.facelist.uvIdx for i in indices])
 
-                uv_layer = mesh.uv_layers.new(name='UVMap_lm', do_init=False)
-                uv_layer.data.foreach_set('uv', uv)
+            uv_layer = mesh.uv_layers.new(name='UVMap_lm', do_init=False)
+            uv_layer.data.foreach_set('uv', uv)
 
         # If there are room links in MDL, then this model is from MDLedit, and we must NOT skip non-walkable faces
         if self.roottype == 'mdl' and len(self.roomlinks):

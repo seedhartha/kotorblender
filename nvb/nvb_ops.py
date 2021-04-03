@@ -448,17 +448,15 @@ class NVB_OT_import_mdl(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
             description = 'Import smooth groups as sharp edges',
             default = True)
 
+    importMaterials : bpy.props.BoolProperty(
+            name = 'Import Materials',
+            description = "Import materials",
+            default = True)
+
     importAnim : bpy.props.BoolProperty(
             name = 'Import Animations',
             description = 'Import animations',
             default = True)
-
-    materialMode : bpy.props.EnumProperty(
-            name = 'Materials',
-            items = (('NON', 'None', 'Don\'t create materials or import textures'),
-                     ('SIN', 'Single', 'Create only one material per texture, shared between objects'),
-                     ('MUL', 'Multiple', 'Create a seperate material for each object')),
-            default = 'SIN')
 
     textureSearch : bpy.props.BoolProperty(
             name='Image search',
@@ -513,17 +511,15 @@ class NVB_OT_import_lyt(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
             description = 'Import smooth groups as sharp edges',
             default = True)
 
+    importMaterials : bpy.props.BoolProperty(
+            name = 'Import Materials',
+            description = "Import materials",
+            default = True)
+
     importAnim : bpy.props.BoolProperty(
             name = 'Import Animations',
             description = 'Import animations',
             default = True)
-
-    materialMode : bpy.props.EnumProperty(
-            name = 'Materials',
-            items = (('NON', 'None', 'Don\'t create materials or import textures'),
-                     ('SIN', 'Single', 'Create only one material per texture, shared between objects'),
-                     ('MUL', 'Multiple', 'Create a seperate material for each object')),
-            default = 'SIN')
 
     textureSearch : bpy.props.BoolProperty(
             name='Image search',
@@ -807,17 +803,6 @@ class KB_OT_rebuild_material_nodes(bpy.types.Operator):
 
     def execute(self, context):
         if context.object and (context.object.type == 'MESH') and (context.object.nvb.meshtype != nvb_def.Meshtype.EMITTER):
-            # Create a material if it does not exist
-            mesh = context.object.data
-            if len(mesh.materials) == 0:
-                if context.object.name in bpy.data.materials:
-                    material = bpy.data.materials[context.object.name]
-                else:
-                    material = bpy.data.materials.new(context.object.name)
-                mesh.materials.append(material)
-            else:
-                material = context.object.active_material
-
-            nvb_material.rebuild_material(material, context.object.nvb)
+            nvb_material.rebuild_material(context.object)
 
         return {'FINISHED'}

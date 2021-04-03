@@ -1,10 +1,9 @@
 # Import
 importGeometry     = True
-importSmoothGroups = True
-importAnim         = True
 importWalkmesh     = True
-
-materialMode = 'SIN'
+importSmoothGroups = True
+importMaterials    = True
+importAnim         = True
 
 texturePath   = ''
 textureSearch = False
