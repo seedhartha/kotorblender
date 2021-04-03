@@ -758,6 +758,11 @@ class NVB_OT_export_lyt(bpy.types.Operator, bpy_extras.io_utils.ExportHelper):
             default = '*.lyt',
             options = {'HIDDEN'})
 
+    def _describe_object(self, obj):
+        parent = nvb_utils.get_mdl_root(obj)
+        orientation = obj.rotation_euler.to_quaternion()
+        return "{} {} {:.7g} {:.7g} {:.7g} {:.7g} {:.7g} {:.7g} {:.7g}".format(parent.name if parent else 'NULL', obj.name, *obj.matrix_world.translation, *orientation)
+
     def execute(self, context):
         with open(self.filepath, 'w') as f:
             rooms = []
@@ -782,14 +787,10 @@ class NVB_OT_export_lyt(bpy.types.Operator, bpy_extras.io_utils.ExportHelper):
             f.write('  obstaclecount 0\n')
             f.write("  doorhookcount {}\n".format(len(doors)))
             for door in doors:
-                parent = nvb_utils.get_mdl_root(door)
-                orientation = door.rotation_euler.to_quaternion()
-                f.write("    {} {} {:.7g} {:.7g} {:.7g} {:.7g} {:.7g} {:.7g} {:.7g}\n".format(parent.name if parent else 'NULL', door.name, *door.matrix_world.translation, *orientation))
+                f.write("    {}\n".format(self._describe_object(door)))
             f.write("  othercount {}\n".format(len(others)))
             for other in others:
-                parent = nvb_utils.get_mdl_root(other)
-                orientation = other.rotation_euler.to_quaternion()
-                f.write("    {} {} {:.7g} {:.7g} {:.7g} {:.7g} {:.7g} {:.7g} {:.7g}\n".format(parent.name if parent else 'NULL', other.name, *other.matrix_world.translation, *orientation))
+                f.write("    {}\n".format(self._describe_object(other)))
             f.write('donelayout\n')
 
         return {'FINISHED'}
