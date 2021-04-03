@@ -29,7 +29,6 @@ bl_info = {
     "tracker_url": "",
     "category": "Import-Export"}
 
-
 if 'bpy' in locals():
     import importlib
     importlib.reload(nvb.nvb_anim)
@@ -39,6 +38,7 @@ if 'bpy' in locals():
     importlib.reload(nvb.nvb_light)
     importlib.reload(nvb.nvb_material)
     importlib.reload(nvb.nvb_mdl)
+    importlib.reload(nvb.nvb_minimap)
     importlib.reload(nvb.nvb_node)
     importlib.reload(nvb.nvb_ops_anim)
     importlib.reload(nvb.nvb_ops_path)
@@ -48,21 +48,10 @@ if 'bpy' in locals():
     importlib.reload(nvb.nvb_ui)
     importlib.reload(nvb.nvb_utils)
 else:
-    from kotorblender.nvb import nvb_anim
-    from kotorblender.nvb import nvb_animnode
-    from kotorblender.nvb import nvb_def
-    from kotorblender.nvb import nvb_io
-    from kotorblender.nvb import nvb_light
-    from kotorblender.nvb import nvb_material
-    from kotorblender.nvb import nvb_mdl
-    from kotorblender.nvb import nvb_node
-    from kotorblender.nvb import nvb_ops
-    from kotorblender.nvb import nvb_ops_anim
-    from kotorblender.nvb import nvb_ops_path
-    from kotorblender.nvb import nvb_props
-    from kotorblender.nvb import nvb_teximage
-    from kotorblender.nvb import nvb_ui
-    from kotorblender.nvb import nvb_utils
+    from kotorblender.nvb import (nvb_anim, nvb_animnode, nvb_def, nvb_io,
+                                  nvb_light, nvb_material, nvb_mdl, nvb_minimap,
+                                  nvb_node, nvb_ops, nvb_ops_anim, nvb_ops_path,
+                                  nvb_props, nvb_teximage, nvb_ui, nvb_utils)
 
 import addon_utils
 import bpy
