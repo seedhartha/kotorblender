@@ -185,10 +185,6 @@ class Animation():
         node = nvb_animnode.Node()
         node.to_ascii(bObject, asciiLines, self.name)
 
-        '''
-        for child in bObject.children:
-            self.anim_node_to_ascii(child, asciiLines)
-        '''
         # If this mdl was imported, we need to retain the order of the
         # objects in the original mdl file. Unfortunately this order is
         # seemingly arbitrary so we need to save it at import

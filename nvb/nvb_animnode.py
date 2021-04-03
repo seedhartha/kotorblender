@@ -980,12 +980,6 @@ class Animnode():
                          if not l_is_number(v[0])), -1)
 
         self.nodeidx = nodeidx
-        '''
-        properties_list = [  # For easier parsing
-            [type(self).emitter_properties, self.emitter_data],
-            [type(self).material_properties, self.material_data],
-            [type(self).object_properties, self.object_data]]
-        '''
         key_data = {}
         l_is_number = nvb_utils.is_number
         for i, line in enumerate(ascii_lines):
@@ -1071,25 +1065,6 @@ class Animnode():
                         attr_type['objdata'] if 'objdata' in attr_type else '',
                         numVals
                     ]
-                '''
-                for key_def, key_data in properties_list:
-                    if key_name in key_def and key_name not in key_data:
-                        data_path = key_def[key_name][0]
-                        data_dim = key_def[key_name][1]
-                        # key_converter = key_def[key_name][2]
-                        if key_is_single:
-                            data = [[0.0] + list(map(float,
-                                    line[1:data_dim+1]))]
-                        else:
-                            keycnt = find_end(ascii_lines[i+1:])
-                            data = [list(map(float, v[:data_dim+1]))
-                                    for v in ascii_lines[i+1:i+keycnt+1]]
-                        # values = \
-                        # [[float(v[0])] + list(map(key_converter, v[1:]))
-                        #  for v in values]
-                        key_data[key_name] = [data, data_path, data_dim]
-                        break
-                '''
 
 
     def create_data_object(self, obj, anim, options={}):
@@ -1146,14 +1121,6 @@ class Animnode():
             frames = [fps * d[0] + frame_start for d in data]
             #print(label + ' ' + data_path)
             use_action = action
-            '''
-            try:
-                getattr(obj, data_path)
-            except:
-                #XXX hack to get light data to apply and show up on correct object
-                #XXX no-go because Object has 'color'
-                use_action = nvb_utils.get_action(obj.data, options['mdlname'] + '.' + obj.name)
-            '''
             if obj.type == 'LIGHT' and label in ['radius', 'color']:
                 use_action = nvb_utils.get_action(
                     # Light object, not Object object
@@ -1195,13 +1162,7 @@ class Animnode():
             #print(dp)
             Animnode.insert_kfp(frames, values, action, dp, dp_dim,
                                 'Odyssey Emitter')
-            '''
-            if dp.startswith('nvb'):  # Group custom properties
-                Animnode.insert_kfp(frames, values, action, dp, dp_dim,
-                                    'Aurora Emitter')
-            else:
-                Animnode.insert_kfp(frames, values, action, dp, dp_dim)
-            '''
+
 
     def create_data_shape(self, obj, anim, animlength, options={}):
         """Import animated vertices as shapekeys."""

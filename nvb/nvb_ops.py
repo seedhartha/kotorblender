@@ -201,28 +201,6 @@ class NVB_OT_skin_bone_ops(bpy.types.Operator):
             bone.head = pbone.tail
             bone.tail = obj.matrix_world.to_translation()
             #+ parent.matrix_world.to_translation()
-            '''
-            if pbone is not None:
-                #bone.parent = amt.edit_bones[parent.name + 'Bone']
-                bone.parent = pbone
-                bone.head = bone.parent.tail
-                bone.use_connect = False
-                (trans, rot, scale) = bone.parent.matrix.decompose()
-                vector = trans
-                if not isinstance(rot, Quaternion):
-                    rot = rot.to_quaternion()
-                bone.tail = rot * obj.rotation_quaternion * bone.head
-            else:
-                #bone.head = obj.location
-                bone.tail = obj.location
-                rot = obj.rotation_euler
-                if not isinstance(rot, Quaternion):
-                    rot = rot.to_quaternion()
-                #rot = Matrix.Translation((0, 0, 0))
-                #vector = (1, 0, 0)
-                bone.head = rot * obj.rotation_quaternion * bone.tail
-            #bone.tail = rot * Vector(vector) + bone.head
-            '''
         if bone is None:
             bone = pbone
         for c in obj.children:
@@ -249,14 +227,6 @@ class NVB_OT_skin_bone_ops(bpy.types.Operator):
         self.boner(amt, context.scene.objects['rootdummy'], pbone=amt.edit_bones[0])
         bpy.ops.object.mode_set(mode='OBJECT')
         #for name, obj in context.scene.objects.items():
-        '''
-        while len(obj.children):
-            print(name)
-            print(dir(obj))
-            if obj.nvb.meshtype == nvb_def.Meshtype.TRIMESH and \
-               not obj.nvb.render:
-                pass
-        '''
         return {'FINISHED'}
 
 class NVB_OT_texture_ops(bpy.types.Operator):
