@@ -48,6 +48,15 @@ This add-on is a fork of KotorBlender, upgraded to support Blender 2.8+. KotorBl
 5. Export ASCII PTH via File → Export → KotOR Path (.pth)
 6. Convert ASCII PTH to binary PTH using reone-tools: `reone-tools --to-pth m13aa-ascii.pth`
 
+### Connecting Room Walkmeshes
+
+1. Select a room walkmesh
+2. Enter Edit mode and select two vertices adjacent to another room
+3. Determine 0-based index of the other room into the LYT file
+4. Enter Vertex Paint mode and set brush color to (0.0, G, 0.0), where G = (200 + room index) / 255
+5. Ensure that brush blending mode is set to Mix, and brush strength is set to 1.0
+6. Paint over the selected vertices
+
 ## Trivia
 
 - Check "Image search" when importing to recursively search for textures in subdirectories
