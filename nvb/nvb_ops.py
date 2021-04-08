@@ -175,33 +175,60 @@ class NVB_OT_skin_bone_ops(bpy.types.Operator):
     bl_label = "Armature Operations"
     bl_options = {'UNDO'}
 
-    def boner(self, amt, obj, parent=None, pbone=None):
-        bone = None
-        if obj.nvb.meshtype == nvb_def.Meshtype.TRIMESH and \
-           not obj.nvb.render:
-            bone = amt.edit_bones.new(obj.name + 'Bone')
-            bone.parent = pbone
-            bone.head = pbone.tail
-            bone.tail = obj.matrix_world.to_translation()
-        if bone is None:
-            bone = pbone
-        for c in obj.children:
-            self.boner(amt, c, obj, bone)
+    model_name : bpy.props.StringProperty()
 
     def execute(self, context):
-        bpy.ops.object.armature_add()
-        ob = bpy.context.scene.objects.active
-        ob.show_x_ray = True
-        ob.name = 'Armature'
-        ob.show_axis = True
-        ob.location = context.scene.objects['cutscenedummy'].location
-        amt = ob.data
-        amt.name = 'ArmatureAmt'
-        bpy.ops.object.mode_set(mode='EDIT')
-        amt.edit_bones[0].tail = context.scene.objects['rootdummy'].location
-        self.boner(amt, context.scene.objects['rootdummy'], pbone=amt.edit_bones[0])
-        bpy.ops.object.mode_set(mode='OBJECT')
+        rootdummy = None
+        for o in context.collection.objects:
+            if o.name.lower() == 'rootdummy':
+                rootdummy = o
+                break
+
+        if rootdummy:
+            bpy.ops.object.armature_add()
+            armature_object = context.object
+            armature_object.name = 'Armature_' + self.model_name
+            armature_object.show_in_front = True
+
+            bpy.ops.object.mode_set(mode='EDIT')
+            armature = armature_object.data
+            armature.edit_bones[0].tail = rootdummy.location
+            self._boner(armature, rootdummy, pbone=armature.edit_bones[0])
+            bpy.ops.object.mode_set(mode='OBJECT')
+
+            # Add Armature modifier to all skinmeshes in the active collection
+            for o in context.collection.objects:
+                if o.nvb.meshtype == nvb_def.Meshtype.SKIN:
+                    modifier = o.modifiers.new(name='Armature', type='ARMATURE')
+                    modifier.object = armature_object
+
         return {'FINISHED'}
+
+    def _boner(self, amt, obj, parent=None, pbone=None):
+        bone = None
+
+        if (obj.nvb.meshtype == nvb_def.Meshtype.TRIMESH) and (not obj.nvb.render):
+            bone = amt.edit_bones.new(obj.name)
+            bone.parent = pbone
+            bone.head = obj.matrix_world.to_translation()
+        if bone is None:
+            bone = pbone
+
+        if obj.children:
+            # Place bone tail at the average location of its children
+            bone.tail = [0.0] * 3
+            for c in obj.children:
+                child_loc = c.matrix_world.to_translation()
+                bone.tail += child_loc
+            bone.tail /= len(obj.children)
+        else:
+            # If bone has no children, place its tail away from the parent head
+            direction = (pbone.tail - pbone.head).normalized()
+            mag = nvb_utils.calculate_bounding_box_size(obj)
+            bone.tail = bone.head + mag * direction
+
+        for c in obj.children:
+            self._boner(amt, c, obj, bone)
 
 
 class NVB_OT_texture_ops(bpy.types.Operator):
@@ -422,25 +449,28 @@ class NVB_OT_import_mdl(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
             default = True)
 
     textureSearch : bpy.props.BoolProperty(
-            name='Image search',
-            description='Search for images in subdirectories' \
-                        ' (Warning, may be slow)',
-            default=False)
+            name = 'Image search',
+            description = 'Search for images in subdirectories' \
+                          ' (Warning, may be slow)',
+            default = False)
+
+    createArmature : bpy.props.BoolProperty(
+            name = 'Create armature',
+            description = 'Create armature from bone nodes',
+            default = False)
 
     # Hidden option, only used for batch minimap creation
     minimapMode : bpy.props.BoolProperty(
             name = 'Minimap Mode',
             description = 'Ignore lights and walkmeshes',
             default = False,
-            options = {'HIDDEN'},
-            )
+            options = {'HIDDEN'})
 
     minimapSkipFade : bpy.props.BoolProperty(
             name = 'Minimap Mode: Import Fading Objects',
             description = 'Ignore fading objects',
             default = False,
-            options = {'HIDDEN'},
-            )
+            options = {'HIDDEN'})
 
     def execute(self, context):
         return nvb_io.load_mdl(self, context, **self.as_keywords(ignore=('filter_glob',)))
