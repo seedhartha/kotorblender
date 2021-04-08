@@ -8,6 +8,8 @@ importAnim         = True
 texturePath   = ''
 textureSearch = False
 
+createArmature = False
+
 minimapMode     = False
 minimapSkipFade = False
 

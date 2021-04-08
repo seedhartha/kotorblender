@@ -80,6 +80,10 @@ def _load_mdl(filepath, position = (0.0, 0.0, 0.0)):
                 aabb.roomlinks = wkmesh.roomlinks
                 aabb.set_room_links(collection.objects[aabb.name].data)
 
+    # Optionally, create an armature from bone nodes
+    if nvb_glob.createArmature:
+        bpy.ops.nvb.armature('EXEC_DEFAULT', model_name=mdl.name)
+
 
 def load_mdl(operator,
             context,
@@ -90,6 +94,7 @@ def load_mdl(operator,
             importMaterials = True,
             importAnim = True,
             textureSearch = False,
+            createArmature = False,
             minimapMode = False,
             minimapSkipFade = False):
     """
@@ -102,6 +107,7 @@ def load_mdl(operator,
     nvb_glob.importAnim = importAnim
     nvb_glob.texturePath = os.path.dirname(filepath)
     nvb_glob.textureSearch = textureSearch
+    nvb_glob.createArmature = createArmature
     nvb_glob.minimapMode = minimapMode
     nvb_glob.minimapSkipFade = minimapSkipFade
 

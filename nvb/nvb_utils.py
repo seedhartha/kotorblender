@@ -1,5 +1,6 @@
 ﻿import math
 import os
+import sys
 
 import bpy
 import mathutils
@@ -675,18 +676,28 @@ def color_to_hex(color):
         int_to_hex(float_to_byte(color[2])))
 
 
-def is_path_point(object):
-    return object and (object.type == 'EMPTY') and (object.nvb.dummytype == nvb_def.Dummytype.PATHPOINT)
+def is_path_point(obj):
+    return obj and (obj.type == 'EMPTY') and (obj.nvb.dummytype == nvb_def.Dummytype.PATHPOINT)
 
 
-def get_mdl_root(object):
+def get_mdl_root(obj):
     """
     :returns: MDL root object for the specified object.
     """
-    if (object.type == 'EMPTY') and (object.nvb.dummytype == nvb_def.Dummytype.MDLROOT):
-        return object
+    if (obj.type == 'EMPTY') and (obj.nvb.dummytype == nvb_def.Dummytype.MDLROOT):
+        return obj
 
-    if not object.parent:
+    if not obj.parent:
         return None
 
-    return get_mdl_root(object.parent)
+    return get_mdl_root(obj.parent)
+
+
+def calculate_bounding_box_size(obj):
+    bbmin = mathutils.Vector([sys.float_info.max] * 3)
+    bbmax = mathutils.Vector([sys.float_info.min] * 3)
+    for co in obj.bound_box:
+        for i in range(3):
+            if co[i] < bbmin[i]: bbmin[i] = co[i]
+            if co[i] > bbmax[i]: bbmax[i] = co[i]
+    return bbmax - bbmin
