@@ -96,7 +96,7 @@ class Mdl():
             else:
                 self.animDict[anim.name] = anim
 
-    def import_to_scene(self, scene, wkm, position = (0.0, 0.0, 0.0)):
+    def import_to_collection(self, collection, wkm, position = (0.0, 0.0, 0.0)):
         rootDummy = None
         objIdx = 0
         if (nvb_glob.importGeometry) and self.nodeDict:
@@ -108,7 +108,7 @@ class Mdl():
             (nodeKey, node) = next(it)
             if (type(node) == nvb_node.Dummy) and \
                (nvb_utils.is_null(node.parentName)):
-                obj                    = node.add_to_scene(scene)
+                obj                    = node.add_to_collection(collection)
                 obj.location           = position
                 obj.nvb.dummytype      = nvb_def.Dummytype.MDLROOT
                 obj.nvb.supermodel     = self.supermodel
@@ -126,7 +126,7 @@ class Mdl():
                 raise nvb_def.MalformedMdlFile("First node has to be a dummy without a parent.")
 
             for (nodeKey, node) in it:
-                obj = node.add_to_scene(scene)
+                obj = node.add_to_collection(collection)
                 obj.nvb.imporder = objIdx
                 objIdx += 1
 
@@ -179,12 +179,12 @@ class Mdl():
         # Import the walkmesh, it will use any placeholder dummies just imported,
         # and the walkmesh nodes will be copied during animation import
         if (nvb_glob.importWalkmesh) and not wkm is None and wkm.walkmeshType != 'wok':
-            wkm.import_to_scene(scene)
+            wkm.import_to_collection(collection)
 
         # Attempt to import animations
         # Search for the rootDummy if not already present
         if not rootDummy:
-            for obj in scene.objects:
+            for obj in collection.objects:
                 if nvb_utils.is_root_dummy(obj, nvb_def.Dummytype.MDLROOT):
                     rootDummy = obj
                     break
@@ -471,7 +471,7 @@ class Xwk(Mdl):
         for child in rootDummy.children:
             self.geometry_to_ascii(child, asciiLines, True)
 
-    def import_to_scene(self, scene):
+    def import_to_collection(self, collection):
         if self.nodeDict:
             # Walkmeshes have no rootdummys. We need to create one ourselves
             # Unless the rootdummy is in the model already, because that happens
@@ -512,7 +512,7 @@ class Xwk(Mdl):
                 else:
                     node.dummytype = nvb_def.Dummytype.PWKROOT
                 node.name = wkm_name
-                rootdummy = node.add_to_scene(scene)
+                rootdummy = node.add_to_collection(collection)
                 if mdl_name in bpy.data.objects:
                     rootdummy.parent = bpy.data.objects[mdl_name]
                 else:
@@ -558,11 +558,11 @@ class Xwk(Mdl):
                 if node.name.lower().endswith('pwk_use02') and pwk_use02:
                     node.name = pwk_use02.name
                 # remove pre-existing nodes that were added as part of a model
-                if node.name in scene.objects:
-                    obj = scene.objects[node.name]
-                    bpy.context.collection.objects.unlink(obj)
+                if node.name in collection.objects:
+                    obj = collection.objects[node.name]
+                    collection.objects.unlink(obj)
                     bpy.data.objects.remove(obj)
-                obj = node.add_to_scene(scene)
+                obj = node.add_to_collection(collection)
                 # Check if such an object exists
                 if node.parentName.lower() in [k.lower() for k in bpy.data.objects.keys()]:
                     parent_name = nvb_utils.get_real_name(node.parentName)
@@ -603,5 +603,5 @@ class Wok(Xwk):
         # Geometry = AABB
         self.geometry_to_ascii(rootDummy, asciiLines, True)
 
-    def import_to_scene(self, scene):
+    def import_to_collection(self, collection):
         pass

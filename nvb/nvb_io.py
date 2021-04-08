@@ -7,7 +7,7 @@ from . import nvb_def, nvb_glob, nvb_mdl, nvb_utils
 
 
 def _load_mdl(filepath, position = (0.0, 0.0, 0.0)):
-    scene = bpy.context.scene
+    collection = bpy.context.collection
 
     # Try to load walkmeshes ... pwk (placeable) and dwk (door)
     # If the files are and the option is activated we'll import them
@@ -60,7 +60,7 @@ def _load_mdl(filepath, position = (0.0, 0.0, 0.0)):
     print("Importing: " + filepath)
     mdl = nvb_mdl.Mdl()
     mdl.load_ascii(ascii_mdl)
-    mdl.import_to_scene(scene, wkm, position)
+    mdl.import_to_collection(collection, wkm, position)
 
     # processing to use AABB node as trimesh for walkmesh file
     if wkm is not None and wkm.walkmeshType == 'wok' and mdl.nodeDict and wkm.nodeDict:
@@ -78,7 +78,7 @@ def _load_mdl(filepath, position = (0.0, 0.0, 0.0)):
             aabb.compute_layout_position(wkmesh)
             if len(wkmesh.roomlinks):
                 aabb.roomlinks = wkmesh.roomlinks
-                aabb.set_room_links(scene.objects[aabb.name].data)
+                aabb.set_room_links(collection.objects[aabb.name].data)
 
 
 def load_mdl(operator,

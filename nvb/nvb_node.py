@@ -130,10 +130,10 @@ class GeometryNode():
             txt.write(self.rawascii)
             obj.nvb.rawascii = txt.name
 
-    def add_to_scene(self, scene):
+    def add_to_collection(self, collection):
         obj = bpy.data.objects.new(self.name, None)
         self.set_object_data(obj)
-        bpy.context.collection.objects.link(obj)
+        collection.objects.link(obj)
         return obj
 
     def get_adjusted_matrix(self, obj):
@@ -658,11 +658,11 @@ class Trimesh(GeometryNode):
         obj.nvb.ambient          = self.ambient
         obj.nvb.lytposition      = self.lytposition
 
-    def add_to_scene(self, scene):
+    def add_to_collection(self, collection):
         if nvb_glob.minimapMode and not self.render:
             # Fading objects won't be imported in minimap mode
             # We may need it for the tree stucture, so import it as an empty
-            return Dummy.add_to_scene(self, scene)
+            return Dummy.add_to_collection(self, collection)
 
         mesh = self.create_mesh(self.name)
         obj  = bpy.data.objects.new(self.name, mesh)
@@ -671,7 +671,7 @@ class Trimesh(GeometryNode):
         if nvb_glob.importMaterials and self.roottype == 'mdl':
             nvb_material.rebuild_material(obj)
 
-        bpy.context.collection.objects.link(obj)
+        collection.objects.link(obj)
         return obj
 
     def add_material_data_to_ascii(self, obj, asciiLines):
@@ -1421,17 +1421,17 @@ class Emitter(GeometryNode):
                 continue
             setattr(obj.nvb, attrname, value)
 
-    def add_to_scene(self, scene):
+    def add_to_collection(self, collection):
         if nvb_glob.minimapMode:
             # We don't need emitters in minimap mode
             # We may need it for the tree stucture, so import it as an empty
-            return GeometryNode.add_to_scene(self, scene)
+            return GeometryNode.add_to_collection(self, collection)
 
         mesh = self.create_mesh(self.name)
         obj  = bpy.data.objects.new(self.name, mesh)
 
         self.set_object_data(obj)
-        bpy.context.collection.objects.link(obj)
+        collection.objects.link(obj)
         return obj
 
     def add_data_to_ascii(self, obj, asciiLines, classification = nvb_def.Classification.UNKNOWN, simple = False, nameDict=None):
@@ -1639,15 +1639,15 @@ class Light(GeometryNode):
         obj.nvb.flareradius = self.flareradius
         nvb_light.calc_light_power(obj)
 
-    def add_to_scene(self, scene):
+    def add_to_collection(self, collection):
         if nvb_glob.minimapMode:
             # We don't need lights in minimap mode
             # We may need it for the tree stucture, so import it as an empty
-            return GeometryNode.add_to_scene(self, scene)
+            return GeometryNode.add_to_collection(self, collection)
         light = self.create_light(self.name)
         obj  = bpy.data.objects.new(self.name, light)
         self.set_object_data(obj)
-        bpy.context.collection.objects.link(obj)
+        collection.objects.link(obj)
         return obj
 
     def add_flares_to_ascii(self, obj, asciiLines):
@@ -1883,13 +1883,13 @@ class Aabb(Trimesh):
         mesh.update()
         return mesh
 
-    def add_to_scene(self, scene):
+    def add_to_collection(self, collection):
         if nvb_glob.minimapMode:
             # No walkmeshes in minimap mode and we don't need an empty as
             # replacement either as AABB nodes never have children
-            return GeometryNode.add_to_scene(self, scene)
+            return GeometryNode.add_to_collection(self, collection)
         mesh = self.create_mesh(self.name)
         obj = bpy.data.objects.new(self.name, mesh)
         self.set_object_data(obj)
-        bpy.context.collection.objects.link(obj)
+        collection.objects.link(obj)
         return obj
