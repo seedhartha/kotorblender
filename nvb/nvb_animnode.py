@@ -831,7 +831,7 @@ class Node():
         else:
             asciiLines.append('  node dummy ' + originalName)
             asciiLines.append('    parent ' + originalParent)
-        self.addKeysToAscii(animObj, originalObj, asciiLines)
+        self.add_keys_to_ascii(animObj, originalObj, asciiLines)
         self.add_keys_to_ascii_incompat(animObj, asciiLines)
         asciiLines.append('  endnode')
 
