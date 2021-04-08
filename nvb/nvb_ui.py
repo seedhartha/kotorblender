@@ -177,8 +177,6 @@ class NVB_PT_smoothgroups(bpy.types.Panel):
                     sg[power] += 1
                     if face.select:
                         sg_selected.add(power + 1)
-        #print(sg)
-        #row.label(text="{}".format(str(sg)))
 
         # display readout of smoothgroups in use on selected faces
         row = layout.row()
@@ -545,10 +543,6 @@ class NVB_PT_texture(bpy.types.Panel):
     def draw(self, context):
         layout = self.layout
         texture = context.texture
-        #print(dir(context))
-        #print(dir(context.object))
-        #self.layout.prop(texture.nvb, 'bumpmapped', text='Allow Normal Mapping')
-        #self.layout.prop(context.object.nvb, 'bumpmapped', text='Bumpmapped')
 
         # TXI file operations
         row = layout.row(align=True)
@@ -558,14 +552,6 @@ class NVB_PT_texture(bpy.types.Panel):
         # Texture type
         if len(texture.nvb.modified_properties):
             box = layout.row().box()
-            #row = box.row()
-            #row.alignment = 'LEFT'
-            #row.label(text="TXI File Summary")
-            #row.operator('nvb.texture_info_box_ops', text="TXI File Summary", icon="TRIA_DOWN", emboss=False)
-            #bbif not texture.nvb.box_visible_summary:
-            #    row.operator('nvb.texture_info_box_ops', text="TXI File Summary", icon="TRIA_RIGHT", emboss=False).boxname = 'summary'
-            #else:
-            #    row.operator('nvb.texture_info_box_ops', text="TXI File Summary", icon="TRIA_DOWN", emboss=False).boxname = 'summary'
             if self.draw_box_header(texture, box, 'summary', 'TXI File Summary'):
                 for propname in texture.nvb.modified_properties:
                     self.draw_summ_prop(texture, box, propname.name)
@@ -655,8 +641,6 @@ class NVB_PT_texture(bpy.types.Panel):
             box.prop(texture.nvb, 'texturewidth')
             box.prop(texture.nvb, 'spacingR')
             box.prop(texture.nvb, 'spacingB')
-            #box.prop(texture.nvb, 'upperleftcoords')
-            #box.prop(texture.nvb, 'lowerrightcoords')
 
 class NVB_PT_emitter(bpy.types.Panel):
     """
@@ -671,12 +655,6 @@ class NVB_PT_emitter(bpy.types.Panel):
 
     @classmethod
     def poll(cls, context):
-        #if context.particle_system:
-        #    partsys_settings = context.particle_system.settings
-        #    if partsys_settings is None:
-        #        return False
-        #    else:
-        #        return True
         try:
             return context.object and \
                    context.object.type == 'MESH' and \
@@ -694,8 +672,6 @@ class NVB_PT_emitter(bpy.types.Panel):
             sub.prop(target, factor, text=name, slider=True)
             return sub
 
-        #if context.particle_system:
-            #partsys_settings = context.particle_system.settings
         obj = context.object
 
         layout = self.layout
@@ -704,9 +680,6 @@ class NVB_PT_emitter(bpy.types.Panel):
         row.prop(obj.nvb, 'meshtype', text='Type')
 
         layout.separator()
-
-        #row = layout.row()
-        #row.label(text='Emitter Style')
 
         box = layout.row().box()
         row = box.row()
@@ -725,9 +698,6 @@ class NVB_PT_emitter(bpy.types.Panel):
         if obj.nvb.update != 'Fountain' or \
            not nvb_utils.is_null(obj.nvb.chunkName):
             row.enabled = False
-            row.enabled = False
-            # not allowed in draw context ... fun
-            #obj.nvb.spawntype = False
 
         box.separator()
 
@@ -739,9 +709,7 @@ class NVB_PT_emitter(bpy.types.Panel):
 
         box.separator()
 
-        #row = box.row()
         # Inheritance
-        #box = layout.row().box()
         row = box.row()
         row.label(text="Inheritance")
         row = box.row()
@@ -755,9 +723,7 @@ class NVB_PT_emitter(bpy.types.Panel):
 
         box.separator()
 
-        #box = layout.row().box()
         row = box.row()
-        #row.alignment = 'CENTER'
         row.label(text="Miscellaneous")
         row = box.row()
         row.prop(obj.nvb, "numBranches")
@@ -766,7 +732,6 @@ class NVB_PT_emitter(bpy.types.Panel):
         row = box.row()
         row.prop(obj.nvb, "threshold")
 
-        #box = layout.row().box()
         row = box.row()
         box.label(text="Blur")
         row = box.row()
@@ -776,10 +741,8 @@ class NVB_PT_emitter(bpy.types.Panel):
 
         box = layout.row().box()
         row = box.row()
-        #row.alignment = 'CENTER'
         row.label(text="Particles", icon='PARTICLE_DATA')
         row = box.row()
-        #row.alignment = 'CENTER'
         row.label(text="")
         row.label(text="Start")
         row.label(text="Mid")
@@ -886,7 +849,6 @@ class NVB_PT_emitter(bpy.types.Panel):
 
         box = layout.row().box()
         row = box.row()
-        #row.alignment = 'CENTER'
         row.label(text="Texture / Chunk", icon='TEXTURE')
         row = box.row()
         row.prop(obj.nvb, 'texture')
@@ -935,7 +897,6 @@ class NVB_PT_emitter(bpy.types.Panel):
 
         box = layout.row().box()
         row = box.row()
-        #row.alignment = 'CENTER'
         row.label(text="Advanced", icon='PREFERENCES')
 
         # Lightning
@@ -960,7 +921,6 @@ class NVB_PT_emitter(bpy.types.Panel):
         box.separator()
 
         # Blast props
-        #box = row.box()
         parent_box = box
         box = box.row().box()
         row =  box.row()
@@ -974,7 +934,6 @@ class NVB_PT_emitter(bpy.types.Panel):
         box.separator()
 
         # p2p settings
-        #box = row.box()
         parent_box = box
         box = box.row().box()
         if obj.nvb.update != 'Fountain' and\
@@ -988,8 +947,6 @@ class NVB_PT_emitter(bpy.types.Panel):
         row.prop(obj.nvb, 'p2p_type')
         if not obj.nvb.p2p:
             row.enabled = False
-        #row = box.row()
-        #row.prop(obj.nvb, 'p2p_sel')
         if not obj.nvb.p2p:
             row.enabled = False
         row = box.row()
@@ -1002,8 +959,6 @@ class NVB_PT_emitter(bpy.types.Panel):
         if not obj.nvb.p2p or \
            obj.nvb.p2p_type == 'Gravity':
             row.enabled = False
-        #row = box.row()
-        #row.prop(obj.nvb, 'threshold')
         row = box.row()
         row.prop(obj.nvb, 'grav')
         if not obj.nvb.p2p or \
@@ -1031,21 +986,6 @@ class NVB_PT_emitter(bpy.types.Panel):
         row = box.row()
         row.prop(obj.nvb, 'controlptsmoothing')
         box = parent_box
-
-        #split = layout.split()
-        #col = split.column(align=True)
-        #col.prop(obj, 'frame_start')
-        #col.prop(obj, 'frame_end')
-
-        #col = split.column(align=True)
-        #col.prop(obj, 'normal_factor')
-        #col.prop(obj, 'factor_random')
-
-        #row = layout.row()
-        #col = row.column()
-        #col.prop(obj.effector_weights, 'wind')
-        #col.prop(obj.effector_weights, 'drag')
-        #col.prop(obj.effector_weights, 'gravity')
 
 
 class NVB_PT_mesh(bpy.types.Panel):

@@ -30,8 +30,6 @@ def _load_mdl(filepath, position = (0.0, 0.0, 0.0)):
                 asciiLines = [line.strip().split() for line in open(fp, 'r')]
                 wkm = nvb_mdl.Xwk(wkmType)
                 wkm.load_ascii(asciiLines)
-                # adding walkmesh to scene has to be done within mdl import now
-                #wkm.import_to_scene(scene)
             except IOError:
                 print(
                     "Kotorblender - WARNING: No walkmesh found {}".format(
@@ -61,7 +59,6 @@ def _load_mdl(filepath, position = (0.0, 0.0, 0.0)):
 
     print("Importing: " + filepath)
     mdl = nvb_mdl.Mdl()
-    #mdl.load_ascii(asciiLines)
     mdl.load_ascii(ascii_mdl)
     mdl.import_to_scene(scene, wkm, position)
 
@@ -78,9 +75,7 @@ def _load_mdl(filepath, position = (0.0, 0.0, 0.0)):
             if node.nodetype == 'aabb' or node.nodetype == 'trimesh':
                 wkmesh = node
         if aabb and wkmesh:
-            #print(aabb.lytposition)
             aabb.compute_layout_position(wkmesh)
-            #print(aabb.lytposition)
             if len(wkmesh.roomlinks):
                 aabb.roomlinks = wkmesh.roomlinks
                 aabb.set_room_links(scene.objects[aabb.name].data)
@@ -200,11 +195,7 @@ def save_mdl(operator,
     frame_set_current = None
     if frame_set_zero and bpy.context.scene:
         frame_set_current = bpy.context.scene.frame_current
-        # this technique does not work, docs say use frame_set
-        #options.scene.frame_current = 0
-        #bpy.context.scene.update()
         bpy.context.scene.frame_set(0)
-        #print('frame set to 0 for export')
 
     mdlRoot = nvb_utils.get_mdl_base(scene=bpy.context.scene)
     if mdlRoot:
@@ -257,7 +248,6 @@ def save_mdl(operator,
 
     # Return frame to pre-export, if specified in options
     if frame_set_current is not None and bpy.context.scene:
-        #print('current frame restored to {}'.format(frame_set_current))
         bpy.context.scene.frame_set(frame_set_current)
 
     return {'FINISHED'}

@@ -9,7 +9,6 @@ from . import nvb_def, nvb_io, nvb_material, nvb_txi, nvb_utils
 class NVB_OT_children_smoothgroup(bpy.types.Operator):
     bl_idname = "nvb.children_smoothgroup"
     bl_label = "Smoothgroup settings on descendants"
-    #bl_property = 'action'
     bl_options = {'UNDO'}
 
     action : bpy.props.StringProperty()
@@ -40,14 +39,12 @@ class NVB_OT_toggle_smoothgroup(bpy.types.Operator):
         for face in bm.faces:
             if not face.select:
                 continue
-            #print("face sg before: {}".format(face[sg_layer]))
             if sg_value & face[sg_layer]:
                 # turn off for face
                 face[sg_layer] &= ~sg_value
             else:
                 # turn on for face
                 face[sg_layer] |= sg_value
-            #print("face sg after: {}".format(face[sg_layer]))
         bmesh.update_edit_mesh(context.object.data)
         return {'FINISHED'}
 
@@ -70,24 +67,19 @@ class NVB_OT_generate_smoothgroup(bpy.types.Operator):
         # and sg layer is available and modifiable
         initial_mode = ob.mode
         bpy.ops.object.mode_set(mode='OBJECT')
-        #ob.data.update(True, True)
         # copy the mesh, applying modifiers w/ render settings
         mesh = ob.to_mesh(scene=context.scene, apply_modifiers=True, settings='RENDER')
-        #mesh.update(True, True)
 
         # get, or create, the smoothgroups data layer on the object mesh (not the copy)
         sg_list = ob.data.polygon_layers_int.get(nvb_def.sg_layer_name)
         if sg_list is None:
             sg_list = ob.data.polygon_layers_int.new(name=nvb_def.sg_layer_name)
-        #ob.data.update()
-        #mesh.calc_tessface()
 
         # make all the faces on mesh copy smooth,
         # allowing calc_smooth_groups to work
         for face in mesh.polygons:
             face.use_smooth = True
         (sg, sg_number) = mesh.calc_smooth_groups(use_bitflags=True)
-        #print(sg)
 
         # apply the calculated smoothgroups
         if self.action == 'ALL':
@@ -109,7 +101,6 @@ class NVB_OT_generate_smoothgroup(bpy.types.Operator):
 class NVB_OT_select_smoothgroup(bpy.types.Operator):
     bl_idname = "nvb.smoothgroup_select"
     bl_label = "Smoothgroup select"
-    #bl_property = 'action'
     bl_options = {'UNDO'}
 
     sg_number : bpy.props.IntProperty()
@@ -130,18 +121,13 @@ class NVB_OT_select_smoothgroup(bpy.types.Operator):
         bm.faces.ensure_lookup_table()
         # the smoothgroup data layer
         sg_layer = bm.faces.layers.int.get(nvb_def.sg_layer_name)
-        #print("test with #{} and sel/desel: {}".format(self.sg_number, str(sel)))
         # convert sg_number to actual sg bitflag value
         sg_value = pow(2, self.sg_number)
 
         for face in bm.faces:
             if sg_value & face[sg_layer]:
                 # select/deselect face
-                #print("select set: {}".format(str(sel)))
                 face.select_set(self.action == 'SEL')
-        # using this causes ALL connected geometry to be selected,
-        # including additional faces, undesirable
-        #bm.select_flush(sel)
         # required to get the selection change to show in the 3D view
         bmesh.update_edit_mesh(context.object.data)
         return {'FINISHED'}
@@ -161,12 +147,8 @@ class NVB_OT_texture_io(bpy.types.Operator):
     def execute(self, context):
         if self.action == 'SAVE':
             nvb_txi.save_txi(context.texture, self)
-            #if nvb_txi.save_txi(context.texture):
-            #    self.report({'INFO'}, 'Successfully saved TXI file')
         else:
             nvb_txi.load_txi(context.texture, self)
-            #if nvb_txi.load_txi(context.texture):
-            #    self.report({'INFO'}, 'Successfully loaded TXI file')
         return {'FINISHED'}
 
 
@@ -191,7 +173,6 @@ class NVB_OT_texture_box_ops(bpy.types.Operator):
 class NVB_OT_skin_bone_ops(bpy.types.Operator):
     bl_idname = "nvb.armature"
     bl_label = "Armature Operations"
-    #bl_property = 'action'
     bl_options = {'UNDO'}
 
     def boner(self, amt, obj, parent=None, pbone=None):
@@ -202,33 +183,24 @@ class NVB_OT_skin_bone_ops(bpy.types.Operator):
             bone.parent = pbone
             bone.head = pbone.tail
             bone.tail = obj.matrix_world.to_translation()
-            #+ parent.matrix_world.to_translation()
         if bone is None:
             bone = pbone
         for c in obj.children:
-            #print(obj.nvb.meshtype)
-            #print(obj.nvb.render)
             self.boner(amt, c, obj, bone)
 
     def execute(self, context):
-        #bpy.ops.object.add(type='ARMATURE', enter_editmode=True, location=context.scene.objects['cutscenedummy'].location)
         bpy.ops.object.armature_add()
         ob = bpy.context.scene.objects.active
         ob.show_x_ray = True
         ob.name = 'Armature'
         ob.show_axis = True
         ob.location = context.scene.objects['cutscenedummy'].location
-        #context.scene.objects.active = ob
-        print(dir(ob))
         amt = ob.data
-        print(dir(amt))
         amt.name = 'ArmatureAmt'
-        #amt.show_axes = True
         bpy.ops.object.mode_set(mode='EDIT')
         amt.edit_bones[0].tail = context.scene.objects['rootdummy'].location
         self.boner(amt, context.scene.objects['rootdummy'], pbone=amt.edit_bones[0])
         bpy.ops.object.mode_set(mode='OBJECT')
-        #for name, obj in context.scene.objects.items():
         return {'FINISHED'}
 
 
@@ -248,15 +220,6 @@ class NVB_OT_texture_ops(bpy.types.Operator):
         if self.propname == '':
             return {'FINISHED'}
         if self.action == 'RESET':
-            #print(bpy.types.ImageTexture.nvb)
-            #print(bpy.types.ImageTexture.nvb[1])
-            #print(bpy.types.ImageTexture.nvb[1]['type'])
-            #print(bpy.types.ImageTexture.nvb[1]['type'][self.propname])
-            #print(getattr(bpy.types.ImageTexture.nvb[1]['type'], self.propname))
-            #print(getattr(bpy.types.ImageTexture.nvb[1]['type'], self.propname)[1])
-            #print(getattr(bpy.types.ImageTexture.nvb[1]['type'], self.propname)[1]['default'])
-            #print(getattr(bpy.types.ImageTexture.nvb[1], self.propname)[1]['default'])
-            #attr_def = getattr(bpy.types.ImageTexture.nvb[1], self.propname)[1]['default']
             attr_def = getattr(bpy.types.ImageTexture.nvb[1]['type'], self.propname)[1]
             if 'default' in attr_def:
                 setattr(context.texture.nvb, self.propname, attr_def['default'])
@@ -625,7 +588,6 @@ class NVB_OT_render_minimap(bpy.types.Operator):
             if (obj.nvb.dummytype == nvb_def.Dummytype.MDLROOT):
                 nvb_utils.setup_minimap_render(obj, scene)
                 bpy.ops.render.render(use_viewport = True)
-                #bpy.ops.render.view_show()
 
                 self.report({'INFO'}, 'Ready to render')
             else:

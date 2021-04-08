@@ -186,8 +186,6 @@ def load_txi(imagetexture, operator=None):
                 elif line[0] in float_tokens:
                     value = float(value)
                 setattr(imagetexture.nvb, line[0], value)
-                print(line[0])
-                print(getattr(imagetexture.nvb, line[0]))
         except:
             pass
     
@@ -275,9 +273,8 @@ def save_txi(imagetexture, operator=None):
         asciiLines.append("{} {}".format(propname, str(value)))
 
     # write txi file, join on CRLF for the windows people
-    print(asciiLines)
     with open(os.fsencode(filepath), 'w') as f:
-                f.write("\r\n".join(asciiLines) + "\r\n")
+        f.write("\r\n".join(asciiLines) + "\r\n")
 
     if operator is not None:
         operator.report({'INFO'}, "Exported {}".format(os.path.basename(filepath)))

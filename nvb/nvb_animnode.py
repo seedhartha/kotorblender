@@ -410,7 +410,6 @@ class Node():
                 key_type = ''
                 key_type = 'key' if label.endswith('key') else key_type
                 key_type = 'bezierkey' if label.endswith('bezierkey') else key_type
-                #print('found {}{} {:d} values'.format(attrname, key_type, attr_type['values']))
                 numVals = attr_type['values']
                 if key_type:
                     if key_type == 'bezierkey':
@@ -433,7 +432,6 @@ class Node():
                 key_type = ''
                 key_type = 'key' if label.endswith('key') else key_type
                 key_type = 'bezierkey' if label.endswith('bezierkey') else key_type
-                #print('found {}{} {:d} values'.format(attrname, key_type, attr_type['values']))
                 numVals = attr_type['values']
                 if key_type:
                     if key_type == 'bezierkey':
@@ -446,10 +444,8 @@ class Node():
                 # parse numvals plus one for time
                 if 'conversion' in attr_type and attr_type['conversion'] is int:
                     nvb_parse._i(subblock, getattr(self.keys, propname), numVals + 1)
-                    #print(getattr(self.keys, attrname))
                 else:
                     nvb_parse._f(subblock, getattr(self.keys, propname), numVals + 1)
-                #print(attrname + ' ' + label)
                 self.isEmpty = False
             # Some unknown text.
             # Probably keys for emitters = incompatible with blender. Import as text.
@@ -484,7 +480,6 @@ class Node():
         """
         Add the animations in this node to target object
         """
-        #actionName           = animName + '.' + targetObject.name
         actionName           = targetObject.name
         action               = bpy.data.actions.new(name=actionName)
         action.use_fake_user = True
@@ -527,7 +522,6 @@ class Node():
             propname = attrname.lower()
             if not getattr(self.keys, propname):
                 continue
-            #print('emitter ' + propname)
             key_type = self.EMITTER_KEY_TYPE[attrname]
             curves = []
             # one fcurve per 'axis' (xyz, rgb, etc.)
@@ -559,7 +553,6 @@ class Node():
             axis     = fcurve.array_index
             dataPath = fcurve.data_path
             name     = ''
-            #print(dataPath)
             for keyname in Node.KEY_TYPE.keys():
                 ktype = Node.KEY_TYPE[keyname]
                 if ktype['objdata'] is not None and \
@@ -589,7 +582,6 @@ class Node():
                     break
 
             for kfkey, kfp in enumerate(fcurve.keyframe_points):
-                #frame = int(round(kfp.co[0])) - anim.frameStart
                 frame = int(round(kfp.co[0]))
                 if frame < anim.frameStart or frame > anim.frameEnd:
                     continue
@@ -601,7 +593,6 @@ class Node():
                 else:
                     values = [0.0, 0.0, 0.0, 0.0]
                 values[axis] = values[axis] + kfp.co[1]
-                #print(values)
                 if name.endswith('bezierkey'):
                     if kfp.interpolation == 'BEZIER':
                         values[ktype['axes'] + (axis * 2):(ktype['axes'] + 1) + (axis * 2)] = \
@@ -644,7 +635,6 @@ class Node():
                         # somebody mixed an unknown keyframe type ...
                         # give them some bad data
                         values[ktype['axes'] + (axis * 2):(ktype['axes'] + 1) + (axis * 2)] = [ 0.0, 0.0 ]
-                        #values.extend([ 0.0, 0.0 ])
                 keys[frame] = values
 
     def add_keys_to_ascii_incompat(self, obj, asciiLines):
@@ -652,8 +642,6 @@ class Node():
 
     @staticmethod
     def generate_ascii_keys_incompat(obj, asciiLines, options={}):
-        #if obj.nvb.meshtype != nvb_def.Meshtype.EMITTER:
-        #    return
         if obj.nvb.rawascii not in bpy.data.texts:
             return
         txt      = bpy.data.texts[obj.nvb.rawascii]
@@ -746,13 +734,8 @@ class Node():
                 # export title and
                 value_str = " {: .7g}"
                 if "conversion" in ktype and ktype["conversion"] is int:
-                    #print(attrname)
-                    #print(key)
-                    #print(ktype)
                     value_str = " {: d}"
                     key[0:ktype['values']] = [int(k) for k in key[0:ktype['values']]]
-                    #print('converted')
-                    #print(key)
                 line = '      {: .7g}' + (value_str * ktype['values'])
                 s = line.format(time, *key[0:ktype['values']])
                 # export bezierkey control points
@@ -820,7 +803,6 @@ class Node():
                 # this node has animation controllers, include it
                 #XXX match actual controllers sometime
                 # (current will match ANY animation)
-                #print('export_needed for ' + animObj.name)
                 return True
         # if any children of this node will be included, this node must be
         for child in animObj.children:
@@ -846,7 +828,6 @@ class Node():
         if originalObj.nvb.meshtype == nvb_def.Meshtype.EMITTER:
             asciiLines.append('  node emitter ' + originalName)
             asciiLines.append('    parent ' + originalParent)
-            #self.add_keys_to_ascii_incompat(animObj, asciiLines)
         else:
             asciiLines.append('  node dummy ' + originalName)
             asciiLines.append('    parent ' + originalParent)
@@ -860,8 +841,6 @@ from . import nvb_node
 
 
 class Animnode():
-    # Keys that go into particle system settings
-    #emitter_properties = nvb_node.Emitter.property_dict
     # Keys that go directly into objects
     object_properties = {'position': ('', 3, float,  # Needs conversion
                                       ' {:> 6.5f}'),
@@ -912,9 +891,6 @@ class Animnode():
         kfp_cnt = list(map(lambda x: len(x), kfp_list))
         list(map(lambda x: x.add(len(values)), kfp_list))
         for i, (frm, val) in enumerate(zip(frames, values)):
-            #print(
-            #    "{} dim {} v{} f{}".format(dp, dp_dim, len(val), frm)
-            #)
             for d in range(dp_dim):
                 p = kfp_list[d][kfp_cnt[d]+i]
                 p.co = frm, val[d]
@@ -1033,11 +1009,9 @@ class Animnode():
                     else:
                         numKeys = 1
                         subblock = [[0.0] + line[1:]]
-                    #key_data[key_name] = [
                     converter = float
                     if 'conversion' in attr_type:
                         converter = attr_type['conversion']
-                        #print('used converter for ' + attr_name)
                     key_data[key_name] = [
                         [
                             # time followed by values, for each line
@@ -1053,22 +1027,18 @@ class Animnode():
     def create_data_object(self, obj, anim, options={}):
         """Creates animations in object actions."""
         def data_conversion(label, obj, vals, options={}):
-            #print("data conversion {}".format(label))
             if label == 'orientation':
                 if obj.rotation_mode == 'AXIS_ANGLE':
                     dp = 'rotation_axis_angle'
-                    #print(dp)
                     dp_dim = 4
                     new_values = [[v[3], v[0], v[1], v[2]] for v in vals]
                 elif obj.rotation_mode == 'QUATERNION':
                     dp = 'rotation_quaternion'
-                    #print(dp)
                     dp_dim = 4
                     quats = [mathutils.Quaternion(v[0:3], v[3]) for v in vals]
                     new_values = [[q.w, q.x, q.y, q.z] for q in quats]
                 else:
                     dp = 'rotation_euler'
-                    #print(dp)
                     dp_dim = 3
                     # Run an euler filter
                     prev_eul = mathutils.Euler()
@@ -1082,7 +1052,6 @@ class Animnode():
                         prev_eul = eul
             elif label == 'position':
                 #XXX need MDL animation scale here
-                #scl = options.anim_scale
                 scl = 1.0
                 dp = 'location'
                 dp_dim = 3
@@ -1096,13 +1065,11 @@ class Animnode():
                 new_values = [[v[0]] * dp_dim for v in vals]
             return new_values, dp, dp_dim
 
-        #fps = options.scene.render.fps
         fps = nvb_def.fps
         frame_start = anim.frameStart
         action = nvb_utils.get_action(obj, options['mdlname'] + '.' + obj.name)
         for label, (data, data_path, data_dim) in self.object_data.items():
             frames = [fps * d[0] + frame_start for d in data]
-            #print(label + ' ' + data_path)
             use_action = action
             if obj.type == 'LIGHT' and label in ['radius', 'color']:
                 use_action = nvb_utils.get_action(
@@ -1125,30 +1092,19 @@ class Animnode():
     def create_data_emitter(self, obj, anim, options={}):
         """Creates animations in emitter actions."""
 
-        #part_sys = obj.particle_systems.active
-        #if not part_sys:
-        #    return
-        #part_settings = part_sys.settings
-        #if not part_settings:
-        #    return
-        #fps = options.scene.render.fps
         fps = nvb_def.fps
         frame_start = anim.frameStart
-        #action = nvb_utils.get_action(part_settings, part_settings.name)
         action = nvb_utils.get_action(obj, options['mdlname'] + '.' + obj.name)
         for label, (data, data_path, data_dim) in self.emitter_data.items():
             frames = [fps * d[0] + frame_start for d in data]
             values = [d[1:data_dim+1] for d in data]
-            #dp = data_path
             dp = "nvb.{}".format(label)
             dp_dim = data_dim
-            #print(dp)
             Animnode.insert_kfp(frames, values, action, dp, dp_dim,
                                 'Odyssey Emitter')
 
     def create_data_shape(self, obj, anim, animlength, options={}):
         """Import animated vertices as shapekeys."""
-        #fps = options.scene.render.fps
         fps = nvb_def.fps
         if not obj.data:
             return
@@ -1324,20 +1280,15 @@ class Animnode():
         if not obj or not Node.export_needed(obj, anim):
             return
         # Type + Name
-        #node_type = nvb_utils.get_node_type(obj)
-        #node_name = nvb_utils.generate_node_name(obj, options.strip_trailing)
         node_type = "dummy"
         if obj.nvb.meshtype == nvb_def.Meshtype.EMITTER:
             node_type = "emitter"
         node_name = Node.get_original_name(obj.name, anim.name)
         asciiLines.append('  node ' + node_type + ' ' + node_name)
         # Parent
-        #parent_name = nvb_utils.generate_node_name(obj.parent,
-        #                                           options.strip_trailing)
         parent_name = nvb_def.null
         if obj.parent:
             parent_name = Node.get_original_name(obj.parent.name, anim.name)
         asciiLines.append('    parent ' + parent_name)
         Node.generate_ascii_keys(obj, anim, asciiLines, options)
-        #Node.generate_ascii_keys_incompat(obj, anim, asciiLines, options)
         asciiLines.append('  endnode')
