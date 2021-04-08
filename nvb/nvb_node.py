@@ -169,7 +169,6 @@ class GeometryNode():
         s = "  position {: .7g} {: .7g} {: .7g}".format(round(loc[0], 7), round(loc[1], 7), round(loc[2], 7))
         asciiLines.append(s)
 
-        #rot = nvb_utils.euler2nwangle(transmat.to_euler('XYZ'))
         rot = nvb_utils.get_aurora_rot_from_object(obj)
         s = "  orientation {: .7g} {: .7g} {: .7g} {: .7g}".format(round(rot[0], 7), round(rot[1], 7), round(rot[2], 7), round(rot[3], 7))
         asciiLines.append(s)
@@ -465,7 +464,6 @@ class Trimesh(GeometryNode):
                 elif (label == 'verts'):
                     numVals = l_int(line[1])
                     nvb_parse.f3(asciiNode[idx+1:idx+numVals+1], self.verts)
-                    #self.verts = [(float(l[0]), float(l[1]), float(l[2])) for l in asciiNode[idx+1:idx+numVals+1]]
                     self.parsed_lines.extend(range(idx,idx+numVals+1))
                 elif (label == 'faces'):
                     numVals = l_int(line[1])
@@ -474,7 +472,6 @@ class Trimesh(GeometryNode):
                 elif (label == 'tverts'):
                     numVals = l_int(line[1])
                     nvb_parse.f2(asciiNode[idx+1:idx+numVals+1], self.tverts)
-                    #self.tverts = [(float(l[0]), float(l[1])) for l in asciiNode[idx+1:idx+numVals+1]]
                     self.parsed_lines.extend(range(idx,idx+numVals+1))
                 elif (label == 'tverts1'):
                     numVals = l_int(line[1])
@@ -564,7 +561,6 @@ class Trimesh(GeometryNode):
             # Mark edge as sharp if its faces belong to different smooth groups
             for e in bm.edges:
                 f = e.link_faces
-                #if (len(f) > 1) and (self.facelist.shdgr[f[0].index] != self.facelist.shdgr[f[1].index]):
                 if (len(f) > 1) and not (self.facelist.shdgr[f[0].index] & self.facelist.shdgr[f[1].index]):
                     edgeIdx = e.index
                     mesh.edges[edgeIdx].use_edge_sharp = True
@@ -573,7 +569,6 @@ class Trimesh(GeometryNode):
             mesh.update()
             # load all smoothgroup numbers into a mesh data layer per-poly
             mesh_sg_list = mesh.polygon_layers_int.new(name=nvb_def.sg_layer_name)
-            #print("sg list {} shdgr {}".format(len(mesh_sg_list.data), len(self.facelist.shdgr)))
             mesh_sg_list.data.foreach_set('value', self.facelist.shdgr)
 
         if self.roottype == 'wok' and len(self.roomlinks):
@@ -583,8 +578,6 @@ class Trimesh(GeometryNode):
         return mesh
 
     def set_room_links(self, mesh, skipNonWalkable=True):
-        #if len(self.roomlinks) < 1:
-        #    return
         if not 'RoomLinks' in mesh.vertex_colors:
             room_vert_colors = mesh.vertex_colors.new(name='RoomLinks')
         else:
@@ -596,9 +589,6 @@ class Trimesh(GeometryNode):
             room_color = [ 0.0 / 255, (200 + link[1]) / 255.0, 0.0 / 255 ]
             realIdx = 0
             for face_idx, face in enumerate(mesh.polygons):
-            #for idx in range(0, faceIdx - 1):
-                #if mesh.polygons[faceIdx].material_index == 7:
-                #if face.material_index != 7:
                 if skipNonWalkable and (face.material_index not in nvb_def.WkmMaterial.NONWALKABLE):
                     if realIdx == faceIdx:
                         faceIdx = face_idx
@@ -606,9 +596,7 @@ class Trimesh(GeometryNode):
                     else:
                         realIdx += 1
             face = mesh.polygons[faceIdx]
-            print(face.edge_keys)
             for vert_idx, loop_idx in zip(face.vertices, face.loop_indices):
-                #if vert_idx in mesh.edges[link[0]].vertices:
                 if vert_idx in face.edge_keys[edgeIdx]:
                     room_vert_colors.data[loop_idx].color = [*room_color, 1.0]
 
@@ -617,7 +605,6 @@ class Trimesh(GeometryNode):
         if not 'RoomLinks' in mesh.vertex_colors:
             return
         room_vert_colors = mesh.vertex_colors['RoomLinks']
-        #roomlinks = []
         self.roomlinks = []
         face_bonus = 0
         for face_idx, face in enumerate(mesh.polygons):
@@ -629,23 +616,16 @@ class Trimesh(GeometryNode):
                 continue
             for vert_idx, loop_idx in zip(face.vertices, face.loop_indices):
                 room = int(round(room_vert_colors.data[loop_idx].color[1] * 255, 0)) - 200
-                #room = int(room_vert_colors.data[loop_idx].color[1] * 255) - 200
-                #print('room {:}'.format(room))
-                #print('color {:.7g}'.format(room_vert_colors.data[loop_idx].color[1]))
                 # we use color space for links to 55 rooms,
                 # which is likely more than the game could handle
                 if room < 0 or room > 54:
                     continue
                 verts[vert_idx] = room
-                #print(room)
             if len(verts) < 2:
                 continue
             vertIndices = list(verts.keys())
             for edge_idx, edge in enumerate(face.edge_keys):
-                #print(vertIndices)
-                #print(edge)
                 if vertIndices[0] in edge and vertIndices[1] in edge:
-                    #roomlinks.append(((face_idx + face_bonus) * 3 + edge_idx, room))
                     self.roomlinks.append(((face_idx + face_bonus) * 3 + edge_idx, verts[vertIndices[0]]))
 
     def set_object_data(self, obj):
@@ -744,8 +724,6 @@ class Trimesh(GeometryNode):
                                          [0,scale[1],0,0],
                                          [0,0,scale[2],0],
                                          [0,0,0       ,1]])
-        # So... I could figure this out, but I need to know what breaks without this
-        #mesh.transform(scale_matrix)
 
         # Triangulation (doing it with bmesh to retain edges marked as sharp)
         bm = bmesh.new()
@@ -772,7 +750,6 @@ class Trimesh(GeometryNode):
             numSmoothGroups = 1
         else:
             (smoothGroups, numSmoothGroups) = mesh.calc_smooth_groups(use_bitflags=True)
-            #(smoothGroups, numSmoothGroups) = mesh.calc_smooth_groups(use_bitflags=False)
 
         faceList = [] # List of triangle faces
         uvList   = [] # List of uv indices
@@ -888,7 +865,6 @@ class Trimesh(GeometryNode):
                 formatString = '    {: .7g} {: .7g} {: .7g}'
                 for face in mesh.polygons:
                     for loop_idx in face.loop_indices:
-                        print('loop ' + str(loop_idx) + '\n')
                         s = formatString.format(mesh.vertex_colors[colorKey].data[loop_idx].color[0],
                                                 mesh.vertex_colors[colorKey].data[loop_idx].color[1],
                                                 mesh.vertex_colors[colorKey].data[loop_idx].color[2])
@@ -983,7 +959,6 @@ class Danglymesh(Trimesh):
                 elif (label == 'constraints'):
                     numVals = l_int(line[1])
                     nvb_parse.f1(asciiNode[idx+1:idx+numVals+1], self.constraints)
-                    #self.constraints = [float(l[0]) for l in asciiNode[idx+1:idx+numVals+1]]
                     self.parsed_lines.extend(range(idx,idx+numVals+1))
         if (self.nodetype == 'danglymesh'):
             self.add_unparsed_to_raw(asciiNode)
@@ -1444,10 +1419,7 @@ class Emitter(GeometryNode):
                 # except it doesn't seem to initially
                 obj.nvb.p2p_sel = self.p2p_sel
                 continue
-            #print(attrname)
             setattr(obj.nvb, attrname, value)
-
-        #self.add_raw_ascii(obj)
 
     def add_to_scene(self, scene):
         if nvb_glob.minimapMode:
@@ -1604,19 +1576,16 @@ class Light(GeometryNode):
                     # List of floats
                     numVals = next((i for i, v in enumerate(asciiNode[idx+1:]) if not l_is_number(v[0])), -1)
                     nvb_parse.f1(asciiNode[idx+1:idx+numVals+1], self.flareList.sizes)
-                    #self.flareList.sizes = [float(l[0]) for l in asciiNode[idx+1:idx+numVals+1]]
                     self.parsed_lines.extend(range(idx,idx+numVals+1))
                 elif (label == 'flarepositions'):
                     # List of floats
                     numVals = next((i for i, v in enumerate(asciiNode[idx+1:]) if not l_is_number(v[0])), -1)
                     nvb_parse.f1(asciiNode[idx+1:idx+numVals+1], self.flareList.positions)
-                    #self.flareList.positions = [float(l[0]) for l in asciiNode[idx+1:idx+numVals+1]]
                     self.parsed_lines.extend(range(idx,idx+numVals+1))
                 elif (label == 'flarecolorshifts'):
                     # List of float 3-tuples
                     numVals = next((i for i, v in enumerate(asciiNode[idx+1:]) if not l_is_number(v[0])), -1)
                     nvb_parse.f3(asciiNode[idx+1:idx+numVals+1], self.flareList.colorshifts)
-                    #self.flareList.colorshifts = [(float(l[0]), float(l[1]), float(l[2])) for l in asciiNode[idx+1:idx+numVals+1]]
                     self.parsed_lines.extend(range(idx,idx+numVals+1))
 
         # Load flare texture names:
@@ -1684,7 +1653,6 @@ class Light(GeometryNode):
     def add_flares_to_ascii(self, obj, asciiLines):
         if obj.nvb.lensflares:
             asciiLines.append('  lensflares ' + str(int(obj.nvb.lensflares)))
-            # print(str(len(obj.nvb.flareList)))
             if len(obj.nvb.flareList) > 0:
 
                 # TODO: Clean this up
@@ -1739,17 +1707,14 @@ class Aabb(Trimesh):
         wkmv1 = (wkmv1[0] - wkm.position[0],
                  wkmv1[1] - wkm.position[1],
                  wkmv1[2] - wkm.position[2])
-        #print(wkmv1)
         for faceIdx, face in enumerate(self.facelist.faces):
             if self.facelist.matId[faceIdx] != 7:
                 v1 = self.verts[face[0]]
-                #print(v1)
                 self.lytposition = (round(wkmv1[0] - v1[0], 6),
                                     round(wkmv1[1] - v1[1], 6),
                                     round(wkmv1[2] - v1[2], 6))
                 break
         bpy.data.objects[self.objref].nvb.lytposition = self.lytposition
-        #pprint(bpy.data.objects[self.name])
 
     def add_aabb_to_ascii(self, obj, asciiLines):
         if nvb_glob.applyModifiers:

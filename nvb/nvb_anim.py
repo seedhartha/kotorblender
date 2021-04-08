@@ -26,19 +26,11 @@ class Animation():
 
     def create(self, mdl_base, options={}):
         """Create animations with a list of imported objects."""
-        # Check for existing animations:
-        #if options.anim_ignore_existing and \
-        #        self.name in mdl_base.nvb.animList.keys():
-        #    return
         # Add new animation to list
-        #fps = options.scene.render.fps
         fps = nvb_def.fps
         new_anim = nvb_utils.create_anim_list_item(mdl_base)
         new_anim.name = self.name
-        # new_anim.ttime = self.transtime
         new_anim.transtime = fps * self.transtime
-        # new_anim.root = self.animroot
-        #new_anim.root_obj = noderesolver.get_obj(self.animroot, -1)
         search_result = nvb_utils.search_node(
             mdl_base,
             lambda o, name=self.animroot: o.name.lower() == name.lower()
@@ -61,7 +53,6 @@ class Animation():
                 mdl_base,
                 lambda o, name=node.name: o.name.lower() == name.lower()
             )
-            #obj = noderesolver.get_obj(node.name, node.nodeidx)
             if obj:
                 node.create(obj, new_anim, self.length, {"mdlname":mdl_base.name})
                 if options.get("anim_restpose"):

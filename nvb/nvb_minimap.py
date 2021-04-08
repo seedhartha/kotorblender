@@ -24,10 +24,7 @@ def setup_minimap_render(mdlroot, scene, light_color = (1.0, 1.0, 1.0), alpha_mo
             minimapLight = bpy.data.objects.new(lightName , lightData)
         bpy.context.collection.objects.link(minimapLight)
     # Adjust light properties
-    # TODO: rewrite for Blender 2.8
-    #minimapLight.data.use_specular = False
     minimapLight.data.color        = light_color
-    #minimapLight.data.falloff_type = 'CONSTANT'
     minimapLight.data.distance     = (mdlroot.nvb.minimapzoffset+20.0)*2.0
     minimapLight.location.z        = mdlroot.nvb.minimapzoffset+20.0
 
@@ -52,13 +49,6 @@ def setup_minimap_render(mdlroot, scene, light_color = (1.0, 1.0, 1.0), alpha_mo
 
     scene.camera = minimapCam
     # Adjust render settings
-    # TODO: rewrite for Blender 2.8
-    #scene.render.alpha_mode                 = alpha_mode
-    #scene.render.use_antialiasing           = True
-    #scene.render.pixel_filter_type          = 'BOX'
-    #scene.render.antialiasing_samples       = '16'
-    #scene.render.use_shadows                = False
-    #scene.render.use_envmaps                = False
     scene.render.resolution_x               = mdlroot.nvb.minimapsize
     scene.render.resolution_y               = mdlroot.nvb.minimapsize / 2
     scene.render.resolution_percentage      = 100

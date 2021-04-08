@@ -35,7 +35,6 @@ def get_name(s):
     To be able to switch to case sensitive and back
     Still not certain mdl node names are case sensitive
     """
-    #return s.lower()
     return s
 
 

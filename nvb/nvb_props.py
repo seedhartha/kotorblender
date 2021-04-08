@@ -85,9 +85,6 @@ class KB_PG_TEXTURE(bpy.types.PropertyGroup):
         Update list of modified TXI properties
         by testing against default values
         """
-        #print(self)
-        #print(dir(self))
-        #print(dir(context))
         self.modified_properties.clear()
         for tok in nvb_txi.tokens:
             attr_def = KB_PG_TEXTURE.__annotations__[tok][1]
@@ -96,11 +93,6 @@ class KB_PG_TEXTURE(bpy.types.PropertyGroup):
                 default_value = Color(default_value)
             if getattr(self, tok) != default_value:
                 self.modified_properties.add().name = tok
-            #print(getattr(KB_PG_TEXTURE, tok))
-            #print(dir(getattr(KB_PG_TEXTURE, tok)))
-            #print(getattr(KB_PG_TEXTURE, tok)[1])
-            #print(getattr(KB_PG_TEXTURE, tok)[1]['default'])
-            #print(getattr(KB_PG_TEXTURE, tok).default)
 
     # TXI props
     blending : bpy.props.EnumProperty(items=[
@@ -162,14 +154,10 @@ class KB_PG_TEXTURE(bpy.types.PropertyGroup):
     wateralpha : bpy.props.FloatProperty(default=0.0, update=prop_update)
     arturowidth : bpy.props.IntProperty(default=15, update=prop_update)
     arturoheight : bpy.props.IntProperty(default=15, update=prop_update)
-    #arturowidth : bpy.props.BoolProperty(default=False, update=prop_update)
-    #arturoheight : bpy.props.BoolProperty(default=False, update=prop_update)
     forcecyclespeed : bpy.props.FloatProperty(default=0.0, update=prop_update)
     anglecyclespeed : bpy.props.FloatProperty(default=0.0, update=prop_update)
     waterwidth : bpy.props.IntProperty(default=0, update=prop_update)
     waterheight : bpy.props.IntProperty(default=0, update=prop_update)
-    #waterwidth : bpy.props.BoolProperty(default=False, update=prop_update)
-    #waterheight : bpy.props.BoolProperty(default=False, update=prop_update)
     channelscale : bpy.props.IntProperty(default=4, update=prop_update)
     channeltranslate : bpy.props.IntProperty(default=4, update=prop_update)
     distort : bpy.props.BoolProperty(default=False, update=prop_update)
@@ -192,22 +180,14 @@ class KB_PG_TEXTURE(bpy.types.PropertyGroup):
     texturewidth : bpy.props.FloatProperty(default=0.0, update=prop_update)
     spacingR : bpy.props.FloatProperty(default=0.0, update=prop_update)
     spacingB : bpy.props.FloatProperty(default=0.0, update=prop_update)
-    #upperleftcoords         %d %c (list)
-    #lowerrightcoords        %d %c (list)
     upperleftcoords : bpy.props.StringProperty(default="", update=prop_update)
     lowerrightcoords : bpy.props.StringProperty(default="", update=prop_update)
 
 
 def nvb_update_emitter_prop(self, context):
-    # if update == lightning, birthrate = 2^subdiv + 1, render = lightning, lifeExp = 1
-    # if chunk text != '' and text != 'null'/NULL, render = Normal, blend = Normal
-    # if p2p_type, set p2p_sel
     obj = context.object
     if not obj:
         return
-    #if obj.nvb.update != 'Fountain' and \
-    #   obj.nvb.update != 'Single':
-    #    obj.nvb.p2p = False
     if obj.nvb.update == 'Lightning':
         obj.nvb.birthrate = pow(2, obj.nvb.lightningsubdiv) + 1
         obj.nvb.lifeexp = 1
@@ -251,10 +231,6 @@ class KB_PG_anim(bpy.types.PropertyGroup):
         default=7.5, min=0.0, soft_max=60.0)
     root : bpy.props.StringProperty(name='Root', default='', options=set(),
                                     description='Entry point of the animation')
-    # Blender 2.79+ method:
-    #root_obj : bpy.props.PointerProperty(
-    #    name='Root', description='Entry point of the animation',
-    #    type=bpy.types.Object, options=set())#, poll=KB_anim_root_obj_poll)
     root_obj : bpy.props.StringProperty(
         name='Root', description='Entry point of the animation',
         default='unnamed', options=set())
@@ -466,7 +442,7 @@ class KB_PG_OBJECT(bpy.types.PropertyGroup):
     frameend : bpy.props.IntProperty(name="End Frame", description="Frame End", default=0)
     framestart : bpy.props.IntProperty(name="Start Frame", description="Frame Start", default=0)
     grav : bpy.props.FloatProperty(name="Gravity", description="Gravity (m/s²)", default=0.0, min=0.0, unit='ACCELERATION')
-    lifeexp : bpy.props.FloatProperty(name="Lifetime", description="Life Expectancy", default=1.0, min=-1.0)#, update=kb_update_lifeexp_prop)
+    lifeexp : bpy.props.FloatProperty(name="Lifetime", description="Life Expectancy", default=1.0, min=-1.0)
     mass : bpy.props.FloatProperty(name="Mass", description="Mass", default=1.0, min=0.0)
     p2p_bezier2 : bpy.props.FloatProperty(name="Bezier 2", description="???", default=0.0)
     p2p_bezier3 : bpy.props.FloatProperty(name="Bezier 3", description="???", default=0.0)

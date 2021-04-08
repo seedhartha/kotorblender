@@ -69,11 +69,6 @@ class NVB_OT_anim_clone(bpy.types.Operator):
             if mat:
                 self.clone_frames(mat, animStart, animEnd,
                                   cloned_anim.frameStart)
-            # Shape key animations
-            #XXX Aurora animated mesh support
-            #if obj.data and obj.data.shape_keys:
-            #    self.clone_frames(obj.data.shape_keys,
-            #                      animStart, animEnd, cloned_anim.frameStart)
             # Emitter keyframes
             part_sys = obj.particle_systems.active
             if part_sys:
@@ -179,11 +174,6 @@ class NVB_OT_anim_scale(bpy.types.Operator):
             if mat:
                 self.scale_frames(mat, anim.frameStart,
                                   anim.frameEnd, self.scaleFactor)
-            # Adjust the object's shape key animation
-            #XXX Aurora animated mesh support
-            #if obj.data and obj.data.shape_keys:
-            #    self.scale_frames(obj.data.shape_keys, anim.frameStart,
-            #                      anim.frameEnd, self.scaleFactor)
             # Emitter keyframes
             part_sys = obj.particle_systems.active
             if part_sys:
@@ -312,10 +302,6 @@ class NVB_OT_anim_crop(bpy.types.Operator):
             # Material animation
             if obj.active_material:
                 self.crop_frames(obj.active_material, animStart, animEnd)
-            # Shape key animation
-            #XXX Aurora animated mesh support
-            #if obj.data and obj.data.shape_keys:
-            #    self.crop_frames(obj.data.shape_keys, animStart, animEnd)
             # Emitter animation
             part_sys = obj.particle_systems.active
             if part_sys:
@@ -420,10 +406,6 @@ class NVB_OT_anim_pad(bpy.types.Operator):
             # Material animation
             if obj.active_material:
                 self.pad_frames(obj.active_material, frame_start, frame_end)
-            # Shape key animation
-            #XXX Aurora animated mesh support
-            #if obj.data and obj.data.shape_keys:
-            #    self.pad_frames(obj.data.shape_keys, frame_start, frame_end)
             # Emitter animation
             part_sys = obj.particle_systems.active
             if part_sys:
@@ -555,10 +537,6 @@ class NVB_OT_anim_delete(bpy.types.Operator):
             # Material animation
             if obj.active_material:
                 self.delete_frames(obj.active_material, frame_start, frame_end)
-            # Shape key animation
-            #XXX Aurora animated mesh support
-            #if obj.data and obj.data.shape_keys:
-            #    self.delete_frames(obj.data.shape_keys, frame_start, frame_end)
             # Emitter animation
             part_sys = obj.particle_systems.active
             if part_sys:
@@ -632,11 +610,6 @@ class NVB_OT_anim_moveback(bpy.types.Operator):
             mat = obj.active_material
             if mat:
                 self.move_frames(mat, old_start, old_end, start)
-            # Shape key animation
-            #XXX Aurora animated mesh support
-            #if obj.data and obj.data.shape_keys:
-            #    self.move_frames(obj.data.shape_keys,
-            #                     old_start, old_end, start)
             # Emitter animation
             part_sys = obj.particle_systems.active
             if part_sys:
