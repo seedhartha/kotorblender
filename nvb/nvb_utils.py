@@ -96,9 +96,7 @@ def search_node_in_model(obj, test):
 
 
 def is_root_dummy(obj, dummytype = nvb_def.Dummytype.MDLROOT):
-    if not obj:
-        return False
-    return (obj.type == 'EMPTY') and (obj.nvb.dummytype == dummytype)
+    return obj and (obj.type == 'EMPTY') and (obj.nvb.dummytype == dummytype)
 
 
 def get_node_type(obj):
