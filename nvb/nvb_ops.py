@@ -178,57 +178,55 @@ class NVB_OT_skin_bone_ops(bpy.types.Operator):
     model_name : bpy.props.StringProperty()
 
     def execute(self, context):
-        rootdummy = None
-        for o in context.collection.objects:
-            if o.name.lower() == 'rootdummy':
-                rootdummy = o
-                break
+        mdl_root = nvb_utils.get_mdl_root_from_context()
+        if mdl_root:
+            # Begin creating bones from the rootdummy
+            rootdummy = nvb_utils.search_node(mdl_root, lambda o: o.name.lower() == "rootdummy")
+            if rootdummy:
+                # Create armature
+                bpy.ops.object.armature_add()
+                armature_object = context.object
+                armature_object.name = 'Armature_' + self.model_name
+                armature_object.show_in_front = True
 
-        if rootdummy:
-            bpy.ops.object.armature_add()
-            armature_object = context.object
-            armature_object.name = 'Armature_' + self.model_name
-            armature_object.show_in_front = True
+                # Create bones
+                bpy.ops.object.mode_set(mode='EDIT')
+                armature = armature_object.data
+                armature.edit_bones.remove(armature.edit_bones[0])
+                self._create_bones_recursive(armature, rootdummy)
+                bpy.ops.object.mode_set(mode='OBJECT')
 
-            bpy.ops.object.mode_set(mode='EDIT')
-            armature = armature_object.data
-            armature.edit_bones[0].tail = rootdummy.location
-            self._boner(armature, rootdummy, pbone=armature.edit_bones[0])
-            bpy.ops.object.mode_set(mode='OBJECT')
-
-            # Add Armature modifier to all skinmeshes in the active collection
-            for o in context.collection.objects:
-                if o.nvb.meshtype == nvb_def.Meshtype.SKIN:
-                    modifier = o.modifiers.new(name='Armature', type='ARMATURE')
+                # Add Armature modifier to all skinmeshes
+                skinmeshes = nvb_utils.search_node_all(mdl_root, lambda o: o.nvb.meshtype == nvb_def.Meshtype.SKIN)
+                for mesh in skinmeshes:
+                    modifier = mesh.modifiers.new(name='Armature', type='ARMATURE')
                     modifier.object = armature_object
 
         return {'FINISHED'}
 
-    def _boner(self, amt, obj, parent=None, pbone=None):
-        bone = None
+    def _create_bones_recursive(self, armature, obj, parent_bone=None):
+        # Skip Trimeshes whose Render flag is set to True
+        if (obj.type == 'MESH') and obj.nvb.render:
+            return
 
-        if (obj.nvb.meshtype == nvb_def.Meshtype.TRIMESH) and (not obj.nvb.render):
-            bone = amt.edit_bones.new(obj.name)
-            bone.parent = pbone
-            bone.head = obj.matrix_world.to_translation()
-        if bone is None:
-            bone = pbone
+        bone = armature.edit_bones.new(obj.name)
+        bone.parent = parent_bone
+        bone.head = obj.matrix_world.to_translation()
 
         if obj.children:
-            # Place bone tail at the average location of its children
-            bone.tail = [0.0] * 3
-            for c in obj.children:
-                child_loc = c.matrix_world.to_translation()
-                bone.tail += child_loc
-            bone.tail /= len(obj.children)
-        else:
-            # If bone has no children, place its tail away from the parent head
-            direction = (pbone.tail - pbone.head).normalized()
-            mag = nvb_utils.calculate_bounding_box_size(obj)
-            bone.tail = bone.head + mag * direction
+            # If object has children, set bone tail to the average child location
+            bone.tail = Vector([0.0] * 3)
+            for child in obj.children:
+                bone.tail += child.matrix_world.to_translation()
+            bone.tail /= float(len(obj.children))
 
-        for c in obj.children:
-            self._boner(amt, c, obj, bone)
+            # Recursively create bones from child objects
+            for child in obj.children:
+                self._create_bones_recursive(armature, child, bone)
+        else:
+            # If object has no children, place bone tail away from its parent
+            parent_dir = (parent_bone.tail - parent_bone.head).normalized()
+            bone.tail = bone.head + 0.1 * parent_dir
 
 
 class NVB_OT_texture_ops(bpy.types.Operator):

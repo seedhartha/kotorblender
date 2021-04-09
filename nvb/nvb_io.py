@@ -203,7 +203,7 @@ def save_mdl(operator,
         frame_set_current = bpy.context.scene.frame_current
         bpy.context.scene.frame_set(0)
 
-    mdlRoot = nvb_utils.get_mdl_base(scene=bpy.context.scene)
+    mdlRoot = nvb_utils.get_mdl_root_from_context()
     if mdlRoot:
         print("Kotorblender: Exporting " + mdlRoot.name)
         mdl = nvb_mdl.Mdl()

@@ -82,8 +82,8 @@ class Node():
         },
         'orientation': {
             'values': 4,
-            'axes': 3,
-            'objdata': 'rotation_euler',
+            'axes': 4,
+            'objdata': 'rotation_quaternion',
         },
         'scale': {
             'values': 1,
@@ -494,29 +494,15 @@ class Node():
             # one fcurve per 'axis' (xyz, rgb, etc.)
             for x in range(0, key_type['axes']):
                 curves.append(action.fcurves.new(data_path=key_type['objdata'], index=x))
-            if attrname == 'orientation':
-                currEul = None
-                prevEul = None
-                eulVals = []
             # handle each keyframe
             for index, key in enumerate(getattr(self.keys, attrname)):
                 frame = nvb_utils.nwtime2frame(key[0])
-                if attrname == 'orientation':
-                    # orientation is special
-                    eul   = nvb_utils.nwangle2euler(key[1:5])
-                    currEul = nvb_utils.euler_filter(eul, prevEul)
-                    prevEul = currEul
-                    kfs = []
-                    for x in range(0, key_type['axes']):
-                        kfs.append(curves[x].keyframe_points.insert(frame, currEul[x]))
-                        kfs[x].interpolation = 'LINEAR'
-                else:
-                    # handle each axis, matching values to curves
-                    for x in range(0, key_type['axes']):
-                        # handle key/bezierkey for all types in add_keyframe_to_curve
-                        self.add_keyframe_to_curve(
-                            curves[x], getattr(self.keys, attrname), index,
-                            min(x + 1, key_type['values']), key_type['values'])
+                # handle each axis, matching values to curves
+                for x in range(0, key_type['axes']):
+                    # handle key/bezierkey for all types in add_keyframe_to_curve
+                    self.add_keyframe_to_curve(
+                        curves[x], getattr(self.keys, attrname), index,
+                        min(x + 1, key_type['values']), key_type['values'])
         # test for all key types, if present, create timelines for them
         for attrname in self.EMITTER_KEY_TYPE.keys():
             propname = attrname.lower()
@@ -705,7 +691,7 @@ class Node():
                 time = l_round(nvb_utils.frame2nwtime(frame - anim.frameStart), 5)
                 # orientation value conversion
                 if keyname.startswith('orientation'):
-                    key = nvb_utils.euler2nwangle(mathutils.Euler((key[0:3]), 'XYZ'))
+                    key = nvb_utils.quat2nwangle(key[0:4])
                 # export title and
                 line = '      {: .7g}' + (' {: .7g}' * ktype['values'])
                 s = line.format(time, *key[0:ktype['values']])
@@ -1028,28 +1014,10 @@ class Animnode():
         """Creates animations in object actions."""
         def data_conversion(label, obj, vals, options={}):
             if label == 'orientation':
-                if obj.rotation_mode == 'AXIS_ANGLE':
-                    dp = 'rotation_axis_angle'
-                    dp_dim = 4
-                    new_values = [[v[3], v[0], v[1], v[2]] for v in vals]
-                elif obj.rotation_mode == 'QUATERNION':
-                    dp = 'rotation_quaternion'
-                    dp_dim = 4
-                    quats = [mathutils.Quaternion(v[0:3], v[3]) for v in vals]
-                    new_values = [[q.w, q.x, q.y, q.z] for q in quats]
-                else:
-                    dp = 'rotation_euler'
-                    dp_dim = 3
-                    # Run an euler filter
-                    prev_eul = mathutils.Euler()
-                    new_values = []
-                    for v in vals:
-                        quat = mathutils.Quaternion(v[0:3], v[3])
-                        eul = quat.to_euler('XYZ', prev_eul)
-                        #  eul = nvb_utils.euler_filter(quat.to_euler(),
-                        #  prev_eul)
-                        new_values.append(eul)
-                        prev_eul = eul
+                dp = 'rotation_quaternion'
+                dp_dim = 4
+                quats = [mathutils.Quaternion(v[0:3], v[3]) for v in vals]
+                new_values = [[q.w, q.x, q.y, q.z] for q in quats]
             elif label == 'position':
                 #XXX need MDL animation scale here
                 scl = 1.0
@@ -1237,26 +1205,12 @@ class Animnode():
         action = animData.action
         if not action:
             return  # No action = no animation = no need for rest pose
-        if obj.rotation_mode == 'AXIS_ANGLE':
-            dp = 'rotation_axis_angle'
-            fcu = [action.fcurves.find(dp, index=i) for i in range(4)]
-            if fcu.count(None) < 1:
-                rr = obj.nvb.restrot
-                insert_kfp(fcu, frame, [rr[3], rr[0], rr[1], rr[2]], 4)
-        elif obj.rotation_mode == 'QUATERNION':
-            dp = 'rotation_quaternion'
-            fcu = [action.fcurves.find(dp, index=i) for i in range(4)]
-            if fcu.count(None) < 1:
-                rr = obj.nvb.restrot
-                q = mathutils.Quaternion((rr[0], rr[1], rr[2]), rr[3])
-                insert_kfp(fcu, frame, [q.w, q.x, q.y, q.z], 4)
-        else:
-            dp = 'rotation_euler'
-            fcu = [action.fcurves.find(dp, index=i) for i in range(3)]
-            if fcu.count(None) < 1:
-                eul = mathutils.Quaternion(obj.nvb.restrot[:3],
-                                           obj.nvb.restrot[3]).to_euler()
-                insert_kfp(fcu, frame, eul, 3)
+        dp = 'rotation_quaternion'
+        fcu = [action.fcurves.find(dp, index=i) for i in range(4)]
+        if fcu.count(None) < 1:
+            rr = obj.nvb.restrot
+            q = mathutils.Quaternion((rr[0], rr[1], rr[2]), rr[3])
+            insert_kfp(fcu, frame, [q.w, q.x, q.y, q.z], 4)
         fcu = [action.fcurves.find('location', index=i) for i in range(3)]
         if fcu.count(None) < 1:
             insert_kfp(fcu, frame, obj.nvb.restloc, 3)

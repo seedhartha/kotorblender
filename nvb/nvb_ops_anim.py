@@ -16,7 +16,7 @@ class NVB_OT_anim_clone(bpy.types.Operator):
     @classmethod
     def poll(cls, context):
         """Prevent execution if no rootdummy was found."""
-        mdl_base = nvb_utils.get_obj_mdl_base(context.object)
+        mdl_base = nvb_utils.get_mdl_root_from_object(context.object)
         if mdl_base is not None:
             return (len(mdl_base.nvb.animList) > 0)
         return False
@@ -45,7 +45,7 @@ class NVB_OT_anim_clone(bpy.types.Operator):
 
     def execute(self, context):
         """Clone the animation."""
-        mdl_base = nvb_utils.get_obj_mdl_base(context.object)
+        mdl_base = nvb_utils.get_mdl_root_from_object(context.object)
         source_anim = mdl_base.nvb.animList[mdl_base.nvb.animListIdx]
         animStart = source_anim.frameStart
         animEnd = source_anim.frameEnd
@@ -91,7 +91,7 @@ class NVB_OT_anim_scale(bpy.types.Operator):
     @classmethod
     def poll(cls, context):
         """Prevent execution if no rootdummy was found."""
-        mdl_base = nvb_utils.get_obj_mdl_base(context.object)
+        mdl_base = nvb_utils.get_mdl_root_from_object(context.object)
         if mdl_base is not None:
             return (len(mdl_base.nvb.animList) > 0)
         return False
@@ -148,7 +148,7 @@ class NVB_OT_anim_scale(bpy.types.Operator):
 
     def execute(self, context):
         """TODO:DOC."""
-        mdl_base = nvb_utils.get_obj_mdl_base(context.object)
+        mdl_base = nvb_utils.get_mdl_root_from_object(context.object)
         if not nvb_utils.check_anim_bounds(mdl_base):
             self.report({'INFO'}, 'Error: Nested animations.')
             return {'CANCELLED'}
@@ -233,7 +233,7 @@ class NVB_OT_anim_crop(bpy.types.Operator):
     @classmethod
     def poll(cls, context):
         """TODO:DOC."""
-        rootDummy = nvb_utils.get_obj_mdl_base(context.object)
+        rootDummy = nvb_utils.get_mdl_root_from_object(context.object)
         if rootDummy is not None:
             return (len(rootDummy.nvb.animList) > 0)
         return False
@@ -276,7 +276,7 @@ class NVB_OT_anim_crop(bpy.types.Operator):
 
     def execute(self, context):
         """TODO:DOC."""
-        mdl_base = nvb_utils.get_obj_mdl_base(context.object)
+        mdl_base = nvb_utils.get_mdl_root_from_object(context.object)
         if not nvb_utils.check_anim_bounds(mdl_base):
             self.report({'INFO'}, 'Failure: Convoluted animations.')
             return {'CANCELLED'}
@@ -364,7 +364,7 @@ class NVB_OT_anim_pad(bpy.types.Operator):
     @classmethod
     def poll(cls, context):
         """TODO:DOC."""
-        mdl_base = nvb_utils.get_obj_mdl_base(context.object)
+        mdl_base = nvb_utils.get_mdl_root_from_object(context.object)
         if mdl_base is not None:
             return (len(mdl_base.nvb.animList) > 0)
         return False
@@ -386,7 +386,7 @@ class NVB_OT_anim_pad(bpy.types.Operator):
 
     def execute(self, context):
         """TODO:DOC."""
-        mdl_base = nvb_utils.get_obj_mdl_base(context.object)
+        mdl_base = nvb_utils.get_mdl_root_from_object(context.object)
         if not nvb_utils.check_anim_bounds(mdl_base):
             self.report({'INFO'}, 'Failure: Convoluted animations.')
             return {'CANCELLED'}
@@ -454,14 +454,14 @@ class NVB_OT_anim_focus(bpy.types.Operator):
     @classmethod
     def poll(self, context):
         """Prevent execution if animation list is empty."""
-        mdl_base = nvb_utils.get_obj_mdl_base(context.object)
+        mdl_base = nvb_utils.get_mdl_root_from_object(context.object)
         if mdl_base is not None:
             return (len(mdl_base.nvb.animList) > 0)
         return False
 
     def execute(self, context):
         """Set the timeline to this animation."""
-        mdl_base = nvb_utils.get_obj_mdl_base(context.object)
+        mdl_base = nvb_utils.get_mdl_root_from_object(context.object)
         nvb_utils.toggle_anim_focus(context.scene, mdl_base)
         return {'FINISHED'}
 
@@ -475,12 +475,12 @@ class NVB_OT_anim_new(bpy.types.Operator):
     @classmethod
     def poll(self, context):
         """Prevent execution if no object is selected."""
-        mdl_base = nvb_utils.get_obj_mdl_base(context.object)
+        mdl_base = nvb_utils.get_mdl_root_from_object(context.object)
         return (mdl_base is not None)
 
     def execute(self, context):
         """Create the animation"""
-        mdl_base = nvb_utils.get_obj_mdl_base(context.object)
+        mdl_base = nvb_utils.get_mdl_root_from_object(context.object)
         anim = nvb_utils.create_anim_list_item(mdl_base, True)
         anim.root_obj = mdl_base.name
         # Create an unique name
@@ -503,7 +503,7 @@ class NVB_OT_anim_delete(bpy.types.Operator):
     @classmethod
     def poll(self, context):
         """Prevent execution if animation list is empty."""
-        mdl_base = nvb_utils.get_obj_mdl_base(context.object)
+        mdl_base = nvb_utils.get_mdl_root_from_object(context.object)
         if mdl_base is not None:
             return (len(mdl_base.nvb.animList) > 0)
         return False
@@ -521,7 +521,7 @@ class NVB_OT_anim_delete(bpy.types.Operator):
 
     def execute(self, context):
         """Delete the animation."""
-        mdl_base = nvb_utils.get_obj_mdl_base(context.object)
+        mdl_base = nvb_utils.get_mdl_root_from_object(context.object)
         anim_list = mdl_base.nvb.animList
         anim_list_idx = mdl_base.nvb.animListIdx
         anim = anim_list[anim_list_idx]
@@ -557,7 +557,7 @@ class NVB_OT_anim_moveback(bpy.types.Operator):
     @classmethod
     def poll(self, context):
         """Prevent execution if animation list is empty."""
-        mdl_base = nvb_utils.get_obj_mdl_base(context.object)
+        mdl_base = nvb_utils.get_mdl_root_from_object(context.object)
         if mdl_base is not None:
             return (len(mdl_base.nvb.animList) > 1)
         return False
@@ -587,7 +587,7 @@ class NVB_OT_anim_moveback(bpy.types.Operator):
 
     def execute(self, context):
         """Move the animation."""
-        mdl_base = nvb_utils.get_obj_mdl_base(context.object)
+        mdl_base = nvb_utils.get_mdl_root_from_object(context.object)
         if not nvb_utils.check_anim_bounds(mdl_base):
             self.report({'INFO'}, 'Failure: Convoluted animations.')
             return {'CANCELLED'}
@@ -641,14 +641,14 @@ class NVB_OT_anim_move(bpy.types.Operator):
     @classmethod
     def poll(self, context):
         """Prevent execution if animation list has less than 2 elements."""
-        mdl_base = nvb_utils.get_obj_mdl_base(context.object)
+        mdl_base = nvb_utils.get_mdl_root_from_object(context.object)
         if mdl_base is not None:
             return (len(mdl_base.nvb.animList) > 1)
         return False
 
     def execute(self, context):
         """Move an item in the animation list."""
-        mdl_base = nvb_utils.get_obj_mdl_base(context.object)
+        mdl_base = nvb_utils.get_mdl_root_from_object(context.object)
         anim_list = mdl_base.nvb.animList
 
         currentIdx = mdl_base.nvb.animListIdx
@@ -679,7 +679,7 @@ class NVB_OT_anim_event_new(bpy.types.Operator):
     @classmethod
     def poll(self, context):
         """Enable only if there is an animation."""
-        mdl_base = nvb_utils.get_obj_mdl_base(context.object)
+        mdl_base = nvb_utils.get_mdl_root_from_object(context.object)
         if mdl_base is not None:
             anim_list = mdl_base.nvb.animList
             anim_list_idx = mdl_base.nvb.animListIdx
@@ -688,7 +688,7 @@ class NVB_OT_anim_event_new(bpy.types.Operator):
 
     def execute(self, context):
         """Add the new item."""
-        mdl_base = nvb_utils.get_obj_mdl_base(context.object)
+        mdl_base = nvb_utils.get_mdl_root_from_object(context.object)
         anim = mdl_base.nvb.animList[mdl_base.nvb.animListIdx]
 
         eventList = anim.eventList
@@ -711,7 +711,7 @@ class NVB_OT_anim_event_delete(bpy.types.Operator):
     @classmethod
     def poll(self, context):
         """Enable only if the list isn't empty."""
-        mdl_base = nvb_utils.get_obj_mdl_base(context.object)
+        mdl_base = nvb_utils.get_mdl_root_from_object(context.object)
         if mdl_base is not None:
             anim_list = mdl_base.nvb.animList
             anim_list_idx = mdl_base.nvb.animListIdx
@@ -723,7 +723,7 @@ class NVB_OT_anim_event_delete(bpy.types.Operator):
         return False
 
     def execute(self, context):
-        mdl_base = nvb_utils.get_obj_mdl_base(context.object)
+        mdl_base = nvb_utils.get_mdl_root_from_object(context.object)
         anim = mdl_base.nvb.animList[mdl_base.nvb.animListIdx]
         eventList = anim.eventList
         eventIdx = anim.eventListIdx
@@ -748,7 +748,7 @@ class NVB_OT_anim_event_move(bpy.types.Operator):
     @classmethod
     def poll(self, context):
         """Enable only if the list isn't empty."""
-        mdl_base = nvb_utils.get_obj_mdl_base(context.object)
+        mdl_base = nvb_utils.get_mdl_root_from_object(context.object)
         if mdl_base is not None:
             anim_list = mdl_base.nvb.animList
             anim_list_idx = mdl_base.nvb.animListIdx
@@ -760,7 +760,7 @@ class NVB_OT_anim_event_move(bpy.types.Operator):
         return False
 
     def execute(self, context):
-        mdl_base = nvb_utils.get_obj_mdl_base(context.object)
+        mdl_base = nvb_utils.get_mdl_root_from_object(context.object)
         anim = mdl_base.nvb.animList[mdl_base.nvb.animListIdx]
         eventList = anim.eventList
 

@@ -153,39 +153,31 @@ def get_children_recursive(obj, obj_list):
     obj_list.extend(search_node_all(obj, lambda o: o is not None))
 
 
-def is_mdl_base(obj):
-    return is_root_dummy(obj)
-
-
-def get_obj_mdl_base(obj):
-    """
-    Helper following neverblender naming, compatibility layer
-    Get ancestor-or-self MDL root
-    """
+def get_mdl_root_from_object(obj):
     return ancestor_node(obj, is_root_dummy)
 
 
-def get_mdl_base(obj=None, scene=None):
+def get_mdl_root_from_context():
     """
     Method to find the best MDL root dummy based on user intent
     """
-    # Use first selected object as search context if none provided
-    if obj is None:
-        if len(bpy.context.selected_objects):
-            obj = bpy.context.selected_objects[0]
-    # 1. Check the object and its parents
-    match = get_obj_mdl_base(obj)
-    if match:
-        return match
-    # 2. Search 'Empty' objects in the current scene
-    if scene:
-        matches = [m for m in scene.objects if is_mdl_base(m)]
-        if matches:
-            return matches[0]
-    # 3. Search all objects, return first
-    matches = [m for m in bpy.data.objects if is_mdl_base(m)]
+    # 1. Search first selected object, if any
+    if bpy.context.selected_objects:
+        obj = bpy.context.selected_objects[0]
+        match = get_mdl_root_from_object(obj)
+        if match:
+            return match
+
+    # 2. Search Empty objects in the current collection
+    matches = [o for o in bpy.context.collection.objects if is_root_dummy(o)]
     if matches:
         return matches[0]
+
+    # 3. Search all Empty objects
+    matches = [m for m in bpy.data.objects if is_root_dummy(m)]
+    if matches:
+        return matches[0]
+
     return None
 
 
@@ -353,43 +345,13 @@ def is_shagr(vgroup):
 
 
 def set_object_rotation_aurora(obj, nwangle):
-    rotMode = obj.rotation_mode
-    if   rotMode == "QUATERNION":
-        q = mathutils.Quaternion((nwangle[0], nwangle[1], nwangle[2]), nwangle[3])
-        obj.rotation_quaternion = q
-    elif rotMode == "AXIS_ANGLE":
-        obj.rotation_axis_angle = [ auroraRot[3], \
-                                    auroraRot[0], \
-                                    auroraRot[1], \
-                                    auroraRot[2] ]
-    else: # Has to be euler
-        q = mathutils.Quaternion((nwangle[0], nwangle[1], nwangle[2]), nwangle[3])
-        eul = q.to_euler(rotMode)
-        obj.rotation_euler = eul
+    obj.rotation_mode = 'QUATERNION'
+    obj.rotation_quaternion = mathutils.Quaternion((nwangle[0], nwangle[1], nwangle[2]), nwangle[3])
 
 
 def get_aurora_rot_from_object(obj):
-    """
-    Get the rotation from an object as Axis Angle in the format used by NWN
-    NWN uses     [X, Y, Z, Angle]
-    Blender uses [Angle, X, Y, Z]
-    Depending on rotation_mode we have to get the rotation from different
-    attributes
-    """
-    rotMode = obj.rotation_mode
-
-    if   rotMode == "QUATERNION":
-        q = obj.rotation_quaternion
-        return [q.axis[0], q.axis[1], q.axis[0], q.angle]
-    elif rotMode == "AXIS_ANGLE":
-        aa = obj.rotation_axis_angle
-        return [aa[1], aa[2], aa[3], aa[0]]
-    else: # Has to be Euler
-        eul = obj.rotation_euler
-        q   = eul.to_quaternion()
-        return [q.axis[0], q.axis[1], q.axis[2], q.angle]
-
-    return [0.0, 0.0, 0.0, 0.0]
+    q = obj.rotation_quaternion
+    return [q.axis[0], q.axis[1], q.axis[2], q.angle]
 
 
 def get_aurora_rot_from_matrix(matrix):
@@ -425,14 +387,9 @@ def frame2nwtime(frame, fps = nvb_def.fps):
     return round(frame / fps, 7)
 
 
-def euler2nwangle(eul):
-    q = eul.to_quaternion()
-    return [q.axis[0], q.axis[1], q.axis[2], q.angle]
-
-
-def nwangle2euler(nwangle):
-    q = mathutils.Quaternion((nwangle[0], nwangle[1], nwangle[2]), nwangle[3])
-    return q.to_euler()
+def quat2nwangle(quatValues):
+    quat = mathutils.Quaternion(quatValues)
+    return [quat.axis[0], quat.axis[1], quat.axis[2], quat.angle]
 
 
 def copy_anim_scene_check(theOriginal, newSuffix, oldSuffix = ''):

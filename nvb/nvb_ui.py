@@ -73,13 +73,13 @@ class NVB_PT_animlist(bpy.types.Panel):
     @classmethod
     def poll(cls, context):
         """Draw only if part of a valid mdl is selected."""
-        mdl_base = nvb_utils.get_obj_mdl_base(context.object)
+        mdl_base = nvb_utils.get_mdl_root_from_object(context.object)
         return mdl_base is not None
 
     def draw(self, context):
         """Draw the panel."""
         layout = self.layout
-        mdl_base = nvb_utils.get_obj_mdl_base(context.object)
+        mdl_base = nvb_utils.get_mdl_root_from_object(context.object)
         if mdl_base:
             # Display and add/remove animations
             row = layout.row()
