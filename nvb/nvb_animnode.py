@@ -3,7 +3,7 @@ import re
 from math import asin, cos, sqrt
 
 import bpy
-import mathutils
+from mathutils import Quaternion
 
 from . import nvb_def, nvb_parse, nvb_utils
 
@@ -1016,7 +1016,7 @@ class Animnode():
             if label == 'orientation':
                 dp = 'rotation_quaternion'
                 dp_dim = 4
-                quats = [mathutils.Quaternion(v[0:3], v[3]) for v in vals]
+                quats = [Quaternion(v[0:3], v[3]) for v in vals]
                 new_values = [[q.w, q.x, q.y, q.z] for q in quats]
             elif label == 'position':
                 #XXX need MDL animation scale here
@@ -1209,7 +1209,7 @@ class Animnode():
         fcu = [action.fcurves.find(dp, index=i) for i in range(4)]
         if fcu.count(None) < 1:
             rr = obj.nvb.restrot
-            q = mathutils.Quaternion((rr[0], rr[1], rr[2]), rr[3])
+            q = Quaternion((rr[0], rr[1], rr[2]), rr[3])
             insert_kfp(fcu, frame, [q.w, q.x, q.y, q.z], 4)
         fcu = [action.fcurves.find('location', index=i) for i in range(3)]
         if fcu.count(None) < 1:

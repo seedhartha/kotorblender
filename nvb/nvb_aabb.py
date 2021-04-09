@@ -1,4 +1,4 @@
-import mathutils
+from mathutils import Vector
 
 
 def generate_tree(aabb_tree, face_list, rlevel = 0):
@@ -12,9 +12,9 @@ def generate_tree(aabb_tree, face_list, rlevel = 0):
         return
 
     # Calculate Bounding box centers and min/max coordinates
-    bb_min         = mathutils.Vector(( 100000.0,  100000.0,  100000.0))
-    bb_max         = mathutils.Vector((-100000.0, -100000.0, -100000.0))
-    bb_avgcentroid = mathutils.Vector((0.0, 0.0, 0.0))
+    bb_min         = Vector(( 100000.0,  100000.0,  100000.0))
+    bb_max         = Vector((-100000.0, -100000.0, -100000.0))
+    bb_avgcentroid = Vector((0.0, 0.0, 0.0))
     for face in face_list:
         face_vertices = face[1]
         # Every vertex in the face

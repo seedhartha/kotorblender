@@ -3,8 +3,8 @@ import re
 import bmesh
 import bpy
 import bpy_extras.image_utils
-import mathutils
 from bpy_extras.io_utils import unpack_face_list, unpack_list
+from mathutils import Color, Matrix, Vector
 
 from . import (nvb_aabb, nvb_def, nvb_glob, nvb_light, nvb_material, nvb_parse,
                nvb_teximage, nvb_txi, nvb_utils)
@@ -141,14 +141,9 @@ class GeometryNode():
         if obj.parent:
             parent_mw = obj.parent.matrix_world
         else:
-            parent_mw = mathutils.matrix()
+            parent_mw = Matrix()
 
         p_mw_scale = parent_mw.to_scale()
-
-        # scale_m = mathutils.Matrix([[p_mw_scale[0],0,0,0],
-        #                             [0,p_mw_scale[1],0,0],
-        #                             [0,0,p_mw_scale[2],0],
-        #                             [0,0,0            ,1]])
 
         scaled = obj.matrix_local.copy()
         scaled[0][3] = scaled[0][3] * p_mw_scale[0]
@@ -720,7 +715,7 @@ class Trimesh(GeometryNode):
         # Scaling fix
         # TODO: Find out how exactly blender handles scaling, which matrices to use etc
         scale = obj.matrix_world.to_scale()
-        scale_matrix = mathutils.Matrix([[scale[0],0,0,0],
+        scale_matrix = Matrix([[scale[0],0,0,0],
                                          [0,scale[1],0,0],
                                          [0,0,scale[2],0],
                                          [0,0,0       ,1]])
@@ -1448,7 +1443,7 @@ class Emitter(GeometryNode):
                     value = 0
                 elif value == 'Trail':
                     value = 1
-            if isinstance(value, mathutils.Color):
+            if isinstance(value, Color):
                 value = ' '.join(list(map(lambda x: '{:.6g}'.format(x), value)))
             elif isinstance(value, tuple):
                 value = ' '.join(list(map(lambda x: '{:.6g}'.format(x), value)))
@@ -1733,7 +1728,7 @@ class Aabb(Trimesh):
                 v1 = polygon.vertices[1]
                 v2 = polygon.vertices[2]
 
-                centroid = mathutils.Vector((walkmesh.vertices[v0].co + walkmesh.vertices[v1].co + walkmesh.vertices[v2].co)/3)
+                centroid = Vector((walkmesh.vertices[v0].co + walkmesh.vertices[v1].co + walkmesh.vertices[v2].co)/3)
                 faceList.append((faceIdx, [walkmesh.vertices[v0].co, walkmesh.vertices[v1].co, walkmesh.vertices[v2].co], centroid))
                 faceIdx += 1
 
@@ -1744,11 +1739,11 @@ class Aabb(Trimesh):
                 v2 = polygon.vertices[2]
                 v3 = polygon.vertices[3]
 
-                centroid = mathutils.Vector((walkmesh.vertices[v0].co + walkmesh.vertices[v1].co + walkmesh.vertices[v2].co)/3)
+                centroid = Vector((walkmesh.vertices[v0].co + walkmesh.vertices[v1].co + walkmesh.vertices[v2].co)/3)
                 faceList.append((faceIdx, [walkmesh.vertices[v0].co, walkmesh.vertices[v1].co, walkmesh.vertices[v2].co], centroid))
                 faceIdx += 1
 
-                centroid = mathutils.Vector((walkmesh.vertices[v2].co + walkmesh.vertices[v3].co + walkmesh.vertices[v0].co)/3)
+                centroid = Vector((walkmesh.vertices[v2].co + walkmesh.vertices[v3].co + walkmesh.vertices[v0].co)/3)
                 faceList.append((faceIdx, [walkmesh.vertices[v2].co, walkmesh.vertices[v3].co, walkmesh.vertices[v0].co], centroid))
                 faceIdx += 1
             else:
