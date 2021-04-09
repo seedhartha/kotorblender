@@ -50,12 +50,6 @@ def get_real_name(s):
         return None
 
 
-def get_valid_exports(rootDummy, validExports):
-    validExports.append(rootDummy.name)
-    for child in rootDummy.children:
-        get_valid_exports(child, validExports)
-
-
 def ancestor_node(obj, test):
     try:
         if test(obj):
@@ -223,23 +217,6 @@ def get_last_keyframe(root_obj):
     return max(frame_list)
 
 
-def get_frame_interval(obj):
-    """Get the first and last keyed frame of this object and its children."""
-    obj_list = [obj]
-    get_children_recursive(obj, obj_list)
-    max_frame = nvb_def.anim_globstart
-    min_frame = nvb_def.anim_globstart + 1000
-    for o in obj_list:
-        if o.animation_data and o.animation_data.action:
-            action = o.animation_data.action
-            for fcu in action.fcurves:
-                max_frame = max(max([p.co[0] for p in fcu.keyframe_points],
-                                    default=0), max_frame)
-                min_frame = min(min([p.co[0] for p in fcu.keyframe_points],
-                                    default=0), min_frame)
-    return (min_frame, max_frame)
-
-
 def create_anim_list_item(mdl_base, check_keyframes=False):
     """Append a new animation at the and of the animation list."""
     last_frame = max([nvb_def.anim_globstart] +
@@ -305,34 +282,6 @@ def chunker(seq, size):
     return (seq[pos:pos + size] for pos in range(0, len(seq), size))
 
 
-def get_image_filename(image):
-    """
-    Returns the image name without the file extension.
-    """
-    # Try getting the image name from the image source path
-    filename = os.path.splitext(os.path.basename(image.filepath))[0]
-    if (filename == ''):
-        # If that doesn't work, get it from the image name
-        filename = os.path.splitext(os.path.basename(image.name))[0]
-
-    return filename
-
-
-def get_shagr_id(shagrName):
-    return  int(shagrName[-4:])
-
-
-def get_shagr_name(shagrId):
-    return  nvb_def.shagrPrefix + "{0:0>4}".format(shagrId)
-
-
-def is_shagr(vgroup):
-    """
-    Determines wether vertex_group ist a shading group or not
-    """
-    return (nvb_def.shagrPrefix in vgroup.name)
-
-
 def set_object_rotation_aurora(obj, nwangle):
     obj.rotation_mode = 'QUATERNION'
     obj.rotation_quaternion = Quaternion((nwangle[0], nwangle[1], nwangle[2]), nwangle[3])
@@ -340,16 +289,6 @@ def set_object_rotation_aurora(obj, nwangle):
 
 def get_aurora_rot_from_object(obj):
     q = obj.rotation_quaternion
-    return [q.axis[0], q.axis[1], q.axis[2], q.angle]
-
-
-def get_aurora_rot_from_matrix(matrix):
-    """
-    Get the rotation from a 4x4 matrix as Axis Angle in the format used by NWN
-    NWN uses     [X, Y, Z, Angle]
-    Blender uses [Angle, X, Y, Z]
-    """
-    q = matrix.to_quaternion()
     return [q.axis[0], q.axis[1], q.axis[2], q.angle]
 
 
@@ -379,232 +318,6 @@ def frame2nwtime(frame, fps = nvb_def.fps):
 def quat2nwangle(quatValues):
     quat = Quaternion(quatValues)
     return [quat.axis[0], quat.axis[1], quat.axis[2], quat.angle]
-
-
-def copy_anim_scene_check(theOriginal, newSuffix, oldSuffix = ''):
-    """
-    Checks if it possible to copy the object and it's children with the suffix
-    It would be impossible if:
-        - An object with the same name already exists
-        - Object data with the same name already exists
-    """
-    oldName = theOriginal.name
-    newName = 'ERROR'
-    if oldSuffix:
-        if oldName.endswith(oldSuffix):
-            newName = oldName[:len(oldName)-len(oldSuffix)]
-            if newName.endswith('.'):
-                newName = newName[:len(newName)-1]
-        else:
-            newName = oldName.partition('.')[0]
-            if not newName:
-                print("Kotorblender: Unable to generate new name")
-                return False
-        newName = newName + '.' + newSuffix
-    else:
-        newName = oldName + '.' + newSuffix
-
-    if newName in bpy.data.objects:
-        print("Kotorblender: Duplicate object")
-        return False
-
-    objType = theOriginal.type
-    if (objType == 'LIGHT'):
-        if newName in bpy.data.lights:
-            print("Kotorblender: Duplicate light")
-            return False
-    elif (objType == 'MESH'):
-        if theOriginal.animation_data:
-            action = theOriginal.animation_data.action
-            for fcurve in action.fcurves:
-                dataPath = fcurve.data_path
-                if dataPath.endswith('alpha_factor'):
-                    if newName in bpy.data.materials:
-                        print("Kotorblender: Duplicate Material")
-                        return False
-
-        if newName in bpy.data.actions:
-            print("Kotorblender: Duplicate Action")
-            return False
-
-    valid = True
-    for child in theOriginal.children:
-        valid = valid and copy_anim_scene_check(child, newSuffix, oldSuffix)
-
-    return valid
-
-
-def copy_anim_scene(scene, theOriginal, newSuffix, oldSuffix = '', parent = None):
-    """
-    Copy object and all it's children to scene.
-    For object with simple (position, rotation) or no animations we
-    create a linked copy.
-    For alpha animation we'll need to copy the data too.
-    """
-    oldName = theOriginal.name
-    newName = 'ERROR'
-    if oldSuffix:
-        if oldName.endswith(oldSuffix):
-            newName = oldName[:len(oldName)-len(oldSuffix)]
-            if newName.endswith('.'):
-                newName = newName[:len(newName)-1]
-        else:
-            newName = oldName.partition('.')[0]
-            if not newName:
-                return
-        newName = newName + '.' + newSuffix
-    else:
-        newName = oldName + '.' + newSuffix
-
-    theCopy        = theOriginal.copy()
-    theCopy.name   = newName
-    theCopy.parent = parent
-
-    # Do not bring in the unhandled ASCII data for geometry nodes
-    # when cloning for animation
-    if 'rawascii' in theCopy.nvb:
-        theCopy.nvb.rawascii = ''
-
-    # We need to copy the data for:
-    # - Lights
-    # - Meshes & materials when there are alphakeys
-    objType = theOriginal.type
-    if (objType == 'LIGHT'):
-        data         = theOriginal.data.copy()
-        data.name    = newName
-        theCopy.data = data
-    elif (objType == 'MESH'):
-        if theOriginal.animation_data:
-            action = theOriginal.animation_data.action
-            for fcurve in action.fcurves:
-                dataPath = fcurve.data_path
-                if dataPath.endswith('alpha_factor'):
-                    data         = theOriginal.data.copy()
-                    data.name    = newName
-                    theCopy.data = data
-                    # Create a copy of the material
-                    if (theOriginal.active_material):
-                        material      = theOriginal.active_material.copy()
-                        material.name = newName
-                        theCopy.active_material = material
-                        break
-            actionCopy = action.copy()
-            actionCopy.name = newName
-            theCopy.animation_data.action = actionCopy
-
-    # Link copy to the anim scene
-    bpy.context.collection.objects.link(theCopy)
-
-    # Convert all child objects too
-    for child in theOriginal.children:
-        copy_anim_scene(scene, child, newSuffix, oldSuffix, theCopy)
-
-    # Return the copied rootDummy
-    return theCopy
-
-
-def rename_anim_scene(obj, newSuffix, oldSuffix = ''):
-    """
-    Copy object and all it's children to scene.
-    For object with simple (position, rotation) or no animations we
-    create a linked copy.
-    For alpha animation we'll need to copy the data too.
-    """
-    oldName = obj.name
-    newName = 'ERROR'
-    if oldSuffix:
-        if oldName.endswith(oldSuffix):
-            newName = oldName[:len(oldName)-len(oldSuffix)]
-            if newName.endswith('.'):
-                newName = newName[:len(newName)-1]
-        else:
-            newName = oldName.partition('.')[0]
-            if not newName:
-                return
-        newName = newName + '.' + newSuffix
-    else:
-        newName = oldName + '.' + newSuffix
-
-    obj.name = newName
-    if obj.data:
-        obj.data.name = newName
-    # We need to copy the data for:
-    # - Lights
-    # - Meshes & materials when there are alphakeys
-    objType = obj.type
-    if (objType == 'MESH'):
-        if obj.animation_data:
-            action = obj.animation_data.action
-            action.name = newName
-            for fcurve in action.fcurves:
-                dataPath = fcurve.data_path
-                if dataPath.endswith('alpha_factor'):
-                    # Create a copy of the material
-                    if (obj.active_material):
-                        material      = obj.active_material
-                        material.name = newName
-                        break
-
-    # Convert all child objects too
-    for child in obj.children:
-        rename_anim_scene(child, newSuffix, oldSuffix)
-
-    # Return the renamed rootDummy
-    return obj
-
-
-def create_hook_modifiers(obj):
-    skingrName = ''
-    for vg in obj.vertex_groups:
-        if vg.name in bpy.data.objects:
-            mod = obj.modifiers.new(vg.name + '.skin', 'HOOK')
-            mod.object = bpy.data.objects[vg.name]
-            mod.vertex_group = vg
-
-
-def euler_filter(currEul, prevEul):
-
-    def distance(a, b):
-        return abs(a[0] - b[0]) + abs(a[1] - b[1]) + abs(a[2] - b[2])
-
-    def flip(e):
-        f = e.copy()
-        f[0] += math.pi
-        f[1] *= -1
-        f[1] += math.pi
-        f[2] += math.pi
-        return f
-
-    def flip_diff(a, b):
-        while abs(a - b) > math.pi:
-            if a < b:
-                b -= 2 * math.pi
-            else:
-                b += 2 * math.pi
-        return b
-
-    if not prevEul:
-        # Nothing to compare to, return original value
-        return currEul
-
-    eul = currEul.copy()
-    eul[0] = flip_diff(prevEul[0], eul[0])
-    eul[1] = flip_diff(prevEul[1], eul[1])
-    eul[2] = flip_diff(prevEul[2], eul[2])
-
-    # Flip current euler
-    flipEul = flip(eul)
-    flipEul[0] = flip_diff(prevEul[0], flipEul[0])
-    flipEul[1] = flip_diff(prevEul[1], flipEul[1])
-    flipEul[2] = flip_diff(prevEul[2], flipEul[2])
-
-    currDist = distance(prevEul, eul)
-    flipDist = distance(prevEul, flipEul)
-
-    if flipDist < currDist:
-        return flipEul
-    else:
-        return eul
 
 
 def float_to_byte(val):
@@ -637,13 +350,3 @@ def get_mdl_root(obj):
         return None
 
     return get_mdl_root(obj.parent)
-
-
-def calculate_bounding_box_size(obj):
-    bbmin = Vector([sys.float_info.max] * 3)
-    bbmax = Vector([sys.float_info.min] * 3)
-    for co in obj.bound_box:
-        for i in range(3):
-            if co[i] < bbmin[i]: bbmin[i] = co[i]
-            if co[i] > bbmax[i]: bbmax[i] = co[i]
-    return bbmax - bbmin
