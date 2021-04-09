@@ -855,14 +855,6 @@ class Animnode():
         self.emitter_data = dict()
         self.object_data = dict()
 
-        # Animesh Data
-        self.sampleperiod = 0.0
-        self.animtverts = []
-        self.animverts = []
-
-        self.uvdata = False  # Animmesh, uv animations present
-        self.shapedata = False  # Animmesh, vertex animations present
-
     def __bool__(self):
         """Return false if the node is empty, i.e. no anims attached."""
         return self.object_data or self.emitter_data
@@ -943,21 +935,6 @@ class Animnode():
                 return
             elif label == 'parent':
                 self.parentName = nvb_utils.str2identifier(line[1])
-            # Animeshes
-            elif label == 'sampleperiod':
-                self.sampleperiod = float(line[1])
-            elif label == 'animverts':
-                if not self.animverts:
-                    valcnt = int(line[1])
-                    self.animverts = [list(map(float, v))
-                                      for v in ascii_lines[i+1:i+valcnt+1]]
-                    self.shapedata = True
-            elif label == 'animtverts':
-                if not self.animtverts:
-                    valcnt = int(line[1])
-                    self.animtverts = [list(map(float, v))
-                                       for v in ascii_lines[i+1:i+valcnt+1]]
-                    self.uvdata = True
             else:  # Check for keys
                 key_name = label
                 key_is_single = True
@@ -1059,7 +1036,6 @@ class Animnode():
 
     def create_data_emitter(self, obj, anim, options={}):
         """Creates animations in emitter actions."""
-
         fps = nvb_def.fps
         frame_start = anim.frameStart
         action = nvb_utils.get_action(obj, options['mdlname'] + '.' + obj.name)
@@ -1070,125 +1046,6 @@ class Animnode():
             dp_dim = data_dim
             Animnode.insert_kfp(frames, values, action, dp, dp_dim,
                                 'Odyssey Emitter')
-
-    def create_data_shape(self, obj, anim, animlength, options={}):
-        """Import animated vertices as shapekeys."""
-        fps = nvb_def.fps
-        if not obj.data:
-            return
-        # Sanity check: Sample period can't be 0
-        if self.sampleperiod < 0.001:
-            return
-        # Sanity check: animation length has to be a multiple of
-        #               sampleperiod
-        if animlength % self.sampleperiod > 0.0:
-            return
-        numSamples = int(animlength / self.sampleperiod) + 1
-        # Sanity check: Number of animtverts = number verts * numSamples
-        numVerts = len(obj.data.vertices)
-        if (len(self.animverts) != numVerts * numSamples):
-            print("NeverBlender: WARNING - animvert sample size mismatch: " +
-                  obj.name)
-            return
-        sampleDistance = fps * self.sampleperiod
-        # Get the shape key name
-        if obj.nvb.aurorashapekey:
-            shapekeyname = obj.nvb.aurorashapekey
-        else:
-            shapekeyname = nvb_def.shapekeyname
-        # Create a basis shapekey
-        obj.shape_key_add(name='basis', from_mix=False)
-        # Get or create the shape key to hold the animation
-        if obj.data.shape_keys and \
-           shapekeyname in obj.data.shape_keys.key_blocks:
-            keyBlock = obj.data.shape_keys.key_blocks[shapekeyname]
-        else:
-            keyBlock = obj.shape_key_add(name=shapekeyname,
-                                         from_mix=False)
-            keyBlock.value = 1.0
-            obj.active_shape_key_index = 1
-            obj.nvb.aurorashapekey = keyBlock.name
-        # Get animation data, create it if necessary
-        animData = obj.data.shape_keys.animation_data
-        if not animData:
-            animData = obj.data.shape_keys.animation_data_create()
-        # Get action, create one if necessary
-        action = animData.action
-        if not action:
-            action = bpy.data.actions.new(name=obj.name)
-            action.use_fake_user = True
-            animData.action = action
-        # Insert keyframes
-        # We need to create three curves for each vert, one for each coordinate
-        kfOptions = {'FAST'}
-        frameStart = anim.frameStart
-        dpPrefix = 'key_blocks["' + keyBlock.name + '"].data['
-        for vertIdx in range(numVerts):
-            dp = dpPrefix + str(vertIdx) + '].co'
-            curveX = nvb_utils.get_fcurve(action, dp, 0)
-            curveY = nvb_utils.get_fcurve(action, dp, 1)
-            curveZ = nvb_utils.get_fcurve(action, dp, 2)
-            samples = self.animverts[vertIdx::numVerts]
-            for sampleIdx, co in enumerate(samples):
-                frame = frameStart + (sampleIdx * sampleDistance)
-                curveX.keyframe_points.insert(frame, co[0], options=kfOptions)
-                curveY.keyframe_points.insert(frame, co[1], options=kfOptions)
-                curveZ.keyframe_points.insert(frame, co[2], options=kfOptions)
-
-    def create_data_uv(self, obj, anim, animlength, options={}):
-        """Import animated texture coordinates."""
-        fps = options.scene.render.fps
-        if not obj.data:
-            return
-        if not obj.data.uv_layers.active:
-            return
-        uvlayer = obj.data.uv_layers.active
-        # Check if the original uv/tvert order was saved
-        if obj.data.name not in nvb_def.tvert_order:
-            return
-        tvert_order = [v for sl in nvb_def.tvert_order[obj.data.name]
-                       for v in sl]
-        # Sanity check: Sample period can't be 0
-        if self.sampleperiod <= 0.00001:
-            return
-        # Sanity check: animation length has to be a multiple of
-        #               sampleperiod
-        if animlength % self.sampleperiod > 0.0:
-            return
-        numSamples = int(animlength / self.sampleperiod) + 1
-        # Sanity check: Number of animtverts = number tverts * numSamples
-        numTVerts = len(tvert_order)
-        if (len(self.animtverts) != numTVerts * numSamples):
-            print("NeverBlender: WARNING - animtvert sample size mismatch: " +
-                  obj.name)
-            return
-        sampleDistance = fps * self.sampleperiod
-
-        # Get animation data, create it if necessary
-        animData = obj.data.animation_data
-        if not animData:
-            animData = obj.data.animation_data_create()
-        # Get action, create one if necessary
-        action = animData.action
-        if not action:
-            action = bpy.data.actions.new(name=obj.name)
-            action.use_fake_user = True
-            animData.action = action
-        # Insert keyframes
-        # We need to create two curves for each uv, one for each coordinate
-        kfOptions = {'FAST'}
-        frameStart = anim.frameStart
-        dpPrefix = 'uv_layers["' + uvlayer.name + '"].data['
-        # uvIdx = order in blender, tvertIdx = order in mdl
-        for uvIdx, tvertIdx in enumerate(tvert_order):
-            dp = dpPrefix + str(uvIdx) + '].uv'
-            curveU = nvb_utils.get_fcurve(action, dp, 0)
-            curveV = nvb_utils.get_fcurve(action, dp, 1)
-            samples = self.animtverts[tvertIdx::numTVerts]
-            for sampleIdx, co in enumerate(samples):
-                frame = frameStart + (sampleIdx * sampleDistance)
-                curveU.keyframe_points.insert(frame, co[0], options=kfOptions)
-                curveV.keyframe_points.insert(frame, co[1], options=kfOptions)
 
     @staticmethod
     def create_restpose(obj, frame=1):
@@ -1223,10 +1080,6 @@ class Animnode():
             self.create_data_object(obj, anim, options)
         if self.emitter_data:
             self.create_data_emitter(obj, anim, options)
-        if self.uvdata:
-            self.create_data_uv(obj, anim, animlength, options)
-        if self.shapedata:
-            self.create_data_shape(obj, anim, animlength, options)
 
     @staticmethod
     def generate_ascii(obj, anim, asciiLines, options={}):
