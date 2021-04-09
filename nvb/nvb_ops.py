@@ -182,7 +182,7 @@ class KB_OT_skin_bone_ops(bpy.types.Operator):
             rootdummy = nvb_utils.search_node(mdl_root, lambda o: o.name.lower() == "rootdummy")
             if rootdummy:
                 # (Re)create armature
-                armature_name = 'Armature_'+mdl_root.nvb.name
+                armature_name = 'Armature_'+mdl_root.name
                 if armature_name in bpy.data.armatures:
                     armature = bpy.data.armatures[armature_name]
                     bpy.data.armatures.remove(armature)
