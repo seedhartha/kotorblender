@@ -57,7 +57,7 @@ class KB_MT_animlist_specials(bpy.types.Menu):
                         icon='NODETREE')
 
 
-class NVB_PT_animlist(bpy.types.Panel):
+class KB_PT_animlist(bpy.types.Panel):
     """Property panel for animationslist.
 
     Property panel for additional properties needed for the mdl file
@@ -135,7 +135,7 @@ class NVB_PT_animlist(bpy.types.Panel):
             layout.separator()
 
 
-class NVB_PT_smoothgroups(bpy.types.Panel):
+class KB_PT_smoothgroups(bpy.types.Panel):
     bl_label = "Smoothgroups"
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
@@ -237,7 +237,7 @@ class NVB_PT_smoothgroups(bpy.types.Panel):
         row.operator_enum('nvb.smoothgroup_generate', 'action')
 
 
-class NVB_UL_lightflares(bpy.types.UIList):
+class KB_UL_lightflares(bpy.types.UIList):
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
 
         custom_icon = 'NONE'
@@ -251,7 +251,7 @@ class NVB_UL_lightflares(bpy.types.UIList):
             layout.label('', icon = custom_icon)
 
 
-class NVB_PT_empty(bpy.types.Panel):
+class KB_PT_empty(bpy.types.Panel):
     """
     Property panel for additional properties needed for the mdl file
     format. This is only available for EMPTY objects.
@@ -276,56 +276,55 @@ class NVB_PT_empty(bpy.types.Panel):
 
         # Display properties depending on type of the empty
         if (obj.nvb.dummytype == nvb_def.Dummytype.MDLROOT):
-            if not obj.nvb.isanimation:
-                row = layout.row()
-                box = row.box()
-                split = box.split()
-                col = split.column()
-                col.label(text = 'Classification:')
-                col.label(text = 'Supermodel:')
-                col.label(text = 'Ignore Fog:')
-                col.label(text = 'Animation Scale:')
-                if obj.nvb.classification == nvb_def.Classification.CHARACTER:
-                    col.label(text = 'Head Model:')
-                col = split.column()
-                col.prop(obj.nvb, 'classification', text = '')
-                col.prop(obj.nvb, 'supermodel', text = '')
-                col.prop(obj.nvb, 'ignorefog', text = '')
-                col.prop(obj.nvb, 'animscale', text = '')
-                if obj.nvb.classification == nvb_def.Classification.CHARACTER:
-                    col.prop(obj.nvb, 'headlink', text = '')
+            row = layout.row()
+            box = row.box()
+            split = box.split()
+            col = split.column()
+            col.label(text = 'Classification:')
+            col.label(text = 'Supermodel:')
+            col.label(text = 'Ignore Fog:')
+            col.label(text = 'Animation Scale:')
+            if obj.nvb.classification == nvb_def.Classification.CHARACTER:
+                col.label(text = 'Head Model:')
+            col = split.column()
+            col.prop(obj.nvb, 'classification', text = '')
+            col.prop(obj.nvb, 'supermodel', text = '')
+            col.prop(obj.nvb, 'ignorefog', text = '')
+            col.prop(obj.nvb, 'animscale', text = '')
+            if obj.nvb.classification == nvb_def.Classification.CHARACTER:
+                col.prop(obj.nvb, 'headlink', text = '')
 
-                sep = layout.separator()
+            sep = layout.separator()
 
-                # Minimap Helper.
-                # TODO: uncomment when compatible with Blender 2.8
-                '''
-                row = layout.row()
-                box = row.box()
-                box.label(text = 'Minimap Helper')
-                row = box.row()
-                row.prop(obj.nvb, 'minimapzoffset', text = 'z Offset')
-                row = box.row()
-                row.prop(obj.nvb, 'minimapsize', text = 'Minimap size')
-                row = box.row()
-                row.operator('nvb.render_minimap', text = 'Render Minimap', icon='NONE')
-                '''
+            # Minimap Helper.
+            # TODO: uncomment when compatible with Blender 2.8
+            '''
+            row = layout.row()
+            box = row.box()
+            box.label(text = 'Minimap Helper')
+            row = box.row()
+            row.prop(obj.nvb, 'minimapzoffset', text = 'z Offset')
+            row = box.row()
+            row.prop(obj.nvb, 'minimapsize', text = 'Minimap size')
+            row = box.row()
+            row.operator('nvb.render_minimap', text = 'Render Minimap', icon='NONE')
+            '''
 
-                # All Children Settings Helper
-                row = layout.row()
-                box = row.box()
-                box.label(text="Child Node Settings")
-                row = box.row()
-                row.label(text="Smoothgroups")
-                row = box.row()
-                op = row.operator('nvb.children_smoothgroup', text="Direct")
-                op.action = 'DRCT'
-                op = row.operator('nvb.children_smoothgroup', text="Auto")
-                op.action = 'AUTO'
-                op = row.operator('nvb.children_smoothgroup', text="Single")
-                op.action = 'SING'
-                op = row.operator('nvb.children_smoothgroup', text="Separate")
-                op.action = 'SEPR'
+            # All Children Settings Helper
+            row = layout.row()
+            box = row.box()
+            box.label(text="Child Node Settings")
+            row = box.row()
+            row.label(text="Smoothgroups")
+            row = box.row()
+            op = row.operator('nvb.children_smoothgroup', text="Direct")
+            op.action = 'DRCT'
+            op = row.operator('nvb.children_smoothgroup', text="Auto")
+            op.action = 'AUTO'
+            op = row.operator('nvb.children_smoothgroup', text="Single")
+            op.action = 'SING'
+            op = row.operator('nvb.children_smoothgroup', text="Separate")
+            op.action = 'SEPR'
 
         elif (obj.nvb.dummytype == nvb_def.Dummytype.PWKROOT):
             pass
@@ -352,7 +351,7 @@ class NVB_PT_empty(bpy.types.Panel):
             row.prop(obj.nvb, 'dummysubtype')
 
 
-class NVB_PT_light(bpy.types.Panel):
+class KB_PT_light(bpy.types.Panel):
     """
     Property panel for additional light properties. This
     holds all properties not supported by blender at the moment,
@@ -412,7 +411,7 @@ class NVB_PT_light(bpy.types.Panel):
         sub.prop(obj.nvb, 'flareradius', text='Radius')
         row = box.row()
         row.active = obj.nvb.lensflares
-        row.template_list('NVB_UL_lightflares', 'The_List', obj.nvb, 'flareList', obj.nvb, 'flareListIdx')
+        row.template_list('KB_UL_lightflares', 'The_List', obj.nvb, 'flareList', obj.nvb, 'flareListIdx')
         col = row.column(align = True)
         col.operator('nvb.lightflare_new', icon='ADD', text = '')
         col.operator('nvb.lightflare_delete', icon='REMOVE', text = '')
@@ -433,7 +432,7 @@ class NVB_PT_light(bpy.types.Panel):
             row.prop(item, 'position')
 
 
-class NVB_PT_texture(bpy.types.Panel):
+class KB_PT_texture(bpy.types.Panel):
     """Texture properties panel, mostly for managing TXI files"""
     bl_label = 'Odyssey Texture Properties'
     bl_space_type = 'PROPERTIES'
@@ -575,7 +574,7 @@ class NVB_PT_texture(bpy.types.Panel):
             box.prop(texture.nvb, 'spacingR')
             box.prop(texture.nvb, 'spacingB')
 
-class NVB_PT_emitter(bpy.types.Panel):
+class KB_PT_emitter(bpy.types.Panel):
     """
     Property panel for additional properties needed for the mdl file
     format. This is only available for particle systems.
@@ -921,7 +920,7 @@ class NVB_PT_emitter(bpy.types.Panel):
         box = parent_box
 
 
-class NVB_PT_mesh(bpy.types.Panel):
+class KB_PT_mesh(bpy.types.Panel):
     """
     Property panel for additional mesh properties. This
     holds all properties not supported by blender at the moment,
@@ -1063,7 +1062,7 @@ class KB_UL_path_points(bpy.types.UIList):
         layout.prop_search(item, 'point', bpy.data, 'objects')
 
 
-class NVB_PT_path_point(bpy.types.Panel):
+class KB_PT_path_point(bpy.types.Panel):
     bl_label = 'Odyssey Path Point'
     bl_space_type = 'PROPERTIES'
     bl_region_type = 'WINDOW'

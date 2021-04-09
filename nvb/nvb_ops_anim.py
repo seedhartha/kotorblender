@@ -7,7 +7,7 @@ import bpy
 from . import nvb_def, nvb_utils
 
 
-class NVB_OT_anim_clone(bpy.types.Operator):
+class KB_OT_anim_clone(bpy.types.Operator):
     """Clone animation and add it to the animation list"""
 
     bl_idname = 'kb.anim_clone'
@@ -77,7 +77,7 @@ class NVB_OT_anim_clone(bpy.types.Operator):
         return {'FINISHED'}
 
 
-class NVB_OT_anim_scale(bpy.types.Operator):
+class KB_OT_anim_scale(bpy.types.Operator):
     """Open a dialog to scale the length of a single animation"""
 
     bl_idname = 'kb.anim_scale'
@@ -209,7 +209,7 @@ class NVB_OT_anim_scale(bpy.types.Operator):
         return wm.invoke_props_dialog(self)
 
 
-class NVB_OT_anim_crop(bpy.types.Operator):
+class KB_OT_anim_crop(bpy.types.Operator):
     """Open a dialog to crop a single animation"""
 
     bl_idname = 'kb.anim_crop'
@@ -335,7 +335,7 @@ class NVB_OT_anim_crop(bpy.types.Operator):
         return wm.invoke_props_dialog(self)
 
 
-class NVB_OT_anim_pad(bpy.types.Operator):
+class KB_OT_anim_pad(bpy.types.Operator):
     """Open a dialog to pad a single animation"""
 
     bl_idname = 'kb.anim_pad'
@@ -429,7 +429,7 @@ class NVB_OT_anim_pad(bpy.types.Operator):
         return wm.invoke_props_dialog(self)
 
 
-class NVB_OT_anim_focus(bpy.types.Operator):
+class KB_OT_anim_focus(bpy.types.Operator):
     """Set the Start and end frames of the timeline"""
 
     bl_idname = 'kb.anim_focus'
@@ -450,7 +450,7 @@ class NVB_OT_anim_focus(bpy.types.Operator):
         return {'FINISHED'}
 
 
-class NVB_OT_anim_new(bpy.types.Operator):
+class KB_OT_anim_new(bpy.types.Operator):
     """Add a new animation to the animation list"""
 
     bl_idname = 'kb.anim_new'
@@ -478,7 +478,7 @@ class NVB_OT_anim_new(bpy.types.Operator):
         return {'FINISHED'}
 
 
-class NVB_OT_anim_delete(bpy.types.Operator):
+class KB_OT_anim_delete(bpy.types.Operator):
     """Delete the selected animation and its keyframes"""
 
     bl_idname = 'kb.anim_delete'
@@ -532,7 +532,7 @@ class NVB_OT_anim_delete(bpy.types.Operator):
         return {'FINISHED'}
 
 
-class NVB_OT_anim_moveback(bpy.types.Operator):
+class KB_OT_anim_moveback(bpy.types.Operator):
     """Move an animation and its keyframes to the end of the animation list"""
 
     bl_idname = 'kb.anim_moveback'
@@ -612,7 +612,7 @@ class NVB_OT_anim_moveback(bpy.types.Operator):
         return {'FINISHED'}
 
 
-class NVB_OT_anim_move(bpy.types.Operator):
+class KB_OT_anim_move(bpy.types.Operator):
     """Move an item in the animation list, without affecting keyframes"""
 
     bl_idname = 'kb.anim_move'
@@ -653,7 +653,7 @@ class NVB_OT_anim_move(bpy.types.Operator):
         return {'FINISHED'}
 
 
-class NVB_OT_anim_event_new(bpy.types.Operator):
+class KB_OT_anim_event_new(bpy.types.Operator):
     """Add a new item to the event list"""
 
     bl_idname = 'kb.anim_event_new'
@@ -685,7 +685,7 @@ class NVB_OT_anim_event_new(bpy.types.Operator):
         return {'FINISHED'}
 
 
-class NVB_OT_anim_event_delete(bpy.types.Operator):
+class KB_OT_anim_event_delete(bpy.types.Operator):
     """Delete the selected item from the event list"""
 
     bl_idname = 'kb.anim_event_delete'
@@ -719,7 +719,7 @@ class NVB_OT_anim_event_delete(bpy.types.Operator):
         return {'FINISHED'}
 
 
-class NVB_OT_anim_event_move(bpy.types.Operator):
+class KB_OT_anim_event_move(bpy.types.Operator):
     """Move an item in the event list"""
 
     bl_idname = 'kb.anim_event_move'
@@ -764,7 +764,7 @@ class NVB_OT_anim_event_move(bpy.types.Operator):
         return {'FINISHED'}
 
 
-class NVB_OT_amt_event_new(bpy.types.Operator):
+class KB_OT_amt_event_new(bpy.types.Operator):
     """Add a new event to the event list"""
 
     bl_idname = 'kb.amt_event_new'
@@ -799,7 +799,7 @@ class NVB_OT_amt_event_new(bpy.types.Operator):
         return {'FINISHED'}
 
 
-class NVB_OT_amt_event_delete(bpy.types.Operator):
+class KB_OT_amt_event_delete(bpy.types.Operator):
     """Delete the selected event and its keyframes"""
 
     bl_idname = 'kb.amt_event_delete'
