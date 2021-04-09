@@ -82,7 +82,7 @@ def _load_mdl(filepath, position = (0.0, 0.0, 0.0)):
 
     # Optionally, create an armature from bone nodes
     if nvb_glob.createArmature:
-        bpy.ops.nvb.armature('EXEC_DEFAULT')
+        bpy.ops.kb.armature('EXEC_DEFAULT')
 
 
 def load_mdl(operator,
