@@ -82,16 +82,16 @@ def menu_func_export_pth(self, context):
 
 
 classes = (
-    nvb_props.KB_PG_OBJECT.PathConnection,
-    nvb_props.KB_PG_TEXTURE.PropListItem,
+    nvb_props.ObjectPropertyGroup.PathConnection,
+    nvb_props.TexturePropertyGroup.PropListItem,
 
     # Property Groups
 
-    nvb_props.KB_PG_animevent,
-    nvb_props.KB_PG_anim,
-    nvb_props.KB_PG_FLARE,
-    nvb_props.KB_PG_OBJECT,
-    nvb_props.KB_PG_TEXTURE,
+    nvb_props.AnimEventPropertyGroup,
+    nvb_props.AnimPropertyGroup,
+    nvb_props.FlarePropertyGroup,
+    nvb_props.ObjectPropertyGroup,
+    nvb_props.TexturePropertyGroup,
 
     # Operators
 
@@ -170,8 +170,8 @@ def register():
     for cls in classes:
         bpy.utils.register_class(cls)
 
-    bpy.types.Object.nvb = bpy.props.PointerProperty(type=nvb_props.KB_PG_OBJECT)
-    bpy.types.ImageTexture.nvb = bpy.props.PointerProperty(type=nvb_props.KB_PG_TEXTURE)
+    bpy.types.Object.nvb = bpy.props.PointerProperty(type=nvb_props.ObjectPropertyGroup)
+    bpy.types.ImageTexture.nvb = bpy.props.PointerProperty(type=nvb_props.TexturePropertyGroup)
 
     bpy.types.TOPBAR_MT_file_import.append(menu_func_import_mdl)
     bpy.types.TOPBAR_MT_file_import.append(menu_func_import_lyt)
