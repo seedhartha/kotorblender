@@ -97,7 +97,6 @@ class NVB_OT_anim_scale(bpy.types.Operator):
         return False
 
     def scale_frames_up(self, target, animStart, animEnd, scaleFactor):
-        """TODO:DOC."""
         if target.animation_data and target.animation_data.action:
             size_old = animEnd - animStart
             padding = (scaleFactor * size_old) - size_old
@@ -122,7 +121,6 @@ class NVB_OT_anim_scale(bpy.types.Operator):
                 fcurve.update()
 
     def scale_frames_down(self, target, animStart, animEnd, scaleFactor):
-        """TODO:DOC."""
         if target.animation_data and target.animation_data.action:
             for fcurve in target.animation_data.action.fcurves:
                     # Scale the animation down first
@@ -139,7 +137,6 @@ class NVB_OT_anim_scale(bpy.types.Operator):
                     fcurve.update()
 
     def scale_frames(self, target, animStart, animEnd, scaleFactor):
-        """TODO:DOC."""
         if target.animation_data and target.animation_data.action:
             if scaleFactor > 1.0:
                 self.scale_frames_up(target, animStart, animEnd, scaleFactor)
@@ -147,7 +144,6 @@ class NVB_OT_anim_scale(bpy.types.Operator):
                 self.scale_frames_down(target, animStart, animEnd, scaleFactor)
 
     def execute(self, context):
-        """TODO:DOC."""
         mdl_base = nvb_utils.get_mdl_root_from_object(context.object)
         if not nvb_utils.check_anim_bounds(mdl_base):
             self.report({'INFO'}, 'Error: Nested animations.')
@@ -199,7 +195,6 @@ class NVB_OT_anim_scale(bpy.types.Operator):
         return {'FINISHED'}
 
     def draw(self, context):
-        """TODO:DOC."""
         layout = self.layout
 
         row = layout.row()
@@ -210,7 +205,6 @@ class NVB_OT_anim_scale(bpy.types.Operator):
         layout.separator()
 
     def invoke(self, context, event):
-        """TODO:DOC."""
         wm = context.window_manager
         return wm.invoke_props_dialog(self)
 
@@ -232,14 +226,12 @@ class NVB_OT_anim_crop(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        """TODO:DOC."""
         rootDummy = nvb_utils.get_mdl_root_from_object(context.object)
         if rootDummy is not None:
             return (len(rootDummy.nvb.animList) > 0)
         return False
 
     def crop_frames(self, target, animStart, animEnd):
-        """TODO:DOC."""
         if target.animation_data and target.animation_data.action:
             # Grab some values for speed
             cf = self.cropFront
@@ -275,7 +267,6 @@ class NVB_OT_anim_crop(bpy.types.Operator):
                     pass
 
     def execute(self, context):
-        """TODO:DOC."""
         mdl_base = nvb_utils.get_mdl_root_from_object(context.object)
         if not nvb_utils.check_anim_bounds(mdl_base):
             self.report({'INFO'}, 'Failure: Convoluted animations.')
@@ -327,7 +318,6 @@ class NVB_OT_anim_crop(bpy.types.Operator):
         return {'FINISHED'}
 
     def draw(self, context):
-        """TODO:DOC."""
         layout = self.layout
 
         row = layout.row()
@@ -341,7 +331,6 @@ class NVB_OT_anim_crop(bpy.types.Operator):
         layout.separator()
 
     def invoke(self, context, event):
-        """TODO:DOC."""
         wm = context.window_manager
         return wm.invoke_props_dialog(self)
 
@@ -363,14 +352,12 @@ class NVB_OT_anim_pad(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        """TODO:DOC."""
         mdl_base = nvb_utils.get_mdl_root_from_object(context.object)
         if mdl_base is not None:
             return (len(mdl_base.nvb.animList) > 0)
         return False
 
     def pad_frames(self, target, frame_start, frame_end):
-        """TODO:DOC."""
         if target.animation_data and target.animation_data.action:
             for fcurve in target.animation_data.action.fcurves:
                 for p in reversed(fcurve.keyframe_points):
@@ -385,7 +372,6 @@ class NVB_OT_anim_pad(bpy.types.Operator):
                 fcurve.update()
 
     def execute(self, context):
-        """TODO:DOC."""
         mdl_base = nvb_utils.get_mdl_root_from_object(context.object)
         if not nvb_utils.check_anim_bounds(mdl_base):
             self.report({'INFO'}, 'Failure: Convoluted animations.')
@@ -427,7 +413,6 @@ class NVB_OT_anim_pad(bpy.types.Operator):
         return {'FINISHED'}
 
     def draw(self, context):
-        """TODO:DOC."""
         layout = self.layout
 
         row = layout.row()
@@ -440,7 +425,6 @@ class NVB_OT_anim_pad(bpy.types.Operator):
         layout.separator()
 
     def invoke(self, context, event):
-        """TODO:DOC."""
         wm = context.window_manager
         return wm.invoke_props_dialog(self)
 
