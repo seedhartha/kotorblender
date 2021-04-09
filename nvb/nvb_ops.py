@@ -175,24 +175,25 @@ class KB_OT_skin_bone_ops(bpy.types.Operator):
     bl_label = "Armature Operations"
     bl_options = {'UNDO'}
 
-    model_name : bpy.props.StringProperty()
-
     def execute(self, context):
         mdl_root = nvb_utils.get_mdl_root_from_context()
         if mdl_root:
             # Begin creating bones from the rootdummy
             rootdummy = nvb_utils.search_node(mdl_root, lambda o: o.name.lower() == "rootdummy")
             if rootdummy:
-                # Create armature
-                bpy.ops.object.armature_add()
-                armature_object = context.object
-                armature_object.name = 'Armature_' + self.model_name
+                # (Re)create armature
+                armature_name = 'Armature_'+mdl_root.nvb.name
+                if armature_name in bpy.data.armatures:
+                    armature = bpy.data.armatures[armature_name]
+                    bpy.data.armatures.remove(armature)
+                armature = bpy.data.armatures.new(armature_name)
+                armature_object = bpy.data.objects.new(armature_name, armature)
                 armature_object.show_in_front = True
+                bpy.context.collection.objects.link(armature_object)
 
                 # Create bones
+                bpy.context.view_layer.objects.active = armature_object
                 bpy.ops.object.mode_set(mode='EDIT')
-                armature = armature_object.data
-                armature.edit_bones.remove(armature.edit_bones[0])
                 self._create_bones_recursive(armature, rootdummy)
                 bpy.ops.object.mode_set(mode='OBJECT')
 

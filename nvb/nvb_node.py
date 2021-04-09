@@ -117,6 +117,7 @@ class GeometryNode():
                     self.parsed_lines.append(index)
 
     def set_object_data(self, obj):
+        obj.nvb.name     = self.name
         self.objref = obj.name  # used to resolve naming conflicts
         nvb_utils.set_object_rotation_aurora(obj, self.orientation)
         obj.nvb.restrot   = self.orientation
