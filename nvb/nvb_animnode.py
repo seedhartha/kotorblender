@@ -1219,7 +1219,6 @@ class Animnode():
             insert_kfp(fcu, frame, [obj.nvb.restscl] * 3, 3)
 
     def create(self, obj, anim, animlength, options={}):
-        """TODO:Doc."""
         if self.object_data:
             self.create_data_object(obj, anim, options)
         if self.emitter_data:
