@@ -237,6 +237,7 @@ class ObjectPropertyGroup(bpy.types.PropertyGroup):
     """
 
     # For all objects
+    name      : bpy.props.StringProperty(name = "Name", description = "Name as imported from MDL")
     wirecolor : bpy.props.FloatVectorProperty(name = 'Wirecolor',
                                               description = 'Color of the wireframe',
                                               subtype = 'COLOR_GAMMA',

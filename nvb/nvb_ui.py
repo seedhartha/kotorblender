@@ -237,7 +237,7 @@ class KB_PT_smoothgroups(bpy.types.Panel):
         row.operator_enum('nvb.smoothgroup_generate', 'action')
 
 
-class KB_UL_lightflares(bpy.types.UIList):
+class NVB_UL_lightflares(bpy.types.UIList):
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
 
         custom_icon = 'NONE'
@@ -293,6 +293,9 @@ class KB_PT_empty(bpy.types.Panel):
             col.prop(obj.nvb, 'animscale', text = '')
             if obj.nvb.classification == nvb_def.Classification.CHARACTER:
                 col.prop(obj.nvb, 'headlink', text = '')
+
+            row = box.row()
+            operator = row.operator('nvb.armature', text="Recreate Armature")
 
             sep = layout.separator()
 
@@ -411,7 +414,7 @@ class KB_PT_light(bpy.types.Panel):
         sub.prop(obj.nvb, 'flareradius', text='Radius')
         row = box.row()
         row.active = obj.nvb.lensflares
-        row.template_list('KB_UL_lightflares', 'The_List', obj.nvb, 'flareList', obj.nvb, 'flareListIdx')
+        row.template_list('NVB_UL_lightflares', 'The_List', obj.nvb, 'flareList', obj.nvb, 'flareListIdx')
         col = row.column(align = True)
         col.operator('nvb.lightflare_new', icon='ADD', text = '')
         col.operator('nvb.lightflare_delete', icon='REMOVE', text = '')
