@@ -21,7 +21,7 @@ def nvb_update_shadow_prop(self, context):
         context.object.data.use_shadow = self.shadow != 0
 
 
-class KB_PG_FLARE(bpy.types.PropertyGroup):
+class FlarePropertyGroup(bpy.types.PropertyGroup):
     """
     Properties for a single flare in the flare list
     """
@@ -43,7 +43,7 @@ class KB_PG_FLARE(bpy.types.PropertyGroup):
                                                 soft_min = 0.0, soft_max = 1.0)
 
 
-class KB_PG_TEXTURE(bpy.types.PropertyGroup):
+class TexturePropertyGroup(bpy.types.PropertyGroup):
     """
     This class defines all additional properties needed by the txi file
     format. It hold the properties for image textures.
@@ -71,7 +71,7 @@ class KB_PG_TEXTURE(bpy.types.PropertyGroup):
         """
         self.modified_properties.clear()
         for tok in nvb_txi.tokens:
-            attr_def = KB_PG_TEXTURE.__annotations__[tok][1]
+            attr_def = TexturePropertyGroup.__annotations__[tok][1]
             default_value = attr_def['default']
             if tok == 'specularcolor':
                 default_value = Color(default_value)
@@ -187,7 +187,7 @@ def nvb_update_emitter_prop(self, context):
         obj.nvb.p2p_sel = 0
 
 
-class KB_PG_animevent(bpy.types.PropertyGroup):
+class AnimEventPropertyGroup(bpy.types.PropertyGroup):
     """Properties for a single event in the even list."""
 
     name : bpy.props.StringProperty(name='Name', default='unnamed',
@@ -199,7 +199,7 @@ class KB_PG_animevent(bpy.types.PropertyGroup):
         options=set())
 
 
-class KB_PG_anim(bpy.types.PropertyGroup):
+class AnimPropertyGroup(bpy.types.PropertyGroup):
     """Properties for a single animation in the animation list."""
 
     name : bpy.props.StringProperty(name='Name',
@@ -225,12 +225,12 @@ class KB_PG_anim(bpy.types.PropertyGroup):
     frameEnd : bpy.props.IntProperty(name='End', default=0, options=set(),
                                      description='Animation End', min=0)
 
-    eventList : bpy.props.CollectionProperty(type=KB_PG_animevent)
+    eventList : bpy.props.CollectionProperty(type=AnimEventPropertyGroup)
     eventListIdx : bpy.props.IntProperty(name='Index for event List',
                                          default=0, options=set())
 
 
-class KB_PG_OBJECT(bpy.types.PropertyGroup):
+class ObjectPropertyGroup(bpy.types.PropertyGroup):
     """
     This class defines all additional properties needed by the mdl file
     format. It hold the properties for meshes, lights and empties.
@@ -303,7 +303,7 @@ class KB_PG_OBJECT(bpy.types.PropertyGroup):
                                             default = 'NONE')
     animscale   : bpy.props.FloatProperty(name = 'Animationscale', description = 'Animation scale for all animations', default = 1.00, min = 0.0)
     # Animation Data (for separation)
-    animList : bpy.props.CollectionProperty(type=KB_PG_anim)
+    animList : bpy.props.CollectionProperty(type=AnimPropertyGroup)
     animListIdx : bpy.props.IntProperty(name='Index for anim List',
                                         default=0, options=set())
     # For reference emptys
@@ -391,7 +391,7 @@ class KB_PG_OBJECT(bpy.types.PropertyGroup):
     negativelight : bpy.props.BoolProperty(name = 'Negative Light', default = False)
     lensflares    : bpy.props.BoolProperty(name = 'Lensflares', default = False)
     flareradius   : bpy.props.FloatProperty(name = 'Flare Radius', default = 0.0, min = 0.0, max = 100.0)
-    flareList     : bpy.props.CollectionProperty(type = KB_PG_FLARE)
+    flareList     : bpy.props.CollectionProperty(type = FlarePropertyGroup)
     flareListIdx  : bpy.props.IntProperty(name = "Index for flare list", default = 0)
 
     # Point lights in Eevee do not have equivalent for Aurora light multiplier and radius
