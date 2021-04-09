@@ -7,7 +7,7 @@ from . import nvb_def, nvb_io, nvb_material, nvb_txi, nvb_utils
 
 
 class KB_OT_children_smoothgroup(bpy.types.Operator):
-    bl_idname = "nvb.children_smoothgroup"
+    bl_idname = "kb.children_smoothgroup"
     bl_label = "Smoothgroup settings on descendants"
     bl_options = {'UNDO'}
 
@@ -23,7 +23,7 @@ class KB_OT_children_smoothgroup(bpy.types.Operator):
 
 
 class KB_OT_toggle_smoothgroup(bpy.types.Operator):
-    bl_idname = "nvb.smoothgroup_toggle"
+    bl_idname = "kb.smoothgroup_toggle"
     bl_label = "Smoothgroup toggle"
     bl_options = {'UNDO'}
 
@@ -50,7 +50,7 @@ class KB_OT_toggle_smoothgroup(bpy.types.Operator):
 
 
 class KB_OT_generate_smoothgroup(bpy.types.Operator):
-    bl_idname = "nvb.smoothgroup_generate"
+    bl_idname = "kb.smoothgroup_generate"
     bl_label = "Smoothgroup generate"
     bl_options = {'UNDO'}
 
@@ -99,7 +99,7 @@ class KB_OT_generate_smoothgroup(bpy.types.Operator):
 
 
 class KB_OT_select_smoothgroup(bpy.types.Operator):
-    bl_idname = "nvb.smoothgroup_select"
+    bl_idname = "kb.smoothgroup_select"
     bl_label = "Smoothgroup select"
     bl_options = {'UNDO'}
 
@@ -134,7 +134,7 @@ class KB_OT_select_smoothgroup(bpy.types.Operator):
 
 
 class KB_OT_texture_io(bpy.types.Operator):
-    bl_idname = "nvb.texture_info_io"
+    bl_idname = "kb.texture_info_io"
     bl_label = "Texture Info"
     bl_property = 'action'
     bl_options = {'UNDO'}
@@ -154,7 +154,7 @@ class KB_OT_texture_io(bpy.types.Operator):
 
 class KB_OT_texture_box_ops(bpy.types.Operator):
     """ Hide/show Texture Info sub-groups"""
-    bl_idname = "nvb.texture_info_box_ops"
+    bl_idname = "kb.texture_info_box_ops"
     bl_label = "Box Controls"
     bl_description = "Show/hide this property list"
 
@@ -171,7 +171,7 @@ class KB_OT_texture_box_ops(bpy.types.Operator):
 
 
 class KB_OT_skin_bone_ops(bpy.types.Operator):
-    bl_idname = "nvb.armature"
+    bl_idname = "kb.armature"
     bl_label = "Armature Operations"
     bl_options = {'UNDO'}
 
@@ -231,7 +231,7 @@ class KB_OT_skin_bone_ops(bpy.types.Operator):
 
 
 class KB_OT_texture_ops(bpy.types.Operator):
-    bl_idname = "nvb.texture_info_ops"
+    bl_idname = "kb.texture_info_ops"
     bl_label = "Texture Info Operations"
     bl_property = 'action'
     bl_options = {'UNDO'}
@@ -255,7 +255,7 @@ class KB_OT_texture_ops(bpy.types.Operator):
 class KB_OT_new_lightflare(bpy.types.Operator):
     """ Add a new item to the flare list """
 
-    bl_idname = 'nvb.lightflare_new'
+    bl_idname = "kb.lightflare_new"
     bl_label  = 'Add a new flare to a light'
 
     def execute(self, context):
@@ -268,7 +268,7 @@ class KB_OT_new_lightflare(bpy.types.Operator):
 class KB_OT_delete_lightflare(bpy.types.Operator):
     """ Delete the selected item from the flare list """
 
-    bl_idname = 'nvb.lightflare_delete'
+    bl_idname = "kb.lightflare_delete"
     bl_label = 'Deletes a flare from the light'
 
     @classmethod
@@ -290,7 +290,7 @@ class KB_OT_delete_lightflare(bpy.types.Operator):
 class KB_OT_move_lightflare(bpy.types.Operator):
     """ Move an item in the flare list """
 
-    bl_idname = 'nvb.lightflare_move'
+    bl_idname = "kb.lightflare_move"
     bl_label  = 'Move an item in the flare list'
 
     direction : bpy.props.EnumProperty(items=(('UP', 'Up', ''), ('DOWN', 'Down', '')))
@@ -485,7 +485,7 @@ class KB_OT_load_wok_materials(bpy.types.Operator):
     Load all materials for aabb walkmeshes for the selected object. Current
     material slots will be deleted.
     """
-    bl_idname = "nvb.load_wok_mats"
+    bl_idname = "kb.load_wok_mats"
     bl_label  = "Load walkmesh materials"
 
     def execute(self, context):
@@ -525,7 +525,7 @@ class KB_OT_load_wok_materials(bpy.types.Operator):
 
 
 class KB_OT_render_minimap(bpy.types.Operator):
-    bl_idname = "nvb.render_minimap"
+    bl_idname = "kb.render_minimap"
     bl_label  = "Render Minimap"
 
     def execute(self, context):
@@ -552,7 +552,7 @@ class KB_OT_render_minimap(bpy.types.Operator):
 
 
 class KB_OT_add_skingroup(bpy.types.Operator):
-    bl_idname = "nvb.skingroup_add"
+    bl_idname = "kb.skingroup_add"
     bl_label  = "Add new Skingroup"
 
     def execute(self, context):

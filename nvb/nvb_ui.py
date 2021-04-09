@@ -189,10 +189,10 @@ class KB_PT_smoothgroups(bpy.types.Panel):
             if sg[i]:
                 row = layout.row(align=True)
                 row.label("{}: {} faces".format(i + 1, sg[i]))
-                op = row.operator('nvb.smoothgroup_select', text="", icon='EDIT')
+                op = row.operator('kb.smoothgroup_select', text="", icon='EDIT')
                 op.sg_number = i
                 op.action = 'SEL'
-                op = row.operator('nvb.smoothgroup_select', text="", icon='X')
+                op = row.operator('kb.smoothgroup_select', text="", icon='X')
                 op.sg_number = i
                 op.action = 'DESEL'
 
@@ -200,33 +200,33 @@ class KB_PT_smoothgroups(bpy.types.Panel):
         row = layout.row(align=True)
         row.label(text="Toggle")
         row = layout.row(align=True)
-        op = row.operator('nvb.smoothgroup_toggle', text = '1', icon=custom_icon)
+        op = row.operator('kb.smoothgroup_toggle', text = '1', icon=custom_icon)
         op.sg_number = 0
         op.activity = int(sg[1])
-        op = row.operator('nvb.smoothgroup_toggle', text = '2', icon=custom_icon)
+        op = row.operator('kb.smoothgroup_toggle', text = '2', icon=custom_icon)
         op.sg_number = 1
         op.activity = int(sg[2])
-        op = row.operator('nvb.smoothgroup_toggle', text = '3', icon=custom_icon)
+        op = row.operator('kb.smoothgroup_toggle', text = '3', icon=custom_icon)
         op.sg_number = 2
         op.activity = int(sg[3])
         row = layout.row(align=True)
-        op = row.operator('nvb.smoothgroup_toggle', text = '4', icon=custom_icon)
+        op = row.operator('kb.smoothgroup_toggle', text = '4', icon=custom_icon)
         op.sg_number = 3
         op.activity = int(sg[4])
-        op = row.operator('nvb.smoothgroup_toggle', text = '5', icon=custom_icon)
+        op = row.operator('kb.smoothgroup_toggle', text = '5', icon=custom_icon)
         op.sg_number = 4
         op.activity = int(sg[5])
-        op = row.operator('nvb.smoothgroup_toggle', text = '6', icon=custom_icon)
+        op = row.operator('kb.smoothgroup_toggle', text = '6', icon=custom_icon)
         op.sg_number = 5
         op.activity = int(sg[6])
         row = layout.row(align=True)
-        op = row.operator('nvb.smoothgroup_toggle', text = '7', icon=custom_icon)
+        op = row.operator('kb.smoothgroup_toggle', text = '7', icon=custom_icon)
         op.sg_number = 6
         op.activity = int(sg[7])
-        op = row.operator('nvb.smoothgroup_toggle', text = '8', icon=custom_icon)
+        op = row.operator('kb.smoothgroup_toggle', text = '8', icon=custom_icon)
         op.sg_number = 7
         op.activity = int(sg[8])
-        op = row.operator('nvb.smoothgroup_toggle', text = '9', icon=custom_icon)
+        op = row.operator('kb.smoothgroup_toggle', text = '9', icon=custom_icon)
         op.sg_number = 8
         op.activity = int(sg[9])
 
@@ -234,10 +234,10 @@ class KB_PT_smoothgroups(bpy.types.Panel):
         row = layout.row(align=True)
         row.label(text="Generate")
         row = layout.row(align=True)
-        row.operator_enum('nvb.smoothgroup_generate', 'action')
+        row.operator_enum('kb.smoothgroup_generate', 'action')
 
 
-class NVB_UL_lightflares(bpy.types.UIList):
+class KB_UL_lightflares(bpy.types.UIList):
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
 
         custom_icon = 'NONE'
@@ -295,7 +295,7 @@ class KB_PT_empty(bpy.types.Panel):
                 col.prop(obj.nvb, 'headlink', text = '')
 
             row = box.row()
-            operator = row.operator('nvb.armature', text="Recreate Armature")
+            operator = row.operator('kb.armature', text="Recreate Armature")
 
             sep = layout.separator()
 
@@ -310,7 +310,7 @@ class KB_PT_empty(bpy.types.Panel):
             row = box.row()
             row.prop(obj.nvb, 'minimapsize', text = 'Minimap size')
             row = box.row()
-            row.operator('nvb.render_minimap', text = 'Render Minimap', icon='NONE')
+            row.operator('kb.render_minimap', text = 'Render Minimap', icon='NONE')
             '''
 
             # All Children Settings Helper
@@ -320,13 +320,13 @@ class KB_PT_empty(bpy.types.Panel):
             row = box.row()
             row.label(text="Smoothgroups")
             row = box.row()
-            op = row.operator('nvb.children_smoothgroup', text="Direct")
+            op = row.operator('kb.children_smoothgroup', text="Direct")
             op.action = 'DRCT'
-            op = row.operator('nvb.children_smoothgroup', text="Auto")
+            op = row.operator('kb.children_smoothgroup', text="Auto")
             op.action = 'AUTO'
-            op = row.operator('nvb.children_smoothgroup', text="Single")
+            op = row.operator('kb.children_smoothgroup', text="Single")
             op.action = 'SING'
-            op = row.operator('nvb.children_smoothgroup', text="Separate")
+            op = row.operator('kb.children_smoothgroup', text="Separate")
             op.action = 'SEPR'
 
         elif (obj.nvb.dummytype == nvb_def.Dummytype.PWKROOT):
@@ -414,13 +414,13 @@ class KB_PT_light(bpy.types.Panel):
         sub.prop(obj.nvb, 'flareradius', text='Radius')
         row = box.row()
         row.active = obj.nvb.lensflares
-        row.template_list('NVB_UL_lightflares', 'The_List', obj.nvb, 'flareList', obj.nvb, 'flareListIdx')
+        row.template_list('KB_UL_lightflares', 'The_List', obj.nvb, 'flareList', obj.nvb, 'flareListIdx')
         col = row.column(align = True)
-        col.operator('nvb.lightflare_new', icon='ADD', text = '')
-        col.operator('nvb.lightflare_delete', icon='REMOVE', text = '')
+        col.operator('kb.lightflare_new', icon='ADD', text = '')
+        col.operator('kb.lightflare_delete', icon='REMOVE', text = '')
         col.separator()
-        col.operator('nvb.lightflare_move', icon='TRIA_UP', text = '').direction = 'UP'
-        col.operator('nvb.lightflare_move', icon='TRIA_DOWN', text = '').direction = 'DOWN'
+        col.operator('kb.lightflare_move', icon='TRIA_UP', text = '').direction = 'UP'
+        col.operator('kb.lightflare_move', icon='TRIA_DOWN', text = '').direction = 'DOWN'
         if obj.nvb.flareListIdx >= 0 and len(obj.nvb.flareList) > 0:
             item = obj.nvb.flareList[obj.nvb.flareListIdx]
             row = box.row()
@@ -457,7 +457,7 @@ class KB_PT_texture(bpy.types.Panel):
         prop_names = [o.name for o in texture.nvb.modified_properties]
         if propname in prop_names:
             row.label(icon='FILE_TICK')
-            op = row.operator('nvb.texture_info_ops', text='', icon='X', emboss=False)
+            op = row.operator('kb.texture_info_ops', text='', icon='X', emboss=False)
             op.action = 'RESET'
             op.propname = propname
         else:
@@ -469,10 +469,10 @@ class KB_PT_texture(bpy.types.Panel):
         row.alignment = 'LEFT'
         state = getattr(texture.nvb, 'box_visible_' + boxname)
         if not state:
-            row.operator('nvb.texture_info_box_ops', text=text, icon="TRIA_RIGHT", emboss=False).boxname = boxname
+            row.operator('kb.texture_info_box_ops', text=text, icon="TRIA_RIGHT", emboss=False).boxname = boxname
             return False
         else:
-            row.operator('nvb.texture_info_box_ops', text=text, icon="TRIA_DOWN", emboss=False).boxname = boxname
+            row.operator('kb.texture_info_box_ops', text=text, icon="TRIA_DOWN", emboss=False).boxname = boxname
             return True
 
     def draw(self, context):
@@ -481,8 +481,8 @@ class KB_PT_texture(bpy.types.Panel):
 
         # TXI file operations
         row = layout.row(align=True)
-        row.operator('nvb.texture_info_io', text=" Import", icon='IMPORT').action = 'LOAD'
-        row.operator('nvb.texture_info_io', text=" Export", icon='EXPORT').action = 'SAVE'
+        row.operator('kb.texture_info_io', text=" Import", icon='IMPORT').action = 'LOAD'
+        row.operator('kb.texture_info_io', text=" Export", icon='EXPORT').action = 'SAVE'
 
         # Texture type
         if len(texture.nvb.modified_properties):
@@ -1046,7 +1046,7 @@ class KB_PT_mesh(bpy.types.Panel):
                 row.label(text = 'Create vertex group: ')
                 row = box.row(align = True)
                 row.prop_search(obj.nvb, 'skingroup_obj', context.scene, 'objects')
-                row.operator('nvb.skingroup_add', text = '', icon='ADD')
+                row.operator('kb.skingroup_add', text = '', icon='ADD')
 
             # Additional props for aabb walkmeshes
             elif (obj.nvb.meshtype == nvb_def.Meshtype.AABB):
@@ -1057,7 +1057,7 @@ class KB_PT_mesh(bpy.types.Panel):
                 row = box.row()
                 row.prop(obj.nvb, 'lytposition', text='LYT Position')
                 row = box.row()
-                row.operator('nvb.load_wok_mats', text = 'Load walkmesh materials', icon='NONE')
+                row.operator('kb.load_wok_mats', text = 'Load walkmesh materials', icon='NONE')
 
 
 class KB_UL_path_points(bpy.types.UIList):
