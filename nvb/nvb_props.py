@@ -410,7 +410,7 @@ class ObjectPropertyGroup(bpy.types.PropertyGroup):
     # Controllers, in numeric order, these should ALL be animatable
     alphaend : bpy.props.FloatProperty(name="Alpha end", description="Alpha end", default=1.0, min=0.0, max=1.0)
     alphastart : bpy.props.FloatProperty(name="Alpha start", description="Alpha start", default=1.0, min=0.0, max=1.0)
-    birthrate : bpy.props.IntProperty(name="Birthrate", description="Birthrate", default=10, min=0)
+    birthrate : bpy.props.FloatProperty(name="Birthrate", description="Birthrate", default=10.0, min=0.0)
     bounce_co : bpy.props.FloatProperty(name="Coefficient", description="Bounce coefficient", default=0.0, min=0.0)
     combinetime : bpy.props.FloatProperty(name="Combinetime", description="Combinetime", default=0.0)
     drag : bpy.props.FloatProperty(name="Drag", description="Drag (m/s²)", default=0.0, unit='ACCELERATION')
@@ -446,7 +446,7 @@ class ObjectPropertyGroup(bpy.types.PropertyGroup):
     percentend : bpy.props.FloatProperty(name="Percent end", description="Percent end", default=1.0, min=0.0, max=1.0)
     sizemid : bpy.props.FloatProperty(name='sizeMid', description = 'x size mid', default=1.0, min=0.0)
     sizemid_y : bpy.props.FloatProperty(name='sizeMid_y', description = 'y size mid', default=0.0, min=0.0)
-    m_frandombirthrate : bpy.props.IntProperty(name = 'Random Birthrate', description = 'Random Birthrate', default=10, min=0)
+    m_frandombirthrate : bpy.props.FloatProperty(name = 'Random Birthrate', description = 'Random Birthrate', default=10.0, min=0.0)
     targetsize : bpy.props.IntProperty(name="Target Size", description="Target Size", default=1, min=0)
     numcontrolpts : bpy.props.IntProperty(name="# of Control Points", description="Number of Control Points", default=0, min=0)
     controlptradius : bpy.props.FloatProperty(name="Control Point Radius", description="Control Point Radius", default=0.0, min=0.0)
