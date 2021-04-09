@@ -56,15 +56,6 @@ def get_valid_exports(rootDummy, validExports):
         get_valid_exports(child, validExports)
 
 
-def get_animation_root_dummy(animScene):
-    if animScene:
-        for obj in animScene.objects:
-            if obj.type == 'EMPTY':
-                if (obj.nvb.dummytype == nvb_def.Dummytype.MDLROOT) and (obj.nvb.isanimation):
-                    return obj
-    return None
-
-
 def ancestor_node(obj, test):
     try:
         if test(obj):
@@ -113,9 +104,7 @@ def search_node_in_model(obj, test):
 def is_root_dummy(obj, dummytype = nvb_def.Dummytype.MDLROOT):
     if not obj:
         return False
-    return (obj.type == 'EMPTY') and \
-           (obj.nvb.dummytype == dummytype) and \
-           (not obj.nvb.isanimation)
+    return (obj.type == 'EMPTY') and (obj.nvb.dummytype == dummytype)
 
 
 def get_node_type(obj):

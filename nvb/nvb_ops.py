@@ -6,7 +6,7 @@ from mathutils import Matrix, Quaternion, Vector
 from . import nvb_def, nvb_io, nvb_material, nvb_txi, nvb_utils
 
 
-class NVB_OT_children_smoothgroup(bpy.types.Operator):
+class KB_OT_children_smoothgroup(bpy.types.Operator):
     bl_idname = "nvb.children_smoothgroup"
     bl_label = "Smoothgroup settings on descendants"
     bl_options = {'UNDO'}
@@ -22,7 +22,7 @@ class NVB_OT_children_smoothgroup(bpy.types.Operator):
         return {'FINISHED'}
 
 
-class NVB_OT_toggle_smoothgroup(bpy.types.Operator):
+class KB_OT_toggle_smoothgroup(bpy.types.Operator):
     bl_idname = "nvb.smoothgroup_toggle"
     bl_label = "Smoothgroup toggle"
     bl_options = {'UNDO'}
@@ -49,7 +49,7 @@ class NVB_OT_toggle_smoothgroup(bpy.types.Operator):
         return {'FINISHED'}
 
 
-class NVB_OT_generate_smoothgroup(bpy.types.Operator):
+class KB_OT_generate_smoothgroup(bpy.types.Operator):
     bl_idname = "nvb.smoothgroup_generate"
     bl_label = "Smoothgroup generate"
     bl_options = {'UNDO'}
@@ -98,7 +98,7 @@ class NVB_OT_generate_smoothgroup(bpy.types.Operator):
         return {'FINISHED'}
 
 
-class NVB_OT_select_smoothgroup(bpy.types.Operator):
+class KB_OT_select_smoothgroup(bpy.types.Operator):
     bl_idname = "nvb.smoothgroup_select"
     bl_label = "Smoothgroup select"
     bl_options = {'UNDO'}
@@ -133,7 +133,7 @@ class NVB_OT_select_smoothgroup(bpy.types.Operator):
         return {'FINISHED'}
 
 
-class NVB_OT_texture_io(bpy.types.Operator):
+class KB_OT_texture_io(bpy.types.Operator):
     bl_idname = "nvb.texture_info_io"
     bl_label = "Texture Info"
     bl_property = 'action'
@@ -152,7 +152,7 @@ class NVB_OT_texture_io(bpy.types.Operator):
         return {'FINISHED'}
 
 
-class NVB_OT_texture_box_ops(bpy.types.Operator):
+class KB_OT_texture_box_ops(bpy.types.Operator):
     """ Hide/show Texture Info sub-groups"""
     bl_idname = "nvb.texture_info_box_ops"
     bl_label = "Box Controls"
@@ -170,7 +170,7 @@ class NVB_OT_texture_box_ops(bpy.types.Operator):
         return {'FINISHED'}
 
 
-class NVB_OT_skin_bone_ops(bpy.types.Operator):
+class KB_OT_skin_bone_ops(bpy.types.Operator):
     bl_idname = "nvb.armature"
     bl_label = "Armature Operations"
     bl_options = {'UNDO'}
@@ -229,7 +229,7 @@ class NVB_OT_skin_bone_ops(bpy.types.Operator):
             bone.tail = bone.head + 0.1 * parent_dir
 
 
-class NVB_OT_texture_ops(bpy.types.Operator):
+class KB_OT_texture_ops(bpy.types.Operator):
     bl_idname = "nvb.texture_info_ops"
     bl_label = "Texture Info Operations"
     bl_property = 'action'
@@ -251,7 +251,7 @@ class NVB_OT_texture_ops(bpy.types.Operator):
         return {'FINISHED'}
 
 
-class NVB_OT_new_lightflare(bpy.types.Operator):
+class KB_OT_new_lightflare(bpy.types.Operator):
     """ Add a new item to the flare list """
 
     bl_idname = 'nvb.lightflare_new'
@@ -264,7 +264,7 @@ class NVB_OT_new_lightflare(bpy.types.Operator):
         return{'FINISHED'}
 
 
-class NVB_OT_delete_lightflare(bpy.types.Operator):
+class KB_OT_delete_lightflare(bpy.types.Operator):
     """ Delete the selected item from the flare list """
 
     bl_idname = 'nvb.lightflare_delete'
@@ -286,7 +286,7 @@ class NVB_OT_delete_lightflare(bpy.types.Operator):
         return{'FINISHED'}
 
 
-class NVB_OT_move_lightflare(bpy.types.Operator):
+class KB_OT_move_lightflare(bpy.types.Operator):
     """ Move an item in the flare list """
 
     bl_idname = 'nvb.lightflare_move'
@@ -330,7 +330,7 @@ class NVB_OT_move_lightflare(bpy.types.Operator):
         return{'FINISHED'}
 
 
-class NVB_OT_import_mdl(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
+class KB_OT_import_mdl(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
     """Import Odyssey Engine model (.mdl)"""
 
     bl_idname = 'kb.mdlimport'
@@ -396,7 +396,7 @@ class NVB_OT_import_mdl(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
         return nvb_io.load_mdl(self, context, **self.as_keywords(ignore=('filter_glob',)))
 
 
-class NVB_OT_import_lyt(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
+class KB_OT_import_lyt(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
     """Import Odyssey Engine layout (.lyt)"""
 
     bl_idname = 'kb.lytimport'
@@ -444,7 +444,7 @@ class NVB_OT_import_lyt(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
         return nvb_io.load_lyt(self, context, **self.as_keywords(ignore=('filter_glob',)))
 
 
-class NVB_OT_export_mdl(bpy.types.Operator, bpy_extras.io_utils.ExportHelper):
+class KB_OT_export_mdl(bpy.types.Operator, bpy_extras.io_utils.ExportHelper):
     """Export Odyssey Engine model (.mdl)"""
 
     bl_idname = 'kb.mdlexport'
@@ -523,7 +523,7 @@ class KB_OT_load_wok_materials(bpy.types.Operator):
         return {'FINISHED'}
 
 
-class NVB_OT_render_minimap(bpy.types.Operator):
+class KB_OT_render_minimap(bpy.types.Operator):
     bl_idname = "nvb.render_minimap"
     bl_label  = "Render Minimap"
 
@@ -550,7 +550,7 @@ class NVB_OT_render_minimap(bpy.types.Operator):
         return {'FINISHED'}
 
 
-class NVB_OT_add_skingroup(bpy.types.Operator):
+class KB_OT_add_skingroup(bpy.types.Operator):
     bl_idname = "nvb.skingroup_add"
     bl_label  = "Add new Skingroup"
 
@@ -574,7 +574,7 @@ class NVB_OT_add_skingroup(bpy.types.Operator):
             return {'CANCELLED'}
 
 
-class NVB_OT_export_lyt(bpy.types.Operator, bpy_extras.io_utils.ExportHelper):
+class KB_OT_export_lyt(bpy.types.Operator, bpy_extras.io_utils.ExportHelper):
     """Export Odyssey Engine layout (.lyt)"""
 
     bl_idname = 'kb.lytexport'

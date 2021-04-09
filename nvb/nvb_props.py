@@ -21,23 +21,7 @@ def nvb_update_shadow_prop(self, context):
         context.object.data.use_shadow = self.shadow != 0
 
 
-class NVB_PG_ANIMEVENT(bpy.types.PropertyGroup):
-    """
-    Properties for a single event in the even list
-    """
-
-    name : bpy.props.StringProperty(
-           name = 'Name',
-           description = 'Name for this event',
-           default = 'Unnamed')
-
-    frame : bpy.props.IntProperty(
-           name = 'Frame',
-           description = 'Frame at which the event should fire',
-           default = 1)
-
-
-class NVB_PG_FLARE(bpy.types.PropertyGroup):
+class KB_PG_FLARE(bpy.types.PropertyGroup):
     """
     Properties for a single flare in the flare list
     """
@@ -318,18 +302,10 @@ class KB_PG_OBJECT(bpy.types.PropertyGroup):
                                                      ('CL02', 'DWK: Closed 2nd', 'Closed State, 2nd node for "Use" anim',  13) ],
                                             default = 'NONE')
     animscale   : bpy.props.FloatProperty(name = 'Animationscale', description = 'Animation scale for all animations', default = 1.00, min = 0.0)
-    isanimation : bpy.props.BoolProperty(name = 'Animation', description = 'Whether this dummy and it\'s children are in an animation scene', default = False)
     # Animation Data (for separation)
     animList : bpy.props.CollectionProperty(type=KB_PG_anim)
     animListIdx : bpy.props.IntProperty(name='Index for anim List',
                                         default=0, options=set())
-    # For MDL Rootdummies in animations
-    animname     : bpy.props.StringProperty(name = 'Animation name', description = 'Name of the animation', default = '')
-    newanimname  : bpy.props.StringProperty(name = 'New name', description = 'Name of the new animation', default = '')
-    transtime    : bpy.props.FloatProperty(name = 'Transitiontime', description = 'Used for for animations only. Set for each Scene individually', default = 1.00, min = 0.0)
-    animroot     : bpy.props.StringProperty(name = 'Animation Root', description = 'Entry point of the animation', default = '')
-    eventList    : bpy.props.CollectionProperty(type = NVB_PG_ANIMEVENT)
-    eventListIdx : bpy.props.IntProperty(name = "Index for event List", default = 0)
     # For reference emptys
     refmodel     : bpy.props.StringProperty(name = 'Reference Model', description = 'Name of another mdl file', default = 'fx_ref')
     reattachable : bpy.props.BoolProperty(name = 'Reattachable', default = False)
@@ -415,7 +391,7 @@ class KB_PG_OBJECT(bpy.types.PropertyGroup):
     negativelight : bpy.props.BoolProperty(name = 'Negative Light', default = False)
     lensflares    : bpy.props.BoolProperty(name = 'Lensflares', default = False)
     flareradius   : bpy.props.FloatProperty(name = 'Flare Radius', default = 0.0, min = 0.0, max = 100.0)
-    flareList     : bpy.props.CollectionProperty(type = NVB_PG_FLARE)
+    flareList     : bpy.props.CollectionProperty(type = KB_PG_FLARE)
     flareListIdx  : bpy.props.IntProperty(name = "Index for flare list", default = 0)
 
     # Point lights in Eevee do not have equivalent for Aurora light multiplier and radius

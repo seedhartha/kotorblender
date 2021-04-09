@@ -58,11 +58,11 @@ import bpy
 
 
 def menu_func_import_mdl(self, context):
-    self.layout.operator(nvb_ops.NVB_OT_import_mdl.bl_idname, text="KotOR Model (.mdl)")
+    self.layout.operator(nvb_ops.KB_OT_import_mdl.bl_idname, text="KotOR Model (.mdl)")
 
 
 def menu_func_import_lyt(self, context):
-    self.layout.operator(nvb_ops.NVB_OT_import_lyt.bl_idname, text="KotOR Layout (.lyt)")
+    self.layout.operator(nvb_ops.KB_OT_import_lyt.bl_idname, text="KotOR Layout (.lyt)")
 
 
 def menu_func_import_pth(self, context):
@@ -70,11 +70,11 @@ def menu_func_import_pth(self, context):
 
 
 def menu_func_export_mdl(self, context):
-    self.layout.operator(nvb_ops.NVB_OT_export_mdl.bl_idname, text="KotOR Model (.mdl)")
+    self.layout.operator(nvb_ops.KB_OT_export_mdl.bl_idname, text="KotOR Model (.mdl)")
 
 
 def menu_func_export_lyt(self, context):
-    self.layout.operator(nvb_ops.NVB_OT_export_lyt.bl_idname, text="KotOR Layout (.lyt)")
+    self.layout.operator(nvb_ops.KB_OT_export_lyt.bl_idname, text="KotOR Layout (.lyt)")
 
 
 def menu_func_export_pth(self, context):
@@ -87,53 +87,50 @@ classes = (
 
     # Property Groups
 
-    nvb_props.NVB_PG_ANIMEVENT,
-    nvb_props.NVB_PG_FLARE,
-
     nvb_props.KB_PG_animevent,
     nvb_props.KB_PG_anim,
+    nvb_props.KB_PG_FLARE,
     nvb_props.KB_PG_OBJECT,
     nvb_props.KB_PG_TEXTURE,
 
     # Operators
 
+    nvb_ops.KB_OT_add_skingroup,
+    nvb_ops.KB_OT_children_smoothgroup,
+    nvb_ops.KB_OT_delete_lightflare,
+    nvb_ops.KB_OT_export_lyt,
+    nvb_ops.KB_OT_export_mdl,
+    nvb_ops.KB_OT_generate_smoothgroup,
+    nvb_ops.KB_OT_import_lyt,
+    nvb_ops.KB_OT_import_mdl,
     nvb_ops.KB_OT_load_wok_materials,
-    nvb_ops.NVB_OT_delete_lightflare,
-    nvb_ops.NVB_OT_move_lightflare,
-    nvb_ops.NVB_OT_new_lightflare,
-    nvb_ops.NVB_OT_export_lyt,
-    nvb_ops.NVB_OT_export_mdl,
-    nvb_ops.NVB_OT_import_lyt,
-    nvb_ops.NVB_OT_import_mdl,
-    nvb_ops.NVB_OT_children_smoothgroup,
-    nvb_ops.NVB_OT_render_minimap,
-    nvb_ops.NVB_OT_add_skingroup,
-    nvb_ops.NVB_OT_skin_bone_ops,
-    nvb_ops.NVB_OT_generate_smoothgroup,
-    nvb_ops.NVB_OT_select_smoothgroup,
-    nvb_ops.NVB_OT_toggle_smoothgroup,
-    nvb_ops.NVB_OT_texture_box_ops,
-    nvb_ops.NVB_OT_texture_io,
-    nvb_ops.NVB_OT_texture_ops,
-
+    nvb_ops.KB_OT_move_lightflare,
+    nvb_ops.KB_OT_new_lightflare,
     nvb_ops.KB_OT_rebuild_material_nodes,
+    nvb_ops.KB_OT_render_minimap,
+    nvb_ops.KB_OT_select_smoothgroup,
+    nvb_ops.KB_OT_skin_bone_ops,
+    nvb_ops.KB_OT_texture_box_ops,
+    nvb_ops.KB_OT_texture_io,
+    nvb_ops.KB_OT_texture_ops,
+    nvb_ops.KB_OT_toggle_smoothgroup,
 
     # Animation Operators
 
-    nvb_ops_anim.NVB_OT_amt_event_delete,
-    nvb_ops_anim.NVB_OT_amt_event_new,
-    nvb_ops_anim.NVB_OT_anim_clone,
-    nvb_ops_anim.NVB_OT_anim_crop,
-    nvb_ops_anim.NVB_OT_anim_delete,
-    nvb_ops_anim.NVB_OT_anim_event_delete,
-    nvb_ops_anim.NVB_OT_anim_event_move,
-    nvb_ops_anim.NVB_OT_anim_event_new,
-    nvb_ops_anim.NVB_OT_anim_focus,
-    nvb_ops_anim.NVB_OT_anim_move,
-    nvb_ops_anim.NVB_OT_anim_moveback,
-    nvb_ops_anim.NVB_OT_anim_new,
-    nvb_ops_anim.NVB_OT_anim_pad,
-    nvb_ops_anim.NVB_OT_anim_scale,
+    nvb_ops_anim.KB_OT_amt_event_delete,
+    nvb_ops_anim.KB_OT_amt_event_new,
+    nvb_ops_anim.KB_OT_anim_clone,
+    nvb_ops_anim.KB_OT_anim_crop,
+    nvb_ops_anim.KB_OT_anim_delete,
+    nvb_ops_anim.KB_OT_anim_event_delete,
+    nvb_ops_anim.KB_OT_anim_event_move,
+    nvb_ops_anim.KB_OT_anim_event_new,
+    nvb_ops_anim.KB_OT_anim_focus,
+    nvb_ops_anim.KB_OT_anim_move,
+    nvb_ops_anim.KB_OT_anim_moveback,
+    nvb_ops_anim.KB_OT_anim_new,
+    nvb_ops_anim.KB_OT_anim_pad,
+    nvb_ops_anim.KB_OT_anim_scale,
 
     # Path Operators
 
@@ -144,14 +141,14 @@ classes = (
 
     # Panels
 
-    nvb_ui.NVB_PT_animlist,
-    nvb_ui.NVB_PT_emitter,
-    nvb_ui.NVB_PT_empty,
-    nvb_ui.NVB_PT_light,
-    nvb_ui.NVB_PT_mesh,
-    nvb_ui.NVB_PT_path_point,
-    nvb_ui.NVB_PT_smoothgroups,
-    nvb_ui.NVB_PT_texture,
+    nvb_ui.KB_PT_animlist,
+    nvb_ui.KB_PT_emitter,
+    nvb_ui.KB_PT_empty,
+    nvb_ui.KB_PT_light,
+    nvb_ui.KB_PT_mesh,
+    nvb_ui.KB_PT_path_point,
+    nvb_ui.KB_PT_smoothgroups,
+    nvb_ui.KB_PT_texture,
 
     # Menus
 
@@ -159,10 +156,9 @@ classes = (
 
     # UI Lists
 
-    nvb_ui.NVB_UL_lightflares,
-
     nvb_ui.KB_UL_anim_events,
     nvb_ui.KB_UL_anims,
+    nvb_ui.KB_UL_lightflares,
     nvb_ui.KB_UL_path_points
 )
 
