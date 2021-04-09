@@ -251,20 +251,6 @@ class NVB_UL_lightflares(bpy.types.UIList):
             layout.label('', icon = custom_icon)
 
 
-class NVB_UL_animevents(bpy.types.UIList):
-    def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
-
-        custom_icon = 'NONE'
-
-        # Supports all 3 layout types
-        if self.layout_type in {'DEFAULT', 'COMPACT'}:
-            layout.label(item.name, icon = custom_icon)
-
-        elif self.layout_type in {'GRID'}:
-            layout.alignment = 'CENTER'
-            layout.label('', icon = custom_icon)
-
-
 class NVB_PT_empty(bpy.types.Panel):
     """
     Property panel for additional properties needed for the mdl file
@@ -291,21 +277,6 @@ class NVB_PT_empty(bpy.types.Panel):
         # Display properties depending on type of the empty
         if (obj.nvb.dummytype == nvb_def.Dummytype.MDLROOT):
             if not obj.nvb.isanimation:
-                # Animation Helper. Creates a new scene, copies all objects to it
-                # and renames them
-                row = layout.row()
-                box = row.box()
-                row = box.row()
-                row.prop(obj.nvb, 'isanimation', text = 'Animation')
-                sub = row.row()
-                sub.enabled = False
-                sub.prop(obj.nvb, 'animname', text = '')
-                row = box.row(align = True)
-                row.prop(obj.nvb, 'newanimname', text = 'Create')
-                row.operator('nvb.animscene_add', text = '', icon='ADD')
-
-                sep = layout.separator()
-
                 row = layout.row()
                 box = row.box()
                 split = box.split()
@@ -355,44 +326,6 @@ class NVB_PT_empty(bpy.types.Panel):
                 op.action = 'SING'
                 op = row.operator('nvb.children_smoothgroup', text="Separate")
                 op.action = 'SEPR'
-            else:
-                # MDL Rootdummy in an animation scene
-                row = layout.row()
-                box = row.box()
-                row = box.row()
-                row.prop(obj.nvb, 'isanimation', text = 'Animation')
-                sub = row.row()
-                sub.enabled = False
-                sub.prop(obj.nvb, 'animname', text = '')
-                row = box.row(align = True)
-                row.prop(obj.nvb, 'newanimname', text = 'Rename/Copy')
-                row.operator('nvb.animscene_rename', text = '', icon='FILE_REFRESH')
-                row.operator('nvb.animscene_add', text = '', icon='ADD')
-                row = box.row()
-                row.prop_search(obj.nvb, 'animroot', bpy.data, 'objects', text = 'Root')
-                row = box.row()
-                row.prop(obj.nvb, 'transtime')
-
-                sep = layout.separator()
-                # Event Helper. Display and add/remove events.
-                row = layout.row()
-                box = row.box()
-                row = box.row()
-                row.label(text = 'Event List')
-
-                row = box.row()
-                row.template_list('NVB_UILIST_ANIMEVENTS', 'The_List', obj.nvb, 'eventList', obj.nvb, 'eventListIdx')
-                col = row.column(align = True)
-                col.operator('nvb.animevent_new', text = '', icon='ADD')
-                col.operator('nvb.animevent_delete', text = '', icon='REMOVE')
-                col.separator()
-                col.operator('nvb.animevent_move', icon='TRIA_UP', text = '').direction = 'UP'
-                col.operator('nvb.animevent_move', icon='TRIA_DOWN', text = '').direction = 'DOWN'
-                if obj.nvb.eventListIdx >= 0 and len(obj.nvb.eventList) > 0:
-                    item = obj.nvb.eventList[obj.nvb.eventListIdx]
-                    row = box.row()
-                    row.prop(item, 'name')
-                    row.prop(item, 'frame')
 
         elif (obj.nvb.dummytype == nvb_def.Dummytype.PWKROOT):
             pass

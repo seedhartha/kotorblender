@@ -98,9 +98,6 @@ classes = (
     # Operators
 
     nvb_ops.KB_OT_load_wok_materials,
-    nvb_ops.NVB_OT_delete_animevent,
-    nvb_ops.NVB_OT_move_animevent,
-    nvb_ops.NVB_OT_new_animevent,
     nvb_ops.NVB_OT_delete_lightflare,
     nvb_ops.NVB_OT_move_lightflare,
     nvb_ops.NVB_OT_new_lightflare,
@@ -109,8 +106,6 @@ classes = (
     nvb_ops.NVB_OT_import_lyt,
     nvb_ops.NVB_OT_import_mdl,
     nvb_ops.NVB_OT_children_smoothgroup,
-    nvb_ops.NVB_OT_add_animscene,
-    nvb_ops.NVB_OT_rename_animscene,
     nvb_ops.NVB_OT_render_minimap,
     nvb_ops.NVB_OT_add_skingroup,
     nvb_ops.NVB_OT_skin_bone_ops,
@@ -164,7 +159,6 @@ classes = (
 
     # UI Lists
 
-    nvb_ui.NVB_UL_animevents,
     nvb_ui.NVB_UL_lightflares,
 
     nvb_ui.KB_UL_anim_events,
