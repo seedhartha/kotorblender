@@ -137,7 +137,6 @@ class GeometryNode():
         return obj
 
     def get_adjusted_matrix(self, obj):
-
         if obj.parent:
             parent_mw = obj.parent.matrix_world
         else:
@@ -240,7 +239,7 @@ class Dummy(GeometryNode):
         s = "  position {: .7g} {: .7g} {: .7g}".format(round(loc[0], 7), round(loc[1], 7), round(loc[2], 7))
         asciiLines.append(s)
 
-        rot = nvb_utils.euler2nwangle(transmat.to_euler('XYZ'))
+        rot = nvb_utils.quat2nwangle(transmat.to_quaternion())
         s = "  orientation {: .7g} {: .7g} {: .7g} {: .7g}".format(round(rot[0], 7), round(rot[1], 7), round(rot[2], 7), round(rot[3], 7))
         asciiLines.append(s)
 
