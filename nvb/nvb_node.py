@@ -1253,8 +1253,8 @@ class Emitter(GeometryNode):
         self.alphastart = 0.0
         self.alphamid = 0.0
         self.alphaend = 0.0
-        self.birthrate = 0
-        self.m_frandombirthrate = 0
+        self.birthrate = 0.0
+        self.m_frandombirthrate = 0.0
         self.bounce_co = 0.0
         self.combinetime = 0.0
         self.drag = 0.0
