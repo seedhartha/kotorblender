@@ -3,7 +3,7 @@ import os
 import sys
 
 import bpy
-import mathutils
+from mathutils import Quaternion, Vector
 
 from . import nvb_def
 
@@ -335,7 +335,7 @@ def is_shagr(vgroup):
 
 def set_object_rotation_aurora(obj, nwangle):
     obj.rotation_mode = 'QUATERNION'
-    obj.rotation_quaternion = mathutils.Quaternion((nwangle[0], nwangle[1], nwangle[2]), nwangle[3])
+    obj.rotation_quaternion = Quaternion((nwangle[0], nwangle[1], nwangle[2]), nwangle[3])
 
 
 def get_aurora_rot_from_object(obj):
@@ -377,7 +377,7 @@ def frame2nwtime(frame, fps = nvb_def.fps):
 
 
 def quat2nwangle(quatValues):
-    quat = mathutils.Quaternion(quatValues)
+    quat = Quaternion(quatValues)
     return [quat.axis[0], quat.axis[1], quat.axis[2], quat.angle]
 
 
@@ -640,8 +640,8 @@ def get_mdl_root(obj):
 
 
 def calculate_bounding_box_size(obj):
-    bbmin = mathutils.Vector([sys.float_info.max] * 3)
-    bbmax = mathutils.Vector([sys.float_info.min] * 3)
+    bbmin = Vector([sys.float_info.max] * 3)
+    bbmax = Vector([sys.float_info.min] * 3)
     for co in obj.bound_box:
         for i in range(3):
             if co[i] < bbmin[i]: bbmin[i] = co[i]
