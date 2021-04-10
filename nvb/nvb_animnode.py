@@ -827,25 +827,6 @@ from . import nvb_node
 
 
 class Animnode():
-    # Keys that go directly into objects
-    object_properties = {'position': ('', 3, float,  # Needs conversion
-                                      ' {:> 6.5f}'),
-                         'orientation': ('', 4, float,  # Needs conversion
-                                         ' {:> 6.5f}'),
-                         'scale': ('', 1, float,  # Needs conversion
-                                   ' {:> 6.5f}'),
-                         'color': ('color', 3, float,
-                                   ' {:>4.2f}'),
-                         'radius': ('distance', 1, float,
-                                    ' {:>6.5f}'),
-                         'selfillumcolor': ('nvb.selfillumcolor', 3, float,
-                                            ' {:>4.2f}'),
-                         'setfillumcolor': ('nvb.selfillumcolor', 3, float,
-                                            ' {:>4.2f}')}
-    # Keys that go into materials
-    material_properties = {'alpha': ('', 1, float,  # Needs conversion
-                                     ' {:>4.2f}')}
-
     def __init__(self, name='UNNAMED'):
         self.nodeidx = -1
         self.nodetype = nvb_def.Nodetype.DUMMY
