@@ -10,7 +10,7 @@ from . import nvb_glob, nvb_txi
 
 def _create_image(name, path):
     image = bpy_extras.image_utils.load_image(
-        name + '.tga',
+        name + ".tga",
         path,
         recursive=nvb_glob.textureSearch,
         place_holder=False,

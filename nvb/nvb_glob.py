@@ -5,7 +5,7 @@ importSmoothGroups = True
 importMaterials    = True
 importAnim         = True
 
-texturePath   = ''
+texturePath   = ""
 textureSearch = False
 
 createArmature = False

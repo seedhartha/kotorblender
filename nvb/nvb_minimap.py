@@ -7,8 +7,8 @@ import bpy
 
 def setup_minimap_render(mdlroot, scene, light_color = (1.0, 1.0, 1.0), alpha_mode = 'TRANSPARENT'):
     # Create the light if not already present in scene
-    lightName = 'MinimapLight'
-    camName  = 'MinimapCamera'
+    lightName = "MinimapLight"
+    camName  = "MinimapCamera"
 
     if lightName in scene.objects:
         minimapLight = scene.objects[lightName]

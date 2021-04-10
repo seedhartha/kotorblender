@@ -69,4 +69,4 @@ def i3(asciiBlock, intList, initialFloat=True):
 def txt(asciiBlock, txtBlock):
     # txtBlock = ['\n'+' '.join(l) for l in aciiBlock]
     for line in asciiBlock:
-        txtBlock = txtBlock + '\n' + ' '.join(line)
+        txtBlock = txtBlock + "\n" + " ".join(line)

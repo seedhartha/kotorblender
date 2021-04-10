@@ -13,21 +13,21 @@ def _load_mdl(filepath, position = (0.0, 0.0, 0.0)):
     # If the files are and the option is activated we'll import them
     wkm = None
     if nvb_glob.importWalkmesh:
-        filetypes = ['pwk', 'dwk', 'wok']
+        filetypes = ["pwk", "dwk", "wok"]
         (wkmPath, wkmFilename) = os.path.split(filepath)
         using_extra_extension = False
-        if wkmFilename.endswith('.ascii'):
+        if wkmFilename.endswith(".ascii"):
             wkmFilename = os.path.splitext(wkmFilename)[0]
             using_extra_extension = True
         for wkmType in filetypes:
             wkmFilepath = os.path.join(wkmPath,
                                        os.path.splitext(wkmFilename)[0] +
-                                       '.' + wkmType)
+                                       "." + wkmType)
             fp = os.fsencode(wkmFilepath)
             if using_extra_extension or not os.path.isfile(fp):
-                fp = os.fsencode(wkmFilepath + '.ascii')
+                fp = os.fsencode(wkmFilepath + ".ascii")
             try:
-                asciiLines = [line.strip().split() for line in open(fp, 'r')]
+                asciiLines = [line.strip().split() for line in open(fp, "r")]
                 wkm = nvb_mdl.Xwk(wkmType)
                 wkm.load_ascii(asciiLines)
             except IOError:
@@ -45,14 +45,14 @@ def _load_mdl(filepath, position = (0.0, 0.0, 0.0)):
 
     # read the ascii mdl text
     fp = os.fsencode(filepath)
-    ascii_mdl = ''
-    f = open(fp, 'r')
+    ascii_mdl = ""
+    f = open(fp, "r")
     ascii_mdl = f.read()
     f.close()
 
     # strip any comments from the text immediately,
     # newer method of text processing is not robust against comments
-    ascii_mdl = re.sub(r'#.+$', '', ascii_mdl, flags=re.MULTILINE)
+    ascii_mdl = re.sub(r'#.+$', "", ascii_mdl, flags=re.MULTILINE)
 
     # prepare the old style data
     asciiLines = [line.strip().split() for line in ascii_mdl.splitlines()]
@@ -63,16 +63,16 @@ def _load_mdl(filepath, position = (0.0, 0.0, 0.0)):
     mdl.import_to_collection(collection, wkm, position)
 
     # processing to use AABB node as trimesh for walkmesh file
-    if wkm is not None and wkm.walkmeshType == 'wok' and mdl.nodeDict and wkm.nodeDict:
+    if wkm is not None and wkm.walkmeshType == "wok" and mdl.nodeDict and wkm.nodeDict:
         aabb = None
         wkmesh = None
         # find aabb node in model
-        for (nodeKey, node) in mdl.nodeDict.items():
-            if node.nodetype == 'aabb':
+        for (_, node) in mdl.nodeDict.items():
+            if node.nodetype == "aabb":
                 aabb = node
         # find mesh node in wkm
-        for (nodeKey, node) in wkm.nodeDict.items():
-            if node.nodetype == 'aabb' or node.nodetype == 'trimesh':
+        for (_, node) in wkm.nodeDict.items():
+            if node.nodetype == "aabb" or node.nodetype == "trimesh":
                 wkmesh = node
         if aabb and wkmesh:
             aabb.compute_layout_position(wkmesh)
@@ -87,7 +87,7 @@ def _load_mdl(filepath, position = (0.0, 0.0, 0.0)):
 
 def load_mdl(operator,
             context,
-            filepath = '',
+            filepath = "",
             importGeometry = True,
             importWalkmesh = True,
             importSmoothGroups = True,
@@ -119,7 +119,7 @@ def load_mdl(operator,
 def _load_lyt(filepath):
     # Read lines from LYT
     fp = os.fsencode(filepath)
-    f = open(fp, 'r')
+    f = open(fp, "r")
     lines = [line.strip() for line in f.read().splitlines()]
     f.close()
 
@@ -137,16 +137,16 @@ def _load_lyt(filepath):
             rooms_to_read -= 1
             if rooms_to_read == 0:
                 break
-        elif tokens[0].startswith('roomcount'):
+        elif tokens[0].startswith("roomcount"):
             rooms_to_read = int(tokens[1])
 
     (path, _) = os.path.split(filepath)
 
     for room in rooms:
         # MDLedit appends .ascii extension to decompiled models - try that first
-        mdl_path = os.path.join(path, room[0] + '.mdl.ascii')
+        mdl_path = os.path.join(path, room[0] + ".mdl.ascii")
         if not os.path.exists(mdl_path):
-            mdl_path = os.path.join(path, room[0] + '-ascii.mdl')
+            mdl_path = os.path.join(path, room[0] + "-ascii.mdl")
         if os.path.exists(mdl_path):
             _load_mdl(mdl_path, room[1:])
         else:
@@ -155,7 +155,7 @@ def _load_lyt(filepath):
 
 def load_lyt(operator,
             context,
-            filepath = '',
+            filepath = "",
             importGeometry = True,
             importWalkmesh = True,
             importSmoothGroups = True,
@@ -180,8 +180,8 @@ def load_lyt(operator,
 
 def save_mdl(operator,
          context,
-         filepath = '',
-         exports = {'ANIMATION', 'WALKMESH'},
+         filepath = "",
+         exports = {"ANIMATION", "WALKMESH"},
          exportSmoothGroups = True,
          applyModifiers = True,
          ):
@@ -209,35 +209,35 @@ def save_mdl(operator,
         mdl = nvb_mdl.Mdl()
         asciiLines = []
         mdl.generate_ascii(asciiLines, mdlRoot)
-        with open(os.fsencode(filepath), 'w') as f:
-            f.write('\n'.join(asciiLines))
+        with open(os.fsencode(filepath), "w") as f:
+            f.write("\n".join(asciiLines))
 
-        if 'WALKMESH' in exports:
+        if "WALKMESH" in exports:
             wkmRoot = None
             aabb = nvb_utils.search_node(mdlRoot, lambda x: x.nvb.meshtype == nvb_def.Meshtype.AABB)
             if aabb is not None:
                 wkm     = nvb_mdl.Wok()
                 wkmRoot = aabb
-                wkmType = 'wok'
+                wkmType = "wok"
             else:
                 # We need to look for a walkmesh rootdummy
-                wkmRootName = mdl.name + '_pwk'
+                wkmRootName = mdl.name + "_pwk"
                 if (wkmRootName in bpy.data.objects):
                     wkmRoot = bpy.data.objects[wkmRootName]
-                    wkm     = nvb_mdl.Xwk('pwk')
-                wkmRootName = mdl.name + '_PWK'
+                    wkm     = nvb_mdl.Xwk("pwk")
+                wkmRootName = mdl.name + "_PWK"
                 if (not wkmRoot) and (wkmRootName in bpy.data.objects):
                     wkmRoot = bpy.data.objects[wkmRootName]
-                    wkm     = nvb_mdl.Xwk('pwk')
+                    wkm     = nvb_mdl.Xwk("pwk")
 
-                wkmRootName = mdl.name + '_dwk'
+                wkmRootName = mdl.name + "_dwk"
                 if (not wkmRoot) and (wkmRootName in bpy.data.objects):
                     wkmRoot = bpy.data.objects[wkmRootName]
-                    wkm     = nvb_mdl.Xwk('dwk')
-                wkmRootName = mdl.name + '_DWK'
+                    wkm     = nvb_mdl.Xwk("dwk")
+                wkmRootName = mdl.name + "_DWK"
                 if (not wkmRoot) and (wkmRootName in bpy.data.objects):
                     wkmRoot = bpy.data.objects[wkmRootName]
-                    wkm     = nvb_mdl.Xwk('dwk')
+                    wkm     = nvb_mdl.Xwk("dwk")
 
             if wkmRoot:
                 asciiLines = []
@@ -245,12 +245,12 @@ def save_mdl(operator,
 
                 (wkmPath, wkmFilename) = os.path.split(filepath)
                 wkmType = wkm.walkmeshType
-                if wkmFilename.endswith('.ascii'):
+                if wkmFilename.endswith(".ascii"):
                     wkmFilename = os.path.splitext(wkmFilename)[0]
-                    wkmType += '.ascii'
-                wkmFilepath = os.path.join(wkmPath, os.path.splitext(wkmFilename)[0] + '.' + wkmType)
-                with open(os.fsencode(wkmFilepath), 'w') as f:
-                    f.write('\n'.join(asciiLines))
+                    wkmType += ".ascii"
+                wkmFilepath = os.path.join(wkmPath, os.path.splitext(wkmFilename)[0] + "." + wkmType)
+                with open(os.fsencode(wkmFilepath), "w") as f:
+                    f.write("\n".join(asciiLines))
 
     # Return frame to pre-export, if specified in options
     if frame_set_current is not None and bpy.context.scene:

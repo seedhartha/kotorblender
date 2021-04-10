@@ -7,7 +7,7 @@ from . import nvb_def, nvb_utils
 
 
 class KB_OT_add_connection(bpy.types.Operator):
-    bl_idname = 'kb.add_path_connection'
+    bl_idname = "kb.add_path_connection"
     bl_label = "Add Odyssey Path Connection"
 
     @classmethod
@@ -20,7 +20,7 @@ class KB_OT_add_connection(bpy.types.Operator):
 
 
 class KB_OT_remove_connection(bpy.types.Operator):
-    bl_idname = 'kb.remove_path_connection'
+    bl_idname = "kb.remove_path_connection"
     bl_label = "Remove Odyssey Path Connection"
 
     @classmethod
@@ -35,20 +35,20 @@ class KB_OT_remove_connection(bpy.types.Operator):
 class KB_OT_import_path(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
     """Import Odyssey Engine path (.pth)"""
 
-    bl_idname = 'kb.pthimport'
-    bl_label  = 'Import Odyssey PTH'
+    bl_idname = "kb.pthimport"
+    bl_label  = "Import Odyssey PTH"
 
-    filename_ext = '.pth'
+    filename_ext = ".pth"
 
     filter_glob : bpy.props.StringProperty(
-            default = '*.pth',
+            default = "*.pth",
             options = {'HIDDEN'})
 
     def execute(self, context):
-        lines = [line.strip().split() for line in open(self.filepath, 'r')]
+        lines = [line.strip().split() for line in open(self.filepath, "r")]
 
         basename = os.path.basename(self.filepath)
-        pathname = 'Path_' + os.path.splitext(basename)[0]
+        pathname = "Path_" + os.path.splitext(basename)[0]
         if pathname in bpy.data.objects:
             path_object = bpy.data.objects[pathname]
         else:
@@ -83,17 +83,17 @@ class KB_OT_import_path(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
 class KB_OT_export_path(bpy.types.Operator, bpy_extras.io_utils.ExportHelper):
     """Export Odyssey Engine path (.pth)"""
 
-    bl_idname = 'kb.pthexport'
-    bl_label  = 'Export Odyssey PTH'
+    bl_idname = "kb.pthexport"
+    bl_label  = "Export Odyssey PTH"
 
-    filename_ext = '.pth'
+    filename_ext = ".pth"
 
     filter_glob : bpy.props.StringProperty(
-            default = '*.pth',
+            default = "*.pth",
             options = {'HIDDEN'})
 
     def execute(self, context):
-        with open(self.filepath, 'w') as f:
+        with open(self.filepath, "w") as f:
             for o in bpy.data.objects:
                 if nvb_utils.is_path_point(o):
                     f.write("{} {:.7g} {:.7g} {:.7g} {}\n".format(o.name, *o.location, len(o.nvb.path_connections)))
