@@ -14,7 +14,7 @@ class Mdl():
         self.nodeDict      = collections.OrderedDict()
         self.animDict      = dict() # No need to retain order
 
-        self.name           = 'UNNAMED'
+        self.name           = "UNNAMED"
         self.supermodel     = nvb_def.null
         self.animscale      = 1.0
         self.classification = nvb_def.Classification.UNKNOWN
@@ -32,7 +32,7 @@ class Mdl():
         if asciiBlock is None:
             raise nvb_def.MalformedMdlFile("Empty Node")
 
-        nodeType = ''
+        nodeType = ""
         try:
             nodeType = asciiBlock[0][1].lower()
         except (IndexError, AttributeError):
@@ -84,7 +84,7 @@ class Mdl():
         if newNode:
             key = newNode.parentName + newNode.name
             if key in self.nodeDict:
-                print('Kotorblender - WARNING: Node name conflict ' + key + '.')
+                print("Kotorblender - WARNING: Node name conflict " + key + ".")
             else:
                 self.nodeDict[key] = newNode
                 self.mdlnodes.append(newNode)
@@ -105,7 +105,7 @@ class Mdl():
             # The first node should be the rootdummy.
             # If the first node has a parent or isn't a dummy we don't
             # even try to import the mdl
-            (nodeKey, node) = next(it)
+            (_, node) = next(it)
             if (type(node) == nvb_node.Dummy) and \
                (nvb_utils.is_null(node.parentName)):
                 obj                    = node.add_to_collection(collection)
@@ -125,19 +125,19 @@ class Mdl():
             else:
                 raise nvb_def.MalformedMdlFile("First node has to be a dummy without a parent.")
 
-            for (nodeKey, node) in it:
+            for (_, node) in it:
                 obj = node.add_to_collection(collection)
                 obj.nvb.imporder = objIdx
                 objIdx += 1
 
                 # If LYT position is specified, set it for the AABB node
-                if self.lytposition and node.nodetype == 'aabb':
+                if self.lytposition and node.nodetype == "aabb":
                     node.lytposition = self.lytposition
                     obj.nvb.lytposition = self.lytposition
 
                 if (nvb_utils.is_null(node.parentName)):
                     # Node without parent and not the mdl root.
-                    raise nvb_def.MalformedMdlFile(node.name + ' has no parent.')
+                    raise nvb_def.MalformedMdlFile(node.name + " has no parent.")
                 else:
                     # Check if such an object exists
                     if obj.parent is not None:
@@ -174,11 +174,11 @@ class Mdl():
                                 break
                         # Node with invalid parent.
                         if not found:
-                            raise nvb_def.MalformedMdlFile(node.name + ' has no parent ' + node.parentName)
+                            raise nvb_def.MalformedMdlFile(node.name + " has no parent " + node.parentName)
 
         # Import the walkmesh, it will use any placeholder dummies just imported,
         # and the walkmesh nodes will be copied during animation import
-        if (nvb_glob.importWalkmesh) and not wkm is None and wkm.walkmeshType != 'wok':
+        if (nvb_glob.importWalkmesh) and not wkm is None and wkm.walkmeshType != "wok":
             wkm.import_to_collection(collection)
 
         # Attempt to import animations
@@ -200,11 +200,11 @@ class Mdl():
             "anim_restpose": 1
         }
         # Load the 'default' animation first, so it is at the front
-        anims = [a for a in animationlist if a.name == 'default']
+        anims = [a for a in animationlist if a.name == "default"]
         for a in anims:
             a.create(mdl_base, options)
         # Load the rest of the anims
-        anims = [a for a in animationlist if a.name != 'default']
+        anims = [a for a in animationlist if a.name != "default"]
         for a in anims:
             a.create(mdl_base, options)
 
@@ -241,17 +241,15 @@ class Mdl():
         """Load all geometry nodes from an ascii mdl block."""
         delim = "node "
         ascii_nodes = [delim + b for b in ascii_block.split(delim) if b]
-        for idx, ascii_node in enumerate(ascii_nodes):
+        for _, ascii_node in enumerate(ascii_nodes):
             ascii_lines = [l.strip().split() for l in ascii_node.splitlines()]
             node = None
-            node_type = ''
-            node_name = 'UNNAMED'
             try:  # Read node type
-                node_type = ascii_lines[0][1].lower()
+                ascii_lines[0][1].lower()
             except (IndexError, AttributeError):
                 raise nvb_def.MalformedMdlFile("Unable to read node type")
             try:  # Read node name
-                node_name = ascii_lines[0][2].lower()
+                ascii_lines[0][2].lower()
             except (IndexError, AttributeError):
                 raise nvb_def.MalformedMdlFile("Unable to read node name")
             self.load_ascii_node(ascii_lines)
@@ -264,18 +262,18 @@ class Mdl():
                 label = line[0].lower()
             except (IndexError, AttributeError):
                 continue  # Probably empty line, skip it
-            if label == 'newmodel':
+            if label == "newmodel":
                 try:
                     self.name = line[1]
                 except (ValueError, IndexError):
                     print("Kotorblender: WARNING - Unable to read model name.")
-            elif label == 'setsupermodel':
+            elif label == "setsupermodel":
                 try:  # should be ['setsupermodel', modelname, supermodelname]
                     self.supermodel = line[2]
                 except (ValueError, IndexError):
                     print("Kotorblender: WARNING - Unable to read supermodel. \
                            Using default value " + self.supermodel)
-            elif label == 'classification':
+            elif label == "classification":
                 try:
                     self.classification = line[1].title()
                 except (ValueError, IndexError):
@@ -283,51 +281,49 @@ class Mdl():
                            classification. \
                            Using Default value " + self.classification)
                 if self.classification not in nvb_def.Classification.ALL:
-                    print("Kotorblender: WARNING - Invalid classification \
-                           '" + self.classification + "'")
+                    print("Kotorblender: WARNING - Invalid classification '{}'".format(self.classification))
                     self.classification = nvb_def.Classification.UNKNOWN
-            elif label == 'classification_unk1':
+            elif label == "classification_unk1":
                 try:
                     self.unknownC1 = int(line[1])
                 except IndexError:
                     print("Kotorblender - WARNING: Unable to read classification unknown. Default value " + self.unknownC1)
-            elif label == 'ignorefog':
+            elif label == "ignorefog":
                 try:
                     self.ignorefog = int(line[1])
                 except IndexError:
                     print("Kotorblender - WARNING: Unable to read ignorefog. Default value " + self.ignorefog)
-            elif label == 'compress_quaternions':
+            elif label == "compress_quaternions":
                 try:
                     self.compress_quats = int(line[1])
                 except IndexError:
                     print("Kotorblender - WARNING: Unable to read compress_quaternions. Default value " + self.compress_quats)
-            elif label == 'headlink':
+            elif label == "headlink":
                 try:
                     self.headlink = int(line[1])
                 except IndexError:
                     print("Kotorblender - WARNING: Unable to read headlink. Default value " + self.headlink)
-            elif label == 'setanimationscale':
+            elif label == "setanimationscale":
                 try:
                     self.animscale = float(line[1])
                 except (ValueError, IndexError):
                     print("Kotorblender: WARNING - Unable to read \
                            animationscale. \
                            Using default value " + self.animscale)
-            elif label == 'layoutposition':
+            elif label == "layoutposition":
                 self.lytposition = [float(x) for x in line[1:]]
 
     def geometry_to_ascii(self, bObject, asciiLines, simple = False, nameDict = None):
-
         nodeType = nvb_utils.get_node_type(bObject)
-        switch = {'dummy':      nvb_node.Dummy,
-                  'patch':      nvb_node.Patch,
-                  'reference':  nvb_node.Reference,
-                  'trimesh':    nvb_node.Trimesh,
-                  'danglymesh': nvb_node.Danglymesh,
-                  'skin':       nvb_node.Skinmesh,
-                  'emitter':    nvb_node.Emitter,
-                  'light':      nvb_node.Light,
-                  'aabb':       nvb_node.Aabb}
+        switch = {"dummy":      nvb_node.Dummy,
+                  "patch":      nvb_node.Patch,
+                  "reference":  nvb_node.Reference,
+                  "trimesh":    nvb_node.Trimesh,
+                  "danglymesh": nvb_node.Danglymesh,
+                  "skin":       nvb_node.Skinmesh,
+                  "emitter":    nvb_node.Emitter,
+                  "light":      nvb_node.Light,
+                  "aabb":       nvb_node.Aabb}
         try:
             node = switch[nodeType]()
         except KeyError:
@@ -340,7 +336,7 @@ class Mdl():
             childList.append((child.nvb.imporder, child))
         childList.sort(key=lambda tup: tup[0])
 
-        for (imporder, child) in childList:
+        for (_, child) in childList:
             self.geometry_to_ascii(child, asciiLines, simple, nameDict=nameDict)
 
     def generate_ascii_animations(self, ascii_lines, rootDummy, options={}):
@@ -350,7 +346,7 @@ class Mdl():
                 nvb_anim.Animation.generate_ascii(rootDummy, anim,
                                                  ascii_lines, options)
 
-    def generate_ascii(self, asciiLines, rootDummy, exports = {'ANIMATION', 'WALKMESH'}):
+    def generate_ascii(self, asciiLines, rootDummy, exports = {"ANIMATION", "WALKMESH"}):
         self.name           = rootDummy.name
         self.classification = rootDummy.nvb.classification
         self.supermodel     = rootDummy.nvb.supermodel
@@ -392,25 +388,25 @@ class Mdl():
         currentTime   = datetime.now()
         blendFileName = os.path.basename(bpy.data.filepath)
         if not blendFileName:
-            blendFileName = 'unknown'
-        asciiLines.append('# Exported from blender at ' + currentTime.strftime('%A, %Y-%m-%d'))
-        asciiLines.append('filedependancy ' + blendFileName)
-        asciiLines.append('newmodel ' + self.name)
-        asciiLines.append('setsupermodel ' + self.name + ' ' + self.supermodel)
-        asciiLines.append('classification ' + self.classification)
-        asciiLines.append('classification_unk1 ' + str(self.unknownC1))
-        asciiLines.append('ignorefog ' + str(int(self.ignorefog)))
+            blendFileName = "unknown"
+        asciiLines.append("# Exported from blender at " + currentTime.strftime("%A, %Y-%m-%d"))
+        asciiLines.append("filedependancy " + blendFileName)
+        asciiLines.append("newmodel " + self.name)
+        asciiLines.append("setsupermodel " + self.name + " " + self.supermodel)
+        asciiLines.append("classification " + self.classification)
+        asciiLines.append("classification_unk1 " + str(self.unknownC1))
+        asciiLines.append("ignorefog " + str(int(self.ignorefog)))
         if self.compress_quats:
             # quaternion compression does not work with the rotations we export,
             # for unknown reasons...
             # therefore, just export it as disabled for now...
-            asciiLines.append('compress_quaternions 0')
+            asciiLines.append("compress_quaternions 0")
             # they actually work with mdlops now, not mdledit yet...
         if self.headlink:
-            asciiLines.append('headlink ' + str(int(self.headlink)))
-        asciiLines.append('setanimationscale ' + str(round(self.animscale, 7)))
+            asciiLines.append("headlink " + str(int(self.headlink)))
+        asciiLines.append("setanimationscale " + str(round(self.animscale, 7)))
         # Geometry
-        asciiLines.append('beginmodelgeom ' + self.name)
+        asciiLines.append("beginmodelgeom " + self.name)
         aabb = nvb_utils.search_node(rootDummy, lambda x: x.nvb.meshtype == nvb_def.Meshtype.AABB)
         if aabb is not None and aabb.nvb.lytposition != (0.0, 0.0, 0.0):
             lytposition = (aabb.nvb.lytposition[0],
@@ -422,19 +418,19 @@ class Mdl():
                                rootDummy.location[2])
             asciiLines.append("  layoutposition {: .7g} {: .7g} {: .7g}".format(*lytposition))
         self.geometry_to_ascii(rootDummy, asciiLines, False, nameDict=object_name_map)
-        asciiLines.append('endmodelgeom ' + self.name)
+        asciiLines.append("endmodelgeom " + self.name)
         # Animations
-        if 'ANIMATION' in exports:
-            asciiLines.append('')
-            asciiLines.append('# ANIM ASCII')
+        if "ANIMATION" in exports:
+            asciiLines.append("")
+            asciiLines.append("# ANIM ASCII")
             self.generate_ascii_animations(asciiLines, rootDummy)
         # The End
-        asciiLines.append('donemodel ' + self.name)
-        asciiLines.append('')
+        asciiLines.append("donemodel " + self.name)
+        asciiLines.append("")
 
 
 class Xwk(Mdl):
-    def __init__(self, wkmType = 'pwk'):
+    def __init__(self, wkmType = "pwk"):
         Mdl.__init__(self)
 
         self.walkmeshType   = wkmType
@@ -451,22 +447,22 @@ class Xwk(Mdl):
             except IndexError:
                 # Probably empty line or whatever, just skip it
                 continue
-            if (label == 'node'):
+            if (label == "node"):
                 blockStart = idx
-            elif (label == 'endnode'):
+            elif (label == "endnode"):
                 if (blockStart >= 0):
                     self.load_ascii_node(asciiLines[blockStart:idx+1])
                     blockStart = -1
                 else:
                     # "endnode" before "node"
-                    raise nvb_def.MalformedMdlFile('Unexpected "endnode" at line' + str(idx))
+                    raise nvb_def.MalformedMdlFile("Unexpected 'endnode' at line " + str(idx))
 
-    def generate_ascii(self, asciiLines, rootDummy, exports = {'ANIMATION', 'WALKMESH'}):
+    def generate_ascii(self, asciiLines, rootDummy, exports = {"ANIMATION", "WALKMESH"}):
         self.name = rootDummy.name
 
         # Header
         currentTime = datetime.now()
-        asciiLines.append('# Exported from blender at ' + currentTime.strftime('%A, %Y-%m-%d'))
+        asciiLines.append("# Exported from blender at " + currentTime.strftime("%A, %Y-%m-%d"))
         # Geometry
         for child in rootDummy.children:
             self.geometry_to_ascii(child, asciiLines, True)
@@ -487,14 +483,14 @@ class Xwk(Mdl):
             # Look for the node parents for the list of parents. They should
             # all have the same name
             nameList = []
-            for (nodeKey, node) in self.nodeDict.items():
+            for (_, node) in self.nodeDict.items():
                 if node.parentName not in nameList:
                     nameList.append(node.parentName)
             self.name = nameList[0]
 
-            if self.name in scene.objects and bpy.data.objects[self.name].nvb.dummytype != nvb_def.Dummytype.MDLROOT:
+            if self.name in collection.objects and bpy.data.objects[self.name].nvb.dummytype != nvb_def.Dummytype.MDLROOT:
                 node = bpy.data.objects[self.name].nvb
-                if self.walkmeshType == 'dwk':
+                if self.walkmeshType == "dwk":
                     node.dummytype = nvb_def.Dummytype.DWKROOT
                 else:
                     node.dummytype = nvb_def.Dummytype.PWKROOT
@@ -502,12 +498,12 @@ class Xwk(Mdl):
             else:
                 mdl_name = self.name
                 wkm_name = self.name
-                if not wkm_name.lower().endswith('_' + self.walkmeshType):
-                    wkm_name += '_' + self.walkmeshType
-                if mdl_name.lower().endswith('_' + self.walkmeshType):
+                if not wkm_name.lower().endswith("_" + self.walkmeshType):
+                    wkm_name += "_" + self.walkmeshType
+                if mdl_name.lower().endswith("_" + self.walkmeshType):
                     mdl_name = mdl_name[0:-4]
                 node = nvb_node.Dummy(wkm_name)
-                if self.walkmeshType == 'dwk':
+                if self.walkmeshType == "dwk":
                     node.dummytype = nvb_def.Dummytype.DWKROOT
                 else:
                     node.dummytype = nvb_def.Dummytype.PWKROOT
@@ -520,42 +516,42 @@ class Xwk(Mdl):
             mdlroot = nvb_utils.ancestor_node(rootdummy, lambda o: o.nvb.dummytype == nvb_def.Dummytype.MDLROOT)
             if mdlroot is None and rootdummy.parent:
                 mdlroot = rootdummy.parent
-            if self.walkmeshType == 'dwk':
-                dp_open1 = nvb_utils.search_node(mdlroot, lambda o: 'dwk_dp' in o.name.lower() and o.name.lower().endswith('open1_01'))
-                dp_open2 = nvb_utils.search_node(mdlroot, lambda o: 'dwk_dp' in o.name.lower() and o.name.lower().endswith('open2_01'))
-                dp_closed01 = nvb_utils.search_node(mdlroot, lambda o: 'dwk_dp' in o.name.lower() and o.name.lower().endswith('closed_01'))
-                dp_closed02 = nvb_utils.search_node(mdlroot, lambda o: 'dwk_dp' in o.name.lower() and o.name.lower().endswith('closed_02'))
-                wg_open1 = nvb_utils.search_node(mdlroot, lambda o: 'dwk_wg' in o.name.lower() and o.name.lower().endswith('open1'))
-                wg_open2 = nvb_utils.search_node(mdlroot, lambda o: 'dwk_wg' in o.name.lower() and o.name.lower().endswith('open2'))
-                wg_closed = nvb_utils.search_node(mdlroot, lambda o: 'dwk_wg' in o.name.lower() and o.name.lower().endswith('closed'))
-            if self.walkmeshType == 'pwk':
-                pwk_wg = nvb_utils.search_node(mdlroot, lambda o: o.name.lower().endswith('_wg'))
-                pwk_use01 = nvb_utils.search_node(mdlroot, lambda o: o.name.lower().endswith('pwk_use01'))
-                pwk_use02 = nvb_utils.search_node(mdlroot, lambda o: o.name.lower().endswith('pwk_use02'))
+            if self.walkmeshType == "dwk":
+                dp_open1 = nvb_utils.search_node(mdlroot, lambda o: "dwk_dp" in o.name.lower() and o.name.lower().endswith("open1_01"))
+                dp_open2 = nvb_utils.search_node(mdlroot, lambda o: "dwk_dp" in o.name.lower() and o.name.lower().endswith("open2_01"))
+                dp_closed01 = nvb_utils.search_node(mdlroot, lambda o: "dwk_dp" in o.name.lower() and o.name.lower().endswith("closed_01"))
+                dp_closed02 = nvb_utils.search_node(mdlroot, lambda o: "dwk_dp" in o.name.lower() and o.name.lower().endswith("closed_02"))
+                wg_open1 = nvb_utils.search_node(mdlroot, lambda o: "dwk_wg" in o.name.lower() and o.name.lower().endswith("open1"))
+                wg_open2 = nvb_utils.search_node(mdlroot, lambda o: "dwk_wg" in o.name.lower() and o.name.lower().endswith("open2"))
+                wg_closed = nvb_utils.search_node(mdlroot, lambda o: "dwk_wg" in o.name.lower() and o.name.lower().endswith("closed"))
+            if self.walkmeshType == "pwk":
+                pwk_wg = nvb_utils.search_node(mdlroot, lambda o: o.name.lower().endswith("_wg"))
+                pwk_use01 = nvb_utils.search_node(mdlroot, lambda o: o.name.lower().endswith("pwk_use01"))
+                pwk_use02 = nvb_utils.search_node(mdlroot, lambda o: o.name.lower().endswith("pwk_use02"))
 
-            for (nodeKey, node) in self.nodeDict.items():
+            for (_, node) in self.nodeDict.items():
                 # the node names may only be recorded in the MDL,
                 # this means that the named dummy nodes already exist in-scene,
                 # use these names to translate the WKM's special node names
-                if 'dp_open1_01' in node.name.lower() and dp_open1:
+                if "dp_open1_01" in node.name.lower() and dp_open1:
                     node.name = dp_open1.name
-                if 'dp_open2_01' in node.name.lower() and dp_open2:
+                if "dp_open2_01" in node.name.lower() and dp_open2:
                     node.name = dp_open2.name
-                if 'dp_closed_01' in node.name.lower() and dp_closed01:
+                if "dp_closed_01" in node.name.lower() and dp_closed01:
                     node.name = dp_closed01.name
-                if 'dp_closed_02' in node.name.lower() and dp_closed02:
+                if "dp_closed_02" in node.name.lower() and dp_closed02:
                     node.name = dp_closed02.name
-                if 'dwk_wg_open1' in node.name.lower() and wg_open1:
+                if "dwk_wg_open1" in node.name.lower() and wg_open1:
                     node.name = wg_open1.name
-                if 'dwk_wg_open2' in node.name.lower() and wg_open2:
+                if "dwk_wg_open2" in node.name.lower() and wg_open2:
                     node.name = wg_open2.name
-                if 'dwk_wg_closed' in node.name.lower() and wg_closed:
+                if "dwk_wg_closed" in node.name.lower() and wg_closed:
                     node.name = wg_closed.name
-                if node.name.lower().endswith('_wg') and pwk_wg:
+                if node.name.lower().endswith("_wg") and pwk_wg:
                     node.name = pwk_wg.name
-                if node.name.lower().endswith('pwk_use01') and pwk_use01:
+                if node.name.lower().endswith("pwk_use01") and pwk_use01:
                     node.name = pwk_use01.name
-                if node.name.lower().endswith('pwk_use02') and pwk_use02:
+                if node.name.lower().endswith("pwk_use02") and pwk_use02:
                     node.name = pwk_use02.name
                 # remove pre-existing nodes that were added as part of a model
                 if node.name in collection.objects:
@@ -570,23 +566,22 @@ class Xwk(Mdl):
                     obj.matrix_parent_inverse = obj.parent.matrix_world.inverted()
                 else:
                     # Node with invalid parent.
-                    raise nvb_def.MalformedMdlFile(node.name + ' has no parent ' + node.parentName)
+                    raise nvb_def.MalformedMdlFile(node.name + " has no parent " + node.parentName)
 
 
 class Wok(Xwk):
-    def __init__(self, name = 'UNNAMED', wkmType = 'wok'):
+    def __init__(self, name = "UNNAMED", wkmType = "wok"):
         self.nodeDict       = collections.OrderedDict()
         self.name           = name
-        self.walkmeshType   = 'wok'
+        self.walkmeshType   = "wok"
         self.classification = nvb_def.Classification.UNKNOWN
 
     def geometry_to_ascii(self, bObject, asciiLines, simple):
-
         nodeType = nvb_utils.get_node_type(bObject)
-        if nodeType == 'aabb':
+        if nodeType == "aabb":
             node = nvb_node.Aabb()
-            node.roottype = 'wok'
-            node.nodetype = 'trimesh'
+            node.roottype = "wok"
+            node.nodetype = "trimesh"
             node.get_room_links(bObject.data)
             node.to_ascii(bObject, asciiLines, simple)
             return  # We'll take the first aabb object
@@ -594,12 +589,12 @@ class Wok(Xwk):
             for child in bObject.children:
                 self.geometry_to_ascii(child, asciiLines, simple)
 
-    def generate_ascii(self, asciiLines, rootDummy, exports = {'ANIMATION', 'WALKMESH'}):
+    def generate_ascii(self, asciiLines, rootDummy, exports = {"ANIMATION", "WALKMESH"}):
         self.name = rootDummy.name
 
         # Header
         currentTime   = datetime.now()
-        asciiLines.append('# Exported from blender at ' + currentTime.strftime('%A, %Y-%m-%d'))
+        asciiLines.append("# Exported from blender at " + currentTime.strftime("%A, %Y-%m-%d"))
         # Geometry = AABB
         self.geometry_to_ascii(rootDummy, asciiLines, True)
 

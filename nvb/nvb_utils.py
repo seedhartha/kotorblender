@@ -106,24 +106,24 @@ def get_node_type(obj):
     objType  = obj.type
     if objType == 'EMPTY':
         if   obj.nvb.dummytype == nvb_def.Dummytype.PATCH:
-            return 'patch'
+            return "patch"
         elif obj.nvb.dummytype == nvb_def.Dummytype.REFERENCE:
-            return 'reference'
+            return "reference"
     elif objType == 'MESH':
         if   obj.nvb.meshtype == nvb_def.Meshtype.TRIMESH:
-            return 'trimesh'
+            return "trimesh"
         elif obj.nvb.meshtype == nvb_def.Meshtype.DANGLYMESH:
-            return 'danglymesh'
+            return "danglymesh"
         elif obj.nvb.meshtype == nvb_def.Meshtype.SKIN:
-            return 'skin'
+            return "skin"
         elif obj.nvb.meshtype == nvb_def.Meshtype.EMITTER:
-            return 'emitter'
+            return "emitter"
         elif obj.nvb.meshtype == nvb_def.Meshtype.AABB:
-            return 'aabb'
+            return "aabb"
     elif objType == 'LIGHT':
-        return 'light'
+        return "light"
 
-    return 'dummy'
+    return "dummy"
 
 
 def get_children_recursive(obj, obj_list):
@@ -232,7 +232,7 @@ def create_anim_list_item(mdl_base, check_keyframes=False):
 def str2identifier(s):
     """Convert to lower case. Convert 'null' to empty string."""
     if (not s or s.lower() == nvb_def.null):
-        return ''
+        return ""
     return s.lower()
 
 

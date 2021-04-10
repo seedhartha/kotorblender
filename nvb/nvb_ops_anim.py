@@ -10,8 +10,8 @@ from . import nvb_def, nvb_utils
 class KB_OT_anim_clone(bpy.types.Operator):
     """Clone animation and add it to the animation list"""
 
-    bl_idname = 'kb.anim_clone'
-    bl_label = 'Clone animation'
+    bl_idname = "kb.anim_clone"
+    bl_label = "Clone animation"
 
     @classmethod
     def poll(cls, context):
@@ -55,7 +55,7 @@ class KB_OT_anim_clone(bpy.types.Operator):
         cloned_anim.frameEnd = cloned_anim.frameStart + (animEnd - animStart)
         cloned_anim.transtime = source_anim.transtime
         cloned_anim.root_obj = source_anim.root_obj
-        cloned_anim.name = source_anim.name + '_copy'
+        cloned_anim.name = source_anim.name + "_copy"
         # Copy events
         self.clone_events(source_anim, cloned_anim)
         # Copy keyframes
@@ -80,11 +80,11 @@ class KB_OT_anim_clone(bpy.types.Operator):
 class KB_OT_anim_scale(bpy.types.Operator):
     """Open a dialog to scale the length of a single animation"""
 
-    bl_idname = 'kb.anim_scale'
-    bl_label = 'Scale animation'
+    bl_idname = "kb.anim_scale"
+    bl_label = "Scale animation"
 
-    scaleFactor : bpy.props.FloatProperty(name='scale',
-                                          description='Scale the animation',
+    scaleFactor : bpy.props.FloatProperty(name="scale",
+                                          description="Scale the animation",
                                           min=0.1,
                                           default=1.0)
 
@@ -146,17 +146,17 @@ class KB_OT_anim_scale(bpy.types.Operator):
     def execute(self, context):
         mdl_base = nvb_utils.get_mdl_root_from_object(context.object)
         if not nvb_utils.check_anim_bounds(mdl_base):
-            self.report({'INFO'}, 'Error: Nested animations.')
+            self.report({'INFO'}, "Error: Nested animations.")
             return {'CANCELLED'}
         anim = mdl_base.nvb.animList[mdl_base.nvb.animListIdx]
         # Check resulting length (has to be >= 1)
         oldSize = anim.frameEnd - anim.frameStart
         newSize = self.scaleFactor * oldSize
         if (newSize < 1):
-            self.report({'INFO'}, 'Error: Resulting size < 1.')
+            self.report({'INFO'}, "Error: Resulting size < 1.")
             return {'CANCELLED'}
         if (math.fabs(oldSize - newSize) < 1):
-            self.report({'INFO'}, 'Error: Same size.')
+            self.report({'INFO'}, "Error: Same size.")
             return {'CANCELLED'}
         # Adjust keyframes
         obj_list = [mdl_base]
@@ -198,9 +198,9 @@ class KB_OT_anim_scale(bpy.types.Operator):
         layout = self.layout
 
         row = layout.row()
-        row.label('Scaling: ')
+        row.label("Scaling: ")
         row = layout.row()
-        row.prop(self, 'scaleFactor', text='Factor')
+        row.prop(self, "scaleFactor", text="Factor")
 
         layout.separator()
 
@@ -212,17 +212,17 @@ class KB_OT_anim_scale(bpy.types.Operator):
 class KB_OT_anim_crop(bpy.types.Operator):
     """Open a dialog to crop a single animation"""
 
-    bl_idname = 'kb.anim_crop'
-    bl_label = 'Crop animation'
+    bl_idname = "kb.anim_crop"
+    bl_label = "Crop animation"
 
     cropFront : bpy.props.IntProperty(
-                    name='cropFront',
+                    name="cropFront",
                     min=0,
-                    description='Insert Frames before the first keyframe')
+                    description="Insert Frames before the first keyframe")
     cropBack : bpy.props.IntProperty(
-                    name='cropBack',
+                    name="cropBack",
                     min=0,
-                    description='Insert Frames after the last keyframe')
+                    description="Insert Frames after the last keyframe")
 
     @classmethod
     def poll(cls, context):
@@ -269,7 +269,7 @@ class KB_OT_anim_crop(bpy.types.Operator):
     def execute(self, context):
         mdl_base = nvb_utils.get_mdl_root_from_object(context.object)
         if not nvb_utils.check_anim_bounds(mdl_base):
-            self.report({'INFO'}, 'Failure: Convoluted animations.')
+            self.report({'INFO'}, "Failure: Convoluted animations.")
             return {'CANCELLED'}
         animList = mdl_base.nvb.animList
         currentAnimIdx = mdl_base.nvb.animListIdx
@@ -282,7 +282,7 @@ class KB_OT_anim_crop(bpy.types.Operator):
         totalCrop = cf + cb
         # Resulting length has to be at lest 1 frame
         if totalCrop > (animEnd - animStart + 1):
-            self.report({'INFO'}, 'Failure: Resulting length < 1.')
+            self.report({'INFO'}, "Failure: Resulting length < 1.")
             return {'CANCELLED'}
         # Pad keyframes
         obj_list = [mdl_base]
@@ -321,12 +321,12 @@ class KB_OT_anim_crop(bpy.types.Operator):
         layout = self.layout
 
         row = layout.row()
-        row.label('Crop: ')
+        row.label("Crop: ")
         row = layout.row()
         split = row.split()
         col = split.column(align=True)
-        col.prop(self, 'cropFront', text='Front')
-        col.prop(self, 'cropBack', text='Back')
+        col.prop(self, "cropFront", text="Front")
+        col.prop(self, "cropBack", text="Back")
 
         layout.separator()
 
@@ -338,17 +338,17 @@ class KB_OT_anim_crop(bpy.types.Operator):
 class KB_OT_anim_pad(bpy.types.Operator):
     """Open a dialog to pad a single animation"""
 
-    bl_idname = 'kb.anim_pad'
-    bl_label = 'Pad animation'
+    bl_idname = "kb.anim_pad"
+    bl_label = "Pad animation"
 
     pad_front : bpy.props.IntProperty(
-                    name='Pad Front',
+                    name="Pad Front",
                     min=0,
-                    description='Insert Frames before the first keyframe')
+                    description="Insert Frames before the first keyframe")
     pad_back : bpy.props.IntProperty(
-                    name='Pad Back',
+                    name="Pad Back",
                     min=0,
-                    description='Insert Frames after the last keyframe')
+                    description="Insert Frames after the last keyframe")
 
     @classmethod
     def poll(cls, context):
@@ -374,14 +374,14 @@ class KB_OT_anim_pad(bpy.types.Operator):
     def execute(self, context):
         mdl_base = nvb_utils.get_mdl_root_from_object(context.object)
         if not nvb_utils.check_anim_bounds(mdl_base):
-            self.report({'INFO'}, 'Failure: Convoluted animations.')
+            self.report({'INFO'}, "Failure: Convoluted animations.")
             return {'CANCELLED'}
         anim = mdl_base.nvb.animList[mdl_base.nvb.animListIdx]
         frame_start = anim.frameStart
         frame_end = anim.frameEnd
         # Cancel if padding is 0
         if (self.pad_front + self.pad_back) <= 0:
-            self.report({'INFO'}, 'Failure: No changes.')
+            self.report({'INFO'}, "Failure: No changes.")
             return {'CANCELLED'}
         # Pad keyframes
         obj_list = [mdl_base]
@@ -416,12 +416,12 @@ class KB_OT_anim_pad(bpy.types.Operator):
         layout = self.layout
 
         row = layout.row()
-        row.label('Padding: ')
+        row.label("Padding: ")
         row = layout.row()
         split = row.split()
         col = split.column(align=True)
-        col.prop(self, 'pad_front', text='Front')
-        col.prop(self, 'pad_back', text='Back')
+        col.prop(self, "pad_front", text="Front")
+        col.prop(self, "pad_back", text="Back")
         layout.separator()
 
     def invoke(self, context, event):
@@ -432,8 +432,8 @@ class KB_OT_anim_pad(bpy.types.Operator):
 class KB_OT_anim_focus(bpy.types.Operator):
     """Set the Start and end frames of the timeline"""
 
-    bl_idname = 'kb.anim_focus'
-    bl_label = 'Set start and end frame of the timeline to the animation'
+    bl_idname = "kb.anim_focus"
+    bl_label = "Set start and end frame of the timeline to the animation"
 
     @classmethod
     def poll(self, context):
@@ -453,8 +453,8 @@ class KB_OT_anim_focus(bpy.types.Operator):
 class KB_OT_anim_new(bpy.types.Operator):
     """Add a new animation to the animation list"""
 
-    bl_idname = 'kb.anim_new'
-    bl_label = 'Create new animation'
+    bl_idname = "kb.anim_new"
+    bl_label = "Create new animation"
 
     @classmethod
     def poll(self, context):
@@ -481,8 +481,8 @@ class KB_OT_anim_new(bpy.types.Operator):
 class KB_OT_anim_delete(bpy.types.Operator):
     """Delete the selected animation and its keyframes"""
 
-    bl_idname = 'kb.anim_delete'
-    bl_label = 'Delete an animation'
+    bl_idname = "kb.anim_delete"
+    bl_label = "Delete an animation"
 
     @classmethod
     def poll(self, context):
@@ -535,8 +535,8 @@ class KB_OT_anim_delete(bpy.types.Operator):
 class KB_OT_anim_moveback(bpy.types.Operator):
     """Move an animation and its keyframes to the end of the animation list"""
 
-    bl_idname = 'kb.anim_moveback'
-    bl_label = 'Move an animation to the end'
+    bl_idname = "kb.anim_moveback"
+    bl_label = "Move an animation to the end"
 
     @classmethod
     def poll(self, context):
@@ -573,7 +573,7 @@ class KB_OT_anim_moveback(bpy.types.Operator):
         """Move the animation."""
         mdl_base = nvb_utils.get_mdl_root_from_object(context.object)
         if not nvb_utils.check_anim_bounds(mdl_base):
-            self.report({'INFO'}, 'Failure: Convoluted animations.')
+            self.report({'INFO'}, "Failure: Convoluted animations.")
             return {'CANCELLED'}
         anim_list = mdl_base.nvb.animList
         currentAnimIdx = mdl_base.nvb.animListIdx
@@ -615,12 +615,12 @@ class KB_OT_anim_moveback(bpy.types.Operator):
 class KB_OT_anim_move(bpy.types.Operator):
     """Move an item in the animation list, without affecting keyframes"""
 
-    bl_idname = 'kb.anim_move'
-    bl_label = 'Move an animation in the list, without affecting keyframes'
+    bl_idname = "kb.anim_move"
+    bl_label = "Move an animation in the list, without affecting keyframes"
     bl_options = {'UNDO'}
 
-    direction : bpy.props.EnumProperty(items=(('UP', 'Up', ''),
-                                              ('DOWN', 'Down', '')))
+    direction : bpy.props.EnumProperty(items=(("UP", "Up", ""),
+                                              ("DOWN", "Down", "")))
 
     @classmethod
     def poll(self, context):
@@ -638,9 +638,9 @@ class KB_OT_anim_move(bpy.types.Operator):
         currentIdx = mdl_base.nvb.animListIdx
         new_idx = 0
         max_idx = len(anim_list) - 1
-        if self.direction == 'DOWN':
+        if self.direction == "DOWN":
             new_idx = currentIdx + 1
-        elif self.direction == 'UP':
+        elif self.direction == "UP":
             new_idx = currentIdx - 1
         else:
             return {'CANCELLED'}
@@ -656,8 +656,8 @@ class KB_OT_anim_move(bpy.types.Operator):
 class KB_OT_anim_event_new(bpy.types.Operator):
     """Add a new item to the event list"""
 
-    bl_idname = 'kb.anim_event_new'
-    bl_label = 'Add a new event to an animation'
+    bl_idname = "kb.anim_event_new"
+    bl_label = "Add a new event to an animation"
     bl_options = {'UNDO'}
 
     @classmethod
@@ -688,8 +688,8 @@ class KB_OT_anim_event_new(bpy.types.Operator):
 class KB_OT_anim_event_delete(bpy.types.Operator):
     """Delete the selected item from the event list"""
 
-    bl_idname = 'kb.anim_event_delete'
-    bl_label = 'Deletes an event from an animation'
+    bl_idname = "kb.anim_event_delete"
+    bl_label = "Deletes an event from an animation"
     bl_options = {'UNDO'}
 
     @classmethod
@@ -722,12 +722,12 @@ class KB_OT_anim_event_delete(bpy.types.Operator):
 class KB_OT_anim_event_move(bpy.types.Operator):
     """Move an item in the event list"""
 
-    bl_idname = 'kb.anim_event_move'
-    bl_label = 'Move an item in the event  list'
+    bl_idname = "kb.anim_event_move"
+    bl_label = "Move an item in the event  list"
     bl_options = {'UNDO'}
 
-    direction : bpy.props.EnumProperty(items=(('UP', 'Up', ''),
-                                              ('DOWN', 'Down', '')))
+    direction : bpy.props.EnumProperty(items=(("UP", "Up", ""),
+                                              ("DOWN", "Down", "")))
 
     @classmethod
     def poll(self, context):
@@ -751,9 +751,9 @@ class KB_OT_anim_event_move(bpy.types.Operator):
         currentIdx = anim.eventListIdx
         newIdx = 0
         maxIdx = len(eventList) - 1
-        if self.direction == 'DOWN':
+        if self.direction == "DOWN":
             newIdx = currentIdx + 1
-        elif self.direction == 'UP':
+        elif self.direction == "UP":
             newIdx = currentIdx - 1
         else:
             return {'CANCELLED'}
@@ -767,8 +767,8 @@ class KB_OT_anim_event_move(bpy.types.Operator):
 class KB_OT_amt_event_new(bpy.types.Operator):
     """Add a new event to the event list"""
 
-    bl_idname = 'kb.amt_event_new'
-    bl_label = 'Create new animation event'
+    bl_idname = "kb.amt_event_new"
+    bl_label = "Create new animation event"
 
     bl_options = {'UNDO'}
 
@@ -802,8 +802,8 @@ class KB_OT_amt_event_new(bpy.types.Operator):
 class KB_OT_amt_event_delete(bpy.types.Operator):
     """Delete the selected event and its keyframes"""
 
-    bl_idname = 'kb.amt_event_delete'
-    bl_label = 'Delete an animation event'
+    bl_idname = "kb.amt_event_delete"
+    bl_label = "Delete an animation event"
 
     bl_options = {'UNDO'}
 
@@ -824,7 +824,7 @@ class KB_OT_amt_event_delete(bpy.types.Operator):
         if obj.animation_data and obj.animation_data.action:
             action = obj.animation_data.action
             # Remove the current data path for that idx
-            data_path = 'nvb.amt_event_list[' + str(event_id) + '].fire'
+            data_path = "nvb.amt_event_list[" + str(event_id) + "].fire"
             fcu = action.fcurves.find(data_path, index=0)
             if fcu:
                 action.fcurves.remove(fcu)
@@ -834,8 +834,8 @@ class KB_OT_amt_event_delete(bpy.types.Operator):
         if obj.animation_data and obj.animation_data.action:
             action = obj.animation_data.action
             # Remove the current data path for that idx
-            dp_prefix = 'nvb.amt_event_list['
-            dp_suffix = '].fire'
+            dp_prefix = "nvb.amt_event_list["
+            dp_suffix = "].fire"
             for ev_id in event_id_list:
                 data_path = dp_prefix + str(ev_id) + dp_suffix
                 fcu = action.fcurves.find(data_path, index=0)

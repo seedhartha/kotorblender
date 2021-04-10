@@ -55,9 +55,9 @@ class KB_OT_generate_smoothgroup(bpy.types.Operator):
     bl_options = {'UNDO'}
 
     action : bpy.props.EnumProperty(items=(
-        ('ALL', 'All Faces', 'Generate smoothgroups for all faces, replacing current values'),
-        ('EMPTY', 'Empty Faces', 'Generate smoothgroups for all faces without current assignments'),
-        ('SEL', 'Selected Faces', 'Generate smoothgroups for all selected faces, replacing current values')
+        ("ALL", "All Faces", "Generate smoothgroups for all faces, replacing current values"),
+        ("EMPTY", "Empty Faces", "Generate smoothgroups for all faces without current assignments"),
+        ("SEL", "Selected Faces", "Generate smoothgroups for all selected faces, replacing current values")
     ))
 
     def execute(self, context):
@@ -79,16 +79,16 @@ class KB_OT_generate_smoothgroup(bpy.types.Operator):
         # allowing calc_smooth_groups to work
         for face in mesh.polygons:
             face.use_smooth = True
-        (sg, sg_number) = mesh.calc_smooth_groups(use_bitflags=True)
+        (sg, _) = mesh.calc_smooth_groups(use_bitflags=True)
 
         # apply the calculated smoothgroups
-        if self.action == 'ALL':
-            sg_list.data.foreach_set('value', sg)
+        if self.action == "ALL":
+            sg_list.data.foreach_set("value", sg)
         else:
             for face in mesh.polygons:
-                if (self.action == 'EMPTY' and \
+                if (self.action == "EMPTY" and \
                     sg_list.data[face.index].value == 0) or \
-                   (self.action == 'SEL' and face.select):
+                   (self.action == "SEL" and face.select):
                     sg_list.data[face.index].value = sg[face.index]
 
         # return object to original mode
@@ -105,13 +105,13 @@ class KB_OT_select_smoothgroup(bpy.types.Operator):
 
     sg_number : bpy.props.IntProperty()
     action : bpy.props.EnumProperty(items=(
-        ('SEL', 'Select', 'Select faces with this smoothgroup'),
-        ('DESEL', 'Deselect', 'Deselect faces with this smoothgroup')
+        ("SEL", "Select", "Select faces with this smoothgroup"),
+        ("DESEL", "Deselect", "Deselect faces with this smoothgroup")
     ))
 
     @classmethod
     def description(self, context, properties):
-        if self.action == 'SEL':
+        if self.action == "SEL":
             return "Select faces with this smoothgroup"
         else:
             return "Deselect faces with this smoothgroup"
@@ -127,7 +127,7 @@ class KB_OT_select_smoothgroup(bpy.types.Operator):
         for face in bm.faces:
             if sg_value & face[sg_layer]:
                 # select/deselect face
-                face.select_set(self.action == 'SEL')
+                face.select_set(self.action == "SEL")
         # required to get the selection change to show in the 3D view
         bmesh.update_edit_mesh(context.object.data)
         return {'FINISHED'}
@@ -136,16 +136,16 @@ class KB_OT_select_smoothgroup(bpy.types.Operator):
 class KB_OT_texture_io(bpy.types.Operator):
     bl_idname = "kb.texture_info_io"
     bl_label = "Texture Info"
-    bl_property = 'action'
+    bl_property = "action"
     bl_options = {'UNDO'}
 
     action : bpy.props.EnumProperty(items=(
-        ('LOAD', 'Load', 'Import TXI file for this texture'),
-        ('SAVE', 'Save', 'Export TXI file for this texture')
+        ("LOAD", "Load", "Import TXI file for this texture"),
+        ("SAVE", "Save", "Export TXI file for this texture")
     ))
 
     def execute(self, context):
-        if self.action == 'SAVE':
+        if self.action == "SAVE":
             nvb_txi.save_txi(context.texture, self)
         else:
             nvb_txi.load_txi(context.texture, self)
@@ -158,12 +158,12 @@ class KB_OT_texture_box_ops(bpy.types.Operator):
     bl_label = "Box Controls"
     bl_description = "Show/hide this property list"
 
-    boxname : bpy.props.StringProperty(default='')
+    boxname : bpy.props.StringProperty(default="")
 
     def execute(self, context):
-        if self.boxname == '':
+        if self.boxname == "":
             return {'FINISHED'}
-        attrname = 'box_visible_' + self.boxname
+        attrname = "box_visible_" + self.boxname
         texture = context.texture
         current_state = getattr(texture.nvb, attrname)
         setattr(texture.nvb, attrname, not current_state)
@@ -182,7 +182,7 @@ class KB_OT_skin_bone_ops(bpy.types.Operator):
             rootdummy = nvb_utils.search_node(mdl_root, lambda o: o.name.lower() == "rootdummy")
             if rootdummy:
                 # (Re)create armature
-                armature_name = 'Armature_'+mdl_root.name
+                armature_name = "Armature_"+mdl_root.name
                 if armature_name in bpy.data.armatures:
                     armature = bpy.data.armatures[armature_name]
                     bpy.data.armatures.remove(armature)
@@ -200,7 +200,7 @@ class KB_OT_skin_bone_ops(bpy.types.Operator):
                 # Add Armature modifier to all skinmeshes
                 skinmeshes = nvb_utils.search_node_all(mdl_root, lambda o: o.nvb.meshtype == nvb_def.Meshtype.SKIN)
                 for mesh in skinmeshes:
-                    modifier = mesh.modifiers.new(name='Armature', type='ARMATURE')
+                    modifier = mesh.modifiers.new(name="Armature", type="ARMATURE")
                     modifier.object = armature_object
 
         return {'FINISHED'}
@@ -233,22 +233,22 @@ class KB_OT_skin_bone_ops(bpy.types.Operator):
 class KB_OT_texture_ops(bpy.types.Operator):
     bl_idname = "kb.texture_info_ops"
     bl_label = "Texture Info Operations"
-    bl_property = 'action'
+    bl_property = "action"
     bl_options = {'UNDO'}
 
     action : bpy.props.EnumProperty(items=(
-        ('RESET', 'Reset', 'Reset the property to default value. This will prevent it from being written to TXI file output.'),
-        ('NYI', 'Other', '')
+        ("RESET", "Reset", "Reset the property to default value. This will prevent it from being written to TXI file output."),
+        ("NYI", "Other", "")
     ))
-    propname : bpy.props.StringProperty(default='')
+    propname : bpy.props.StringProperty(default="")
 
     def execute(self, context):
-        if self.propname == '':
+        if self.propname == "":
             return {'FINISHED'}
-        if self.action == 'RESET':
-            attr_def = getattr(bpy.types.ImageTexture.nvb[1]['type'], self.propname)[1]
-            if 'default' in attr_def:
-                setattr(context.texture.nvb, self.propname, attr_def['default'])
+        if self.action == "RESET":
+            attr_def = getattr(bpy.types.ImageTexture.nvb[1]["type"], self.propname)[1]
+            if "default" in attr_def:
+                setattr(context.texture.nvb, self.propname, attr_def["default"])
         return {'FINISHED'}
 
 
@@ -256,7 +256,7 @@ class KB_OT_new_lightflare(bpy.types.Operator):
     """ Add a new item to the flare list """
 
     bl_idname = "kb.lightflare_new"
-    bl_label  = 'Add a new flare to a light'
+    bl_label  = "Add a new flare to a light"
 
     def execute(self, context):
         if (context.object.type == 'LIGHT'):
@@ -269,7 +269,7 @@ class KB_OT_delete_lightflare(bpy.types.Operator):
     """ Delete the selected item from the flare list """
 
     bl_idname = "kb.lightflare_delete"
-    bl_label = 'Deletes a flare from the light'
+    bl_label = "Deletes a flare from the light"
 
     @classmethod
     def poll(self, context):
@@ -284,16 +284,16 @@ class KB_OT_delete_lightflare(bpy.types.Operator):
         if flareIdx > 0:
             flareIdx =flareIdx - 1
 
-        return{'FINISHED'}
+        return{"FINISHED"}
 
 
 class KB_OT_move_lightflare(bpy.types.Operator):
     """ Move an item in the flare list """
 
     bl_idname = "kb.lightflare_move"
-    bl_label  = 'Move an item in the flare list'
+    bl_label  = "Move an item in the flare list"
 
-    direction : bpy.props.EnumProperty(items=(('UP', 'Up', ''), ('DOWN', 'Down', '')))
+    direction : bpy.props.EnumProperty(items=(("UP", "Up", ""), ("DOWN", "Down", "")))
 
     @classmethod
     def poll(self, context):
@@ -305,9 +305,9 @@ class KB_OT_move_lightflare(bpy.types.Operator):
 
         listLength = len(flareList) - 1 # (index starts at 0)
         newIdx = 0
-        if self.direction == 'UP':
+        if self.direction == "UP":
             newIdx = flareIdx - 1
-        elif self.direction == 'DOWN':
+        elif self.direction == "DOWN":
             newIdx = flareIdx + 1
 
         newIdx   = max(0, min(newIdx, listLength))
@@ -317,11 +317,11 @@ class KB_OT_move_lightflare(bpy.types.Operator):
         flareList = context.object.nvb.flareList
         flareIdx  = context.object.nvb.flareListIdx
 
-        if self.direction == 'DOWN':
+        if self.direction == "DOWN":
             neighbour = flareIdx + 1
             flareList.move(flareIdx, neighbour)
             self.move_index(context)
-        elif self.direction == 'UP':
+        elif self.direction == "UP":
             neighbour = flareIdx - 1
             flareList.move(neighbour, flareIdx)
             self.move_index(context)
@@ -334,150 +334,150 @@ class KB_OT_move_lightflare(bpy.types.Operator):
 class KB_OT_import_mdl(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
     """Import Odyssey Engine model (.mdl)"""
 
-    bl_idname = 'kb.mdlimport'
-    bl_label = 'Import Odyssey MDL'
+    bl_idname = "kb.mdlimport"
+    bl_label = "Import Odyssey MDL"
     bl_options = {'UNDO'}
 
-    filename_ext = '.mdl'
+    filename_ext = ".mdl"
 
     filter_glob : bpy.props.StringProperty(
-            default = '*.mdl;*.mdl.ascii',
+            default = "*.mdl;*.mdl.ascii",
             options = {'HIDDEN'})
 
     importGeometry : bpy.props.BoolProperty(
-            name = 'Import Geometry',
-            description = 'Disable if only animations are needed',
+            name = "Import Geometry",
+            description = "Disable if only animations are needed",
             default = True)
 
     importWalkmesh : bpy.props.BoolProperty(
-            name = 'Import Walkmesh',
-            description = 'Attempt to load placeable and door walkmeshes',
+            name = "Import Walkmesh",
+            description = "Attempt to load placeable and door walkmeshes",
             default = True)
 
     importSmoothGroups : bpy.props.BoolProperty(
-            name = 'Import Smooth Groups',
-            description = 'Import smooth groups as sharp edges',
+            name = "Import Smooth Groups",
+            description = "Import smooth groups as sharp edges",
             default = True)
 
     importMaterials : bpy.props.BoolProperty(
-            name = 'Import Materials',
+            name = "Import Materials",
             description = "Import materials",
             default = True)
 
     importAnim : bpy.props.BoolProperty(
-            name = 'Import Animations',
-            description = 'Import animations',
+            name = "Import Animations",
+            description = "Import animations",
             default = True)
 
     textureSearch : bpy.props.BoolProperty(
-            name = 'Image search',
-            description = 'Search for images in subdirectories' \
-                          ' (Warning, may be slow)',
+            name = "Image search",
+            description = "Search for images in subdirectories" \
+                          " (Warning, may be slow)",
             default = False)
 
     createArmature : bpy.props.BoolProperty(
-            name = 'Create armature',
-            description = 'Create armature from bone nodes',
+            name = "Create armature",
+            description = "Create armature from bone nodes",
             default = False)
 
     # Hidden option, only used for batch minimap creation
     minimapMode : bpy.props.BoolProperty(
-            name = 'Minimap Mode',
-            description = 'Ignore lights and walkmeshes',
+            name = "Minimap Mode",
+            description = "Ignore lights and walkmeshes",
             default = False,
             options = {'HIDDEN'})
 
     minimapSkipFade : bpy.props.BoolProperty(
-            name = 'Minimap Mode: Import Fading Objects',
-            description = 'Ignore fading objects',
+            name = "Minimap Mode: Import Fading Objects",
+            description = "Ignore fading objects",
             default = False,
             options = {'HIDDEN'})
 
     def execute(self, context):
-        return nvb_io.load_mdl(self, context, **self.as_keywords(ignore=('filter_glob',)))
+        return nvb_io.load_mdl(self, context, **self.as_keywords(ignore=("filter_glob",)))
 
 
 class KB_OT_import_lyt(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
     """Import Odyssey Engine layout (.lyt)"""
 
-    bl_idname = 'kb.lytimport'
-    bl_label = 'Import Odyssey LYT'
+    bl_idname = "kb.lytimport"
+    bl_label = "Import Odyssey LYT"
     bl_options = {'UNDO'}
 
-    filename_ext = '.lyt'
+    filename_ext = ".lyt"
 
     filter_glob : bpy.props.StringProperty(
-        default='*.lyt',
+        default="*.lyt",
         options={'HIDDEN'})
 
     importGeometry : bpy.props.BoolProperty(
-            name = 'Import Geometry',
-            description = 'Disable if only animations are needed',
+            name = "Import Geometry",
+            description = "Disable if only animations are needed",
             default = True)
 
     importWalkmesh : bpy.props.BoolProperty(
-            name = 'Import Walkmesh',
-            description = 'Attempt to load placeable and door walkmeshes',
+            name = "Import Walkmesh",
+            description = "Attempt to load placeable and door walkmeshes",
             default = True)
 
     importSmoothGroups : bpy.props.BoolProperty(
-            name = 'Import Smooth Groups',
-            description = 'Import smooth groups as sharp edges',
+            name = "Import Smooth Groups",
+            description = "Import smooth groups as sharp edges",
             default = True)
 
     importMaterials : bpy.props.BoolProperty(
-            name = 'Import Materials',
+            name = "Import Materials",
             description = "Import materials",
             default = True)
 
     importAnim : bpy.props.BoolProperty(
-            name = 'Import Animations',
-            description = 'Import animations',
+            name = "Import Animations",
+            description = "Import animations",
             default = True)
 
     textureSearch : bpy.props.BoolProperty(
-            name='Image search',
-            description='Search for images in subdirectories' \
-                        ' (Warning, may be slow)',
+            name="Image search",
+            description="Search for images in subdirectories" \
+                        " (Warning, may be slow)",
             default=False)
 
     def execute(self, context):
-        return nvb_io.load_lyt(self, context, **self.as_keywords(ignore=('filter_glob',)))
+        return nvb_io.load_lyt(self, context, **self.as_keywords(ignore=("filter_glob",)))
 
 
 class KB_OT_export_mdl(bpy.types.Operator, bpy_extras.io_utils.ExportHelper):
     """Export Odyssey Engine model (.mdl)"""
 
-    bl_idname = 'kb.mdlexport'
-    bl_label  = 'Export Odyssey MDL'
+    bl_idname = "kb.mdlexport"
+    bl_label  = "Export Odyssey MDL"
 
-    filename_ext = '.mdl'
+    filename_ext = ".mdl"
 
     filter_glob : bpy.props.StringProperty(
-            default = '*.mdl;*.mdl.ascii',
+            default = "*.mdl;*.mdl.ascii",
             options = {'HIDDEN'})
 
     exports : bpy.props.EnumProperty(
-            name = 'Export',
+            name = "Export",
             options = {'ENUM_FLAG'},
-            items = (('ANIMATION', 'Animations', 'Export animations'),
-                     ('WALKMESH', 'Walkmesh', 'Attempt to create walkmesh file (.pwk, .dwk or .wok depending on classification)'),
+            items = (("ANIMATION", "Animations", "Export animations"),
+                     ("WALKMESH", "Walkmesh", "Attempt to create walkmesh file (.pwk, .dwk or .wok depending on classification)"),
                      ),
-            default = {'ANIMATION', 'WALKMESH'})
+            default = {"ANIMATION", "WALKMESH"})
 
     exportSmoothGroups : bpy.props.BoolProperty(
-            name='Export Smooth Groups',
-            description='Generate smooth groups from sharp edges' \
-                        '(When disabled every face belongs to the same group)',
+            name="Export Smooth Groups",
+            description="Generate smooth groups from sharp edges" \
+                        "(When disabled every face belongs to the same group)",
             default=True)
 
     applyModifiers : bpy.props.BoolProperty(
-            name='Apply Modifiers',
-            description='Apply Modifiers before exporting',
+            name="Apply Modifiers",
+            description="Apply Modifiers before exporting",
             default=True)
 
     def execute(self, context):
-        return nvb_io.save_mdl(self, context, **self.as_keywords(ignore=('filter_glob','check_existing')))
+        return nvb_io.save_mdl(self, context, **self.as_keywords(ignore=("filter_glob","check_existing")))
 
 
 class KB_OT_load_wok_materials(bpy.types.Operator):
@@ -498,7 +498,7 @@ class KB_OT_load_wok_materials(bpy.types.Operator):
             object_mesh = selected_object.data
 
             # Remove all current material slots
-            for i in range(len(selected_object.material_slots)):
+            for _ in range(len(selected_object.material_slots)):
                 bpy.ops.object.material_slot_remove()
 
             # Create materials
@@ -518,7 +518,7 @@ class KB_OT_load_wok_materials(bpy.types.Operator):
 
                 object_mesh.materials.append(mat)
         else:
-            self.report({'INFO'}, 'A mesh must be selected')
+            self.report({'INFO'}, "A mesh must be selected")
             return {'CANCELLED'}
 
         return {'FINISHED'}
@@ -540,12 +540,12 @@ class KB_OT_render_minimap(bpy.types.Operator):
                 nvb_utils.setup_minimap_render(obj, scene)
                 bpy.ops.render.render(use_viewport = True)
 
-                self.report({'INFO'}, 'Ready to render')
+                self.report({'INFO'}, "Ready to render")
             else:
-                self.report({'INFO'}, 'A MDLROOT must be selected')
+                self.report({'INFO'}, "A MDLROOT must be selected")
                 return {'CANCELLED'}
         else:
-            self.report({'INFO'}, 'An Empty must be selected')
+            self.report({'INFO'}, "An Empty must be selected")
             return {'CANCELLED'}
 
         return {'FINISHED'}
@@ -562,38 +562,38 @@ class KB_OT_add_skingroup(bpy.types.Operator):
         if skingrName:
             if (skingrName not in obj.vertex_groups.keys()):
                 # Create the vertex group
-                vertGroup = obj.vertex_groups.new(name=skingrName)
-                obj.nvb.skingroup_obj = ''
+                obj.vertex_groups.new(name=skingrName)
+                obj.nvb.skingroup_obj = ""
 
-                self.report({'INFO'}, 'Created vertex group ' + skingrName)
+                self.report({'INFO'}, "Created vertex group " + skingrName)
                 return{'FINISHED'}
             else:
-                self.report({'INFO'}, 'Duplicate Name')
+                self.report({'INFO'}, "Duplicate Name")
                 return {'CANCELLED'}
         else:
-            self.report({'INFO'}, 'Empty Name')
+            self.report({'INFO'}, "Empty Name")
             return {'CANCELLED'}
 
 
 class KB_OT_export_lyt(bpy.types.Operator, bpy_extras.io_utils.ExportHelper):
     """Export Odyssey Engine layout (.lyt)"""
 
-    bl_idname = 'kb.lytexport'
-    bl_label  = 'Export Odyssey LYT'
+    bl_idname = "kb.lytexport"
+    bl_label  = "Export Odyssey LYT"
 
-    filename_ext = '.lyt'
+    filename_ext = ".lyt"
 
     filter_glob : bpy.props.StringProperty(
-            default = '*.lyt',
+            default = "*.lyt",
             options = {'HIDDEN'})
 
     def _describe_object(self, obj):
         parent = nvb_utils.get_mdl_root(obj)
         orientation = obj.rotation_euler.to_quaternion()
-        return "{} {} {:.7g} {:.7g} {:.7g} {:.7g} {:.7g} {:.7g} {:.7g}".format(parent.name if parent else 'NULL', obj.name, *obj.matrix_world.translation, *orientation)
+        return "{} {} {:.7g} {:.7g} {:.7g} {:.7g} {:.7g} {:.7g} {:.7g}".format(parent.name if parent else "NULL", obj.name, *obj.matrix_world.translation, *orientation)
 
     def execute(self, context):
-        with open(self.filepath, 'w') as f:
+        with open(self.filepath, "w") as f:
             rooms = []
             doors = []
             others = []
@@ -603,24 +603,24 @@ class KB_OT_export_lyt(bpy.types.Operator, bpy_extras.io_utils.ExportHelper):
                 if obj.type == 'EMPTY':
                     if obj.nvb.dummytype == nvb_def.Dummytype.MDLROOT:
                         rooms.append(obj)
-                    elif obj.name.lower().startswith('door'):
+                    elif obj.name.lower().startswith("door"):
                         doors.append(obj)
                     else:
                         others.append(obj)
 
-            f.write('beginlayout\n')
+            f.write("beginlayout\n")
             f.write("  roomcount {}\n".format(len(rooms)))
             for room in rooms:
                 f.write("    {} {:.7g} {:.7g} {:.7g}\n".format(room.name, *room.location))
-            f.write('  trackcount 0\n')
-            f.write('  obstaclecount 0\n')
+            f.write("  trackcount 0\n")
+            f.write("  obstaclecount 0\n")
             f.write("  doorhookcount {}\n".format(len(doors)))
             for door in doors:
                 f.write("    {}\n".format(self._describe_object(door)))
             f.write("  othercount {}\n".format(len(others)))
             for other in others:
                 f.write("    {}\n".format(self._describe_object(other)))
-            f.write('donelayout\n')
+            f.write("donelayout\n")
 
         return {'FINISHED'}
 
@@ -628,7 +628,7 @@ class KB_OT_export_lyt(bpy.types.Operator, bpy_extras.io_utils.ExportHelper):
 class KB_OT_rebuild_material_nodes(bpy.types.Operator):
     """Rebuild material node tree of this object."""
 
-    bl_idname = 'kb.rebuild_material_nodes'
+    bl_idname = "kb.rebuild_material_nodes"
     bl_label = "Rebuild Material Nodes"
 
     def execute(self, context):

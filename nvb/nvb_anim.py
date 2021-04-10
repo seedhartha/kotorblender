@@ -6,7 +6,7 @@ from . import nvb_animnode, nvb_def, nvb_utils
 
 
 class Animation():
-    def __init__(self, name = 'UNNAMED', ascii_data=None):
+    def __init__(self, name = "UNNAMED", ascii_data=None):
         self.name      = name
         self.length    = 1.0
         self.transtime = 1.0
@@ -84,7 +84,7 @@ class Animation():
             newItem.frame = nvb_utils.nwtime2frame(event[0])
             newItem.name  = event[1]
 
-    def get_anim_from_scene(self, scene, rootDummyName = ''):
+    def get_anim_from_scene(self, scene, rootDummyName = ""):
         pass
 
     def get_anim_from_ascii(self, asciiBlock):
@@ -95,35 +95,35 @@ class Animation():
             except IndexError:
                 # Probably empty line or whatever, skip it
                 continue
-            if (label == 'newanim'):
+            if (label == "newanim"):
                 self.name = nvb_utils.get_name(line[1])
-            elif (label == 'length'):
+            elif (label == "length"):
                 self.length = float(line[1])
-            elif (label == 'transtime'):
+            elif (label == "transtime"):
                 self.transtime = float(line[1])
-            elif (label == 'animroot'):
+            elif (label == "animroot"):
                 try:
                     self.root = line[1]
                 except:
-                    self.root = 'undefined'
-            elif (label == 'event'):
+                    self.root = "undefined"
+            elif (label == "event"):
                 self.add_event((float(line[1]), line[2]))
-            elif (label == 'eventlist'):
+            elif (label == "eventlist"):
                 numEvents = next((i for i, v in enumerate(asciiBlock[idx+1:]) if not nvb_utils.is_number(v[0])), -1)
                 list(map(self.add_event, ((float(v[0]), v[1]) for v in asciiBlock[idx+1:idx+1+numEvents])))
-            elif (label == 'node'):
+            elif (label == "node"):
                 blockStart = idx
-            elif (label == 'endnode'):
+            elif (label == "endnode"):
                 if (blockStart > 0):
                     self.add_ascii_node(asciiBlock[blockStart:idx+1])
                     blockStart = -1
-                elif (label == 'node'):
+                elif (label == "node"):
                     raise nvb_def.MalformedMdlFile("Unexpected 'endnode'")
 
     def load_ascii(self, ascii_data):
         """Load an animation from a block from an ascii mdl file."""
         self.get_anim_from_ascii([l.strip().split() for l in ascii_data.splitlines()])
-        animNodesStart = ascii_data.find('node ')
+        animNodesStart = ascii_data.find("node ")
         if (animNodesStart > -1):
             self.load_ascii_anim_header(ascii_data[:animNodesStart-1])
             self.load_ascii_anim_nodes(ascii_data[animNodesStart:])
@@ -137,23 +137,23 @@ class Animation():
                 label = line[0].lower()
             except (IndexError, AttributeError):
                 continue  # Probably empty line, skip it
-            if (label == 'newanim'):
+            if (label == "newanim"):
                 self.name = nvb_utils.str2identifier(line[1])
-            elif (label == 'length'):
+            elif (label == "length"):
                 self.length = float(line[1])
-            elif (label == 'transtime'):
+            elif (label == "transtime"):
                 self.transtime = float(line[1])
-            elif (label == 'animroot'):
+            elif (label == "animroot"):
                 try:
                     self.animroot = line[1].lower()
                 except (ValueError, IndexError):
-                    self.animroot = ''
-            elif (label == 'event'):
+                    self.animroot = ""
+            elif (label == "event"):
                 self.events.append((float(line[1]), line[2]))
 
     def load_ascii_anim_nodes(self, ascii_data):
-        dlm = 'node '
-        node_list = [dlm + s for s in ascii_data.split(dlm) if s != '']
+        dlm = "node "
+        node_list = [dlm + s for s in ascii_data.split(dlm) if s != ""]
         for idx, ascii_node in enumerate(node_list):
             ascii_lines = [l.strip().split() for l in ascii_node.splitlines()]
             node = nvb_animnode.Animnode()
@@ -173,7 +173,7 @@ class Animation():
             childList.append((child.nvb.imporder, child))
         childList.sort(key=lambda tup: tup[0])
 
-        for (imporder, child) in childList:
+        for (_, child) in childList:
             self.anim_node_to_ascii(child, asciiLines)
 
     @staticmethod
@@ -215,21 +215,21 @@ class Animation():
         ascii_lines.append("doneanim {} {}".format(anim.name, animRootDummy.name))
         ascii_lines.append("")
 
-    def to_ascii(self, animScene, animRootDummy, asciiLines, mdlName = ''):
+    def to_ascii(self, animScene, animRootDummy, asciiLines, mdlName = ""):
         self.name      = animRootDummy.nvb.animname
         self.length    = nvb_utils.frame2nwtime(animScene.frame_end, animScene.render.fps)
         self.transtime = animRootDummy.nvb.transtime
         self.root      = animRootDummy.nvb.animroot
 
-        asciiLines.append('newanim ' + self.name + ' ' + mdlName)
-        asciiLines.append('  length ' + str(round(self.length, 5)))
-        asciiLines.append('  transtime ' + str(round(self.transtime, 3)))
-        asciiLines.append('  animroot ' + self.root)
+        asciiLines.append("newanim " + self.name + " " + mdlName)
+        asciiLines.append("  length " + str(round(self.length, 5)))
+        asciiLines.append("  transtime " + str(round(self.transtime, 3)))
+        asciiLines.append("  animroot " + self.root)
 
         for event in animRootDummy.nvb.eventList:
             eventTime = nvb_utils.frame2nwtime(event.frame, animScene.render.fps)
-            asciiLines.append('  event ' + str(round(eventTime, 5)) + ' ' + event.name)
+            asciiLines.append("  event " + str(round(eventTime, 5)) + " " + event.name)
 
         self.anim_node_to_ascii(animRootDummy, asciiLines)
-        asciiLines.append('doneanim ' + self.name + ' ' + mdlName)
-        asciiLines.append('')
+        asciiLines.append("doneanim " + self.name + " " + mdlName)
+        asciiLines.append("")

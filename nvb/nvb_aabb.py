@@ -33,8 +33,6 @@ def generate_tree(aabb_tree, face_list, rlevel = 0):
 
     bb_avgcentroid = bb_avgcentroid / len(face_list)
 
-    bb_centroid = (bb_min + bb_max) /2
-
     if (len(face_list) == 1):
         # Only one face left in face list
         # This node is a leaf, save the face in the leaf

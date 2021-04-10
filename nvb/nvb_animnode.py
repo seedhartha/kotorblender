@@ -67,7 +67,7 @@ class Keys():
         self.colormid = []
         self.colorend = []
         # Unknown. Import as text
-        self.rawascii = ''
+        self.rawascii = ""
 
     def has_alpha(self):
         return len(self.alpha) > 0
@@ -75,40 +75,40 @@ class Keys():
 
 class Node():
     KEY_TYPE = {
-        'position': {
-            'values': 3,
-            'axes': 3,
-            'objdata': 'location',
+        "position": {
+            "values": 3,
+            "axes": 3,
+            "objdata": "location",
         },
-        'orientation': {
-            'values': 4,
-            'axes': 4,
-            'objdata': 'rotation_quaternion',
+        "orientation": {
+            "values": 4,
+            "axes": 4,
+            "objdata": "rotation_quaternion",
         },
-        'scale': {
-            'values': 1,
-            'axes': 3,
-            'objdata': 'scale',
+        "scale": {
+            "values": 1,
+            "axes": 3,
+            "objdata": "scale",
         },
-        'alpha': {
-            'values': 1,
-            'axes': 1,
-            'objdata': 'nvb.alpha',
+        "alpha": {
+            "values": 1,
+            "axes": 1,
+            "objdata": "nvb.alpha",
         },
-        'selfillumcolor': {
-            'values': 3,
-            'axes': 3,
-            'objdata': 'nvb.selfillumcolor',
+        "selfillumcolor": {
+            "values": 3,
+            "axes": 3,
+            "objdata": "nvb.selfillumcolor",
         },
-        'color': {
-            'values': 3,
-            'axes': 3,
-            'objdata': 'color',
+        "color": {
+            "values": 3,
+            "axes": 3,
+            "objdata": "color",
         },
-        'radius': {
-            'values': 1,
-            'axes': 1,
-            'objdata': 'distance',
+        "radius": {
+            "values": 1,
+            "axes": 1,
+            "objdata": "distance",
         },
     }
     EMITTER_KEY_TYPE = {
@@ -315,9 +315,9 @@ class Node():
         },
     }
 
-    def __init__(self, name = 'UNNAMED'):
+    def __init__(self, name = "UNNAMED"):
         self.name       = name
-        self.nodetype   = 'dummy'
+        self.nodetype   = "dummy"
         self.parentName = nvb_def.null
 
         # Keyed
@@ -368,7 +368,7 @@ class Node():
         as plain text.
         """
         for line in asciiBlock:
-            self.keys.rawascii = self.keys.rawascii + '\n' + ' '.join(line)
+            self.keys.rawascii = self.keys.rawascii + "\n" + " ".join(line)
         self.isEmpty = False
 
     @staticmethod
@@ -381,8 +381,6 @@ class Node():
         return next((i for i, v in enumerate(asciiBlock) if len(v) and not l_is_number(v[0])), -1)
 
     def load_ascii(self, asciiBlock):
-        l_float    = float
-        l_int      = int
         l_is_number = nvb_utils.is_number
         for idx, line in enumerate(asciiBlock):
             try:
@@ -390,29 +388,29 @@ class Node():
             except IndexError:
                 # Probably empty line or whatever, skip it
                 continue
-            if label == 'node':
+            if label == "node":
                 self.nodeType = line[1].lower()
                 self.name = nvb_utils.get_name(line[2])
-            elif label == 'endnode':
+            elif label == "endnode":
                 return
-            elif label == 'endlist':
+            elif label == "endlist":
                 # Can't rely on that being here. We have our own way to get
                 # the end of a key list
                 pass
-            elif label == 'parent':
+            elif label == "parent":
                 self.parentName = nvb_utils.get_name(line[1])
             elif label in self.KEY_TYPE.keys() or \
-                 label in (attr + 'key' for attr in self.KEY_TYPE.keys()) or \
-                 label in (attr + 'bezierkey' for attr in self.KEY_TYPE.keys()):
+                 label in (attr + "key" for attr in self.KEY_TYPE.keys()) or \
+                 label in (attr + "bezierkey" for attr in self.KEY_TYPE.keys()):
                 # Parse all controllers: unkeyed, keyed, or bezierkeyed
                 attrname = [attr for attr in self.KEY_TYPE.keys() if label.startswith(attr)][0]
                 attr_type = self.KEY_TYPE[attrname]
-                key_type = ''
-                key_type = 'key' if label.endswith('key') else key_type
-                key_type = 'bezierkey' if label.endswith('bezierkey') else key_type
-                numVals = attr_type['values']
+                key_type = ""
+                key_type = "key" if label.endswith("key") else key_type
+                key_type = "bezierkey" if label.endswith("bezierkey") else key_type
+                numVals = attr_type["values"]
                 if key_type:
-                    if key_type == 'bezierkey':
+                    if key_type == "bezierkey":
                         numVals *= 3
                     numKeys = type(self).find_end(asciiBlock[idx+1:])
                     subblock = asciiBlock[idx+1:idx+numKeys+1]
@@ -423,18 +421,18 @@ class Node():
                 nvb_parse._f(subblock, getattr(self.keys, attrname), numVals + 1)
                 self.isEmpty = False
             elif label in (attr.lower() for attr in self.EMITTER_KEY_TYPE.keys()) or \
-                 label in (attr.lower() + 'key' for attr in self.EMITTER_KEY_TYPE.keys()) or \
-                 label in (attr.lower() + 'bezierkey' for attr in self.EMITTER_KEY_TYPE.keys()):
+                 label in (attr.lower() + "key" for attr in self.EMITTER_KEY_TYPE.keys()) or \
+                 label in (attr.lower() + "bezierkey" for attr in self.EMITTER_KEY_TYPE.keys()):
                 # Parse all controllers: unkeyed, keyed, or bezierkeyed
                 attrname = [attr for attr in self.EMITTER_KEY_TYPE.keys() if attr.lower() in label][0]
                 propname = attrname.lower()
                 attr_type = self.EMITTER_KEY_TYPE[attrname]
-                key_type = ''
-                key_type = 'key' if label.endswith('key') else key_type
-                key_type = 'bezierkey' if label.endswith('bezierkey') else key_type
-                numVals = attr_type['values']
+                key_type = ""
+                key_type = "key" if label.endswith("key") else key_type
+                key_type = "bezierkey" if label.endswith("bezierkey") else key_type
+                numVals = attr_type["values"]
                 if key_type:
-                    if key_type == 'bezierkey':
+                    if key_type == "bezierkey":
                         numVals *= 3
                     numKeys = type(self).find_end(asciiBlock[idx+1:])
                     subblock = asciiBlock[idx+1:idx+numKeys+1]
@@ -442,7 +440,7 @@ class Node():
                     numKeys = 1
                     subblock = [[0.0] + line[1:]]
                 # parse numvals plus one for time
-                if 'conversion' in attr_type and attr_type['conversion'] is int:
+                if "conversion" in attr_type and attr_type["conversion"] is int:
                     nvb_parse._i(subblock, getattr(self.keys, propname), numVals + 1)
                 else:
                     nvb_parse._f(subblock, getattr(self.keys, propname), numVals + 1)
@@ -476,7 +474,7 @@ class Node():
                 cp2frame = frame + ((nextframe - frame) / 3.0)
                 kfp.handle_right[:] = [ cp2frame, key[value_idx + (2 * num_values)] + key[value_idx] ]
 
-    def add_anim_to_object(self, targetObject, animName = ''):
+    def add_anim_to_object(self, targetObject, animName = ""):
         """
         Add the animations in this node to target object
         """
@@ -487,22 +485,21 @@ class Node():
         # test for all key types, if present, create timelines for them
         for attrname in self.KEY_TYPE.keys():
             if not getattr(self.keys, attrname) or \
-               not self.KEY_TYPE[attrname]['objdata']:
+               not self.KEY_TYPE[attrname]["objdata"]:
                 continue
             key_type = self.KEY_TYPE[attrname]
             curves = []
             # one fcurve per 'axis' (xyz, rgb, etc.)
-            for x in range(0, key_type['axes']):
-                curves.append(action.fcurves.new(data_path=key_type['objdata'], index=x))
+            for x in range(0, key_type["axes"]):
+                curves.append(action.fcurves.new(data_path=key_type["objdata"], index=x))
             # handle each keyframe
-            for index, key in enumerate(getattr(self.keys, attrname)):
-                frame = nvb_utils.nwtime2frame(key[0])
+            for index, _ in enumerate(getattr(self.keys, attrname)):
                 # handle each axis, matching values to curves
-                for x in range(0, key_type['axes']):
+                for x in range(0, key_type["axes"]):
                     # handle key/bezierkey for all types in add_keyframe_to_curve
                     self.add_keyframe_to_curve(
                         curves[x], getattr(self.keys, attrname), index,
-                        min(x + 1, key_type['values']), key_type['values'])
+                        min(x + 1, key_type["values"]), key_type["values"])
         # test for all key types, if present, create timelines for them
         for attrname in self.EMITTER_KEY_TYPE.keys():
             propname = attrname.lower()
@@ -511,17 +508,16 @@ class Node():
             key_type = self.EMITTER_KEY_TYPE[attrname]
             curves = []
             # one fcurve per 'axis' (xyz, rgb, etc.)
-            for x in range(0, key_type['axes']):
-                curves.append(action.fcurves.new(data_path='nvb.' + propname, index=x))
+            for x in range(0, key_type["axes"]):
+                curves.append(action.fcurves.new(data_path="nvb." + propname, index=x))
             # handle each keyframe
-            for index, key in enumerate(getattr(self.keys, propname)):
-                frame = nvb_utils.nwtime2frame(key[0])
+            for index, _ in enumerate(getattr(self.keys, propname)):
                 # handle each axis, matching values to curves
-                for x in range(0, key_type['axes']):
+                for x in range(0, key_type["axes"]):
                     # handle key/bezierkey for all types in add_keyframe_to_curve
                     self.add_keyframe_to_curve(
                         curves[x], getattr(self.keys, propname), index,
-                        min(x + 1, key_type['values']), key_type['values'])
+                        min(x + 1, key_type["values"]), key_type["values"])
 
         # Add imcompatible animations (emitters) as a text object
         if (self.keys.rawascii):
@@ -538,17 +534,17 @@ class Node():
             # Get the sub dict for this particlar type of fcurve
             axis     = fcurve.array_index
             dataPath = fcurve.data_path
-            name     = ''
+            name     = ""
             for keyname in Node.KEY_TYPE.keys():
                 ktype = Node.KEY_TYPE[keyname]
-                if ktype['objdata'] is not None and \
-                   dataPath == ktype['objdata']:
-                    name = keyname + 'key'
+                if ktype["objdata"] is not None and \
+                   dataPath == ktype["objdata"]:
+                    name = keyname + "key"
                     break
             for keyname in Node.EMITTER_KEY_TYPE.keys():
-                if dataPath == 'nvb.' + keyname.lower():
+                if dataPath == "nvb." + keyname.lower():
                     ktype = Node.EMITTER_KEY_TYPE[keyname]
-                    name = keyname + 'key'
+                    name = keyname + "key"
                     break
 
             # does this fcurve have points in this animation?
@@ -560,7 +556,7 @@ class Node():
                 continue
 
             for kfp in fcurve.keyframe_points:
-                if name.startswith('orientation'):
+                if name.startswith("orientation"):
                     # bezier keyed orientation animation currently unsupported
                     break
                 if kfp.interpolation == 'BEZIER':
@@ -579,9 +575,9 @@ class Node():
                 else:
                     values = [0.0, 0.0, 0.0, 0.0]
                 values[axis] = values[axis] + kfp.co[1]
-                if name.endswith('bezierkey'):
+                if name.endswith("bezierkey"):
                     if kfp.interpolation == 'BEZIER':
-                        values[ktype['axes'] + (axis * 2):(ktype['axes'] + 1) + (axis * 2)] = \
+                        values[ktype["axes"] + (axis * 2):(ktype["axes"] + 1) + (axis * 2)] = \
                             [ kfp.handle_left[1] - kfp.co[1], kfp.handle_right[1] - kfp.co[1] ]
                     elif kfp.interpolation == 'LINEAR':
                         # do the linear emulation,
@@ -615,12 +611,12 @@ class Node():
                             left_handle = kfp.handle_left[1] - kfp.co[1]
                         else:
                             left_handle = 0.0
-                        values[ktype['axes'] + (axis * 2):(ktype['axes'] + 1) + (axis * 2)] = \
+                        values[ktype["axes"] + (axis * 2):(ktype["axes"] + 1) + (axis * 2)] = \
                             [ left_handle, right_handle ]
                     else:
                         # somebody mixed an unknown keyframe type ...
                         # give them some bad data
-                        values[ktype['axes'] + (axis * 2):(ktype['axes'] + 1) + (axis * 2)] = [ 0.0, 0.0 ]
+                        values[ktype["axes"] + (axis * 2):(ktype["axes"] + 1) + (axis * 2)] = [ 0.0, 0.0 ]
                 keys[frame] = values
 
     def add_keys_to_ascii_incompat(self, obj, asciiLines):
@@ -631,24 +627,24 @@ class Node():
         if obj.nvb.rawascii not in bpy.data.texts:
             return
         txt      = bpy.data.texts[obj.nvb.rawascii]
-        txtLines = [l.split() for l in txt.as_string().split('\n')]
+        txtLines = [l.split() for l in txt.as_string().split("\n")]
         for line in txtLines:
             try:
                 label = line[0].lower()
             except IndexError:
                 # Probably empty line or whatever, skip it
                 continue
-            if  (label == 'node') or (label  == 'endnode') or \
-                (label == 'parent') or (label == 'position'):
+            if  (label == "node") or (label  == "endnode") or \
+                (label == "parent") or (label == "position"):
                 # We don't need any of this
                 pass
             else:
                 # We'll take everything that doesn't start with a #
-                if label[0] != '#':
+                if label[0] != "#":
                     if nvb_utils.is_number(label):
-                        asciiLines.append('      ' + ' '.join(line))
+                        asciiLines.append("      " + " ".join(line))
                     else:
-                        asciiLines.append('    ' + ' '.join(line))
+                        asciiLines.append("    " + " ".join(line))
 
     @staticmethod
     def generate_ascii_keys(animObj, anim, asciiLines, options={}):
@@ -657,12 +653,6 @@ class Node():
         # Object Data
         if animObj.animation_data:
             action = animObj.animation_data.action
-            if action:
-                Node.get_keys_from_action(anim, action, keyDict)
-
-        # Material/ texture data (= texture alpha_factor)
-        if animObj.active_material and animObj.active_material.animation_data:
-            action = animObj.active_material.animation_data.action
             if action:
                 Node.get_keys_from_action(anim, action, keyDict)
 
@@ -676,8 +666,8 @@ class Node():
         l_round = round
 
         for attrname in Node.KEY_TYPE.keys():
-            bezname = attrname + 'bezierkey'
-            keyname = attrname + 'key'
+            bezname = attrname + "bezierkey"
+            keyname = attrname + "key"
             if (bezname not in keyDict or not len(keyDict[bezname])) and \
                (keyname not in keyDict or not len(keyDict[keyname])):
                 continue
@@ -690,21 +680,21 @@ class Node():
                 # convert raw frame number to animation-relative time
                 time = l_round(nvb_utils.frame2nwtime(frame - anim.frameStart), 5)
                 # orientation value conversion
-                if keyname.startswith('orientation'):
+                if keyname.startswith("orientation"):
                     key = nvb_utils.quat2nwangle(key[0:4])
                 # export title and
-                line = '      {: .7g}' + (' {: .7g}' * ktype['values'])
-                s = line.format(time, *key[0:ktype['values']])
+                line = "      {: .7g}" + (" {: .7g}" * ktype["values"])
+                s = line.format(time, *key[0:ktype["values"]])
                 # export bezierkey control points
                 if keyname == bezname:
                     # left control point(s)
-                    s += (' {: .7g}' * ktype['values']).format(*key[ktype['axes']::2])
+                    s += (" {: .7g}" * ktype["values"]).format(*key[ktype["axes"]::2])
                     # right control point(s)
-                    s += (' {: .7g}' * ktype['values']).format(*key[ktype['axes'] + 1::2])
+                    s += (" {: .7g}" * ktype["values"]).format(*key[ktype["axes"] + 1::2])
                 asciiLines.append(s)
         for attrname in Node.EMITTER_KEY_TYPE.keys():
-            bezname = attrname + 'bezierkey'
-            keyname = attrname + 'key'
+            bezname = attrname + "bezierkey"
+            keyname = attrname + "key"
             if (bezname not in keyDict or not len(keyDict[bezname])) and \
                (keyname not in keyDict or not len(keyDict[keyname])):
                 continue
@@ -721,15 +711,15 @@ class Node():
                 value_str = " {: .7g}"
                 if "conversion" in ktype and ktype["conversion"] is int:
                     value_str = " {: d}"
-                    key[0:ktype['values']] = [int(k) for k in key[0:ktype['values']]]
-                line = '      {: .7g}' + (value_str * ktype['values'])
-                s = line.format(time, *key[0:ktype['values']])
+                    key[0:ktype["values"]] = [int(k) for k in key[0:ktype["values"]]]
+                line = "      {: .7g}" + (value_str * ktype["values"])
+                s = line.format(time, *key[0:ktype["values"]])
                 # export bezierkey control points
                 if keyname == bezname:
                     # left control point(s)
-                    s += (' {: .7g}' * ktype['values']).format(*key[ktype['axes']::2])
+                    s += (" {: .7g}" * ktype["values"]).format(*key[ktype["axes"]::2])
                     # right control point(s)
-                    s += (' {: .7g}' * ktype['values']).format(*key[ktype['axes'] + 1::2])
+                    s += (" {: .7g}" * ktype["values"]).format(*key[ktype["axes"] + 1::2])
                 asciiLines.append(s)
 
     @staticmethod
@@ -739,14 +729,14 @@ class Node():
         """
         if nodeName.endswith(animName):
             orig = nodeName[:len(nodeName)-len(animName)]
-            if orig.endswith('.'):
+            if orig.endswith("."):
                 orig = orig[:len(orig)-1]
             return orig
 
         # Try to separate the name by the first '.'
         # This is unsafe, but we have no choice if we want to maintain some
         # flexibility. It will be up to the user to name the object properly
-        orig = nodeName.partition('.')[0]
+        orig = nodeName.partition(".")[0]
         if orig:
             return orig
 
@@ -812,14 +802,14 @@ class Node():
             originalParent = Node.get_original_name(animObj.parent.name, animName)
 
         if originalObj.nvb.meshtype == nvb_def.Meshtype.EMITTER:
-            asciiLines.append('  node emitter ' + originalName)
-            asciiLines.append('    parent ' + originalParent)
+            asciiLines.append("  node emitter " + originalName)
+            asciiLines.append("    parent " + originalParent)
         else:
-            asciiLines.append('  node dummy ' + originalName)
-            asciiLines.append('    parent ' + originalParent)
+            asciiLines.append("  node dummy " + originalName)
+            asciiLines.append("    parent " + originalParent)
         self.add_keys_to_ascii(animObj, originalObj, asciiLines)
         self.add_keys_to_ascii_incompat(animObj, asciiLines)
-        asciiLines.append('  endnode')
+        asciiLines.append("  endnode")
 
 import copy
 
@@ -827,7 +817,7 @@ from . import nvb_node
 
 
 class Animnode():
-    def __init__(self, name='UNNAMED'):
+    def __init__(self, name="UNNAMED"):
         self.nodeidx = -1
         self.nodetype = nvb_def.Nodetype.DUMMY
         self.name = name
@@ -888,16 +878,6 @@ class Animnode():
         list(map(lambda c: c.update(), fcu))
 
     def load_ascii(self, ascii_lines, nodeidx=-1):
-        def find_end(ascii_lines):
-            """Find the end of a key list.
-
-            We don't know when a list of keys of keys will end. We'll have to
-            search for the first non-numeric value
-            """
-            l_is_number = nvb_utils.is_number
-            return next((i for i, v in enumerate(ascii_lines)
-                         if not l_is_number(v[0])), -1)
-
         self.nodeidx = nodeidx
         key_data = {}
         l_is_number = nvb_utils.is_number
@@ -909,24 +889,22 @@ class Animnode():
             else:
                 if l_is_number(label):
                     continue
-            if label == 'node':
+            if label == "node":
                 self.nodetype = line[1].lower()
                 self.name = nvb_utils.str2identifier(line[2])
-            elif label == 'endnode':
+            elif label == "endnode":
                 return
-            elif label == 'parent':
+            elif label == "parent":
                 self.parentName = nvb_utils.str2identifier(line[1])
             else:  # Check for keys
                 key_name = label
-                key_is_single = True
                 key_type = ""
-                if key_name.endswith('key'):
-                    key_is_single = False
+                if key_name.endswith("key"):
                     key_name = key_name[:-3]
-                    key_type = 'key'
-                if key_name.endswith('bezier'):
+                    key_type = "key"
+                if key_name.endswith("bezier"):
                     key_name = key_name[:-6]
-                    key_type = 'bezierkey'
+                    key_type = "bezierkey"
                 if key_name in Node.KEY_TYPE.keys() or \
                    key_name in [k.lower() for k in Node.EMITTER_KEY_TYPE.keys()]:
                     attr_name = key_name
@@ -943,10 +921,10 @@ class Animnode():
                     else:
                         # object property
                         attr_type = Node.KEY_TYPE[attr_name]
-                    numVals = attr_type['values']
+                    numVals = attr_type["values"]
                     numKeys = 0
                     if key_type:
-                        if key_type == 'bezierkey':
+                        if key_type == "bezierkey":
                             numVals *= 3
                         numKeys = Node.find_end(ascii_lines[i+1:])
                         subblock = ascii_lines[i + 1:i + numKeys + 1]
@@ -954,8 +932,8 @@ class Animnode():
                         numKeys = 1
                         subblock = [[0.0] + line[1:]]
                     converter = float
-                    if 'conversion' in attr_type:
-                        converter = attr_type['conversion']
+                    if "conversion" in attr_type:
+                        converter = attr_type["conversion"]
                     key_data[key_name] = [
                         [
                             # time followed by values, for each line
@@ -964,48 +942,48 @@ class Animnode():
                                 converter, v[1:numVals+1]
                             )) for v in subblock
                         ],
-                        attr_type['objdata'] if 'objdata' in attr_type else '',
+                        attr_type["objdata"] if "objdata" in attr_type else "",
                         numVals
                     ]
 
     def create_data_object(self, obj, anim, options={}):
         """Creates animations in object actions."""
         def data_conversion(label, obj, vals, options={}):
-            if label == 'orientation':
-                dp = 'rotation_quaternion'
+            if label == "orientation":
+                dp = "rotation_quaternion"
                 dp_dim = 4
                 quats = [Quaternion(v[0:3], v[3]) for v in vals]
                 new_values = [[q.w, q.x, q.y, q.z] for q in quats]
-            elif label == 'position':
+            elif label == "position":
                 #XXX need MDL animation scale here
                 scl = 1.0
-                dp = 'location'
+                dp = "location"
                 dp_dim = 3
                 if scl:
                     new_values = [[l * scl for l in loc] for loc in vals]
                 else:
                     new_values = vals
-            elif label == 'scale':
-                dp = 'scale'
+            elif label == "scale":
+                dp = "scale"
                 dp_dim = 3
                 new_values = [[v[0]] * dp_dim for v in vals]
             return new_values, dp, dp_dim
 
         fps = nvb_def.fps
         frame_start = anim.frameStart
-        action = nvb_utils.get_action(obj, options['mdlname'] + '.' + obj.name)
+        action = nvb_utils.get_action(obj, options["mdlname"] + "." + obj.name)
         for label, (data, data_path, data_dim) in self.object_data.items():
             frames = [fps * d[0] + frame_start for d in data]
             use_action = action
-            if obj.type == 'LIGHT' and label in ['radius', 'color']:
+            if obj.type == 'LIGHT' and label in ["radius", "color"]:
                 use_action = nvb_utils.get_action(
                     # Light object, not Object object
                     obj.data,
-                    options['mdlname'] + '.' + obj.name
+                    options["mdlname"] + "." + obj.name
                 )
             #XXX temp disable data path here to get conversion
-            if label in ['orientation', 'position', 'scale']:
-                data_path = ''
+            if label in ["orientation", "position", "scale"]:
+                data_path = ""
             if not data_path:  # Needs conversion
                 values, dp, dp_dim = data_conversion(
                     label, obj, [d[1:data_dim+1] for d in data], options)
@@ -1019,14 +997,14 @@ class Animnode():
         """Creates animations in emitter actions."""
         fps = nvb_def.fps
         frame_start = anim.frameStart
-        action = nvb_utils.get_action(obj, options['mdlname'] + '.' + obj.name)
-        for label, (data, data_path, data_dim) in self.emitter_data.items():
+        action = nvb_utils.get_action(obj, options["mdlname"] + "." + obj.name)
+        for label, (data, _, data_dim) in self.emitter_data.items():
             frames = [fps * d[0] + frame_start for d in data]
             values = [d[1:data_dim+1] for d in data]
             dp = "nvb.{}".format(label)
             dp_dim = data_dim
             Animnode.insert_kfp(frames, values, action, dp, dp_dim,
-                                'Odyssey Emitter')
+                                "Odyssey Emitter")
 
     @staticmethod
     def create_restpose(obj, frame=1):
@@ -1043,16 +1021,16 @@ class Animnode():
         action = animData.action
         if not action:
             return  # No action = no animation = no need for rest pose
-        dp = 'rotation_quaternion'
+        dp = "rotation_quaternion"
         fcu = [action.fcurves.find(dp, index=i) for i in range(4)]
         if fcu.count(None) < 1:
             rr = obj.nvb.restrot
             q = Quaternion((rr[0], rr[1], rr[2]), rr[3])
             insert_kfp(fcu, frame, [q.w, q.x, q.y, q.z], 4)
-        fcu = [action.fcurves.find('location', index=i) for i in range(3)]
+        fcu = [action.fcurves.find("location", index=i) for i in range(3)]
         if fcu.count(None) < 1:
             insert_kfp(fcu, frame, obj.nvb.restloc, 3)
-        fcu = [action.fcurves.find('scale', index=i) for i in range(3)]
+        fcu = [action.fcurves.find("scale", index=i) for i in range(3)]
         if fcu.count(None) < 1:
             insert_kfp(fcu, frame, [obj.nvb.restscl] * 3, 3)
 
@@ -1071,11 +1049,11 @@ class Animnode():
         if obj.nvb.meshtype == nvb_def.Meshtype.EMITTER:
             node_type = "emitter"
         node_name = Node.get_original_name(obj.name, anim.name)
-        asciiLines.append('  node ' + node_type + ' ' + node_name)
+        asciiLines.append("  node " + node_type + " " + node_name)
         # Parent
         parent_name = nvb_def.null
         if obj.parent:
             parent_name = Node.get_original_name(obj.parent.name, anim.name)
-        asciiLines.append('    parent ' + parent_name)
+        asciiLines.append("    parent " + parent_name)
         Node.generate_ascii_keys(obj, anim, asciiLines, options)
-        asciiLines.append('  endnode')
+        asciiLines.append("  endnode")

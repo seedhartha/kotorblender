@@ -4,6 +4,7 @@ from datetime import datetime
 
 import bpy
 
+
 # these should probably live in nvb_def sometime,
 # and separate lists is not necessarily a great way to do it,
 # a hash might be better...
@@ -148,36 +149,36 @@ def load_txi(imagetexture, operator=None):
     except:
         return False
     filepath = os.path.splitext(filepath)[0]
-    if os.path.exists(filepath + '.txi'):
-        filepath = filepath + '.txi'
-    elif os.path.exists(filepath + '.TXI'):
-        filepath = filepath + '.TXI'
+    if os.path.exists(filepath + ".txi"):
+        filepath = filepath + ".txi"
+    elif os.path.exists(filepath + ".TXI"):
+        filepath = filepath + ".TXI"
     else:
         return False
 
     fp = os.fsencode(filepath)
-    asciiLines = [line.strip().split() for line in open(fp, 'r')]
+    asciiLines = [line.strip().split() for line in open(fp, "r")]
 
     for line_idx, line in enumerate(asciiLines):
         try:
             if line[0] in tokens:
                 value = line[1]
                 # special types
-                if line[0] == 'specularcolor':
+                if line[0] == "specularcolor":
                     value = (line[1], line[2], line[3])
-                elif line[0] == 'channelscale':
+                elif line[0] == "channelscale":
                     for scale_counter in range(0,int(line[1])):
                         setattr(imagetexture.nvb,
-                                'channelscale' + str(scale_counter),
+                                "channelscale" + str(scale_counter),
                                 asciiLines[line_idx + 1 + scale_counter][0])
-                elif line[0] == 'channeltranslate':
+                elif line[0] == "channeltranslate":
                     for scale_counter in range(0,int(line[1])):
                         setattr(imagetexture.nvb,
-                                'channeltranslate' + str(scale_counter),
+                                "channeltranslate" + str(scale_counter),
                                 asciiLines[line_idx + 1 + scale_counter][0])
                 # the generalized types
                 elif line[0] in bool_tokens:
-                    if value == 'TRUE' or value == 'true' or int(value) >= 1:
+                    if value == "TRUE" or value == "true" or int(value) >= 1:
                         value = True
                     else:
                         value = False
@@ -209,7 +210,7 @@ def save_txi(imagetexture, operator=None):
         filepath = bpy.path.abspath(imagetexture.image.filepath)
     except:
         return False
-    filepath = os.path.splitext(filepath)[0] + '.new.txi'
+    filepath = os.path.splitext(filepath)[0] + ".new.txi"
 
     if len(imagetexture.nvb.modified_properties) < 1:
         # do not write empty files
@@ -219,32 +220,32 @@ def save_txi(imagetexture, operator=None):
     export_names = []
 
     asciiLines = []
-    asciiLines.append('# Exported from blender ' + datetime.now().strftime('%A, %Y-%m-%d'))
+    asciiLines.append("# Exported from blender " + datetime.now().strftime("%A, %Y-%m-%d"))
     # filter modified to unique, reduce channel{scale,translate}
-    for idx, propname in enumerate(imagetexture.nvb.modified_properties):
+    for _, propname in enumerate(imagetexture.nvb.modified_properties):
         propname = propname.name
-        if propname == 'channelscale' or \
-           propname == 'channelscale0' or \
-           propname == 'channelscale1' or \
-           propname == 'channelscale2' or \
-           propname == 'channelscale3':
-            if 'channelscale' in exported:
+        if propname == "channelscale" or \
+           propname == "channelscale0" or \
+           propname == "channelscale1" or \
+           propname == "channelscale2" or \
+           propname == "channelscale3":
+            if "channelscale" in exported:
                 continue
-            export_names.append('channelscale')
-        elif propname == 'channeltranslate' or \
-           propname == 'channeltranslate0' or \
-           propname == 'channeltranslate1' or \
-           propname == 'channeltranslate2' or \
-           propname == 'channeltranslate3':
-            if 'channeltranslate' in exported:
+            export_names.append("channelscale")
+        elif propname == "channeltranslate" or \
+           propname == "channeltranslate0" or \
+           propname == "channeltranslate1" or \
+           propname == "channeltranslate2" or \
+           propname == "channeltranslate3":
+            if "channeltranslate" in exported:
                 continue
-            export_names.append('channeltranslate')
+            export_names.append("channeltranslate")
         else:
             export_names.append(propname)
             exported[propname] = True
     # construct ascii output lines
     for propname in export_names:
-        if propname == 'channelscale':
+        if propname == "channelscale":
             asciiLines.extend([
                 "channelscale 4",
                 str(imagetexture.nvb.channelscale0),
@@ -254,7 +255,7 @@ def save_txi(imagetexture, operator=None):
                 ""
             ])
             continue
-        if propname == 'channeltranslate':
+        if propname == "channeltranslate":
             asciiLines.extend([
                 "channeltranslate 4",
                 str(imagetexture.nvb.channeltranslate0),
@@ -265,7 +266,7 @@ def save_txi(imagetexture, operator=None):
             ])
             continue
         value = getattr(imagetexture.nvb, propname)
-        if propname == 'specularcolor':
+        if propname == "specularcolor":
             value = tuple(propname)
             value = "{} {} {}".format(*value)
         if isinstance(value, bool):
@@ -273,7 +274,7 @@ def save_txi(imagetexture, operator=None):
         asciiLines.append("{} {}".format(propname, str(value)))
 
     # write txi file, join on CRLF for the windows people
-    with open(os.fsencode(filepath), 'w') as f:
+    with open(os.fsencode(filepath), "w") as f:
         f.write("\r\n".join(asciiLines) + "\r\n")
 
     if operator is not None:
