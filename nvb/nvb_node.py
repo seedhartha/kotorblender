@@ -1614,20 +1614,21 @@ class Light(GeometryNode):
 
     def add_flares_to_ascii(self, obj, asciiLines):
         if obj.nvb.lensflares:
-            asciiLines.append("  lensflares " + str(int(obj.nvb.lensflares)))
+            num_flares = int(obj.nvb.lensflares)
+            asciiLines.append("  lensflares " + str(num_flares))
             if len(obj.nvb.flareList) > 0:
 
                 # TODO: Clean this up
-                asciiLines.append("  texturenames zd")
+                asciiLines.append("  texturenames " + str(num_flares))
                 for flare in obj.nvb.flareList:
                     asciiLines.append("    " + flare.texture)
-                asciiLines.append("  flarepositions zd")
+                asciiLines.append("  flarepositions " + str(num_flares))
                 for flare in obj.nvb.flareList:
                     asciiLines.append("    " + str(round(flare.position, 7)))
-                asciiLines.append("  flaresizes zd")
+                asciiLines.append("  flaresizes " + str(num_flares))
                 for flare in obj.nvb.flareList:
                     asciiLines.append("    " + str(flare.size))
-                asciiLines.append("  flarecolorshifts zd")
+                asciiLines.append("  flarecolorshifts " + str(num_flares))
                 for flare in obj.nvb.flareList:
                     asciiLines.append("    " +  str(round(flare.colorshift[0], 2)) + " " +
                                                 str(round(flare.colorshift[1], 2)) + " " +
