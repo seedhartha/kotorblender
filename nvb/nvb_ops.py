@@ -190,11 +190,19 @@ class KB_OT_skin_bone_ops(bpy.types.Operator):
                 armature_object = bpy.data.objects.new(armature_name, armature)
                 armature_object.show_in_front = True
                 bpy.context.collection.objects.link(armature_object)
-
-                # Create bones
                 bpy.context.view_layer.objects.active = armature_object
+
+                # Enter Edit Mode
                 bpy.ops.object.mode_set(mode='EDIT')
+
                 self._create_bones_recursive(armature, rootdummy)
+
+                # Enter Pose Mode
+                bpy.ops.object.mode_set(mode='POSE')
+
+                self._create_armature_animation(armature_object, rootdummy)
+
+                # Enter Object Mode
                 bpy.ops.object.mode_set(mode='OBJECT')
 
                 # Add Armature modifier to all skinmeshes
@@ -229,6 +237,51 @@ class KB_OT_skin_bone_ops(bpy.types.Operator):
             parent_dir = (parent_bone.tail - parent_bone.head).normalized()
             bone.tail = bone.head + 0.1 * parent_dir
 
+    def _create_armature_animation(self, armature_object, rootdummy):
+        if not armature_object.animation_data:
+            armature_object.animation_data_create()
+
+        action = bpy.data.actions.new(armature_object.name)
+        armature_object.animation_data.action = action
+
+        self._copy_keyframes_to_bones_recursive(rootdummy, armature_object)
+
+    def _copy_keyframes_to_bones_recursive(self, obj, armature_object):
+        # Skip Trimeshes whose Render flag is set to True
+        if (obj.type == 'MESH') and obj.nvb.render:
+            return
+
+        if obj.animation_data and obj.name in armature_object.pose.bones:
+            bone = armature_object.pose.bones[obj.name]
+            action = obj.animation_data.action
+            frames = set()
+            locations = dict()
+            rotations = dict()
+            for fcurve in action.fcurves:
+                if fcurve.data_path == "location":
+                    for kp in fcurve.keyframe_points:
+                        frame = kp.co[0]
+                        frames.add(frame)
+                        if not kp.co[0] in locations:
+                            locations[frame] = [0.0]*3
+                        locations[frame][fcurve.array_index] = kp.co[1]
+                elif fcurve.data_path == "rotation_quaternion":
+                    for kp in fcurve.keyframe_points:
+                        frame = kp.co[0]
+                        frames.add(frame)
+                        if not kp.co[0] in rotations:
+                            rotations[frame] = [0.0]*4
+                        rotations[frame][fcurve.array_index] = kp.co[1]
+            for frame in sorted(frames):
+                if frame in locations:
+                    bone.location = Vector(locations[frame]) - obj.location
+                    bone.keyframe_insert("location", frame=frame)
+                if frame in rotations:
+                    bone.rotation_quaternion = obj.rotation_quaternion.inverted() @ Quaternion(rotations[frame])
+                    bone.keyframe_insert("rotation_quaternion", frame=frame)
+
+        for child in obj.children:
+            self._copy_keyframes_to_bones_recursive(child, armature_object)
 
 class KB_OT_texture_ops(bpy.types.Operator):
     bl_idname = "kb.texture_info_ops"
