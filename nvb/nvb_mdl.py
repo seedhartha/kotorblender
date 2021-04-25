@@ -6,7 +6,7 @@ from datetime import datetime
 
 import bpy
 
-from . import nvb_anim, nvb_def, nvb_glob, nvb_node, nvb_utils
+from . import nvb_anim, nvb_armature, nvb_def, nvb_glob, nvb_node, nvb_utils
 
 
 class Mdl():
@@ -88,7 +88,7 @@ class Mdl():
                 self.animDict[anim.name] = anim
 
     def import_to_collection(self, collection, wkm, position = (0.0, 0.0, 0.0)):
-        rootDummy = None
+        rootdummy = None
         objIdx = 0
         if (nvb_glob.importGeometry) and self.nodeDict:
             it = iter(self.nodeDict.items())
@@ -109,7 +109,7 @@ class Mdl():
                 obj.nvb.compress_quats = (self.compress_quats >= 1)
                 obj.nvb.headlink       = (self.headlink >= 1)
                 obj.nvb.animscale      = self.animscale
-                rootDummy = obj
+                rootdummy = obj
 
                 obj.nvb.imporder = objIdx
                 objIdx += 1
@@ -134,11 +134,11 @@ class Mdl():
                     if obj.parent is not None:
                         print("WARNING: Node already parented: {}".format(obj.name))
                         pass
-                    elif rootDummy and node.parentName in bpy.data.objects and \
+                    elif rootdummy and node.parentName in bpy.data.objects and \
                          nvb_utils.ancestor_node(
                              bpy.data.objects[node.parentName],
                              nvb_utils.is_root_dummy
-                         ).name == rootDummy.name:
+                         ).name == rootdummy.name:
                         # parent named node exists and is in our model
                         obj.parent = bpy.data.objects[node.parentName]
                         if node.parentName != self.name:
@@ -157,7 +157,7 @@ class Mdl():
                                nvb_utils.ancestor_node(
                                    bpy.data.objects[altname],
                                    nvb_utils.is_root_dummy
-                               ).name == rootDummy.name:
+                               ).name == rootdummy.name:
                                 # parent node in our model exists with suffix
                                 obj.parent = bpy.data.objects[altname]
                                 obj.matrix_parent_inverse = obj.parent.matrix_world.inverted()
@@ -174,30 +174,35 @@ class Mdl():
 
         # Attempt to import animations
         # Search for the rootDummy if not already present
-        if not rootDummy:
+        if not rootdummy:
             for obj in collection.objects:
                 if nvb_utils.is_root_dummy(obj, nvb_def.Dummytype.MDLROOT):
-                    rootDummy = obj
+                    rootdummy = obj
                     break
             # Still none ? Don't try to import anims then
-            if not rootDummy:
+            if not rootdummy:
                 return
 
-        type(self).create_animations(self.animations, rootDummy)
+        if nvb_glob.createArmature:
+            armature_object = nvb_armature.create_armature(rootdummy)
+        else:
+            armature_object = None
+
+        type(self).create_animations(self.animations, rootdummy, armature_object)
 
     @staticmethod
-    def create_animations(animationlist, mdl_base):
+    def create_animations(animationlist, rootdummy, armature_object):
         options = {
             "anim_restpose": 1
         }
         # Load the 'default' animation first, so it is at the front
         anims = [a for a in animationlist if a.name == "default"]
         for a in anims:
-            a.create(mdl_base, options)
+            a.create(rootdummy, armature_object, options)
         # Load the rest of the anims
         anims = [a for a in animationlist if a.name != "default"]
         for a in anims:
-            a.create(mdl_base, options)
+            a.create(rootdummy, armature_object, options)
 
     def load_ascii(self, ascii_block):
         geom_start = ascii_block.find("node ")

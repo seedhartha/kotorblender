@@ -318,6 +318,10 @@ def quat2nwangle(quatValues):
     return [quat.axis[0], quat.axis[1], quat.axis[2], quat.angle]
 
 
+def nwangle2quat(values):
+    return Quaternion(values[0:3], values[3])
+
+
 def float_to_byte(val):
     return int(val * 255)
 

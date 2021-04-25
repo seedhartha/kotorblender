@@ -3,7 +3,7 @@ import re
 from math import asin, cos, sqrt
 
 import bpy
-from mathutils import Quaternion
+from mathutils import Quaternion, Vector
 
 from . import nvb_def, nvb_parse, nvb_utils
 
@@ -873,50 +873,31 @@ class Animnode():
 
     def create_data_object(self, obj, anim, options={}):
         """Creates animations in object actions."""
-        def data_conversion(label, obj, vals, options={}):
-            if label == "orientation":
-                dp = "rotation_quaternion"
-                dp_dim = 4
-                quats = [Quaternion(v[0:3], v[3]) for v in vals]
-                new_values = [[q.w, q.x, q.y, q.z] for q in quats]
-            elif label == "position":
-                #XXX need MDL animation scale here
-                scl = 1.0
-                dp = "location"
-                dp_dim = 3
-                if scl:
-                    new_values = [[l * scl for l in loc] for loc in vals]
-                else:
-                    new_values = vals
-            elif label == "scale":
-                dp = "scale"
-                dp_dim = 3
-                new_values = [[v[0]] * dp_dim for v in vals]
-            return new_values, dp, dp_dim
-
         fps = nvb_def.fps
         frame_start = anim.frameStart
-        action = nvb_utils.get_action(obj, options["mdlname"] + "." + obj.name)
+
+        # Insert keyframes of each type
         for label, (data, data_path, data_dim) in self.object_data.items():
             frames = [fps * d[0] + frame_start for d in data]
-            use_action = action
+
             if obj.type == 'LIGHT' and label in ["radius", "color"]:
-                use_action = nvb_utils.get_action(
-                    # Light object, not Object object
-                    obj.data,
-                    options["mdlname"] + "." + obj.name
-                )
-            #XXX temp disable data path here to get conversion
-            if label in ["orientation", "position", "scale"]:
-                data_path = ""
-            if not data_path:  # Needs conversion
-                values, dp, dp_dim = data_conversion(
-                    label, obj, [d[1:data_dim+1] for d in data], options)
+                # For light radius and color, target the object data
+                use_action = nvb_utils.get_action(obj.data, options["mdlname"] + "." + obj.name)
+            else:
+                # Otherwise, target the object
+                use_action = nvb_utils.get_action(obj, options["mdlname"] + "." + obj.name)
+
+            if label == "position":
+                values = [d[1:4] for d in data]
+            elif label == "orientation":
+                quats = [nvb_utils.nwangle2quat(d[1:5]) for d in data]
+                values = [quat[0:4] for quat in quats]
+            elif label == "scale":
+                values = [[d[1]]*3 for d in data]
             else:
                 values = [d[1:data_dim+1] for d in data]
-                dp = data_path
-                dp_dim = data_dim
-            Animnode.insert_kfp(frames, values, use_action, dp, dp_dim)
+
+            Animnode.insert_kfp(frames, values, use_action, data_path, data_dim)
 
     def create_data_emitter(self, obj, anim, options={}):
         """Creates animations in emitter actions."""
@@ -946,8 +927,7 @@ class Animnode():
         action = animData.action
         if not action:
             return  # No action = no animation = no need for rest pose
-        dp = "rotation_quaternion"
-        fcu = [action.fcurves.find(dp, index=i) for i in range(4)]
+        fcu = [action.fcurves.find("rotation_quaternion", index=i) for i in range(4)]
         if fcu.count(None) < 1:
             rr = obj.nvb.restrot
             q = Quaternion((rr[0], rr[1], rr[2]), rr[3])

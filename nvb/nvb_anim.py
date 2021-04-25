@@ -24,46 +24,47 @@ class Animation():
     def create_rest_pose(obj, frame=1):
         nvb_animnode.Animnode.create_restpose(obj, frame)
 
-    def create(self, mdl_base, options={}):
+    def create(self, rootdummy, armature_object, options={}):
         """Create animations with a list of imported objects."""
         # Add new animation to list
         fps = nvb_def.fps
-        new_anim = nvb_utils.create_anim_list_item(mdl_base)
+        new_anim = nvb_utils.create_anim_list_item(rootdummy)
         new_anim.name = self.name
         new_anim.transtime = fps * self.transtime
         search_result = nvb_utils.search_node(
-            mdl_base,
+            rootdummy,
             lambda o, name=self.animroot: o.name.lower() == name.lower()
         )
         if not search_result:
-            search_result = mdl_base
+            search_result = rootdummy
             print("retargeted animation from {} to {}".format(
-                self.animroot, mdl_base.name
+                self.animroot, rootdummy.name
             ))
         new_anim.root = new_anim.root_obj = search_result.name
         new_anim.frameEnd = nvb_utils.nwtime2frame(self.length) + new_anim.frameStart
-        # events
+
+        # Events
         for ev_time, ev_name in self.events:
             newEvent = new_anim.eventList.add()
             newEvent.name = ev_name
             newEvent.frame = nvb_utils.nwtime2frame(ev_time) + new_anim.frameStart
+
         # Load the animation into the objects/actions
         for node in self.nodes:
             obj = nvb_utils.search_node(
-                mdl_base,
+                rootdummy,
                 lambda o, name=node.name: o.name.lower() == name.lower()
             )
             if obj:
-                node.create(obj, new_anim, self.length, {"mdlname":mdl_base.name})
+                node.create(obj, new_anim, self.length, {"mdlname":rootdummy.name})
                 if options.get("anim_restpose"):
                     Animation.create_rest_pose(obj, new_anim.frameStart-5)
 
-    def get_anim_node(self, nodeName, parentName = nvb_def.null):
-        key = parentName + nodeName
-        if key in self.nodeList:
-            return self.nodeList[key]
-        else:
-            return None
+        if armature_object:
+            # Enter Pose Mode
+            bpy.ops.object.mode_set(mode='POSE')
+            # Enter Object Mode
+            bpy.ops.object.mode_set(mode='OBJECT')
 
     def add_ascii_node(self, asciiBlock):
         node = nvb_animnode.Node()

@@ -1,7 +1,7 @@
 import bmesh
 import bpy
 import bpy_extras
-from mathutils import Matrix, Quaternion, Vector
+from mathutils import Quaternion, Vector
 
 from . import nvb_def, nvb_io, nvb_material, nvb_txi, nvb_utils
 
@@ -169,119 +169,6 @@ class KB_OT_texture_box_ops(bpy.types.Operator):
         setattr(texture.nvb, attrname, not current_state)
         return {'FINISHED'}
 
-
-class KB_OT_skin_bone_ops(bpy.types.Operator):
-    bl_idname = "kb.armature"
-    bl_label = "Armature Operations"
-    bl_options = {'UNDO'}
-
-    def execute(self, context):
-        mdl_root = nvb_utils.get_mdl_root_from_context()
-        if mdl_root:
-            # Begin creating bones from the rootdummy
-            rootdummy = nvb_utils.search_node(mdl_root, lambda o: o.name.lower() == "rootdummy")
-            if rootdummy:
-                # (Re)create armature
-                armature_name = "Armature_"+mdl_root.name
-                if armature_name in bpy.data.armatures:
-                    armature = bpy.data.armatures[armature_name]
-                    bpy.data.armatures.remove(armature)
-                armature = bpy.data.armatures.new(armature_name)
-                armature_object = bpy.data.objects.new(armature_name, armature)
-                armature_object.show_in_front = True
-                bpy.context.collection.objects.link(armature_object)
-                bpy.context.view_layer.objects.active = armature_object
-
-                # Enter Edit Mode
-                bpy.ops.object.mode_set(mode='EDIT')
-
-                self._create_bones_recursive(armature, rootdummy)
-
-                # Enter Pose Mode
-                bpy.ops.object.mode_set(mode='POSE')
-
-                self._create_armature_animation(armature_object, rootdummy)
-
-                # Enter Object Mode
-                bpy.ops.object.mode_set(mode='OBJECT')
-
-                # Add Armature modifier to all skinmeshes
-                skinmeshes = nvb_utils.search_node_all(mdl_root, lambda o: o.nvb.meshtype == nvb_def.Meshtype.SKIN)
-                for mesh in skinmeshes:
-                    modifier = mesh.modifiers.new(name="Armature", type="ARMATURE")
-                    modifier.object = armature_object
-
-        return {'FINISHED'}
-
-    def _create_bones_recursive(self, armature, obj, parent_bone=None):
-        # Skip Trimeshes whose Render flag is set to True
-        if (obj.type == 'MESH') and obj.nvb.render:
-            return
-
-        bone = armature.edit_bones.new(obj.name)
-        bone.parent = parent_bone
-        bone.head = obj.matrix_world.to_translation()
-
-        if obj.children:
-            # If object has children, set bone tail to the average child location
-            bone.tail = Vector([0.0] * 3)
-            for child in obj.children:
-                bone.tail += child.matrix_world.to_translation()
-            bone.tail /= float(len(obj.children))
-
-            # Recursively create bones from child objects
-            for child in obj.children:
-                self._create_bones_recursive(armature, child, bone)
-        else:
-            # If object has no children, place bone tail away from its parent
-            parent_dir = (parent_bone.tail - parent_bone.head).normalized()
-            bone.tail = bone.head + 0.1 * parent_dir
-
-    def _create_armature_animation(self, armature_object, rootdummy):
-        if not armature_object.animation_data:
-            armature_object.animation_data_create()
-
-        action = bpy.data.actions.new(armature_object.name)
-        armature_object.animation_data.action = action
-
-        self._copy_keyframes_to_bones_recursive(rootdummy, armature_object)
-
-    def _copy_keyframes_to_bones_recursive(self, obj, armature_object):
-        # Skip Trimeshes whose Render flag is set to True
-        if (obj.type == 'MESH') and obj.nvb.render:
-            return
-
-        if obj.animation_data and obj.name in armature_object.pose.bones:
-            bone = armature_object.pose.bones[obj.name]
-            action = obj.animation_data.action
-            frames = set()
-            locations = dict()
-            rotations = dict()
-            for fcurve in action.fcurves:
-                if fcurve.data_path == "location":
-                    for kp in fcurve.keyframe_points:
-                        frame = kp.co[0]
-                        frames.add(frame)
-                        if not kp.co[0] in locations:
-                            locations[frame] = [0.0]*3
-                        locations[frame][fcurve.array_index] = kp.co[1]
-                elif fcurve.data_path == "rotation_quaternion":
-                    for kp in fcurve.keyframe_points:
-                        frame = kp.co[0]
-                        frames.add(frame)
-                        if not kp.co[0] in rotations:
-                            rotations[frame] = [0.0]*4
-                        rotations[frame][fcurve.array_index] = kp.co[1]
-            for frame in sorted(frames):
-                if frame in locations:
-                    bone.location = Vector(locations[frame]) - obj.location
-                    bone.keyframe_insert("location", frame=frame)
-                if frame in rotations:
-                    bone.rotation_quaternion = obj.rotation_quaternion.inverted() @ Quaternion(rotations[frame])
-                    bone.keyframe_insert("rotation_quaternion", frame=frame)
-
-        for child in obj.children:
-            self._copy_keyframes_to_bones_recursive(child, armature_object)
 
 class KB_OT_texture_ops(bpy.types.Operator):
     bl_idname = "kb.texture_info_ops"
