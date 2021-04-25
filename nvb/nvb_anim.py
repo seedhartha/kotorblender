@@ -78,15 +78,6 @@ class Animation():
     def add_event(self, event):
         self.eventList.append(event)
 
-    def add_events_to_object(self, rootDummy):
-        for event in self.eventList:
-            newItem = rootDummy.nvb.eventList.add()
-            newItem.frame = nvb_utils.nwtime2frame(event[0])
-            newItem.name  = event[1]
-
-    def get_anim_from_scene(self, scene, rootDummyName = ""):
-        pass
-
     def get_anim_from_ascii(self, asciiBlock):
         blockStart = -1
         for idx, line in enumerate(asciiBlock):
