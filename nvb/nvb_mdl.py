@@ -65,15 +65,6 @@ class Mdl():
         node.load_ascii(asciiBlock)
         self.add_node(node)
 
-    def load_ascii_animation(self, asciiBlock):
-        if asciiBlock is None:
-            raise nvb_def.MalformedMdlFile("Empty Animation")
-
-        animation = nvb_anim.Animation()
-        animation.get_anim_from_ascii(asciiBlock)
-
-        self.add_animation(animation)
-
     def add_node(self, newNode):
         # Blender requires unique object names. Names in mdls are only
         # unique for a parent, i.e. another object with the same name but
