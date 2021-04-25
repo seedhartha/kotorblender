@@ -33,6 +33,7 @@ if 'bpy' in locals():
     import importlib
     importlib.reload(nvb.nvb_anim)
     importlib.reload(nvb.nvb_animnode)
+    importlib.reload(nvb.nvb_armature)
     importlib.reload(nvb.nvb_def)
     importlib.reload(nvb.nvb_io)
     importlib.reload(nvb.nvb_light)
@@ -109,7 +110,6 @@ classes = (
     nvb_ops.KB_OT_rebuild_material_nodes,
     nvb_ops.KB_OT_render_minimap,
     nvb_ops.KB_OT_select_smoothgroup,
-    nvb_ops.KB_OT_skin_bone_ops,
     nvb_ops.KB_OT_texture_box_ops,
     nvb_ops.KB_OT_texture_io,
     nvb_ops.KB_OT_texture_ops,

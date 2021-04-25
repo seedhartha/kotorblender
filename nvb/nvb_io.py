@@ -80,10 +80,6 @@ def _load_mdl(filepath, position = (0.0, 0.0, 0.0)):
                 aabb.roomlinks = wkmesh.roomlinks
                 aabb.set_room_links(collection.objects[aabb.name].data)
 
-    # Optionally, create an armature from bone nodes
-    if nvb_glob.createArmature:
-        bpy.ops.kb.armature('EXEC_DEFAULT')
-
 
 def load_mdl(operator,
             context,
