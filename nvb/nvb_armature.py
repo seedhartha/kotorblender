@@ -1,5 +1,5 @@
 import bpy
-from mathutils import Vector
+from mathutils import Matrix, Vector
 
 from . import nvb_def, nvb_utils
 
@@ -11,6 +11,7 @@ def create_armature(rootdummy):
         armature = bpy.data.armatures[armature_name]
         bpy.data.armatures.remove(armature)
     armature = bpy.data.armatures.new(armature_name)
+    armature.display_type = 'STICK'
     armature_object = bpy.data.objects.new(armature_name, armature)
     armature_object.show_in_front = True
     bpy.context.collection.objects.link(armature_object)
@@ -34,25 +35,18 @@ def create_armature(rootdummy):
 
 
 def _create_bones_recursive(armature, obj, parent_bone=None):
-    # Skip Trimeshes whose Render flag is set to True
-    if (obj.type == 'MESH') and obj.nvb.render:
-        return
+    mat_trans = Matrix.Translation(obj.nvb.restloc)
+    mat_rot = nvb_utils.nwangle2quat(obj.nvb.restrot).to_matrix().to_4x4()
+    mat_bone = mat_trans @ mat_rot
+    if parent_bone:
+        mat_bone = parent_bone.matrix @ mat_bone
 
     bone = armature.edit_bones.new(obj.name)
     bone.parent = parent_bone
-    bone.head = obj.matrix_world.to_translation()
+    bone.head = [0.0]*3
+    bone.tail = Vector((0.0, 1e-3, 0.0))
+    bone.matrix = mat_bone
 
-    if obj.children:
-        # If object has children, set bone tail to the average child location
-        bone.tail = Vector([0.0] * 3)
-        for child in obj.children:
-            bone.tail += child.matrix_world.to_translation()
-        bone.tail /= float(len(obj.children))
-
-        # Recursively create bones from child objects
-        for child in obj.children:
-            _create_bones_recursive(armature, child, bone)
-    else:
-        # If object has no children, place bone tail away from its parent
-        parent_dir = (parent_bone.tail - parent_bone.head).normalized()
-        bone.tail = bone.head + 0.1 * parent_dir
+    # Recursively create bones from child objects
+    for child in obj.children:
+        _create_bones_recursive(armature, child, bone)

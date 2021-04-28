@@ -1,6 +1,7 @@
 import collections
 
 import bpy
+from mathutils import Matrix, Quaternion, Vector
 
 from . import nvb_animnode, nvb_def, nvb_utils
 
@@ -49,20 +50,68 @@ class Animation():
             newEvent.name = ev_name
             newEvent.frame = nvb_utils.nwtime2frame(ev_time) + new_anim.frameStart
 
-        # Load the animation into the objects/actions
+        # Create a lookup of object by node name
+        obj_by_name = dict()
         for node in self.nodes:
             obj = nvb_utils.search_node(
                 rootdummy,
-                lambda o, name=node.name: o.name.lower() == name.lower()
-            )
+                lambda o, name=node.name: o.name.lower() == name.lower())
             if obj:
-                node.create(obj, new_anim, self.length, {"mdlname":rootdummy.name})
-                if options.get("anim_restpose"):
-                    Animation.create_rest_pose(obj, new_anim.frameStart-5)
+                obj_by_name[node.name.lower()] = obj
+
+        # Load the animation into the objects/actions
+        for node in self.nodes:
+            name_lower = node.name.lower()
+            if not name_lower in obj_by_name:
+                continue
+            obj = obj_by_name[name_lower]
+            node.create(obj, new_anim, self.length, {"mdlname":rootdummy.name})
+            if options.get("anim_restpose"):
+                Animation.create_rest_pose(obj, new_anim.frameStart-5)
 
         if armature_object:
             # Enter Pose Mode
             bpy.ops.object.mode_set(mode='POSE')
+
+            # Create pose bone keyframes
+            for node in self.nodes:
+                name_lower = node.name.lower()
+                if not name_lower in obj_by_name:
+                    continue
+                obj = obj_by_name[name_lower]
+                if not obj.name in armature_object.pose.bones:
+                    continue
+
+                bone = armature_object.pose.bones[obj.name]
+                if bone.parent:
+                    restmat = bone.parent.bone.matrix_local.inverted() @ bone.bone.matrix_local
+                else:
+                    restmat = bone.bone.matrix_local
+
+                # Animation keyframes
+                for label, (data, data_path, data_dim) in node.object_data.items():
+                    if label == "position":
+                        pos_frames = [(d[0], d[1:4]) for d in data]
+                        for pos_frame in pos_frames:
+                            mat_trans = Matrix.Translation(pos_frame[1])
+                            mat_rot = restmat.to_quaternion().to_matrix().to_4x4()
+                            bone.matrix_basis = restmat.inverted() @ mat_trans @ mat_rot
+                            bone.keyframe_insert("location", frame=nvb_utils.nwtime2frame(pos_frame[0])+new_anim.frameStart)
+                    elif label == "orientation":
+                        rot_frames = [(d[0], nvb_utils.nwangle2quat(d[1:5])) for d in data]
+                        for rot_frame in rot_frames:
+                            mat_trans = Matrix.Translation(restmat.to_translation())
+                            mat_rot = rot_frame[1].to_matrix().to_4x4()
+                            frame = nvb_utils.nwtime2frame(rot_frame[0])+new_anim.frameStart
+                            bone.matrix_basis = restmat.inverted() @ mat_trans @ mat_rot
+                            bone.keyframe_insert("rotation_quaternion", frame=frame)
+
+                # Rest pose keyframes
+                frame = new_anim.frameStart - 5
+                bone.matrix_basis = Matrix()
+                bone.keyframe_insert("location", frame=frame)
+                bone.keyframe_insert("rotation_quaternion", frame=frame)
+
             # Enter Object Mode
             bpy.ops.object.mode_set(mode='OBJECT')
 
