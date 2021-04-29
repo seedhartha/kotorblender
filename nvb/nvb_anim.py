@@ -35,7 +35,8 @@ class Animation():
 
         # Add armature keyframes
         if armature_object:
-            self._create_armature_keyframes(armature_object, list_anim.frameStart, obj_by_node)
+            bpy.context.view_layer.objects.active = armature_object
+            self._create_armature_keyframes(armature_object, list_anim.frameStart)
 
     def _create_list_anim(self, mdl_root):
         result = nvb_utils.create_anim_list_item(mdl_root)
@@ -69,21 +70,19 @@ class Animation():
     def _create_rest_pose(self, obj, frame=1):
         nvb_animnode.Animnode.create_restpose(obj, frame)
 
-    def _create_armature_keyframes(self, armature_object, frame_start, obj_by_node):
+    def _create_armature_keyframes(self, armature_object, frame_start):
         # Enter Pose Mode
         bpy.ops.object.mode_set(mode='POSE')
 
+        bone_by_node = self._associate_node_to_bone(armature_object)
+
         # Create pose bone keyframes
         for node in self.nodes:
-            # Ensure that an object exists by name
-            if not node.name.lower() in obj_by_node:
-                continue
-            obj = obj_by_node[node.name.lower()]
-
             # Ensure that a pose bone exists by name
-            if not obj.name in armature_object.pose.bones:
+            name = node.name.lower()
+            if not name in bone_by_node:
                 continue
-            bone = armature_object.pose.bones[obj.name]
+            bone = bone_by_node[name]
 
             # Animation keyframes
             node.add_pose_bone_keyframes(bone, frame_start)
@@ -94,8 +93,17 @@ class Animation():
             bone.keyframe_insert("location", frame=frame)
             bone.keyframe_insert("rotation_quaternion", frame=frame)
 
-            # Enter Object Mode
-            bpy.ops.object.mode_set(mode='OBJECT')
+        # Enter Object Mode
+        bpy.ops.object.mode_set(mode='OBJECT')
+
+    def _associate_node_to_bone(self, armature_object):
+        result = dict()
+        for node in self.nodes:
+            name = node.name.lower()
+            for bone in armature_object.pose.bones:
+                if bone.name.lower() == name:
+                    result[name] = bone
+        return result
 
     def add_ascii_node(self, asciiBlock):
         node = nvb_animnode.Node()
