@@ -183,10 +183,19 @@ class Mdl():
             if not mdl_root:
                 return
 
+        armature_object = None
         if nvb_glob.createArmature:
             armature_object = nvb_armature.create_armature(mdl_root)
         else:
-            armature_object = None
+            # When armature creation is disabled, see if the MDL root already has an armature and use that
+            skinmeshes = nvb_utils.search_node_all(mdl_root, lambda o: o.nvb.meshtype == nvb_def.Meshtype.SKIN)
+            for skinmesh in skinmeshes:
+                for modifier in skinmesh.modifiers:
+                    if modifier.type == 'ARMATURE':
+                        armature_object = modifier.object
+                        break
+                if armature_object:
+                    break
 
         self._create_animations(mdl_root, armature_object)
 

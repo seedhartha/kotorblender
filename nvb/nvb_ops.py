@@ -355,11 +355,6 @@ class KB_OT_import_lyt(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
             description = "Disable if only animations are needed",
             default = True)
 
-    importWalkmesh : bpy.props.BoolProperty(
-            name = "Import Walkmesh",
-            description = "Attempt to load placeable and door walkmeshes",
-            default = True)
-
     importSmoothGroups : bpy.props.BoolProperty(
             name = "Import Smooth Groups",
             description = "Import smooth groups as sharp edges",
@@ -373,6 +368,11 @@ class KB_OT_import_lyt(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
     importAnim : bpy.props.BoolProperty(
             name = "Import Animations",
             description = "Import animations",
+            default = True)
+
+    importWalkmesh : bpy.props.BoolProperty(
+            name = "Import Walkmesh",
+            description = "Attempt to load placeable and door walkmeshes",
             default = True)
 
     textureSearch : bpy.props.BoolProperty(
