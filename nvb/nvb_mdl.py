@@ -88,7 +88,7 @@ class Mdl():
                 self.animDict[anim.name] = anim
 
     def import_to_collection(self, collection, wkm, position = (0.0, 0.0, 0.0)):
-        rootdummy = None
+        mdl_root = None
         objIdx = 0
         if (nvb_glob.importGeometry) and self.nodeDict:
             it = iter(self.nodeDict.items())
@@ -109,7 +109,7 @@ class Mdl():
                 obj.nvb.compress_quats = (self.compress_quats >= 1)
                 obj.nvb.headlink       = (self.headlink >= 1)
                 obj.nvb.animscale      = self.animscale
-                rootdummy = obj
+                mdl_root = obj
 
                 obj.nvb.imporder = objIdx
                 objIdx += 1
@@ -134,11 +134,11 @@ class Mdl():
                     if obj.parent is not None:
                         print("WARNING: Node already parented: {}".format(obj.name))
                         pass
-                    elif rootdummy and node.parentName in bpy.data.objects and \
+                    elif mdl_root and node.parentName in bpy.data.objects and \
                          nvb_utils.ancestor_node(
                              bpy.data.objects[node.parentName],
                              nvb_utils.is_root_dummy
-                         ).name == rootdummy.name:
+                         ).name == mdl_root.name:
                         # parent named node exists and is in our model
                         obj.parent = bpy.data.objects[node.parentName]
                         if node.parentName != self.name:
@@ -157,7 +157,7 @@ class Mdl():
                                nvb_utils.ancestor_node(
                                    bpy.data.objects[altname],
                                    nvb_utils.is_root_dummy
-                               ).name == rootdummy.name:
+                               ).name == mdl_root.name:
                                 # parent node in our model exists with suffix
                                 obj.parent = bpy.data.objects[altname]
                                 obj.matrix_parent_inverse = obj.parent.matrix_world.inverted()
@@ -173,36 +173,32 @@ class Mdl():
             wkm.import_to_collection(collection)
 
         # Attempt to import animations
-        # Search for the rootDummy if not already present
-        if not rootdummy:
+        # Search for the MDL root if not already present
+        if not mdl_root:
             for obj in collection.objects:
                 if nvb_utils.is_root_dummy(obj, nvb_def.Dummytype.MDLROOT):
-                    rootdummy = obj
+                    mdl_root = obj
                     break
             # Still none ? Don't try to import anims then
-            if not rootdummy:
+            if not mdl_root:
                 return
 
         if nvb_glob.createArmature:
-            armature_object = nvb_armature.create_armature(rootdummy)
+            armature_object = nvb_armature.create_armature(mdl_root)
         else:
             armature_object = None
 
-        type(self).create_animations(self.animations, rootdummy, armature_object)
+        self._create_animations(mdl_root, armature_object)
 
-    @staticmethod
-    def create_animations(animationlist, rootdummy, armature_object):
-        options = {
-            "anim_restpose": 1
-        }
+    def _create_animations(self, mdl_root, armature_object):
         # Load the 'default' animation first, so it is at the front
-        anims = [a for a in animationlist if a.name == "default"]
+        anims = [a for a in self.animations if a.name == "default"]
         for a in anims:
-            a.create(rootdummy, armature_object, options)
+            a.add_to_objects(mdl_root, armature_object)
         # Load the rest of the anims
-        anims = [a for a in animationlist if a.name != "default"]
+        anims = [a for a in self.animations if a.name != "default"]
         for a in anims:
-            a.create(rootdummy, armature_object, options)
+            a.add_to_objects(mdl_root, armature_object)
 
     def load_ascii(self, ascii_block):
         geom_start = ascii_block.find("node ")

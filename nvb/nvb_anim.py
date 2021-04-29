@@ -21,96 +21,78 @@ class Animation():
         if ascii_data:
             self.load_ascii(ascii_data)
 
-    @staticmethod
-    def create_rest_pose(obj, frame=1):
+    def add_to_objects(self, mdl_root, armature_object):
+        list_anim = self._create_list_anim(mdl_root)
+        self._add_events_to_list_anim(list_anim)
+        obj_by_node = self._associate_node_to_object(mdl_root)
+
+        # Add object keyframes
+        for node in self.nodes:
+            if node.name.lower() in obj_by_node:
+                obj = obj_by_node[node.name.lower()]
+                node.add_object_keyframes(obj, list_anim, {"mdlname":mdl_root.name})
+                self._create_rest_pose(obj, list_anim.frameStart-5)
+
+        # Add armature keyframes
+        if armature_object:
+            self._create_armature_keyframes(armature_object, list_anim.frameStart, obj_by_node)
+
+    def _create_list_anim(self, mdl_root):
+        result = nvb_utils.create_anim_list_item(mdl_root)
+        result.name = self.name
+        result.transtime = nvb_def.fps * self.transtime
+        result.root = result.root_obj = self._get_anim_target(mdl_root).name
+        result.frameEnd = nvb_utils.nwtime2frame(self.length) + result.frameStart
+        return result
+
+    def _get_anim_target(self, mdl_root):
+        result = nvb_utils.search_node(mdl_root, lambda o, name=self.animroot: o.name.lower() == name.lower())
+        if not result:
+            result = mdl_root
+            print("KotorBlender: animation retargeted from {} to {}".format(self.animroot, mdl_root.name))
+        return result
+
+    def _add_events_to_list_anim(self, list_anim):
+        for time, name in self.events:
+            event = list_anim.eventList.add()
+            event.name = name
+            event.frame = nvb_utils.nwtime2frame(time) + list_anim.frameStart
+
+    def _associate_node_to_object(self, mdl_root):
+        result = dict()
+        for node in self.nodes:
+            obj = nvb_utils.search_node(mdl_root, lambda o, name=node.name: o.name.lower() == name.lower())
+            if obj:
+                result[node.name.lower()] = obj
+        return result
+
+    def _create_rest_pose(self, obj, frame=1):
         nvb_animnode.Animnode.create_restpose(obj, frame)
 
-    def create(self, rootdummy, armature_object, options={}):
-        """Create animations with a list of imported objects."""
-        # Add new animation to list
-        fps = nvb_def.fps
-        new_anim = nvb_utils.create_anim_list_item(rootdummy)
-        new_anim.name = self.name
-        new_anim.transtime = fps * self.transtime
-        search_result = nvb_utils.search_node(
-            rootdummy,
-            lambda o, name=self.animroot: o.name.lower() == name.lower()
-        )
-        if not search_result:
-            search_result = rootdummy
-            print("retargeted animation from {} to {}".format(
-                self.animroot, rootdummy.name
-            ))
-        new_anim.root = new_anim.root_obj = search_result.name
-        new_anim.frameEnd = nvb_utils.nwtime2frame(self.length) + new_anim.frameStart
+    def _create_armature_keyframes(self, armature_object, frame_start, obj_by_node):
+        # Enter Pose Mode
+        bpy.ops.object.mode_set(mode='POSE')
 
-        # Events
-        for ev_time, ev_name in self.events:
-            newEvent = new_anim.eventList.add()
-            newEvent.name = ev_name
-            newEvent.frame = nvb_utils.nwtime2frame(ev_time) + new_anim.frameStart
-
-        # Create a lookup of object by node name
-        obj_by_name = dict()
+        # Create pose bone keyframes
         for node in self.nodes:
-            obj = nvb_utils.search_node(
-                rootdummy,
-                lambda o, name=node.name: o.name.lower() == name.lower())
-            if obj:
-                obj_by_name[node.name.lower()] = obj
-
-        # Load the animation into the objects/actions
-        for node in self.nodes:
-            name_lower = node.name.lower()
-            if not name_lower in obj_by_name:
+            # Ensure that an object exists by name
+            if not node.name.lower() in obj_by_node:
                 continue
-            obj = obj_by_name[name_lower]
-            node.create(obj, new_anim, self.length, {"mdlname":rootdummy.name})
-            if options.get("anim_restpose"):
-                Animation.create_rest_pose(obj, new_anim.frameStart-5)
+            obj = obj_by_node[node.name.lower()]
 
-        if armature_object:
-            # Enter Pose Mode
-            bpy.ops.object.mode_set(mode='POSE')
+            # Ensure that a pose bone exists by name
+            if not obj.name in armature_object.pose.bones:
+                continue
+            bone = armature_object.pose.bones[obj.name]
 
-            # Create pose bone keyframes
-            for node in self.nodes:
-                name_lower = node.name.lower()
-                if not name_lower in obj_by_name:
-                    continue
-                obj = obj_by_name[name_lower]
-                if not obj.name in armature_object.pose.bones:
-                    continue
+            # Animation keyframes
+            node.add_pose_bone_keyframes(bone, frame_start)
 
-                bone = armature_object.pose.bones[obj.name]
-                if bone.parent:
-                    restmat = bone.parent.bone.matrix_local.inverted() @ bone.bone.matrix_local
-                else:
-                    restmat = bone.bone.matrix_local
-
-                # Animation keyframes
-                for label, (data, data_path, data_dim) in node.object_data.items():
-                    if label == "position":
-                        pos_frames = [(d[0], d[1:4]) for d in data]
-                        for pos_frame in pos_frames:
-                            mat_trans = Matrix.Translation(pos_frame[1])
-                            mat_rot = restmat.to_quaternion().to_matrix().to_4x4()
-                            bone.matrix_basis = restmat.inverted() @ mat_trans @ mat_rot
-                            bone.keyframe_insert("location", frame=nvb_utils.nwtime2frame(pos_frame[0])+new_anim.frameStart)
-                    elif label == "orientation":
-                        rot_frames = [(d[0], nvb_utils.nwangle2quat(d[1:5])) for d in data]
-                        for rot_frame in rot_frames:
-                            mat_trans = Matrix.Translation(restmat.to_translation())
-                            mat_rot = rot_frame[1].to_matrix().to_4x4()
-                            frame = nvb_utils.nwtime2frame(rot_frame[0])+new_anim.frameStart
-                            bone.matrix_basis = restmat.inverted() @ mat_trans @ mat_rot
-                            bone.keyframe_insert("rotation_quaternion", frame=frame)
-
-                # Rest pose keyframes
-                frame = new_anim.frameStart - 5
-                bone.matrix_basis = Matrix()
-                bone.keyframe_insert("location", frame=frame)
-                bone.keyframe_insert("rotation_quaternion", frame=frame)
+            # Rest pose keyframes
+            frame = frame_start - 5
+            bone.matrix_basis = Matrix()
+            bone.keyframe_insert("location", frame=frame)
+            bone.keyframe_insert("rotation_quaternion", frame=frame)
 
             # Enter Object Mode
             bpy.ops.object.mode_set(mode='OBJECT')
@@ -231,11 +213,10 @@ class Animation():
 
     @staticmethod
     def generate_ascii(animRootDummy, anim, ascii_lines, options):
-        fps = nvb_def.fps
         ascii_lines.append("newanim {} {}".format(anim.name, animRootDummy.name))
         ascii_lines.append(
             "  length {}".format(
-                round((anim.frameEnd - anim.frameStart)/fps, 5)
+                round((anim.frameEnd - anim.frameStart)/nvb_def.fps, 5)
             )
         )
         ascii_lines.append(
@@ -246,7 +227,7 @@ class Animation():
         )
         # Get animation events
         for event in anim.eventList:
-            event_time = (event.frame - anim.frameStart) / fps
+            event_time = (event.frame - anim.frameStart) / nvb_def.fps
             ascii_lines.append(
                 "  event {} {}".format(round(event_time, 3), event.name)
             )

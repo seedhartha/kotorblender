@@ -289,11 +289,6 @@ class KB_OT_import_mdl(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
             description = "Disable if only animations are needed",
             default = True)
 
-    importWalkmesh : bpy.props.BoolProperty(
-            name = "Import Walkmesh",
-            description = "Attempt to load placeable and door walkmeshes",
-            default = True)
-
     importSmoothGroups : bpy.props.BoolProperty(
             name = "Import Smooth Groups",
             description = "Import smooth groups as sharp edges",
@@ -309,15 +304,20 @@ class KB_OT_import_mdl(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
             description = "Import animations",
             default = True)
 
+    importWalkmesh : bpy.props.BoolProperty(
+            name = "Import Walkmesh",
+            description = "Attempt to load placeable and door walkmeshes",
+            default = True)
+
+    createArmature : bpy.props.BoolProperty(
+            name = "Import Armature",
+            description = "Import armature from bone nodes",
+            default = False)
+
     textureSearch : bpy.props.BoolProperty(
             name = "Image search",
             description = "Search for images in subdirectories" \
                           " (Warning, may be slow)",
-            default = False)
-
-    createArmature : bpy.props.BoolProperty(
-            name = "Create armature",
-            description = "Create armature from bone nodes",
             default = False)
 
     # Hidden option, only used for batch minimap creation

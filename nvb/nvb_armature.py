@@ -4,9 +4,18 @@ from mathutils import Matrix, Vector
 from . import nvb_def, nvb_utils
 
 
-def create_armature(rootdummy):
-    # (Re)create armature
-    armature_name = "Armature_"+rootdummy.name
+def create_armature(mdl_root):
+    """
+    Create an armature from the MDL root.
+    :param mdl_root: MDL root object - must contain at least one skinmesh
+    """
+    skinmeshes = nvb_utils.search_node_all(mdl_root, lambda o: o.nvb.meshtype == nvb_def.Meshtype.SKIN)
+    if not skinmeshes:
+        print("KotorBlender: WARNING - skinmeshes not found under the MDL root - armature creation aborted")
+        return None
+
+    # (Re)create the armature and make it active
+    armature_name = "Armature_"+mdl_root.name
     if armature_name in bpy.data.armatures:
         armature = bpy.data.armatures[armature_name]
         bpy.data.armatures.remove(armature)
@@ -20,13 +29,13 @@ def create_armature(rootdummy):
     # Enter Edit Mode
     bpy.ops.object.mode_set(mode='EDIT')
 
-    _create_bones_recursive(armature, rootdummy)
+    # Recursively create bones
+    _create_bones_recursive(armature, mdl_root)
 
     # Enter Object Mode
     bpy.ops.object.mode_set(mode='OBJECT')
 
     # Add Armature modifier to all skinmeshes
-    skinmeshes = nvb_utils.search_node_all(rootdummy, lambda o: o.nvb.meshtype == nvb_def.Meshtype.SKIN)
     for mesh in skinmeshes:
         modifier = mesh.modifiers.new(name="Armature", type="ARMATURE")
         modifier.object = armature_object
@@ -35,6 +44,9 @@ def create_armature(rootdummy):
 
 
 def _create_bones_recursive(armature, obj, parent_bone=None):
+    """
+    Recursively create armature bones from objects.
+    """
     mat_trans = Matrix.Translation(obj.nvb.restloc)
     mat_rot = nvb_utils.nwangle2quat(obj.nvb.restrot).to_matrix().to_4x4()
     mat_bone = mat_trans @ mat_rot
@@ -47,6 +59,5 @@ def _create_bones_recursive(armature, obj, parent_bone=None):
     bone.tail = Vector((0.0, 1e-3, 0.0))
     bone.matrix = mat_bone
 
-    # Recursively create bones from child objects
     for child in obj.children:
         _create_bones_recursive(armature, child, bone)
