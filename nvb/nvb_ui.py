@@ -292,6 +292,7 @@ class KB_PT_empty(bpy.types.Panel):
             col.prop(obj.nvb, "animscale", text = "")
             if obj.nvb.classification == nvb_def.Classification.CHARACTER:
                 col.prop(obj.nvb, "headlink", text = "")
+            box.operator("kb.recreate_armature")
             layout.separator()
 
             # Minimap Helper.
