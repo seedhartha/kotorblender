@@ -889,11 +889,14 @@ class Animnode():
 
             if label == "position":
                 values = [d[1:4] for d in data]
+                data_dim = 3 # TODO: add support for Bezier keys
             elif label == "orientation":
                 quats = [nvb_utils.nwangle2quat(d[1:5]) for d in data]
                 values = [quat[0:4] for quat in quats]
+                data_dim = 4
             elif label == "scale":
                 values = [[d[1]]*3 for d in data]
+                data_dim = 3
             else:
                 values = [d[1:data_dim+1] for d in data]
 
