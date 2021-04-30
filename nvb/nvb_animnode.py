@@ -945,31 +945,6 @@ class Animnode():
         if self.emitter_data:
             self.create_data_emitter(obj, anim, options)
 
-    def add_pose_bone_keyframes(self, bone, frame_start):
-        # Compute rest pose matrix of a bone
-        if bone.parent:
-            restmat = bone.parent.bone.matrix_local.inverted() @ bone.bone.matrix_local
-        else:
-            restmat = bone.bone.matrix_local
-
-        # Add keyframes
-        for label, (data, data_path, data_dim) in self.object_data.items():
-            if label == "position":
-                pos_frames = [(d[0], d[1:4]) for d in data]
-                for pos_frame in pos_frames:
-                    mat_trans = Matrix.Translation(pos_frame[1])
-                    mat_rot = restmat.to_quaternion().to_matrix().to_4x4()
-                    bone.matrix_basis = restmat.inverted() @ mat_trans @ mat_rot
-                    bone.keyframe_insert("location", frame=nvb_utils.nwtime2frame(pos_frame[0])+frame_start)
-            elif label == "orientation":
-                rot_frames = [(d[0], nvb_utils.nwangle2quat(d[1:5])) for d in data]
-                for rot_frame in rot_frames:
-                    mat_trans = Matrix.Translation(restmat.to_translation())
-                    mat_rot = rot_frame[1].to_matrix().to_4x4()
-                    frame = nvb_utils.nwtime2frame(rot_frame[0])+frame_start
-                    bone.matrix_basis = restmat.inverted() @ mat_trans @ mat_rot
-                    bone.keyframe_insert("rotation_quaternion", frame=frame)
-
     @staticmethod
     def generate_ascii(obj, anim, asciiLines, options={}):
         if not obj or not Node.export_needed(obj, anim):

@@ -185,7 +185,7 @@ class Mdl():
 
         armature_object = None
         if nvb_glob.createArmature:
-            armature_object = nvb_armature.create_armature(mdl_root)
+            armature_object = nvb_armature.recreate_armature(mdl_root)
         else:
             # When armature creation is disabled, see if the MDL root already has an armature and use that
             skinmeshes = nvb_utils.search_node_all(mdl_root, lambda o: o.nvb.meshtype == nvb_def.Meshtype.SKIN)
@@ -203,11 +203,13 @@ class Mdl():
         # Load the 'default' animation first, so it is at the front
         anims = [a for a in self.animations if a.name == "default"]
         for a in anims:
-            a.add_to_objects(mdl_root, armature_object)
+            a.add_to_objects(mdl_root)
         # Load the rest of the anims
         anims = [a for a in self.animations if a.name != "default"]
         for a in anims:
-            a.add_to_objects(mdl_root, armature_object)
+            a.add_to_objects(mdl_root)
+        if armature_object:
+            nvb_armature.create_armature_animations(mdl_root, armature_object)
 
     def load_ascii(self, ascii_block):
         geom_start = ascii_block.find("node ")

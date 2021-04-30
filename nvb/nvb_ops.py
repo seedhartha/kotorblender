@@ -3,7 +3,7 @@ import bpy
 import bpy_extras
 from mathutils import Quaternion, Vector
 
-from . import nvb_def, nvb_io, nvb_material, nvb_txi, nvb_utils
+from . import nvb_armature, nvb_def, nvb_io, nvb_material, nvb_txi, nvb_utils
 
 
 class KB_OT_children_smoothgroup(bpy.types.Operator):
@@ -572,7 +572,24 @@ class KB_OT_rebuild_material_nodes(bpy.types.Operator):
     bl_label = "Rebuild Material Nodes"
 
     def execute(self, context):
-        if context.object and (context.object.type == 'MESH') and (context.object.nvb.meshtype != nvb_def.Meshtype.EMITTER):
-            nvb_material.rebuild_material(context.object)
+        obj = context.object
+        if obj and (obj.type == 'MESH') and (obj.nvb.meshtype != nvb_def.Meshtype.EMITTER):
+            nvb_material.rebuild_material(obj)
+
+        return {'FINISHED'}
+
+
+class KB_OT_recreate_armature(bpy.types.Operator):
+    """Recreate an armature from bone nodes."""
+
+    bl_idname = "kb.recreate_armature"
+    bl_label = "Recreate Armature"
+
+    def execute(self, context):
+        obj = context.object
+        if nvb_utils.is_root_dummy(obj):
+            armature_object = nvb_armature.recreate_armature(obj)
+            if armature_object:
+                nvb_armature.create_armature_animations(obj, armature_object)
 
         return {'FINISHED'}

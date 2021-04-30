@@ -108,6 +108,7 @@ classes = (
     nvb_ops.KB_OT_move_lightflare,
     nvb_ops.KB_OT_new_lightflare,
     nvb_ops.KB_OT_rebuild_material_nodes,
+    nvb_ops.KB_OT_recreate_armature,
     nvb_ops.KB_OT_render_minimap,
     nvb_ops.KB_OT_select_smoothgroup,
     nvb_ops.KB_OT_texture_box_ops,
