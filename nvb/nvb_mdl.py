@@ -75,7 +75,7 @@ class Mdl():
         if newNode:
             key = newNode.parentName + newNode.name
             if key in self.nodeDict:
-                print("Kotorblender - WARNING: Node name conflict " + key + ".")
+                print("KotorBlender: WARNING - node name conflict " + key + ".")
             else:
                 self.nodeDict[key] = newNode
                 self.mdlnodes.append(newNode)
@@ -83,7 +83,7 @@ class Mdl():
     def add_animation(self, anim):
         if anim:
             if anim.name in self.animDict:
-                print("Kotorblender - WARNING: Animation name conflict.")
+                print("KotorBlender: WARNING - animation name conflict.")
             else:
                 self.animDict[anim.name] = anim
 
@@ -267,48 +267,48 @@ class Mdl():
                 try:
                     self.name = line[1]
                 except (ValueError, IndexError):
-                    print("Kotorblender: WARNING - Unable to read model name.")
+                    print("KotorBlender: WARNING - unable to read model name.")
             elif label == "setsupermodel":
                 try:  # should be ['setsupermodel', modelname, supermodelname]
                     self.supermodel = line[2]
                 except (ValueError, IndexError):
-                    print("Kotorblender: WARNING - Unable to read supermodel. \
+                    print("KotorBlender: WARNING - unable to read supermodel. \
                            Using default value " + self.supermodel)
             elif label == "classification":
                 try:
                     self.classification = line[1].title()
                 except (ValueError, IndexError):
-                    print("Kotorblender: WARNING - Unable to read \
+                    print("KotorBlender: WARNING - unable to read \
                            classification. \
                            Using Default value " + self.classification)
                 if self.classification not in nvb_def.Classification.ALL:
-                    print("Kotorblender: WARNING - Invalid classification '{}'".format(self.classification))
+                    print("KotorBlender: WARNING - invalid classification '{}'".format(self.classification))
                     self.classification = nvb_def.Classification.UNKNOWN
             elif label == "classification_unk1":
                 try:
                     self.unknownC1 = int(line[1])
                 except IndexError:
-                    print("Kotorblender - WARNING: Unable to read classification unknown. Default value " + self.unknownC1)
+                    print("KotorBlender: WARNING - unable to read classification unknown. Default value " + self.unknownC1)
             elif label == "ignorefog":
                 try:
                     self.ignorefog = int(line[1])
                 except IndexError:
-                    print("Kotorblender - WARNING: Unable to read ignorefog. Default value " + self.ignorefog)
+                    print("KotorBlender: WARNING - unable to read ignorefog. Default value " + self.ignorefog)
             elif label == "compress_quaternions":
                 try:
                     self.compress_quats = int(line[1])
                 except IndexError:
-                    print("Kotorblender - WARNING: Unable to read compress_quaternions. Default value " + self.compress_quats)
+                    print("KotorBlender: WARNING - unable to read compress_quaternions. Default value " + self.compress_quats)
             elif label == "headlink":
                 try:
                     self.headlink = int(line[1])
                 except IndexError:
-                    print("Kotorblender - WARNING: Unable to read headlink. Default value " + self.headlink)
+                    print("KotorBlender: WARNING - unable to read headlink. Default value " + self.headlink)
             elif label == "setanimationscale":
                 try:
                     self.animscale = float(line[1])
                 except (ValueError, IndexError):
-                    print("Kotorblender: WARNING - Unable to read \
+                    print("KotorBlender: WARNING - unable to read \
                            animationscale. \
                            Using default value " + self.animscale)
             elif label == "layoutposition":

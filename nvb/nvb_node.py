@@ -1114,7 +1114,7 @@ class Skinmesh(Trimesh):
                     line += "  " + w[0] + " " + str(round(w[1], 6))
             else:
                 # No weights for this vertex ... this is a problem
-                print("Kotorblender - WARNING: Missing vertex weight in " + obj.name)
+                print("KotorBlender: WARNING - missing vertex weight in " + obj.name)
                 line = "ERROR: no weight"
             asciiLines.append(line)
 
@@ -1716,7 +1716,7 @@ class Aabb(Trimesh):
                 faceIdx += 1
             else:
                 # Ngon or no polygon at all (This should never be the case with tessfaces)
-                print("Kotorblender - WARNING: Ngon in walkmesh. Unable to generate aabb.")
+                print("KotorBlender: WARNING - ngon in walkmesh. Unable to generate aabb.")
                 return
 
         aabbTree = []

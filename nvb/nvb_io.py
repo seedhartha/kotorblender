@@ -32,13 +32,13 @@ def _load_mdl(filepath, position = (0.0, 0.0, 0.0)):
                 wkm.load_ascii(asciiLines)
             except IOError:
                 print(
-                    "Kotorblender - WARNING: No walkmesh found {}".format(
+                    "KotorBlender: WARNING - no walkmesh found {}".format(
                         fp
                     )
                 )
             except:
                 print(
-                    "Kotorblender - WARNING: Invalid walkmesh found {}".format(
+                    "KotorBlender: WARNING - invalid walkmesh found {}".format(
                         fp
                     )
                 )
@@ -146,7 +146,7 @@ def _load_lyt(filepath):
         if os.path.exists(mdl_path):
             _load_mdl(mdl_path, room[1:])
         else:
-            print("Kotorblender - WARNING: room model not found: " + mdl_path)
+            print("KotorBlender: WARNING - room model not found: " + mdl_path)
 
 
 def load_lyt(operator,
@@ -201,7 +201,7 @@ def save_mdl(operator,
 
     mdlRoot = nvb_utils.get_mdl_root_from_context()
     if mdlRoot:
-        print("Kotorblender: Exporting " + mdlRoot.name)
+        print("KotorBlender: Exporting " + mdlRoot.name)
         mdl = nvb_mdl.Mdl()
         asciiLines = []
         mdl.generate_ascii(asciiLines, mdlRoot)
