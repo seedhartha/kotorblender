@@ -29,15 +29,18 @@ This add-on is a fork of KotorBlender, upgraded to support Blender 2.8+. KotorBl
 ### Baking Lightmaps
 
 1. Select lightmapped objects and enter Edit mode
-2. UV Unwrap Faces via UV → Lightmap Pack
+2. UV Unwrap Faces via UV → Lightmap Pack (increase Margin to avoid overlapping faces) 
 3. For each lightmapped object:
     1. Select lightmap UV Map in Object Data Properties
     2. Select lightmap texture node in material node tree
-    3. Remove a link between lightmap texture node and Multiply node
+    3. Remove a link between a Multiply node and a Material Output node
+    4. Set Base Color in Principled BSDF node to white
 4. In Render Properties
     1. Set Render Engine to Cycles
-    2. Set Margin to a lower number, e.g. 1
-    3. Press the Bake button
+    2. Set Device to GPU Compute, if available
+    3. Set render samples to a higher number, e.g. 1024 to reduce noise
+    4. Set Margin to a lower number, e.g. 1
+    5. Press the Bake button
 
 ### Editing Paths
 
