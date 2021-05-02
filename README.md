@@ -33,14 +33,19 @@ This add-on is a fork of KotorBlender, upgraded to support Blender 2.8+. KotorBl
 3. For each lightmapped object:
     1. Select lightmap UV Map in Object Data Properties
     2. Select lightmap texture node in material node tree
-    3. Remove a link between a Multiply node and a Material Output node
-    4. Set Base Color in Principled BSDF node to white
+    3. Remove a link between Multiply and Material Output nodes
 4. In Render Properties
     1. Set Render Engine to Cycles
     2. Set Device to GPU Compute, if available
-    3. Set render samples to a higher number, e.g. 1024 to reduce noise
-    4. Set Margin to a lower number, e.g. 1
-    5. Press the Bake button
+    3. Set Margin to a lower number, e.g. 1
+    4. Press the Bake button
+
+Fine-tuning:
+
+1. Disable rendering of walkmeshes in Outliner
+2. Set Render samples to a higher number, e.g. 1024, to reduce noise
+3. Enable Ambient Occlusion in World Properties and tweak Factor to improve contrast
+4. Tweak light radius and color (try copying color from vanilla lightmaps)
 
 ### Editing Paths
 
