@@ -390,7 +390,7 @@ class ObjectPropertyGroup(bpy.types.PropertyGroup):
     affectdynamic : bpy.props.BoolProperty(name = "Affect Dynamic", description = "Affect dynamic objects", default = False)
     negativelight : bpy.props.BoolProperty(name = "Negative Light", default = False)
     lensflares    : bpy.props.BoolProperty(name = "Lensflares", default = False)
-    flareradius   : bpy.props.FloatProperty(name = "Flare Radius", default = 0.0, min = 0.0, max = 100.0)
+    flareradius   : bpy.props.FloatProperty(name = "Flare Radius", default = 0.0, min = 0.0, max = 1000000.0)
     flareList     : bpy.props.CollectionProperty(type = FlarePropertyGroup)
     flareListIdx  : bpy.props.IntProperty(name = "Index for flare list", default = 0)
 

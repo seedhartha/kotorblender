@@ -243,11 +243,11 @@ class KB_UL_lightflares(bpy.types.UIList):
 
         # Supports all 3 layout types
         if self.layout_type in {'DEFAULT', 'COMPACT'}:
-            layout.label(item.texture, icon = custom_icon)
+            layout.label(text=item.texture, icon=custom_icon)
 
         elif self.layout_type in {'GRID'}:
             layout.alignment = 'CENTER'
-            layout.label("", icon = custom_icon)
+            layout.label(text="", icon=custom_icon)
 
 
 class KB_PT_empty(bpy.types.Panel):
