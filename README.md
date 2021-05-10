@@ -23,8 +23,9 @@ This add-on is a fork of KotorBlender, upgraded to support Blender 2.8+. KotorBl
 3. Convert binary MDL to ASCII MDL using MDLops or MDLedit
 4. Import ASCII MDL into Blender via File → Import → KotOR Model (.mdl)
 5. Create/modify models
-6. Export ASCII MDL via File → Export → KotOR Model (.mdl)
-7. Convert ASCII MDL to binary MDL using MDLops or MDLedit
+6. Select an MDL root object to be exported 
+7. Export ASCII MDL via File → Export → KotOR Model (.mdl)
+8. Convert ASCII MDL to binary MDL using MDLops or MDLedit
 
 ### Baking Lightmaps
 
@@ -68,8 +69,6 @@ Fine-tuning:
 ## Trivia
 
 - Check "Image search" when importing to recursively search for textures in subdirectories
-- Only selected objects are exported, unless none are selected, in which case all objects will be exported
-- When baking lightmaps, disable rendering of unwanted objects, such as walkmeshes and path points
 
 ## Compatibility
 
