@@ -52,10 +52,10 @@ Fine-tuning:
 
 1. Extract PTH file from the module's RIM file, e.g. "modules/danm13_s.rim" (Kotor Tool, reone-tools, etc.)
 2. Convert binary PTH to ASCII PTH using reone-tools: `reone-tools --to-ascii m13aa.pth`
-3. Import ASCII PTH into Blender via File → Import → KotOR Path (.pth)
+3. Import ASCII PTH into Blender via File → Import → KotOR Path (.pth.ascii)
 4. Create/move path points, or modify path connections via Object Properties
-5. Export ASCII PTH via File → Export → KotOR Path (.pth)
-6. Convert ASCII PTH to binary PTH using reone-tools: `reone-tools --to-pth m13aa-ascii.pth`
+5. Export ASCII PTH via File → Export → KotOR Path (.pth.ascii)
+6. Convert ASCII PTH to binary PTH using reone-tools: `reone-tools --to-pth m13aa.pth.ascii`
 
 ### Connecting Room Walkmeshes
 
