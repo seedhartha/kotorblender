@@ -33,15 +33,15 @@ class KB_OT_remove_connection(bpy.types.Operator):
 
 
 class KB_OT_import_path(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
-    """Import Odyssey Engine path (.pth)"""
+    """Import Odyssey Engine path (.pth.ascii)"""
 
     bl_idname = "kb.pthimport"
     bl_label  = "Import Odyssey PTH"
 
-    filename_ext = ".pth"
+    filename_ext = ".ascii"
 
     filter_glob : bpy.props.StringProperty(
-            default = "*.pth",
+            default = "*.pth.ascii",
             options = {'HIDDEN'})
 
     def execute(self, context):
@@ -81,15 +81,15 @@ class KB_OT_import_path(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
 
 
 class KB_OT_export_path(bpy.types.Operator, bpy_extras.io_utils.ExportHelper):
-    """Export Odyssey Engine path (.pth)"""
+    """Export Odyssey Engine path (.pth.ascii)"""
 
     bl_idname = "kb.pthexport"
     bl_label  = "Export Odyssey PTH"
 
-    filename_ext = ".pth"
+    filename_ext = ".ascii"
 
     filter_glob : bpy.props.StringProperty(
-            default = "*.pth",
+            default = "*.pth.ascii",
             options = {'HIDDEN'})
 
     def execute(self, context):

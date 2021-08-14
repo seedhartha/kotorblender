@@ -67,7 +67,7 @@ def menu_func_import_lyt(self, context):
 
 
 def menu_func_import_pth(self, context):
-    self.layout.operator(nvb_ops_path.KB_OT_import_path.bl_idname, text="KotOR Path (.pth)")
+    self.layout.operator(nvb_ops_path.KB_OT_import_path.bl_idname, text="KotOR Path (.pth.ascii)")
 
 
 def menu_func_export_mdl(self, context):
@@ -79,7 +79,7 @@ def menu_func_export_lyt(self, context):
 
 
 def menu_func_export_pth(self, context):
-    self.layout.operator(nvb_ops_path.KB_OT_export_path.bl_idname, text="KotOR Path (.pth)")
+    self.layout.operator(nvb_ops_path.KB_OT_export_path.bl_idname, text="KotOR Path (.pth.ascii)")
 
 
 classes = (
