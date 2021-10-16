@@ -39,6 +39,7 @@ if 'bpy' in locals():
     reload(kb_glob)
     reload(kb_io)
     reload(kb_light)
+    reload(kb_loadbinmdl)
     reload(kb_material)
     reload(kb_mdl)
     reload(kb_minimap)
@@ -48,10 +49,12 @@ if 'bpy' in locals():
     reload(kb_ops)
     reload(kb_parse)
     reload(kb_props)
+    reload(kb_readbin)
     reload(kb_teximage)
     reload(kb_txi)
     reload(kb_ui)
     reload(kb_utils)
+    reload(kb_writebin)
 else:
     from . import (
         kb_aabb,
@@ -62,6 +65,7 @@ else:
         kb_glob,
         kb_io,
         kb_light,
+        kb_loadbinmdl,
         kb_material,
         kb_mdl,
         kb_minimap,
@@ -71,9 +75,11 @@ else:
         kb_ops,
         kb_parse,
         kb_props,
+        kb_readbin,
         kb_teximage,
         kb_txi,
         kb_ui,
+        kb_writebin,
         kb_utils)
 
 import addon_utils
