@@ -1,4 +1,4 @@
-from kotorblender.kb_readbin import BinaryReader
+from .kb_readbin import BinaryReader
 
 class GffLoader:
 

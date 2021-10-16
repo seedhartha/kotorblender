@@ -1,4 +1,4 @@
-from kotorblender.kb_writebin import BinaryWriter
+from .kb_writebin import BinaryWriter
 
 class BinaryMdlSaver:
 

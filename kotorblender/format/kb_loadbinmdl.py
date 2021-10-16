@@ -1,5 +1,6 @@
-from kotorblender.kb_def import MalformedMdlFile
-from kotorblender.kb_readbin import BinaryReader
+from ..kb_def import MalformedMdlFile
+
+from .kb_readbin import BinaryReader
 
 class BinaryMdlLoader:
 

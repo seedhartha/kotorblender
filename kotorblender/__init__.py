@@ -31,6 +31,12 @@ bl_info = {
 
 if 'bpy' in locals():
     from importlib import reload
+    reload(format.kb_loadbinmdl)
+    reload(format.kb_loadgff)
+    reload(format.kb_readbin)
+    reload(format.kb_savebinmdl)
+    reload(format.kb_savegff)
+    reload(format.kb_writebin)
     reload(kb_aabb)
     reload(kb_anim)
     reload(kb_animnode)
@@ -39,8 +45,6 @@ if 'bpy' in locals():
     reload(kb_glob)
     reload(kb_io)
     reload(kb_light)
-    reload(kb_loadbinmdl)
-    reload(kb_loadgff)
     reload(kb_material)
     reload(kb_mdl)
     reload(kb_minimap)
@@ -50,14 +54,10 @@ if 'bpy' in locals():
     reload(kb_ops)
     reload(kb_parse)
     reload(kb_props)
-    reload(kb_readbin)
-    reload(kb_savebinmdl)
-    reload(kb_savegff)
     reload(kb_teximage)
     reload(kb_txi)
     reload(kb_ui)
     reload(kb_utils)
-    reload(kb_writebin)
 else:
     from . import (
         kb_aabb,
@@ -68,8 +68,6 @@ else:
         kb_glob,
         kb_io,
         kb_light,
-        kb_loadbinmdl,
-        kb_loadgff,
         kb_material,
         kb_mdl,
         kb_minimap,
@@ -79,14 +77,17 @@ else:
         kb_ops,
         kb_parse,
         kb_props,
-        kb_readbin,
-        kb_savebinmdl,
-        kb_savegff,
         kb_teximage,
         kb_txi,
         kb_ui,
-        kb_writebin,
         kb_utils)
+    from .format import (
+        kb_loadbinmdl,
+        kb_loadgff,
+        kb_readbin,
+        kb_savebinmdl,
+        kb_savegff,
+        kb_writebin)
 
 import addon_utils
 import bpy
