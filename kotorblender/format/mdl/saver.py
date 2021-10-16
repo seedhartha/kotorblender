@@ -1,4 +1,4 @@
-from .kb_writebin import BinaryWriter
+from ..binwriter import BinaryWriter
 
 class BinaryMdlSaver:
 
