@@ -3,7 +3,7 @@ import bpy
 import bpy_extras
 from mathutils import Quaternion, Vector
 
-from . import kb_armature, kb_def, kb_io, kb_material, kb_txi, kb_utils
+from .. import kb_armature, kb_def, kb_io, kb_material, kb_txi, kb_utils
 
 
 class KB_OT_children_smoothgroup(bpy.types.Operator):

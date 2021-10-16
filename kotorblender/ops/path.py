@@ -3,7 +3,7 @@ import os
 import bpy
 import bpy_extras
 
-from . import kb_def, kb_utils
+from .. import kb_def, kb_utils
 
 
 class KB_OT_add_connection(bpy.types.Operator):
