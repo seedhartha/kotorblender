@@ -1,6 +1,6 @@
-from ..kb_def import MalformedMdlFile
+from ...kb_def import MalformedMdlFile
 
-from .kb_readbin import BinaryReader
+from ..binreader import BinaryReader
 
 class BinaryMdlLoader:
 

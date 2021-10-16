@@ -31,12 +31,12 @@ bl_info = {
 
 if 'bpy' in locals():
     from importlib import reload
-    reload(format.kb_loadbinmdl)
-    reload(format.kb_loadgff)
-    reload(format.kb_readbin)
-    reload(format.kb_savebinmdl)
-    reload(format.kb_savegff)
-    reload(format.kb_writebin)
+    reload(format.binreader)
+    reload(format.binwriter)
+    reload(format.gff.loader)
+    reload(format.gff.saver)
+    reload(format.mdl.loader)
+    reload(format.mdl.saver)
     reload(kb_aabb)
     reload(kb_anim)
     reload(kb_animnode)
@@ -82,12 +82,14 @@ else:
         kb_ui,
         kb_utils)
     from .format import (
-        kb_loadbinmdl,
-        kb_loadgff,
-        kb_readbin,
-        kb_savebinmdl,
-        kb_savegff,
-        kb_writebin)
+        binreader,
+        binwriter)
+    from .format.gff import (
+        loader,
+        saver)
+    from .format.mdl import (
+        loader,
+        saver)
 
 import addon_utils
 import bpy
