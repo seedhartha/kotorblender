@@ -3,7 +3,7 @@ import bpy
 import bpy_extras
 from mathutils import Quaternion, Vector
 
-from . import nvb_armature, nvb_def, nvb_io, nvb_material, nvb_txi, nvb_utils
+from . import kb_armature, kb_def, kb_io, kb_material, kb_txi, kb_utils
 
 
 class KB_OT_children_smoothgroup(bpy.types.Operator):
@@ -14,7 +14,7 @@ class KB_OT_children_smoothgroup(bpy.types.Operator):
     action : bpy.props.StringProperty()
 
     def execute(self, context):
-        descendants = nvb_utils.search_node_all(
+        descendants = kb_utils.search_node_all(
             context.object, lambda o: o.type == 'MESH'
         )
         for d in descendants:
@@ -33,7 +33,7 @@ class KB_OT_toggle_smoothgroup(bpy.types.Operator):
     def execute(self, context):
         bm = bmesh.from_edit_mesh(context.object.data)
         # the smoothgroup data layer
-        sg_layer = bm.faces.layers.int.get(nvb_def.sg_layer_name)
+        sg_layer = bm.faces.layers.int.get(kb_def.sg_layer_name)
         # convert sg_number to actual sg bitflag value
         sg_value = pow(2, self.sg_number)
         for face in bm.faces:
@@ -71,9 +71,9 @@ class KB_OT_generate_smoothgroup(bpy.types.Operator):
         mesh = ob.to_mesh(scene=context.scene, apply_modifiers=True, settings='RENDER')
 
         # get, or create, the smoothgroups data layer on the object mesh (not the copy)
-        sg_list = ob.data.polygon_layers_int.get(nvb_def.sg_layer_name)
+        sg_list = ob.data.polygon_layers_int.get(kb_def.sg_layer_name)
         if sg_list is None:
-            sg_list = ob.data.polygon_layers_int.new(name=nvb_def.sg_layer_name)
+            sg_list = ob.data.polygon_layers_int.new(name=kb_def.sg_layer_name)
 
         # make all the faces on mesh copy smooth,
         # allowing calc_smooth_groups to work
@@ -120,7 +120,7 @@ class KB_OT_select_smoothgroup(bpy.types.Operator):
         bm = bmesh.from_edit_mesh(context.object.data)
         bm.faces.ensure_lookup_table()
         # the smoothgroup data layer
-        sg_layer = bm.faces.layers.int.get(nvb_def.sg_layer_name)
+        sg_layer = bm.faces.layers.int.get(kb_def.sg_layer_name)
         # convert sg_number to actual sg bitflag value
         sg_value = pow(2, self.sg_number)
 
@@ -146,9 +146,9 @@ class KB_OT_texture_io(bpy.types.Operator):
 
     def execute(self, context):
         if self.action == "SAVE":
-            nvb_txi.save_txi(context.texture, self)
+            kb_txi.save_txi(context.texture, self)
         else:
-            nvb_txi.load_txi(context.texture, self)
+            kb_txi.load_txi(context.texture, self)
         return {'FINISHED'}
 
 
@@ -334,7 +334,7 @@ class KB_OT_import_mdl(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
             options = {'HIDDEN'})
 
     def execute(self, context):
-        return nvb_io.load_mdl(self, context, **self.as_keywords(ignore=("filter_glob",)))
+        return kb_io.load_mdl(self, context, **self.as_keywords(ignore=("filter_glob",)))
 
 
 class KB_OT_import_lyt(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
@@ -382,7 +382,7 @@ class KB_OT_import_lyt(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
             default=False)
 
     def execute(self, context):
-        return nvb_io.load_lyt(self, context, **self.as_keywords(ignore=("filter_glob",)))
+        return kb_io.load_lyt(self, context, **self.as_keywords(ignore=("filter_glob",)))
 
 
 class KB_OT_export_mdl(bpy.types.Operator, bpy_extras.io_utils.ExportHelper):
@@ -417,7 +417,7 @@ class KB_OT_export_mdl(bpy.types.Operator, bpy_extras.io_utils.ExportHelper):
             default=True)
 
     def execute(self, context):
-        return nvb_io.save_mdl(self, context, **self.as_keywords(ignore=("filter_glob","check_existing")))
+        return kb_io.save_mdl(self, context, **self.as_keywords(ignore=("filter_glob","check_existing")))
 
 
 class KB_OT_load_wok_materials(bpy.types.Operator):
@@ -442,7 +442,7 @@ class KB_OT_load_wok_materials(bpy.types.Operator):
                 bpy.ops.object.material_slot_remove()
 
             # Create materials
-            for matDef in nvb_def.wok_materials:
+            for matDef in kb_def.wok_materials:
                 matName = matDef[0]
 
                 # Walkmesh materials should be shared across multiple
@@ -476,8 +476,8 @@ class KB_OT_render_minimap(bpy.types.Operator):
         obj   = context.object
         scene = bpy.context.scene
         if obj and (obj.type == 'EMPTY'):
-            if (obj.nvb.dummytype == nvb_def.Dummytype.MDLROOT):
-                nvb_utils.setup_minimap_render(obj, scene)
+            if (obj.nvb.dummytype == kb_def.Dummytype.MDLROOT):
+                kb_utils.setup_minimap_render(obj, scene)
                 bpy.ops.render.render(use_viewport = True)
 
                 self.report({'INFO'}, "Ready to render")
@@ -528,7 +528,7 @@ class KB_OT_export_lyt(bpy.types.Operator, bpy_extras.io_utils.ExportHelper):
             options = {'HIDDEN'})
 
     def _describe_object(self, obj):
-        parent = nvb_utils.get_mdl_root(obj)
+        parent = kb_utils.get_mdl_root(obj)
         orientation = obj.rotation_euler.to_quaternion()
         return "{} {} {:.7g} {:.7g} {:.7g} {:.7g} {:.7g} {:.7g} {:.7g}".format(parent.name if parent else "NULL", obj.name, *obj.matrix_world.translation, *orientation)
 
@@ -541,7 +541,7 @@ class KB_OT_export_lyt(bpy.types.Operator, bpy_extras.io_utils.ExportHelper):
             objects = bpy.context.selected_objects if len(bpy.context.selected_objects) > 0 else bpy.context.collection.objects
             for obj in objects:
                 if obj.type == 'EMPTY':
-                    if obj.nvb.dummytype == nvb_def.Dummytype.MDLROOT:
+                    if obj.nvb.dummytype == kb_def.Dummytype.MDLROOT:
                         rooms.append(obj)
                     elif obj.name.lower().startswith("door"):
                         doors.append(obj)
@@ -573,8 +573,8 @@ class KB_OT_rebuild_material_nodes(bpy.types.Operator):
 
     def execute(self, context):
         obj = context.object
-        if obj and (obj.type == 'MESH') and (obj.nvb.meshtype != nvb_def.Meshtype.EMITTER):
-            nvb_material.rebuild_material(obj)
+        if obj and (obj.type == 'MESH') and (obj.nvb.meshtype != kb_def.Meshtype.EMITTER):
+            kb_material.rebuild_material(obj)
 
         return {'FINISHED'}
 
@@ -587,9 +587,9 @@ class KB_OT_recreate_armature(bpy.types.Operator):
 
     def execute(self, context):
         obj = context.object
-        if nvb_utils.is_root_dummy(obj):
-            armature_object = nvb_armature.recreate_armature(obj)
+        if kb_utils.is_root_dummy(obj):
+            armature_object = kb_armature.recreate_armature(obj)
             if armature_object:
-                nvb_armature.create_armature_animations(obj, armature_object)
+                kb_armature.create_armature_animations(obj, armature_object)
 
         return {'FINISHED'}

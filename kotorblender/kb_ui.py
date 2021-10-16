@@ -1,7 +1,7 @@
 import bmesh
 import bpy
 
-from . import nvb_def, nvb_utils
+from . import kb_def, kb_utils
 
 
 class KB_UL_anims(bpy.types.UIList):
@@ -73,12 +73,12 @@ class KB_PT_animlist(bpy.types.Panel):
     @classmethod
     def poll(cls, context):
         """Draw only if part of a valid mdl is selected."""
-        return nvb_utils.is_root_dummy(context.object)
+        return kb_utils.is_root_dummy(context.object)
 
     def draw(self, context):
         """Draw the panel."""
         layout = self.layout
-        mdl_base = nvb_utils.get_mdl_root_from_object(context.object)
+        mdl_base = kb_utils.get_mdl_root_from_object(context.object)
         if mdl_base:
             # Display and add/remove animations
             row = layout.row()
@@ -161,7 +161,7 @@ class KB_PT_smoothgroups(bpy.types.Panel):
             return
 
         # the smoothgroup data layer
-        sg_layer = bm.faces.layers.int.get(nvb_def.sg_layer_name)
+        sg_layer = bm.faces.layers.int.get(kb_def.sg_layer_name)
         # count of faces per smoothgroup in this mesh
         sg = { i: 0 for i in range(0, 32) }
         # smoothgroups in use on selected faces
@@ -274,7 +274,7 @@ class KB_PT_empty(bpy.types.Panel):
         layout.separator()
 
         # Display properties depending on type of the empty
-        if (obj.nvb.dummytype == nvb_def.Dummytype.MDLROOT):
+        if (obj.nvb.dummytype == kb_def.Dummytype.MDLROOT):
             row = layout.row()
             box = row.box()
             split = box.split()
@@ -283,14 +283,14 @@ class KB_PT_empty(bpy.types.Panel):
             col.label(text = "Supermodel:")
             col.label(text = "Ignore Fog:")
             col.label(text = "Animation Scale:")
-            if obj.nvb.classification == nvb_def.Classification.CHARACTER:
+            if obj.nvb.classification == kb_def.Classification.CHARACTER:
                 col.label(text = "Head Model:")
             col = split.column()
             col.prop(obj.nvb, "classification", text = "")
             col.prop(obj.nvb, "supermodel", text = "")
             col.prop(obj.nvb, "ignorefog", text = "")
             col.prop(obj.nvb, "animscale", text = "")
-            if obj.nvb.classification == nvb_def.Classification.CHARACTER:
+            if obj.nvb.classification == kb_def.Classification.CHARACTER:
                 col.prop(obj.nvb, "headlink", text = "")
             box.operator("kb.recreate_armature")
             layout.separator()
@@ -325,13 +325,13 @@ class KB_PT_empty(bpy.types.Panel):
             op = row.operator("kb.children_smoothgroup", text="Separate")
             op.action = "SEPR"
 
-        elif (obj.nvb.dummytype == nvb_def.Dummytype.PWKROOT):
+        elif (obj.nvb.dummytype == kb_def.Dummytype.PWKROOT):
             pass
 
-        elif (obj.nvb.dummytype == nvb_def.Dummytype.DWKROOT):
+        elif (obj.nvb.dummytype == kb_def.Dummytype.DWKROOT):
             pass
 
-        elif (obj.nvb.dummytype == nvb_def.Dummytype.REFERENCE):
+        elif (obj.nvb.dummytype == kb_def.Dummytype.REFERENCE):
             row = layout.row()
             box = row.box()
 
@@ -589,7 +589,7 @@ class KB_PT_emitter(bpy.types.Panel):
         try:
             return context.object and \
                    context.object.type == 'MESH' and \
-                   context.object.nvb.meshtype == nvb_def.Meshtype.EMITTER
+                   context.object.nvb.meshtype == kb_def.Meshtype.EMITTER
         except:
             return False
 
@@ -609,16 +609,16 @@ class KB_PT_emitter(bpy.types.Panel):
         row = box.row()
         row.prop(obj.nvb, "render_emitter")
         if obj.nvb.update == "Lightning" or \
-           not nvb_utils.is_null(obj.nvb.chunkName):
+           not kb_utils.is_null(obj.nvb.chunkName):
             row.enabled = False
         row = box.row()
         row.prop(obj.nvb, "blend")
-        if not nvb_utils.is_null(obj.nvb.chunkName):
+        if not kb_utils.is_null(obj.nvb.chunkName):
             row.enabled = False
         row = box.row()
         row.prop(obj.nvb, "spawntype")
         if obj.nvb.update != "Fountain" or \
-           not nvb_utils.is_null(obj.nvb.chunkName):
+           not kb_utils.is_null(obj.nvb.chunkName):
             row.enabled = False
 
         box.separator()
@@ -774,11 +774,11 @@ class KB_PT_emitter(bpy.types.Panel):
         row.label(text="Texture / Chunk", icon='TEXTURE')
         row = box.row()
         row.prop(obj.nvb, "texture")
-        if not nvb_utils.is_null(obj.nvb.chunkName):
+        if not kb_utils.is_null(obj.nvb.chunkName):
             row.enabled = False
         row = box.row()
         row.prop(obj.nvb, "twosidedtex")
-        if not nvb_utils.is_null(obj.nvb.chunkName):
+        if not kb_utils.is_null(obj.nvb.chunkName):
             row.enabled = False
 
         box.separator()
@@ -789,7 +789,7 @@ class KB_PT_emitter(bpy.types.Panel):
         row.label(text="Grid")
         row.prop(obj.nvb, "xgrid", text="X")
         row.prop(obj.nvb, "ygrid", text="Y")
-        if not nvb_utils.is_null(obj.nvb.chunkName):
+        if not kb_utils.is_null(obj.nvb.chunkName):
             row.enabled = False
         row = box.row()
         row.prop(obj.nvb, "fps")
@@ -927,7 +927,7 @@ class KB_PT_mesh(bpy.types.Panel):
     def poll(cls, context):
         return (context.object and \
                 context.object.type == 'MESH' and \
-                context.object.nvb.meshtype != nvb_def.Meshtype.EMITTER)
+                context.object.nvb.meshtype != kb_def.Meshtype.EMITTER)
 
     def draw(self, context):
         obj      = context.object
@@ -938,7 +938,7 @@ class KB_PT_mesh(bpy.types.Panel):
 
         layout.separator()
 
-        if (obj.nvb.meshtype == nvb_def.Meshtype.EMITTER):
+        if (obj.nvb.meshtype == kb_def.Meshtype.EMITTER):
             row = layout.row()
             box = row.box()
 
@@ -1006,7 +1006,7 @@ class KB_PT_mesh(bpy.types.Panel):
             row.prop(obj.nvb, "smoothgroup", text="Smooth Group", expand = True)
 
             # Additional props for danglymeshes
-            if (obj.nvb.meshtype == nvb_def.Meshtype.DANGLYMESH):
+            if (obj.nvb.meshtype == kb_def.Meshtype.DANGLYMESH):
                 layout.separator()
 
                 row = layout.row()
@@ -1023,7 +1023,7 @@ class KB_PT_mesh(bpy.types.Panel):
                 row.prop(obj.nvb, "displacement", text="Displacement")
 
             # Additional props for skins
-            elif (obj.nvb.meshtype == nvb_def.Meshtype.SKIN):
+            elif (obj.nvb.meshtype == kb_def.Meshtype.SKIN):
                 layout.separator()
 
                 row = layout.row()
@@ -1035,7 +1035,7 @@ class KB_PT_mesh(bpy.types.Panel):
                 row.operator("kb.skingroup_add", text = "", icon='ADD')
 
             # Additional props for aabb walkmeshes
-            elif (obj.nvb.meshtype == nvb_def.Meshtype.AABB):
+            elif (obj.nvb.meshtype == kb_def.Meshtype.AABB):
                 layout.separator()
 
                 row = layout.row()
@@ -1059,7 +1059,7 @@ class KB_PT_path_point(bpy.types.Panel):
 
     @classmethod
     def poll(cls, context):
-        return nvb_utils.is_path_point(context.object)
+        return kb_utils.is_path_point(context.object)
 
     def draw(self, context):
         row = self.layout.row()

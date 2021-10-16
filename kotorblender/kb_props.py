@@ -1,19 +1,19 @@
 import bpy
 from mathutils import Color
 
-from . import nvb_def, nvb_light, nvb_txi, nvb_utils
+from . import kb_def, kb_light, kb_txi, kb_utils
 
 
 def KB_anim_root_obj_poll(self, object):
-    return nvb_utils.ancestor_node(object, nvb_utils.is_root_dummy) is not None
+    return kb_utils.ancestor_node(object, kb_utils.is_root_dummy) is not None
 
 
-def nvb_update_light_power(self, context):
+def kb_update_light_power(self, context):
     if context.object and context.object.type == 'LIGHT':
-        nvb_light.calc_light_power(context.object)
+        kb_light.calc_light_power(context.object)
 
 
-def nvb_update_shadow_prop(self, context):
+def kb_update_shadow_prop(self, context):
     """
     Set the lights shadow to match the Aurora shadow property
     """
@@ -28,7 +28,7 @@ class FlarePropertyGroup(bpy.types.PropertyGroup):
 
     texture : bpy.props.StringProperty(name = "Texture",
                                        description = "Texture name",
-                                       default = nvb_def.null)
+                                       default = kb_def.null)
     size : bpy.props.FloatProperty(name = "Size",
                                  description = "Flare size",
                                  default = 1)
@@ -70,7 +70,7 @@ class TexturePropertyGroup(bpy.types.PropertyGroup):
         by testing against default values
         """
         self.modified_properties.clear()
-        for tok in nvb_txi.tokens:
+        for tok in kb_txi.tokens:
             attr_def = TexturePropertyGroup.__annotations__[tok][1]
             default_value = attr_def["default"]
             if tok == "specularcolor":
@@ -168,7 +168,7 @@ class TexturePropertyGroup(bpy.types.PropertyGroup):
     lowerrightcoords : bpy.props.StringProperty(default="", update=prop_update)
 
 
-def nvb_update_emitter_prop(self, context):
+def kb_update_emitter_prop(self, context):
     obj = context.object
     if not obj:
         return
@@ -178,7 +178,7 @@ def nvb_update_emitter_prop(self, context):
         obj.nvb.render_emitter = "Linked"
     if obj.nvb.update != "Explosion":
         obj.nvb.loop = False
-    if not nvb_utils.is_null(obj.nvb.chunkName):
+    if not kb_utils.is_null(obj.nvb.chunkName):
         obj.nvb.render_emitter = "Normal"
         obj.nvb.blend = "Normal"
     if obj.nvb.p2p_type == "Bezier":
@@ -261,26 +261,26 @@ class ObjectPropertyGroup(bpy.types.PropertyGroup):
 
     # For all emptys
     dummytype  : bpy.props.EnumProperty(name = "Type",
-                                        items = [(nvb_def.Dummytype.NONE,      "None",                "Simple dummy object",                                        0), \
-                                                 (nvb_def.Dummytype.DWKROOT,   "DWK Rootdummy",       "All children are considered part of a door walkmesh",        1), \
-                                                 (nvb_def.Dummytype.MDLROOT,   "MDL Rootdummy",       "All children are considered part of a mdl",                  2), \
-                                                 (nvb_def.Dummytype.PWKROOT,   "PWK Rootdummy",       "All children are considered part of a placeable walkmesh",   3), \
-                                                 (nvb_def.Dummytype.REFERENCE, "Reference node",      "Used in spells. Points to 'fx_ref' by default",              4), \
-                                                 (nvb_def.Dummytype.PATCH,     "Patch node",          "Used in spells. Unknown purpose. ",                          5), \
-                                                 (nvb_def.Dummytype.PATHPOINT, "Path point",          "Used when exporting paths",                                  6)],
-                                        default = nvb_def.Dummytype.NONE)
+                                        items = [(kb_def.Dummytype.NONE,      "None",                "Simple dummy object",                                        0), \
+                                                 (kb_def.Dummytype.DWKROOT,   "DWK Rootdummy",       "All children are considered part of a door walkmesh",        1), \
+                                                 (kb_def.Dummytype.MDLROOT,   "MDL Rootdummy",       "All children are considered part of a mdl",                  2), \
+                                                 (kb_def.Dummytype.PWKROOT,   "PWK Rootdummy",       "All children are considered part of a placeable walkmesh",   3), \
+                                                 (kb_def.Dummytype.REFERENCE, "Reference node",      "Used in spells. Points to 'fx_ref' by default",              4), \
+                                                 (kb_def.Dummytype.PATCH,     "Patch node",          "Used in spells. Unknown purpose. ",                          5), \
+                                                 (kb_def.Dummytype.PATHPOINT, "Path point",          "Used when exporting paths",                                  6)],
+                                        default = kb_def.Dummytype.NONE)
     # For MDL Rootdummy
-    supermodel     : bpy.props.StringProperty(name = "Supermodel", description = "Name of the model to inherit animations from", default = nvb_def.null)
+    supermodel     : bpy.props.StringProperty(name = "Supermodel", description = "Name of the model to inherit animations from", default = kb_def.null)
     classification : bpy.props.EnumProperty(name  = "Classification",
-                                            items = [ (nvb_def.Classification.UNKNOWN,   "Other",     "Unknown classification",              0), \
-                                                      (nvb_def.Classification.EFFECT,    "Effect",    "Effects",                             1), \
-                                                      (nvb_def.Classification.TILE,      "Tile",      "Tiles for a tileset",                 2), \
-                                                      (nvb_def.Classification.CHARACTER, "Character", "Creatures, characters or placeables", 4), \
-                                                      (nvb_def.Classification.DOOR,      "Door",      "Doors",                               8), \
-                                                      (nvb_def.Classification.SABER,     "Lightsaber","Lightsaber weapon",                   16), \
-                                                      (nvb_def.Classification.ITEM,      "Placeable", "Items or placeables",                 32), \
-                                                      (nvb_def.Classification.FLYER,     "Flyer",     "Non-interactive scene elements",      64) ],
-                                            default = nvb_def.Classification.UNKNOWN)
+                                            items = [ (kb_def.Classification.UNKNOWN,   "Other",     "Unknown classification",              0), \
+                                                      (kb_def.Classification.EFFECT,    "Effect",    "Effects",                             1), \
+                                                      (kb_def.Classification.TILE,      "Tile",      "Tiles for a tileset",                 2), \
+                                                      (kb_def.Classification.CHARACTER, "Character", "Creatures, characters or placeables", 4), \
+                                                      (kb_def.Classification.DOOR,      "Door",      "Doors",                               8), \
+                                                      (kb_def.Classification.SABER,     "Lightsaber","Lightsaber weapon",                   16), \
+                                                      (kb_def.Classification.ITEM,      "Placeable", "Items or placeables",                 32), \
+                                                      (kb_def.Classification.FLYER,     "Flyer",     "Non-interactive scene elements",      64) ],
+                                            default = kb_def.Classification.UNKNOWN)
     unknownC1      : bpy.props.IntProperty(name = "Unknown", description = "Unknown byte-2 in the classification bytes section of the model header", default = 0)
     ignorefog      : bpy.props.BoolProperty(name = "Ignore Fog", description = "If true, model will not be occluded by area fog in-game", default = False)
     compress_quats : bpy.props.BoolProperty(name = "Use Compressed Quaternions", description = "If true, model will use compressed quaternions in animations", default = False)
@@ -315,13 +315,13 @@ class ObjectPropertyGroup(bpy.types.PropertyGroup):
 
     # For mesh objects
     meshtype   : bpy.props.EnumProperty(name = "Type",
-                                        items = [ (nvb_def.Meshtype.TRIMESH, "Trimesh", "Triangle mesh", 0), \
-                                                  (nvb_def.Meshtype.DANGLYMESH, "Danglymesh", "Triangle mesh with dangly parts", 1), \
-                                                  (nvb_def.Meshtype.SKIN, "Skinmesh", "Triangle mesh with weighted deformation", 2), \
-                                                  (nvb_def.Meshtype.AABB, "AABB Walkmesh", "Axis Aligned Bounding Box Walkmesh, for collision detection", 3), \
-                                                  (nvb_def.Meshtype.EMITTER, "Emitter", "Particle emitter", 4), \
-                                                  (nvb_def.Meshtype.LIGHTSABER, "Lightsaber", "Saber mesh (blade plane)", 5)],
-                                        default = nvb_def.Meshtype.TRIMESH)
+                                        items = [ (kb_def.Meshtype.TRIMESH, "Trimesh", "Triangle mesh", 0), \
+                                                  (kb_def.Meshtype.DANGLYMESH, "Danglymesh", "Triangle mesh with dangly parts", 1), \
+                                                  (kb_def.Meshtype.SKIN, "Skinmesh", "Triangle mesh with weighted deformation", 2), \
+                                                  (kb_def.Meshtype.AABB, "AABB Walkmesh", "Axis Aligned Bounding Box Walkmesh, for collision detection", 3), \
+                                                  (kb_def.Meshtype.EMITTER, "Emitter", "Particle emitter", 4), \
+                                                  (kb_def.Meshtype.LIGHTSABER, "Lightsaber", "Saber mesh (blade plane)", 5)],
+                                        default = kb_def.Meshtype.TRIMESH)
     smoothgroup    : bpy.props.EnumProperty(name = "Smoothgroup",
                                             items = [   ("SEPR", "Separate", "All faces have their own smoothgroup",   0),
                                                         ("SING", "Single", "All Faces belong to the same smoothgroup", 1),
@@ -333,7 +333,7 @@ class ObjectPropertyGroup(bpy.types.PropertyGroup):
     bitmap           : bpy.props.StringProperty(name = "Diffuse map")
     bitmap2          : bpy.props.StringProperty(name = "Lightmap")
     alpha            : bpy.props.FloatProperty(name = "Alpha", default = 1.0, min = 0.0, max = 1.0)
-    shadow           : bpy.props.BoolProperty(name = "Shadow", description = "Whether to cast shadows", default = True, update=nvb_update_shadow_prop)
+    shadow           : bpy.props.BoolProperty(name = "Shadow", description = "Whether to cast shadows", default = True, update=kb_update_shadow_prop)
     render           : bpy.props.BoolProperty(name = "Render", description = "Whether to render this object in the scene", default = True)
     lightmapped      : bpy.props.BoolProperty(name = "Lightmapped", description = "Whether this object has shading baked into a lightmap", default = False)
     beaming          : bpy.props.BoolProperty(name = "beaming", description = "Object casts beams (?)", default = False)
@@ -395,8 +395,8 @@ class ObjectPropertyGroup(bpy.types.PropertyGroup):
     flareListIdx  : bpy.props.IntProperty(name = "Index for flare list", default = 0)
 
     # Point lights in Eevee do not have equivalent for Aurora light multiplier and radius
-    radius : bpy.props.FloatProperty(name = "Radius", default = 0.0, min = 0.0, max = 10000.0, update = nvb_update_light_power)
-    multiplier : bpy.props.FloatProperty(name = "Multiplier", default = 1.0, min = 0.0, max = 10.0, update = nvb_update_light_power)
+    radius : bpy.props.FloatProperty(name = "Radius", default = 0.0, min = 0.0, max = 10000.0, update = kb_update_light_power)
+    multiplier : bpy.props.FloatProperty(name = "Multiplier", default = 1.0, min = 0.0, max = 10.0, update = kb_update_light_power)
 
     rawascii : bpy.props.StringProperty(name = "Text node", description = "Name of the raw text node", default = "")
 
@@ -437,7 +437,7 @@ class ObjectPropertyGroup(bpy.types.PropertyGroup):
     # Lighting props
     lightningdelay  : bpy.props.FloatProperty(name="Delay", description="Lightning Delay (seconds)", default=0.0, min=0.0, max=1000.0)
     lightningradius : bpy.props.FloatProperty(name="Radius", description="Lightning Radius (meters)", default=0.0, min=0.0, max=1000.0)
-    lightningsubdiv : bpy.props.IntProperty(name="Subdivisions", description="Lightning Subdivisions", default=0, min=0, max=12, update=nvb_update_emitter_prop)
+    lightningsubdiv : bpy.props.IntProperty(name="Subdivisions", description="Lightning Subdivisions", default=0, min=0, max=12, update=kb_update_emitter_prop)
     lightningscale  : bpy.props.FloatProperty(name="Scale", description="Lightning Scale", default=1.0, min=0.0, max=1.0)
     lightningzigzag : bpy.props.IntProperty(name="ZigZag", description="Lightning Zig-Zag", default=0, min=0, max=30)
     alphamid : bpy.props.FloatProperty(name="Alpha mid", description="Alpha mid", default=1.0, min=-1.0, max=1.0)
@@ -493,7 +493,7 @@ class ObjectPropertyGroup(bpy.types.PropertyGroup):
                  ("Single", "Single", "Single", 2),
                  ("Explosion", "Explosion", "Explosion", 3),
                  ("Lightning", "Lightning", "Lightning", 4)],
-        default="NONE", options=set(), update=nvb_update_emitter_prop)
+        default="NONE", options=set(), update=kb_update_emitter_prop)
     render_emitter : bpy.props.EnumProperty(
         name="Render", description="Render type",
         items = [("NONE", "", "", 0),
@@ -513,12 +513,12 @@ class ObjectPropertyGroup(bpy.types.PropertyGroup):
                  ("Lighten", "Lighten", "Lighten", 3)],
         default="NONE", options=set())
     texture : bpy.props.StringProperty(name="Texture", description="Texture", maxlen=32, options=set())
-    chunkName : bpy.props.StringProperty(name="Chunk Name", description="Chunk Name", maxlen=16, default="", options=set(), update=nvb_update_emitter_prop)
+    chunkName : bpy.props.StringProperty(name="Chunk Name", description="Chunk Name", maxlen=16, default="", options=set(), update=kb_update_emitter_prop)
     twosidedtex : bpy.props.BoolProperty(name="Two-Sided Texture", description="Textures visible from front and back", default=False, options=set())
     loop : bpy.props.BoolProperty(name="Loop", description="Loop", default = False, options=set())
     renderorder : bpy.props.IntProperty(name="Render order", description="Render Order", default = 0, min = 0, options=set())
     m_bFrameBlending : bpy.props.BoolProperty(name="Frame Blending", default=False, options=set())
-    m_sDepthTextureName : bpy.props.StringProperty(name="Depth Texture Name", description="Depth Texture Name", default=nvb_def.null, maxlen=32, options=set())
+    m_sDepthTextureName : bpy.props.StringProperty(name="Depth Texture Name", description="Depth Texture Name", default=kb_def.null, maxlen=32, options=set())
 
     # Emitter flags
     p2p         : bpy.props.BoolProperty(name="p2p", description="Use Point to Point settings", default = False, options=set())
@@ -528,7 +528,7 @@ class ObjectPropertyGroup(bpy.types.PropertyGroup):
         items = [("NONE", "", "", 0),
                  ("Bezier", "Bezier", "Bezier", 1),
                  ("Gravity", "Gravity", "Gravity", 2)],
-        default="NONE", options=set(), update=nvb_update_emitter_prop)
+        default="NONE", options=set(), update=kb_update_emitter_prop)
     affectedByWind : bpy.props.BoolProperty(name="Affected By Wind", description="Particles are affected by area wind", default = False, options=set())
     m_isTinted : bpy.props.BoolProperty(name="Tinted", description="Tint texture with start, mid, and end color", default = False, options=set())
     bounce : bpy.props.BoolProperty(name="Bounce", description="Bounce On/Off", default = False, options=set())

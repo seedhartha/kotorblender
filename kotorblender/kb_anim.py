@@ -3,7 +3,7 @@ import collections
 import bpy
 from mathutils import Matrix, Quaternion, Vector
 
-from . import nvb_animnode, nvb_def, nvb_utils
+from . import kb_animnode, kb_def, kb_utils
 
 
 class Animation():
@@ -11,7 +11,7 @@ class Animation():
         self.name      = name
         self.length    = 1.0
         self.transtime = 1.0
-        self.root      = nvb_def.null
+        self.root      = kb_def.null
         self.eventList = []
         self.nodeList  = collections.OrderedDict()
 
@@ -34,15 +34,15 @@ class Animation():
                 self._create_rest_pose(obj, list_anim.frameStart-5)
 
     def _create_list_anim(self, mdl_root):
-        result = nvb_utils.create_anim_list_item(mdl_root)
+        result = kb_utils.create_anim_list_item(mdl_root)
         result.name = self.name
-        result.transtime = nvb_def.fps * self.transtime
+        result.transtime = kb_def.fps * self.transtime
         result.root = result.root_obj = self._get_anim_target(mdl_root).name
-        result.frameEnd = nvb_utils.nwtime2frame(self.length) + result.frameStart
+        result.frameEnd = kb_utils.nwtime2frame(self.length) + result.frameStart
         return result
 
     def _get_anim_target(self, mdl_root):
-        result = nvb_utils.search_node(mdl_root, lambda o, name=self.animroot: o.name.lower() == name.lower())
+        result = kb_utils.search_node(mdl_root, lambda o, name=self.animroot: o.name.lower() == name.lower())
         if not result:
             result = mdl_root
             print("KotorBlender: animation retargeted from {} to {}".format(self.animroot, mdl_root.name))
@@ -52,21 +52,21 @@ class Animation():
         for time, name in self.events:
             event = list_anim.eventList.add()
             event.name = name
-            event.frame = nvb_utils.nwtime2frame(time) + list_anim.frameStart
+            event.frame = kb_utils.nwtime2frame(time) + list_anim.frameStart
 
     def _associate_node_to_object(self, mdl_root):
         result = dict()
         for node in self.nodes:
-            obj = nvb_utils.search_node(mdl_root, lambda o, name=node.name: o.name.lower() == name.lower())
+            obj = kb_utils.search_node(mdl_root, lambda o, name=node.name: o.name.lower() == name.lower())
             if obj:
                 result[node.name.lower()] = obj
         return result
 
     def _create_rest_pose(self, obj, frame=1):
-        nvb_animnode.Animnode.create_restpose(obj, frame)
+        kb_animnode.Animnode.create_restpose(obj, frame)
 
     def add_ascii_node(self, asciiBlock):
-        node = nvb_animnode.Node()
+        node = kb_animnode.Node()
         node.load_ascii(asciiBlock)
         key  = node.parentName + node.name
         if key in self.nodeList:
@@ -87,7 +87,7 @@ class Animation():
                 # Probably empty line or whatever, skip it
                 continue
             if (label == "newanim"):
-                self.name = nvb_utils.get_name(line[1])
+                self.name = kb_utils.get_name(line[1])
             elif (label == "length"):
                 self.length = float(line[1])
             elif (label == "transtime"):
@@ -100,7 +100,7 @@ class Animation():
             elif (label == "event"):
                 self.add_event((float(line[1]), line[2]))
             elif (label == "eventlist"):
-                numEvents = next((i for i, v in enumerate(asciiBlock[idx+1:]) if not nvb_utils.is_number(v[0])), -1)
+                numEvents = next((i for i, v in enumerate(asciiBlock[idx+1:]) if not kb_utils.is_number(v[0])), -1)
                 list(map(self.add_event, ((float(v[0]), v[1]) for v in asciiBlock[idx+1:idx+1+numEvents])))
             elif (label == "node"):
                 blockStart = idx
@@ -109,7 +109,7 @@ class Animation():
                     self.add_ascii_node(asciiBlock[blockStart:idx+1])
                     blockStart = -1
                 elif (label == "node"):
-                    raise nvb_def.MalformedMdlFile("Unexpected 'endnode'")
+                    raise kb_def.MalformedMdlFile("Unexpected 'endnode'")
 
     def load_ascii(self, ascii_data):
         """Load an animation from a block from an ascii mdl file."""
@@ -129,7 +129,7 @@ class Animation():
             except (IndexError, AttributeError):
                 continue  # Probably empty line, skip it
             if (label == "newanim"):
-                self.name = nvb_utils.str2identifier(line[1])
+                self.name = kb_utils.str2identifier(line[1])
             elif (label == "length"):
                 self.length = float(line[1])
             elif (label == "transtime"):
@@ -147,12 +147,12 @@ class Animation():
         node_list = [dlm + s for s in ascii_data.split(dlm) if s != ""]
         for idx, ascii_node in enumerate(node_list):
             ascii_lines = [l.strip().split() for l in ascii_node.splitlines()]
-            node = nvb_animnode.Animnode()
+            node = kb_animnode.Animnode()
             node.load_ascii(ascii_lines, idx)
             self.nodes.append(node)
 
     def anim_node_to_ascii(self, bObject, asciiLines):
-        node = nvb_animnode.Node()
+        node = kb_animnode.Node()
         node.to_ascii(bObject, asciiLines, self.name)
 
         # If this mdl was imported, we need to retain the order of the
@@ -169,7 +169,7 @@ class Animation():
 
     @staticmethod
     def generate_ascii_nodes(obj, anim, ascii_lines, options):
-        nvb_animnode.Animnode.generate_ascii(obj, anim, ascii_lines, options)
+        kb_animnode.Animnode.generate_ascii(obj, anim, ascii_lines, options)
 
         # Sort children to restore original order before import
         # (important for supermodels/animations to work)
@@ -184,7 +184,7 @@ class Animation():
         ascii_lines.append("newanim {} {}".format(anim.name, animRootDummy.name))
         ascii_lines.append(
             "  length {}".format(
-                round((anim.frameEnd - anim.frameStart)/nvb_def.fps, 5)
+                round((anim.frameEnd - anim.frameStart)/kb_def.fps, 5)
             )
         )
         ascii_lines.append(
@@ -195,7 +195,7 @@ class Animation():
         )
         # Get animation events
         for event in anim.eventList:
-            event_time = (event.frame - anim.frameStart) / nvb_def.fps
+            event_time = (event.frame - anim.frameStart) / kb_def.fps
             ascii_lines.append(
                 "  event {} {}".format(round(event_time, 3), event.name)
             )
@@ -207,7 +207,7 @@ class Animation():
 
     def to_ascii(self, animScene, animRootDummy, asciiLines, mdlName = ""):
         self.name      = animRootDummy.nvb.animname
-        self.length    = nvb_utils.frame2nwtime(animScene.frame_end, animScene.render.fps)
+        self.length    = kb_utils.frame2nwtime(animScene.frame_end, animScene.render.fps)
         self.transtime = animRootDummy.nvb.transtime
         self.root      = animRootDummy.nvb.animroot
 
@@ -217,7 +217,7 @@ class Animation():
         asciiLines.append("  animroot " + self.root)
 
         for event in animRootDummy.nvb.eventList:
-            eventTime = nvb_utils.frame2nwtime(event.frame, animScene.render.fps)
+            eventTime = kb_utils.frame2nwtime(event.frame, animScene.render.fps)
             asciiLines.append("  event " + str(round(eventTime, 5)) + " " + event.name)
 
         self.anim_node_to_ascii(animRootDummy, asciiLines)

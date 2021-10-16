@@ -4,7 +4,7 @@ import math
 
 import bpy
 
-from . import nvb_def, nvb_utils
+from . import kb_def, kb_utils
 
 
 class KB_OT_anim_clone(bpy.types.Operator):
@@ -16,7 +16,7 @@ class KB_OT_anim_clone(bpy.types.Operator):
     @classmethod
     def poll(cls, context):
         """Prevent execution if no rootdummy was found."""
-        mdl_base = nvb_utils.get_mdl_root_from_object(context.object)
+        mdl_base = kb_utils.get_mdl_root_from_object(context.object)
         if mdl_base is not None:
             return (len(mdl_base.nvb.animList) > 0)
         return False
@@ -45,12 +45,12 @@ class KB_OT_anim_clone(bpy.types.Operator):
 
     def execute(self, context):
         """Clone the animation."""
-        mdl_base = nvb_utils.get_mdl_root_from_object(context.object)
+        mdl_base = kb_utils.get_mdl_root_from_object(context.object)
         source_anim = mdl_base.nvb.animList[mdl_base.nvb.animListIdx]
         animStart = source_anim.frameStart
         animEnd = source_anim.frameEnd
         # Adds a new animation to the end of the list
-        cloned_anim = nvb_utils.create_anim_list_item(mdl_base, True)
+        cloned_anim = kb_utils.create_anim_list_item(mdl_base, True)
         # Copy data
         cloned_anim.frameEnd = cloned_anim.frameStart + (animEnd - animStart)
         cloned_anim.transtime = source_anim.transtime
@@ -60,7 +60,7 @@ class KB_OT_anim_clone(bpy.types.Operator):
         self.clone_events(source_anim, cloned_anim)
         # Copy keyframes
         obj_list = [mdl_base]
-        nvb_utils.get_children_recursive(mdl_base, obj_list)
+        kb_utils.get_children_recursive(mdl_base, obj_list)
         for obj in obj_list:
             # Object keyframes
             self.clone_frames(obj, animStart, animEnd, cloned_anim.frameStart)
@@ -91,7 +91,7 @@ class KB_OT_anim_scale(bpy.types.Operator):
     @classmethod
     def poll(cls, context):
         """Prevent execution if no rootdummy was found."""
-        mdl_base = nvb_utils.get_mdl_root_from_object(context.object)
+        mdl_base = kb_utils.get_mdl_root_from_object(context.object)
         if mdl_base is not None:
             return (len(mdl_base.nvb.animList) > 0)
         return False
@@ -144,8 +144,8 @@ class KB_OT_anim_scale(bpy.types.Operator):
                 self.scale_frames_down(target, animStart, animEnd, scaleFactor)
 
     def execute(self, context):
-        mdl_base = nvb_utils.get_mdl_root_from_object(context.object)
-        if not nvb_utils.check_anim_bounds(mdl_base):
+        mdl_base = kb_utils.get_mdl_root_from_object(context.object)
+        if not kb_utils.check_anim_bounds(mdl_base):
             self.report({'INFO'}, "Error: Nested animations.")
             return {'CANCELLED'}
         anim = mdl_base.nvb.animList[mdl_base.nvb.animListIdx]
@@ -160,7 +160,7 @@ class KB_OT_anim_scale(bpy.types.Operator):
             return {'CANCELLED'}
         # Adjust keyframes
         obj_list = [mdl_base]
-        nvb_utils.get_children_recursive(mdl_base, obj_list)
+        kb_utils.get_children_recursive(mdl_base, obj_list)
         for obj in obj_list:
             # Adjust the objects animation
             self.scale_frames(obj, anim.frameStart,
@@ -191,7 +191,7 @@ class KB_OT_anim_scale(bpy.types.Operator):
             e.frame = (e.frame - anim.frameStart) * \
                 self.scaleFactor + anim.frameStart
         # Re-adjust the timeline to the new bounds
-        nvb_utils.toggle_anim_focus(context.scene, mdl_base)
+        kb_utils.toggle_anim_focus(context.scene, mdl_base)
         return {'FINISHED'}
 
     def draw(self, context):
@@ -226,7 +226,7 @@ class KB_OT_anim_crop(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        rootDummy = nvb_utils.get_mdl_root_from_object(context.object)
+        rootDummy = kb_utils.get_mdl_root_from_object(context.object)
         if rootDummy is not None:
             return (len(rootDummy.nvb.animList) > 0)
         return False
@@ -267,8 +267,8 @@ class KB_OT_anim_crop(bpy.types.Operator):
                     pass
 
     def execute(self, context):
-        mdl_base = nvb_utils.get_mdl_root_from_object(context.object)
-        if not nvb_utils.check_anim_bounds(mdl_base):
+        mdl_base = kb_utils.get_mdl_root_from_object(context.object)
+        if not kb_utils.check_anim_bounds(mdl_base):
             self.report({'INFO'}, "Failure: Convoluted animations.")
             return {'CANCELLED'}
         animList = mdl_base.nvb.animList
@@ -286,7 +286,7 @@ class KB_OT_anim_crop(bpy.types.Operator):
             return {'CANCELLED'}
         # Pad keyframes
         obj_list = [mdl_base]
-        nvb_utils.get_children_recursive(mdl_base, obj_list)
+        kb_utils.get_children_recursive(mdl_base, obj_list)
         for obj in obj_list:
             # Objects animation
             self.crop_frames(obj, animStart, animEnd)
@@ -314,7 +314,7 @@ class KB_OT_anim_crop(bpy.types.Operator):
                 e.frame -= totalCrop
         anim.frameEnd -= totalCrop
         # Re-adjust the timeline to the new bounds
-        nvb_utils.toggle_anim_focus(context.scene, mdl_base)
+        kb_utils.toggle_anim_focus(context.scene, mdl_base)
         return {'FINISHED'}
 
     def draw(self, context):
@@ -352,7 +352,7 @@ class KB_OT_anim_pad(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        mdl_base = nvb_utils.get_mdl_root_from_object(context.object)
+        mdl_base = kb_utils.get_mdl_root_from_object(context.object)
         if mdl_base is not None:
             return (len(mdl_base.nvb.animList) > 0)
         return False
@@ -372,8 +372,8 @@ class KB_OT_anim_pad(bpy.types.Operator):
                 fcurve.update()
 
     def execute(self, context):
-        mdl_base = nvb_utils.get_mdl_root_from_object(context.object)
-        if not nvb_utils.check_anim_bounds(mdl_base):
+        mdl_base = kb_utils.get_mdl_root_from_object(context.object)
+        if not kb_utils.check_anim_bounds(mdl_base):
             self.report({'INFO'}, "Failure: Convoluted animations.")
             return {'CANCELLED'}
         anim = mdl_base.nvb.animList[mdl_base.nvb.animListIdx]
@@ -385,7 +385,7 @@ class KB_OT_anim_pad(bpy.types.Operator):
             return {'CANCELLED'}
         # Pad keyframes
         obj_list = [mdl_base]
-        nvb_utils.get_children_recursive(mdl_base, obj_list)
+        kb_utils.get_children_recursive(mdl_base, obj_list)
         for obj in obj_list:
             # Objects animation
             self.pad_frames(obj, frame_start, frame_end)
@@ -409,7 +409,7 @@ class KB_OT_anim_pad(bpy.types.Operator):
         for ev in anim.eventList:
             ev.frame += self.pad_front
         # Re-adjust the timeline to the new bounds
-        nvb_utils.toggle_anim_focus(context.scene, mdl_base)
+        kb_utils.toggle_anim_focus(context.scene, mdl_base)
         return {'FINISHED'}
 
     def draw(self, context):
@@ -438,15 +438,15 @@ class KB_OT_anim_focus(bpy.types.Operator):
     @classmethod
     def poll(self, context):
         """Prevent execution if animation list is empty."""
-        mdl_base = nvb_utils.get_mdl_root_from_object(context.object)
+        mdl_base = kb_utils.get_mdl_root_from_object(context.object)
         if mdl_base is not None:
             return (len(mdl_base.nvb.animList) > 0)
         return False
 
     def execute(self, context):
         """Set the timeline to this animation."""
-        mdl_base = nvb_utils.get_mdl_root_from_object(context.object)
-        nvb_utils.toggle_anim_focus(context.scene, mdl_base)
+        mdl_base = kb_utils.get_mdl_root_from_object(context.object)
+        kb_utils.toggle_anim_focus(context.scene, mdl_base)
         return {'FINISHED'}
 
 
@@ -459,13 +459,13 @@ class KB_OT_anim_new(bpy.types.Operator):
     @classmethod
     def poll(self, context):
         """Prevent execution if no object is selected."""
-        mdl_base = nvb_utils.get_mdl_root_from_object(context.object)
+        mdl_base = kb_utils.get_mdl_root_from_object(context.object)
         return (mdl_base is not None)
 
     def execute(self, context):
         """Create the animation"""
-        mdl_base = nvb_utils.get_mdl_root_from_object(context.object)
-        anim = nvb_utils.create_anim_list_item(mdl_base, True)
+        mdl_base = kb_utils.get_mdl_root_from_object(context.object)
+        anim = kb_utils.create_anim_list_item(mdl_base, True)
         anim.root_obj = mdl_base.name
         # Create an unique name
         name_list = [an.name for an in mdl_base.nvb.animList]
@@ -487,7 +487,7 @@ class KB_OT_anim_delete(bpy.types.Operator):
     @classmethod
     def poll(self, context):
         """Prevent execution if animation list is empty."""
-        mdl_base = nvb_utils.get_mdl_root_from_object(context.object)
+        mdl_base = kb_utils.get_mdl_root_from_object(context.object)
         if mdl_base is not None:
             return (len(mdl_base.nvb.animList) > 0)
         return False
@@ -505,7 +505,7 @@ class KB_OT_anim_delete(bpy.types.Operator):
 
     def execute(self, context):
         """Delete the animation."""
-        mdl_base = nvb_utils.get_mdl_root_from_object(context.object)
+        mdl_base = kb_utils.get_mdl_root_from_object(context.object)
         anim_list = mdl_base.nvb.animList
         anim_list_idx = mdl_base.nvb.animListIdx
         anim = anim_list[anim_list_idx]
@@ -514,7 +514,7 @@ class KB_OT_anim_delete(bpy.types.Operator):
         frame_end = anim.frameEnd
         # Remove keyframes
         obj_list = [mdl_base]
-        nvb_utils.get_children_recursive(mdl_base, obj_list)
+        kb_utils.get_children_recursive(mdl_base, obj_list)
         for obj in obj_list:
             # Objects animation
             self.delete_frames(obj, frame_start, frame_end)
@@ -541,7 +541,7 @@ class KB_OT_anim_moveback(bpy.types.Operator):
     @classmethod
     def poll(self, context):
         """Prevent execution if animation list is empty."""
-        mdl_base = nvb_utils.get_mdl_root_from_object(context.object)
+        mdl_base = kb_utils.get_mdl_root_from_object(context.object)
         if mdl_base is not None:
             return (len(mdl_base.nvb.animList) > 1)
         return False
@@ -571,8 +571,8 @@ class KB_OT_anim_moveback(bpy.types.Operator):
 
     def execute(self, context):
         """Move the animation."""
-        mdl_base = nvb_utils.get_mdl_root_from_object(context.object)
-        if not nvb_utils.check_anim_bounds(mdl_base):
+        mdl_base = kb_utils.get_mdl_root_from_object(context.object)
+        if not kb_utils.check_anim_bounds(mdl_base):
             self.report({'INFO'}, "Failure: Convoluted animations.")
             return {'CANCELLED'}
         anim_list = mdl_base.nvb.animList
@@ -582,11 +582,11 @@ class KB_OT_anim_moveback(bpy.types.Operator):
         old_start = anim.frameStart
         old_end = anim.frameEnd
         # Grab a new starting frame
-        last_frame = nvb_utils.get_last_keyframe(mdl_base)
-        start = int(math.ceil((last_frame + nvb_def.anim_offset) / 10.0)) * 10
+        last_frame = kb_utils.get_last_keyframe(mdl_base)
+        start = int(math.ceil((last_frame + kb_def.anim_offset) / 10.0)) * 10
         # Move keyframes
         obj_list = [mdl_base]
-        nvb_utils.get_children_recursive(mdl_base, obj_list)
+        kb_utils.get_children_recursive(mdl_base, obj_list)
         for obj in obj_list:
             # Object animation
             self.move_frames(obj, old_start, old_end, start)
@@ -608,7 +608,7 @@ class KB_OT_anim_moveback(bpy.types.Operator):
         anim_list.move(currentAnimIdx, newAnimIdx)
         mdl_base.nvb.animListIdx = newAnimIdx
         # Re-adjust the timeline to the new bounds
-        nvb_utils.toggle_anim_focus(context.scene, mdl_base)
+        kb_utils.toggle_anim_focus(context.scene, mdl_base)
         return {'FINISHED'}
 
 
@@ -625,14 +625,14 @@ class KB_OT_anim_move(bpy.types.Operator):
     @classmethod
     def poll(self, context):
         """Prevent execution if animation list has less than 2 elements."""
-        mdl_base = nvb_utils.get_mdl_root_from_object(context.object)
+        mdl_base = kb_utils.get_mdl_root_from_object(context.object)
         if mdl_base is not None:
             return (len(mdl_base.nvb.animList) > 1)
         return False
 
     def execute(self, context):
         """Move an item in the animation list."""
-        mdl_base = nvb_utils.get_mdl_root_from_object(context.object)
+        mdl_base = kb_utils.get_mdl_root_from_object(context.object)
         anim_list = mdl_base.nvb.animList
 
         currentIdx = mdl_base.nvb.animListIdx
@@ -663,7 +663,7 @@ class KB_OT_anim_event_new(bpy.types.Operator):
     @classmethod
     def poll(self, context):
         """Enable only if there is an animation."""
-        mdl_base = nvb_utils.get_mdl_root_from_object(context.object)
+        mdl_base = kb_utils.get_mdl_root_from_object(context.object)
         if mdl_base is not None:
             anim_list = mdl_base.nvb.animList
             anim_list_idx = mdl_base.nvb.animListIdx
@@ -672,7 +672,7 @@ class KB_OT_anim_event_new(bpy.types.Operator):
 
     def execute(self, context):
         """Add the new item."""
-        mdl_base = nvb_utils.get_mdl_root_from_object(context.object)
+        mdl_base = kb_utils.get_mdl_root_from_object(context.object)
         anim = mdl_base.nvb.animList[mdl_base.nvb.animListIdx]
 
         eventList = anim.eventList
@@ -695,7 +695,7 @@ class KB_OT_anim_event_delete(bpy.types.Operator):
     @classmethod
     def poll(self, context):
         """Enable only if the list isn't empty."""
-        mdl_base = nvb_utils.get_mdl_root_from_object(context.object)
+        mdl_base = kb_utils.get_mdl_root_from_object(context.object)
         if mdl_base is not None:
             anim_list = mdl_base.nvb.animList
             anim_list_idx = mdl_base.nvb.animListIdx
@@ -707,7 +707,7 @@ class KB_OT_anim_event_delete(bpy.types.Operator):
         return False
 
     def execute(self, context):
-        mdl_base = nvb_utils.get_mdl_root_from_object(context.object)
+        mdl_base = kb_utils.get_mdl_root_from_object(context.object)
         anim = mdl_base.nvb.animList[mdl_base.nvb.animListIdx]
         eventList = anim.eventList
         eventIdx = anim.eventListIdx
@@ -732,7 +732,7 @@ class KB_OT_anim_event_move(bpy.types.Operator):
     @classmethod
     def poll(self, context):
         """Enable only if the list isn't empty."""
-        mdl_base = nvb_utils.get_mdl_root_from_object(context.object)
+        mdl_base = kb_utils.get_mdl_root_from_object(context.object)
         if mdl_base is not None:
             anim_list = mdl_base.nvb.animList
             anim_list_idx = mdl_base.nvb.animListIdx
@@ -744,7 +744,7 @@ class KB_OT_anim_event_move(bpy.types.Operator):
         return False
 
     def execute(self, context):
-        mdl_base = nvb_utils.get_mdl_root_from_object(context.object)
+        mdl_base = kb_utils.get_mdl_root_from_object(context.object)
         anim = mdl_base.nvb.animList[mdl_base.nvb.animListIdx]
         eventList = anim.eventList
 
@@ -784,7 +784,7 @@ class KB_OT_amt_event_new(bpy.types.Operator):
             return
         event_list = amt.nvb.amt_event_list
         # Initialize the first events to add known event types
-        nvb_utils.amt_event_list_init(amt)
+        kb_utils.amt_event_list_init(amt)
         # Create an unique name
         name_list = [ev.name for ev in event_list]
         name_idx = 0
@@ -793,9 +793,9 @@ class KB_OT_amt_event_new(bpy.types.Operator):
             name_idx += 1
             new_name = "event.{:0>3d}".format(name_idx)
         # Add new event
-        nvb_utils.amt_event_list_item_create(amt, new_name)
+        kb_utils.amt_event_list_item_create(amt, new_name)
         if amt.animation_data and amt.animation_data.action:
-            nvb_utils.init_amt_event_action(amt, amt.animation_data.action)
+            kb_utils.init_amt_event_action(amt, amt.animation_data.action)
         return {'FINISHED'}
 
 
@@ -811,7 +811,7 @@ class KB_OT_amt_event_delete(bpy.types.Operator):
     def poll(self, context):
         """Prevent execution if event list is empty or the index invalid."""
         amt = context.object
-        undeletable_events = len(nvb_def.animation_event_names)
+        undeletable_events = len(kb_def.animation_event_names)
         if amt and amt.type == 'ARMATURE':
             event_list = amt.nvb.amt_event_list
             event_list_idx = amt.nvb.amt_event_list_idx

@@ -4,13 +4,13 @@ Functions related to material building.
 
 import bpy
 
-from . import nvb_glob, nvb_teximage, nvb_utils
+from . import kb_glob, kb_teximage, kb_utils
 
 
 def _get_material_name(obj):
-    if nvb_utils.is_null(obj.nvb.bitmap) and nvb_utils.is_null(obj.nvb.bitmap2):
-        diffuse = nvb_utils.color_to_hex(obj.nvb.diffuse)
-        alpha = nvb_utils.int_to_hex(nvb_utils.float_to_byte(obj.nvb.alpha))
+    if kb_utils.is_null(obj.nvb.bitmap) and kb_utils.is_null(obj.nvb.bitmap2):
+        diffuse = kb_utils.color_to_hex(obj.nvb.diffuse)
+        alpha = kb_utils.int_to_hex(kb_utils.float_to_byte(obj.nvb.alpha))
         name = "D{}__A{}".format(diffuse, alpha)
     else:
         name = obj.name
@@ -43,7 +43,7 @@ def _rebuild_material_nodes(material, obj):
     output.location = (1200, 0)
 
     # Shader node
-    selfillumed = not nvb_utils.isclose_3f(obj.nvb.selfillumcolor, [0.0] * 3)
+    selfillumed = not kb_utils.isclose_3f(obj.nvb.selfillumcolor, [0.0] * 3)
     if selfillumed:
         shader = nodes.new("ShaderNodeEmission")
     else:
@@ -65,22 +65,22 @@ def _rebuild_material_nodes(material, obj):
     mul_alpha.inputs[1].default_value = obj.nvb.alpha
 
     # Diffuse map node
-    if not nvb_utils.is_null(obj.nvb.bitmap):
+    if not kb_utils.is_null(obj.nvb.bitmap):
         diffuse = nodes.new("ShaderNodeTexImage")
         diffuse.location = (300, 0)
-        diffuse.image = nvb_teximage.load_texture_image(obj.nvb.bitmap)
+        diffuse.image = kb_teximage.load_texture_image(obj.nvb.bitmap)
         links.new(mul_diffuse_by_lightmap.inputs[0], diffuse.outputs[0])
         links.new(mul_alpha.inputs[0], diffuse.outputs[1])
 
     # Lightmap node
-    if not nvb_utils.is_null(obj.nvb.bitmap2):
+    if not kb_utils.is_null(obj.nvb.bitmap2):
         lightmap_uv = nodes.new("ShaderNodeUVMap")
         lightmap_uv.location = (0, -300)
         lightmap_uv.uv_map = "UVMap_lm"
 
         lightmap = nodes.new("ShaderNodeTexImage")
         lightmap.location = (300, -300)
-        lightmap.image = nvb_teximage.load_texture_image(obj.nvb.bitmap2)
+        lightmap.image = kb_teximage.load_texture_image(obj.nvb.bitmap2)
 
         material.shadow_method = 'NONE'
         links.new(lightmap.inputs[0], lightmap_uv.outputs[0])
@@ -106,7 +106,7 @@ def rebuild_material(obj):
     mesh.materials.append(material)
 
     # Only use nodes when object has at least one texture
-    if (not nvb_utils.is_null(obj.nvb.bitmap)) or (not nvb_utils.is_null(obj.nvb.bitmap2)):
+    if (not kb_utils.is_null(obj.nvb.bitmap)) or (not kb_utils.is_null(obj.nvb.bitmap2)):
         _rebuild_material_nodes(material, obj)
     else:
         _rebuild_material_simple(material, obj)

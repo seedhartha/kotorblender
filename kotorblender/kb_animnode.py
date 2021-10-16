@@ -5,7 +5,7 @@ from math import asin, cos, sqrt
 import bpy
 from mathutils import Matrix, Quaternion, Vector
 
-from . import nvb_def, nvb_parse, nvb_utils
+from . import kb_def, kb_parse, kb_utils
 
 
 class Keys():
@@ -318,7 +318,7 @@ class Node():
     def __init__(self, name = "UNNAMED"):
         self.name       = name
         self.nodetype   = "dummy"
-        self.parentName = nvb_def.null
+        self.parentName = kb_def.null
 
         # Keyed
         self.keys = Keys()
@@ -338,28 +338,28 @@ class Node():
         """
         Parse animation keys containing 9 floats (not counting the time value)
         """
-        nvb_parse._f(asciiBlock, keyList, 10)
+        kb_parse._f(asciiBlock, keyList, 10)
         self.isEmpty = False
 
     def parse_keys_3f(self, asciiBlock, keyList):
         """
         Parse animation keys containing 3 floats (not counting the time value)
         """
-        nvb_parse.f4(asciiBlock, keyList)
+        kb_parse.f4(asciiBlock, keyList)
         self.isEmpty = False
 
     def parse_keys_4f(self, asciiBlock, keyList):
         """
         Parse animation keys containing 4 floats (not counting the time value)
         """
-        nvb_parse.f5(asciiBlock, keyList)
+        kb_parse.f5(asciiBlock, keyList)
         self.isEmpty = False
 
     def parse_keys_1f(self, asciiBlock, keyList):
         """
         Parse animation keys containing 1 float (not counting the time value)
         """
-        nvb_parse.f2(asciiBlock, keyList)
+        kb_parse.f2(asciiBlock, keyList)
         self.isEmpty = False
 
     def parse_keys_incompat(self, asciiBlock):
@@ -377,11 +377,11 @@ class Node():
         We don't know when a list of keys of keys will end. We'll have to
         search for the first non-numeric value
         """
-        l_is_number = nvb_utils.is_number
+        l_is_number = kb_utils.is_number
         return next((i for i, v in enumerate(asciiBlock) if len(v) and not l_is_number(v[0])), -1)
 
     def load_ascii(self, asciiBlock):
-        l_is_number = nvb_utils.is_number
+        l_is_number = kb_utils.is_number
         for idx, line in enumerate(asciiBlock):
             try:
                 label = line[0].lower()
@@ -390,7 +390,7 @@ class Node():
                 continue
             if label == "node":
                 self.nodeType = line[1].lower()
-                self.name = nvb_utils.get_name(line[2])
+                self.name = kb_utils.get_name(line[2])
             elif label == "endnode":
                 return
             elif label == "endlist":
@@ -398,7 +398,7 @@ class Node():
                 # the end of a key list
                 pass
             elif label == "parent":
-                self.parentName = nvb_utils.get_name(line[1])
+                self.parentName = kb_utils.get_name(line[1])
             elif label in self.KEY_TYPE.keys() or \
                  label in (attr + "key" for attr in self.KEY_TYPE.keys()) or \
                  label in (attr + "bezierkey" for attr in self.KEY_TYPE.keys()):
@@ -418,7 +418,7 @@ class Node():
                     numKeys = 1
                     subblock = [[0.0] + line[1:]]
                 # parse numvals plus one for time
-                nvb_parse._f(subblock, getattr(self.keys, attrname), numVals + 1)
+                kb_parse._f(subblock, getattr(self.keys, attrname), numVals + 1)
                 self.isEmpty = False
             elif label in (attr.lower() for attr in self.EMITTER_KEY_TYPE.keys()) or \
                  label in (attr.lower() + "key" for attr in self.EMITTER_KEY_TYPE.keys()) or \
@@ -441,9 +441,9 @@ class Node():
                     subblock = [[0.0] + line[1:]]
                 # parse numvals plus one for time
                 if "conversion" in attr_type and attr_type["conversion"] is int:
-                    nvb_parse._i(subblock, getattr(self.keys, propname), numVals + 1)
+                    kb_parse._i(subblock, getattr(self.keys, propname), numVals + 1)
                 else:
-                    nvb_parse._f(subblock, getattr(self.keys, propname), numVals + 1)
+                    kb_parse._f(subblock, getattr(self.keys, propname), numVals + 1)
                 self.isEmpty = False
             # Some unknown text.
             # Probably keys for emitters = incompatible with blender. Import as text.
@@ -566,7 +566,7 @@ class Node():
             else:
                 # We'll take everything that doesn't start with a #
                 if label[0] != "#":
-                    if nvb_utils.is_number(label):
+                    if kb_utils.is_number(label):
                         asciiLines.append("      " + " ".join(line))
                     else:
                         asciiLines.append("    " + " ".join(line))
@@ -603,10 +603,10 @@ class Node():
             asciiLines.append("    {} {}".format(keyname, l_str(len(keyDict[keyname]))))
             for frame, key in keyDict[keyname].items():
                 # convert raw frame number to animation-relative time
-                time = l_round(nvb_utils.frame2nwtime(frame - anim.frameStart), 5)
+                time = l_round(kb_utils.frame2nwtime(frame - anim.frameStart), 5)
                 # orientation value conversion
                 if keyname.startswith("orientation"):
-                    key = nvb_utils.quat2nwangle(key[0:4])
+                    key = kb_utils.quat2nwangle(key[0:4])
                 # export title and
                 line = "      {: .7g}" + (" {: .7g}" * ktype["values"])
                 s = line.format(time, *key[0:ktype["values"]])
@@ -630,7 +630,7 @@ class Node():
             asciiLines.append("    {} {}".format(keyname, l_str(len(keyDict[keyname]))))
             for frame, key in keyDict[keyname].items():
                 # convert raw frame number to animation-relative time
-                time = l_round(nvb_utils.frame2nwtime(frame - anim.frameStart), 5)
+                time = l_round(kb_utils.frame2nwtime(frame - anim.frameStart), 5)
                 # orientation value conversion
                 # export title and
                 value_str = " {: .7g}"
@@ -722,11 +722,11 @@ class Node():
         if not Node.export_needed(animObj):
             return
 
-        originalParent = nvb_def.null
+        originalParent = kb_def.null
         if animObj.parent:
             originalParent = Node.get_original_name(animObj.parent.name, animName)
 
-        if originalObj.nvb.meshtype == nvb_def.Meshtype.EMITTER:
+        if originalObj.nvb.meshtype == kb_def.Meshtype.EMITTER:
             asciiLines.append("  node emitter " + originalName)
             asciiLines.append("    parent " + originalParent)
         else:
@@ -738,15 +738,15 @@ class Node():
 
 import copy
 
-from . import nvb_node
+from . import kb_node
 
 
 class Animnode():
     def __init__(self, name="UNNAMED"):
         self.nodeidx = -1
-        self.nodetype = nvb_def.Nodetype.DUMMY
+        self.nodetype = kb_def.Nodetype.DUMMY
         self.name = name
-        self.parent = nvb_def.null
+        self.parent = kb_def.null
 
         self.emitter_data = dict()
         self.object_data = dict()
@@ -759,7 +759,7 @@ class Animnode():
     def insert_kfp(frames, values, action, dp, dp_dim, action_group=None):
         if not frames or not values:
             return
-        fcu = [nvb_utils.get_fcurve(action, dp, i, action_group)
+        fcu = [kb_utils.get_fcurve(action, dp, i, action_group)
                for i in range(dp_dim)]
         kfp_list = [fcu[i].keyframe_points for i in range(dp_dim)]
         kfp_cnt = list(map(lambda x: len(x), kfp_list))
@@ -775,8 +775,8 @@ class Animnode():
                     p.handle_left_type = 'FREE'
                     p.handle_right_type = 'FREE'
                     # initialize left and right handle x positions
-                    h_left_frame = frm - nvb_def.fps
-                    h_right_frame = frm + nvb_def.fps
+                    h_left_frame = frm - kb_def.fps
+                    h_right_frame = frm + kb_def.fps
                     # adjust handle x positions based on previous/next keyframes
                     if i > 0:
                         p_left = frames[i - 1]
@@ -805,7 +805,7 @@ class Animnode():
     def load_ascii(self, ascii_lines, nodeidx=-1):
         self.nodeidx = nodeidx
         key_data = {}
-        l_is_number = nvb_utils.is_number
+        l_is_number = kb_utils.is_number
         for i, line in enumerate(ascii_lines):
             try:
                 label = line[0].lower()
@@ -816,11 +816,11 @@ class Animnode():
                     continue
             if label == "node":
                 self.nodetype = line[1].lower()
-                self.name = nvb_utils.str2identifier(line[2])
+                self.name = kb_utils.str2identifier(line[2])
             elif label == "endnode":
                 return
             elif label == "parent":
-                self.parentName = nvb_utils.str2identifier(line[1])
+                self.parentName = kb_utils.str2identifier(line[1])
             else:  # Check for keys
                 key_name = label
                 key_type = ""
@@ -873,7 +873,7 @@ class Animnode():
 
     def create_data_object(self, obj, anim, options={}):
         """Creates animations in object actions."""
-        fps = nvb_def.fps
+        fps = kb_def.fps
         frame_start = anim.frameStart
 
         # Insert keyframes of each type
@@ -882,16 +882,16 @@ class Animnode():
 
             if obj.type == 'LIGHT' and label in ["radius", "color"]:
                 # For light radius and color, target the object data
-                use_action = nvb_utils.get_action(obj.data, options["mdlname"] + "." + obj.name)
+                use_action = kb_utils.get_action(obj.data, options["mdlname"] + "." + obj.name)
             else:
                 # Otherwise, target the object
-                use_action = nvb_utils.get_action(obj, options["mdlname"] + "." + obj.name)
+                use_action = kb_utils.get_action(obj, options["mdlname"] + "." + obj.name)
 
             if label == "position":
                 values = [d[1:4] for d in data]
                 data_dim = 3 # TODO: add support for Bezier keys
             elif label == "orientation":
-                quats = [nvb_utils.nwangle2quat(d[1:5]) for d in data]
+                quats = [kb_utils.nwangle2quat(d[1:5]) for d in data]
                 values = [quat[0:4] for quat in quats]
                 data_dim = 4
             elif label == "scale":
@@ -904,9 +904,9 @@ class Animnode():
 
     def create_data_emitter(self, obj, anim, options={}):
         """Creates animations in emitter actions."""
-        fps = nvb_def.fps
+        fps = kb_def.fps
         frame_start = anim.frameStart
-        action = nvb_utils.get_action(obj, options["mdlname"] + "." + obj.name)
+        action = kb_utils.get_action(obj, options["mdlname"] + "." + obj.name)
         for label, (data, _, data_dim) in self.emitter_data.items():
             frames = [fps * d[0] + frame_start for d in data]
             values = [d[1:data_dim+1] for d in data]
@@ -954,12 +954,12 @@ class Animnode():
             return
         # Type + Name
         node_type = "dummy"
-        if obj.nvb.meshtype == nvb_def.Meshtype.EMITTER:
+        if obj.nvb.meshtype == kb_def.Meshtype.EMITTER:
             node_type = "emitter"
         node_name = Node.get_original_name(obj.name, anim.name)
         asciiLines.append("  node " + node_type + " " + node_name)
         # Parent
-        parent_name = nvb_def.null
+        parent_name = kb_def.null
         if obj.parent:
             parent_name = Node.get_original_name(obj.parent.name, anim.name)
         asciiLines.append("    parent " + parent_name)

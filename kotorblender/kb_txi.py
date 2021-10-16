@@ -5,7 +5,7 @@ from datetime import datetime
 import bpy
 
 
-# these should probably live in nvb_def sometime,
+# these should probably live in kb_def sometime,
 # and separate lists is not necessarily a great way to do it,
 # a hash might be better...
 tokens = [
