@@ -31,28 +31,51 @@ bl_info = {
 
 if 'bpy' in locals():
     import importlib
-    importlib.reload(nvb.nvb_anim)
-    importlib.reload(nvb.nvb_animnode)
-    importlib.reload(nvb.nvb_armature)
-    importlib.reload(nvb.nvb_def)
-    importlib.reload(nvb.nvb_io)
-    importlib.reload(nvb.nvb_light)
-    importlib.reload(nvb.nvb_material)
-    importlib.reload(nvb.nvb_mdl)
-    importlib.reload(nvb.nvb_minimap)
-    importlib.reload(nvb.nvb_node)
-    importlib.reload(nvb.nvb_ops_anim)
-    importlib.reload(nvb.nvb_ops_path)
-    importlib.reload(nvb.nvb_ops)
-    importlib.reload(nvb.nvb_props)
-    importlib.reload(nvb.nvb_teximage)
-    importlib.reload(nvb.nvb_ui)
-    importlib.reload(nvb.nvb_utils)
+    importlib.reload(nvb_aabb)
+    importlib.reload(nvb_anim)
+    importlib.reload(nvb_animnode)
+    importlib.reload(nvb_armature)
+    importlib.reload(nvb_def)
+    importlib.reload(nvb_glob)
+    importlib.reload(nvb_io)
+    importlib.reload(nvb_light)
+    importlib.reload(nvb_material)
+    importlib.reload(nvb_mdl)
+    importlib.reload(nvb_minimap)
+    importlib.reload(nvb_node)
+    importlib.reload(nvb_ops_anim)
+    importlib.reload(nvb_ops_path)
+    importlib.reload(nvb_ops)
+    importlib.reload(nvb_parse)
+    importlib.reload(nvb_props)
+    importlib.reload(nvb_teximage)
+    importlib.reload(nvb_txi)
+    importlib.reload(nvb_ui)
+    importlib.reload(nvb_utils)
 else:
-    from kotorblender.nvb import (nvb_anim, nvb_animnode, nvb_def, nvb_io,
-                                  nvb_light, nvb_material, nvb_mdl, nvb_minimap,
-                                  nvb_node, nvb_ops, nvb_ops_anim, nvb_ops_path,
-                                  nvb_props, nvb_teximage, nvb_ui, nvb_utils)
+    from . import (
+        nvb_aabb,
+        nvb_anim,
+        nvb_animnode,
+        nvb_armature,
+        nvb_def,
+        nvb_glob,
+        nvb_io,
+        nvb_light,
+        nvb_material,
+        nvb_mdl,
+        nvb_minimap,
+        nvb_node,
+        nvb_ops_anim,
+        nvb_ops_path,
+        nvb_ops,
+        nvb_parse,
+        nvb_props,
+        nvb_teximage,
+        nvb_txi,
+        nvb_ui,
+        nvb_utils
+        )
 
 import addon_utils
 import bpy
