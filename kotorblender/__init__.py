@@ -31,12 +31,11 @@ bl_info = {
 
 if 'bpy' in locals():
     from importlib import reload
-    reload(format.binreader)
-    reload(format.binwriter)
-    reload(format.gff.loader)
-    reload(format.gff.saver)
-    reload(format.mdl.loader)
-    reload(format.mdl.saver)
+    reload(animops)
+    reload(binreader)
+    reload(binwriter)
+    reload(gffloader)
+    reload(gffsaver)
     reload(kb_aabb)
     reload(kb_anim)
     reload(kb_animnode)
@@ -49,15 +48,16 @@ if 'bpy' in locals():
     reload(kb_mdl)
     reload(kb_minimap)
     reload(kb_node)
-    reload(kb_ops_anim)
-    reload(kb_ops_path)
-    reload(kb_ops)
     reload(kb_parse)
     reload(kb_props)
     reload(kb_teximage)
     reload(kb_txi)
     reload(kb_ui)
     reload(kb_utils)
+    reload(mainops)
+    reload(mdlloader)
+    reload(mdlsaver)
+    reload(pathops)
 else:
     from . import (
         kb_aabb,
@@ -72,9 +72,6 @@ else:
         kb_mdl,
         kb_minimap,
         kb_node,
-        kb_ops_anim,
-        kb_ops_path,
-        kb_ops,
         kb_parse,
         kb_props,
         kb_teximage,
@@ -85,38 +82,42 @@ else:
         binreader,
         binwriter)
     from .format.gff import (
-        loader,
-        saver)
+        loader as gffloader,
+        saver as gffsaver)
     from .format.mdl import (
-        loader,
-        saver)
+        loader as mdlloader,
+        saver as mdlsaver)
+    from .ops import (
+        anim as animops,
+        main as mainops,
+        path as pathops)
 
 import addon_utils
 import bpy
 
 
 def menu_func_import_mdl(self, context):
-    self.layout.operator(kb_ops.KB_OT_import_mdl.bl_idname, text="KotOR Model (.mdl)")
+    self.layout.operator(mainops.KB_OT_import_mdl.bl_idname, text="KotOR Model (.mdl)")
 
 
 def menu_func_import_lyt(self, context):
-    self.layout.operator(kb_ops.KB_OT_import_lyt.bl_idname, text="KotOR Layout (.lyt)")
+    self.layout.operator(mainops.KB_OT_import_lyt.bl_idname, text="KotOR Layout (.lyt)")
 
 
 def menu_func_import_pth(self, context):
-    self.layout.operator(kb_ops_path.KB_OT_import_path.bl_idname, text="KotOR Path (.pth.ascii)")
+    self.layout.operator(pathops.KB_OT_import_path.bl_idname, text="KotOR Path (.pth.ascii)")
 
 
 def menu_func_export_mdl(self, context):
-    self.layout.operator(kb_ops.KB_OT_export_mdl.bl_idname, text="KotOR Model (.mdl)")
+    self.layout.operator(mainops.KB_OT_export_mdl.bl_idname, text="KotOR Model (.mdl)")
 
 
 def menu_func_export_lyt(self, context):
-    self.layout.operator(kb_ops.KB_OT_export_lyt.bl_idname, text="KotOR Layout (.lyt)")
+    self.layout.operator(mainops.KB_OT_export_lyt.bl_idname, text="KotOR Layout (.lyt)")
 
 
 def menu_func_export_pth(self, context):
-    self.layout.operator(kb_ops_path.KB_OT_export_path.bl_idname, text="KotOR Path (.pth.ascii)")
+    self.layout.operator(pathops.KB_OT_export_path.bl_idname, text="KotOR Path (.pth.ascii)")
 
 
 classes = (
@@ -133,49 +134,49 @@ classes = (
 
     # Operators
 
-    kb_ops.KB_OT_add_skingroup,
-    kb_ops.KB_OT_children_smoothgroup,
-    kb_ops.KB_OT_delete_lightflare,
-    kb_ops.KB_OT_export_lyt,
-    kb_ops.KB_OT_export_mdl,
-    kb_ops.KB_OT_generate_smoothgroup,
-    kb_ops.KB_OT_import_lyt,
-    kb_ops.KB_OT_import_mdl,
-    kb_ops.KB_OT_load_wok_materials,
-    kb_ops.KB_OT_move_lightflare,
-    kb_ops.KB_OT_new_lightflare,
-    kb_ops.KB_OT_rebuild_material_nodes,
-    kb_ops.KB_OT_recreate_armature,
-    kb_ops.KB_OT_render_minimap,
-    kb_ops.KB_OT_select_smoothgroup,
-    kb_ops.KB_OT_texture_box_ops,
-    kb_ops.KB_OT_texture_io,
-    kb_ops.KB_OT_texture_ops,
-    kb_ops.KB_OT_toggle_smoothgroup,
+    mainops.KB_OT_add_skingroup,
+    mainops.KB_OT_children_smoothgroup,
+    mainops.KB_OT_delete_lightflare,
+    mainops.KB_OT_export_lyt,
+    mainops.KB_OT_export_mdl,
+    mainops.KB_OT_generate_smoothgroup,
+    mainops.KB_OT_import_lyt,
+    mainops.KB_OT_import_mdl,
+    mainops.KB_OT_load_wok_materials,
+    mainops.KB_OT_move_lightflare,
+    mainops.KB_OT_new_lightflare,
+    mainops.KB_OT_rebuild_material_nodes,
+    mainops.KB_OT_recreate_armature,
+    mainops.KB_OT_render_minimap,
+    mainops.KB_OT_select_smoothgroup,
+    mainops.KB_OT_texture_box_ops,
+    mainops.KB_OT_texture_io,
+    mainops.KB_OT_texture_ops,
+    mainops.KB_OT_toggle_smoothgroup,
 
     # Animation Operators
 
-    kb_ops_anim.KB_OT_amt_event_delete,
-    kb_ops_anim.KB_OT_amt_event_new,
-    kb_ops_anim.KB_OT_anim_clone,
-    kb_ops_anim.KB_OT_anim_crop,
-    kb_ops_anim.KB_OT_anim_delete,
-    kb_ops_anim.KB_OT_anim_event_delete,
-    kb_ops_anim.KB_OT_anim_event_move,
-    kb_ops_anim.KB_OT_anim_event_new,
-    kb_ops_anim.KB_OT_anim_focus,
-    kb_ops_anim.KB_OT_anim_move,
-    kb_ops_anim.KB_OT_anim_moveback,
-    kb_ops_anim.KB_OT_anim_new,
-    kb_ops_anim.KB_OT_anim_pad,
-    kb_ops_anim.KB_OT_anim_scale,
+    animops.KB_OT_amt_event_delete,
+    animops.KB_OT_amt_event_new,
+    animops.KB_OT_anim_clone,
+    animops.KB_OT_anim_crop,
+    animops.KB_OT_anim_delete,
+    animops.KB_OT_anim_event_delete,
+    animops.KB_OT_anim_event_move,
+    animops.KB_OT_anim_event_new,
+    animops.KB_OT_anim_focus,
+    animops.KB_OT_anim_move,
+    animops.KB_OT_anim_moveback,
+    animops.KB_OT_anim_new,
+    animops.KB_OT_anim_pad,
+    animops.KB_OT_anim_scale,
 
     # Path Operators
 
-    kb_ops_path.KB_OT_add_connection,
-    kb_ops_path.KB_OT_export_path,
-    kb_ops_path.KB_OT_import_path,
-    kb_ops_path.KB_OT_remove_connection,
+    pathops.KB_OT_add_connection,
+    pathops.KB_OT_export_path,
+    pathops.KB_OT_import_path,
+    pathops.KB_OT_remove_connection,
 
     # Panels
 

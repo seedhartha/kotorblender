@@ -4,7 +4,7 @@ import math
 
 import bpy
 
-from . import kb_def, kb_utils
+from .. import kb_def, kb_utils
 
 
 class KB_OT_anim_clone(bpy.types.Operator):
