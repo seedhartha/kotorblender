@@ -3,7 +3,7 @@ import re
 
 import bpy
 
-from . import nvb_def, nvb_glob, nvb_mdl, nvb_utils
+from . import kb_def, kb_glob, kb_mdl, kb_utils
 
 
 def _load_mdl(filepath, position = (0.0, 0.0, 0.0)):
@@ -12,7 +12,7 @@ def _load_mdl(filepath, position = (0.0, 0.0, 0.0)):
     # Try to load walkmeshes ... pwk (placeable) and dwk (door)
     # If the files are and the option is activated we'll import them
     wkm = None
-    if nvb_glob.importWalkmesh:
+    if kb_glob.importWalkmesh:
         filetypes = ["pwk", "dwk", "wok"]
         (wkmPath, wkmFilename) = os.path.split(filepath)
         using_extra_extension = False
@@ -28,7 +28,7 @@ def _load_mdl(filepath, position = (0.0, 0.0, 0.0)):
                 fp = os.fsencode(wkmFilepath + ".ascii")
             try:
                 asciiLines = [line.strip().split() for line in open(fp, "r")]
-                wkm = nvb_mdl.Xwk(wkmType)
+                wkm = kb_mdl.Xwk(wkmType)
                 wkm.load_ascii(asciiLines)
             except IOError:
                 print(
@@ -58,7 +58,7 @@ def _load_mdl(filepath, position = (0.0, 0.0, 0.0)):
     asciiLines = [line.strip().split() for line in ascii_mdl.splitlines()]
 
     print("Importing: " + filepath)
-    mdl = nvb_mdl.Mdl()
+    mdl = kb_mdl.Mdl()
     mdl.load_ascii(ascii_mdl)
     mdl.import_to_collection(collection, wkm, position)
 
@@ -96,16 +96,16 @@ def load_mdl(operator,
     """
     Called from blender ui
     """
-    nvb_glob.importGeometry = importGeometry
-    nvb_glob.importWalkmesh = importWalkmesh
-    nvb_glob.importSmoothGroups = importSmoothGroups
-    nvb_glob.importMaterials = importMaterials
-    nvb_glob.importAnim = importAnim
-    nvb_glob.texturePath = os.path.dirname(filepath)
-    nvb_glob.textureSearch = textureSearch
-    nvb_glob.createArmature = createArmature
-    nvb_glob.minimapMode = minimapMode
-    nvb_glob.minimapSkipFade = minimapSkipFade
+    kb_glob.importGeometry = importGeometry
+    kb_glob.importWalkmesh = importWalkmesh
+    kb_glob.importSmoothGroups = importSmoothGroups
+    kb_glob.importMaterials = importMaterials
+    kb_glob.importAnim = importAnim
+    kb_glob.texturePath = os.path.dirname(filepath)
+    kb_glob.textureSearch = textureSearch
+    kb_glob.createArmature = createArmature
+    kb_glob.minimapMode = minimapMode
+    kb_glob.minimapSkipFade = minimapSkipFade
 
     _load_mdl(filepath)
 
@@ -161,13 +161,13 @@ def load_lyt(operator,
     """
     Called from blender ui
     """
-    nvb_glob.importGeometry = importGeometry
-    nvb_glob.importWalkmesh = importWalkmesh
-    nvb_glob.importSmoothGroups = importSmoothGroups
-    nvb_glob.importMaterials = importMaterials
-    nvb_glob.importAnim = importAnim
-    nvb_glob.texturePath = os.path.dirname(filepath)
-    nvb_glob.textureSearch = textureSearch
+    kb_glob.importGeometry = importGeometry
+    kb_glob.importWalkmesh = importWalkmesh
+    kb_glob.importSmoothGroups = importSmoothGroups
+    kb_glob.importMaterials = importMaterials
+    kb_glob.importAnim = importAnim
+    kb_glob.texturePath = os.path.dirname(filepath)
+    kb_glob.textureSearch = textureSearch
 
     _load_lyt(filepath)
 
@@ -184,9 +184,9 @@ def save_mdl(operator,
     """
     Called from blender ui
     """
-    nvb_glob.exports            = exports
-    nvb_glob.exportSmoothGroups = exportSmoothGroups
-    nvb_glob.applyModifiers     = applyModifiers
+    kb_glob.exports            = exports
+    kb_glob.exportSmoothGroups = exportSmoothGroups
+    kb_glob.applyModifiers     = applyModifiers
     # temporary forced options:
     frame_set_zero              = True
 
@@ -199,10 +199,10 @@ def save_mdl(operator,
         frame_set_current = bpy.context.scene.frame_current
         bpy.context.scene.frame_set(0)
 
-    mdlRoot = nvb_utils.get_mdl_root_from_context()
+    mdlRoot = kb_utils.get_mdl_root_from_context()
     if mdlRoot:
         print("KotorBlender: Exporting " + mdlRoot.name)
-        mdl = nvb_mdl.Mdl()
+        mdl = kb_mdl.Mdl()
         asciiLines = []
         mdl.generate_ascii(asciiLines, mdlRoot)
         with open(os.fsencode(filepath), "w") as f:
@@ -210,9 +210,9 @@ def save_mdl(operator,
 
         if "WALKMESH" in exports:
             wkmRoot = None
-            aabb = nvb_utils.search_node(mdlRoot, lambda x: x.nvb.meshtype == nvb_def.Meshtype.AABB)
+            aabb = kb_utils.search_node(mdlRoot, lambda x: x.nvb.meshtype == kb_def.Meshtype.AABB)
             if aabb is not None:
-                wkm     = nvb_mdl.Wok()
+                wkm     = kb_mdl.Wok()
                 wkmRoot = aabb
                 wkmType = "wok"
             else:
@@ -220,20 +220,20 @@ def save_mdl(operator,
                 wkmRootName = mdl.name + "_pwk"
                 if (wkmRootName in bpy.data.objects):
                     wkmRoot = bpy.data.objects[wkmRootName]
-                    wkm     = nvb_mdl.Xwk("pwk")
+                    wkm     = kb_mdl.Xwk("pwk")
                 wkmRootName = mdl.name + "_PWK"
                 if (not wkmRoot) and (wkmRootName in bpy.data.objects):
                     wkmRoot = bpy.data.objects[wkmRootName]
-                    wkm     = nvb_mdl.Xwk("pwk")
+                    wkm     = kb_mdl.Xwk("pwk")
 
                 wkmRootName = mdl.name + "_dwk"
                 if (not wkmRoot) and (wkmRootName in bpy.data.objects):
                     wkmRoot = bpy.data.objects[wkmRootName]
-                    wkm     = nvb_mdl.Xwk("dwk")
+                    wkm     = kb_mdl.Xwk("dwk")
                 wkmRootName = mdl.name + "_DWK"
                 if (not wkmRoot) and (wkmRootName in bpy.data.objects):
                     wkmRoot = bpy.data.objects[wkmRootName]
-                    wkm     = nvb_mdl.Xwk("dwk")
+                    wkm     = kb_mdl.Xwk("dwk")
 
             if wkmRoot:
                 asciiLines = []

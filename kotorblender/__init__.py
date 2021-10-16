@@ -30,172 +30,171 @@ bl_info = {
     "category": "Import-Export"}
 
 if 'bpy' in locals():
-    import importlib
-    importlib.reload(nvb_aabb)
-    importlib.reload(nvb_anim)
-    importlib.reload(nvb_animnode)
-    importlib.reload(nvb_armature)
-    importlib.reload(nvb_def)
-    importlib.reload(nvb_glob)
-    importlib.reload(nvb_io)
-    importlib.reload(nvb_light)
-    importlib.reload(nvb_material)
-    importlib.reload(nvb_mdl)
-    importlib.reload(nvb_minimap)
-    importlib.reload(nvb_node)
-    importlib.reload(nvb_ops_anim)
-    importlib.reload(nvb_ops_path)
-    importlib.reload(nvb_ops)
-    importlib.reload(nvb_parse)
-    importlib.reload(nvb_props)
-    importlib.reload(nvb_teximage)
-    importlib.reload(nvb_txi)
-    importlib.reload(nvb_ui)
-    importlib.reload(nvb_utils)
+    from importlib import reload
+    reload(kb_aabb)
+    reload(kb_anim)
+    reload(kb_animnode)
+    reload(kb_armature)
+    reload(kb_def)
+    reload(kb_glob)
+    reload(kb_io)
+    reload(kb_light)
+    reload(kb_material)
+    reload(kb_mdl)
+    reload(kb_minimap)
+    reload(kb_node)
+    reload(kb_ops_anim)
+    reload(kb_ops_path)
+    reload(kb_ops)
+    reload(kb_parse)
+    reload(kb_props)
+    reload(kb_teximage)
+    reload(kb_txi)
+    reload(kb_ui)
+    reload(kb_utils)
 else:
     from . import (
-        nvb_aabb,
-        nvb_anim,
-        nvb_animnode,
-        nvb_armature,
-        nvb_def,
-        nvb_glob,
-        nvb_io,
-        nvb_light,
-        nvb_material,
-        nvb_mdl,
-        nvb_minimap,
-        nvb_node,
-        nvb_ops_anim,
-        nvb_ops_path,
-        nvb_ops,
-        nvb_parse,
-        nvb_props,
-        nvb_teximage,
-        nvb_txi,
-        nvb_ui,
-        nvb_utils
-        )
+        kb_aabb,
+        kb_anim,
+        kb_animnode,
+        kb_armature,
+        kb_def,
+        kb_glob,
+        kb_io,
+        kb_light,
+        kb_material,
+        kb_mdl,
+        kb_minimap,
+        kb_node,
+        kb_ops_anim,
+        kb_ops_path,
+        kb_ops,
+        kb_parse,
+        kb_props,
+        kb_teximage,
+        kb_txi,
+        kb_ui,
+        kb_utils)
 
 import addon_utils
 import bpy
 
 
 def menu_func_import_mdl(self, context):
-    self.layout.operator(nvb_ops.KB_OT_import_mdl.bl_idname, text="KotOR Model (.mdl)")
+    self.layout.operator(kb_ops.KB_OT_import_mdl.bl_idname, text="KotOR Model (.mdl)")
 
 
 def menu_func_import_lyt(self, context):
-    self.layout.operator(nvb_ops.KB_OT_import_lyt.bl_idname, text="KotOR Layout (.lyt)")
+    self.layout.operator(kb_ops.KB_OT_import_lyt.bl_idname, text="KotOR Layout (.lyt)")
 
 
 def menu_func_import_pth(self, context):
-    self.layout.operator(nvb_ops_path.KB_OT_import_path.bl_idname, text="KotOR Path (.pth.ascii)")
+    self.layout.operator(kb_ops_path.KB_OT_import_path.bl_idname, text="KotOR Path (.pth.ascii)")
 
 
 def menu_func_export_mdl(self, context):
-    self.layout.operator(nvb_ops.KB_OT_export_mdl.bl_idname, text="KotOR Model (.mdl)")
+    self.layout.operator(kb_ops.KB_OT_export_mdl.bl_idname, text="KotOR Model (.mdl)")
 
 
 def menu_func_export_lyt(self, context):
-    self.layout.operator(nvb_ops.KB_OT_export_lyt.bl_idname, text="KotOR Layout (.lyt)")
+    self.layout.operator(kb_ops.KB_OT_export_lyt.bl_idname, text="KotOR Layout (.lyt)")
 
 
 def menu_func_export_pth(self, context):
-    self.layout.operator(nvb_ops_path.KB_OT_export_path.bl_idname, text="KotOR Path (.pth.ascii)")
+    self.layout.operator(kb_ops_path.KB_OT_export_path.bl_idname, text="KotOR Path (.pth.ascii)")
 
 
 classes = (
-    nvb_props.ObjectPropertyGroup.PathConnection,
-    nvb_props.TexturePropertyGroup.PropListItem,
+    kb_props.ObjectPropertyGroup.PathConnection,
+    kb_props.TexturePropertyGroup.PropListItem,
 
     # Property Groups
 
-    nvb_props.AnimEventPropertyGroup,
-    nvb_props.AnimPropertyGroup,
-    nvb_props.FlarePropertyGroup,
-    nvb_props.ObjectPropertyGroup,
-    nvb_props.TexturePropertyGroup,
+    kb_props.AnimEventPropertyGroup,
+    kb_props.AnimPropertyGroup,
+    kb_props.FlarePropertyGroup,
+    kb_props.ObjectPropertyGroup,
+    kb_props.TexturePropertyGroup,
 
     # Operators
 
-    nvb_ops.KB_OT_add_skingroup,
-    nvb_ops.KB_OT_children_smoothgroup,
-    nvb_ops.KB_OT_delete_lightflare,
-    nvb_ops.KB_OT_export_lyt,
-    nvb_ops.KB_OT_export_mdl,
-    nvb_ops.KB_OT_generate_smoothgroup,
-    nvb_ops.KB_OT_import_lyt,
-    nvb_ops.KB_OT_import_mdl,
-    nvb_ops.KB_OT_load_wok_materials,
-    nvb_ops.KB_OT_move_lightflare,
-    nvb_ops.KB_OT_new_lightflare,
-    nvb_ops.KB_OT_rebuild_material_nodes,
-    nvb_ops.KB_OT_recreate_armature,
-    nvb_ops.KB_OT_render_minimap,
-    nvb_ops.KB_OT_select_smoothgroup,
-    nvb_ops.KB_OT_texture_box_ops,
-    nvb_ops.KB_OT_texture_io,
-    nvb_ops.KB_OT_texture_ops,
-    nvb_ops.KB_OT_toggle_smoothgroup,
+    kb_ops.KB_OT_add_skingroup,
+    kb_ops.KB_OT_children_smoothgroup,
+    kb_ops.KB_OT_delete_lightflare,
+    kb_ops.KB_OT_export_lyt,
+    kb_ops.KB_OT_export_mdl,
+    kb_ops.KB_OT_generate_smoothgroup,
+    kb_ops.KB_OT_import_lyt,
+    kb_ops.KB_OT_import_mdl,
+    kb_ops.KB_OT_load_wok_materials,
+    kb_ops.KB_OT_move_lightflare,
+    kb_ops.KB_OT_new_lightflare,
+    kb_ops.KB_OT_rebuild_material_nodes,
+    kb_ops.KB_OT_recreate_armature,
+    kb_ops.KB_OT_render_minimap,
+    kb_ops.KB_OT_select_smoothgroup,
+    kb_ops.KB_OT_texture_box_ops,
+    kb_ops.KB_OT_texture_io,
+    kb_ops.KB_OT_texture_ops,
+    kb_ops.KB_OT_toggle_smoothgroup,
 
     # Animation Operators
 
-    nvb_ops_anim.KB_OT_amt_event_delete,
-    nvb_ops_anim.KB_OT_amt_event_new,
-    nvb_ops_anim.KB_OT_anim_clone,
-    nvb_ops_anim.KB_OT_anim_crop,
-    nvb_ops_anim.KB_OT_anim_delete,
-    nvb_ops_anim.KB_OT_anim_event_delete,
-    nvb_ops_anim.KB_OT_anim_event_move,
-    nvb_ops_anim.KB_OT_anim_event_new,
-    nvb_ops_anim.KB_OT_anim_focus,
-    nvb_ops_anim.KB_OT_anim_move,
-    nvb_ops_anim.KB_OT_anim_moveback,
-    nvb_ops_anim.KB_OT_anim_new,
-    nvb_ops_anim.KB_OT_anim_pad,
-    nvb_ops_anim.KB_OT_anim_scale,
+    kb_ops_anim.KB_OT_amt_event_delete,
+    kb_ops_anim.KB_OT_amt_event_new,
+    kb_ops_anim.KB_OT_anim_clone,
+    kb_ops_anim.KB_OT_anim_crop,
+    kb_ops_anim.KB_OT_anim_delete,
+    kb_ops_anim.KB_OT_anim_event_delete,
+    kb_ops_anim.KB_OT_anim_event_move,
+    kb_ops_anim.KB_OT_anim_event_new,
+    kb_ops_anim.KB_OT_anim_focus,
+    kb_ops_anim.KB_OT_anim_move,
+    kb_ops_anim.KB_OT_anim_moveback,
+    kb_ops_anim.KB_OT_anim_new,
+    kb_ops_anim.KB_OT_anim_pad,
+    kb_ops_anim.KB_OT_anim_scale,
 
     # Path Operators
 
-    nvb_ops_path.KB_OT_add_connection,
-    nvb_ops_path.KB_OT_export_path,
-    nvb_ops_path.KB_OT_import_path,
-    nvb_ops_path.KB_OT_remove_connection,
+    kb_ops_path.KB_OT_add_connection,
+    kb_ops_path.KB_OT_export_path,
+    kb_ops_path.KB_OT_import_path,
+    kb_ops_path.KB_OT_remove_connection,
 
     # Panels
 
-    nvb_ui.KB_PT_animlist,
-    nvb_ui.KB_PT_emitter,
-    nvb_ui.KB_PT_empty,
-    nvb_ui.KB_PT_light,
-    nvb_ui.KB_PT_mesh,
-    nvb_ui.KB_PT_path_point,
-    nvb_ui.KB_PT_smoothgroups,
-    nvb_ui.KB_PT_texture,
+    kb_ui.KB_PT_animlist,
+    kb_ui.KB_PT_emitter,
+    kb_ui.KB_PT_empty,
+    kb_ui.KB_PT_light,
+    kb_ui.KB_PT_mesh,
+    kb_ui.KB_PT_path_point,
+    kb_ui.KB_PT_smoothgroups,
+    kb_ui.KB_PT_texture,
 
     # Menus
 
-    nvb_ui.KB_MT_animlist_specials,
+    kb_ui.KB_MT_animlist_specials,
 
     # UI Lists
 
-    nvb_ui.KB_UL_anim_events,
-    nvb_ui.KB_UL_anims,
-    nvb_ui.KB_UL_lightflares,
-    nvb_ui.KB_UL_path_points
+    kb_ui.KB_UL_anim_events,
+    kb_ui.KB_UL_anims,
+    kb_ui.KB_UL_lightflares,
+    kb_ui.KB_UL_path_points
 )
 
 def register():
-    (load_dflt, nvb_loaded) = addon_utils.check('neverblender')
-    if nvb_loaded:
+    (load_dflt, kb_loaded) = addon_utils.check('neverblender')
+    if kb_loaded:
         raise Exception("Do not enable both KotorBlender and NeverBlender at the same time!")
 
     for cls in classes:
         bpy.utils.register_class(cls)
 
-    bpy.types.Object.nvb = bpy.props.PointerProperty(type=nvb_props.ObjectPropertyGroup)
-    bpy.types.ImageTexture.nvb = bpy.props.PointerProperty(type=nvb_props.TexturePropertyGroup)
+    bpy.types.Object.nvb = bpy.props.PointerProperty(type=kb_props.ObjectPropertyGroup)
+    bpy.types.ImageTexture.nvb = bpy.props.PointerProperty(type=kb_props.TexturePropertyGroup)
 
     bpy.types.TOPBAR_MT_file_import.append(menu_func_import_mdl)
     bpy.types.TOPBAR_MT_file_import.append(menu_func_import_lyt)

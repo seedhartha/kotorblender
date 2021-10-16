@@ -3,7 +3,7 @@ import os
 import bpy
 import bpy_extras
 
-from . import nvb_def, nvb_utils
+from . import kb_def, kb_utils
 
 
 class KB_OT_add_connection(bpy.types.Operator):
@@ -12,7 +12,7 @@ class KB_OT_add_connection(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        return nvb_utils.is_path_point(context.object)
+        return kb_utils.is_path_point(context.object)
 
     def execute(self, context):
         context.object.nvb.path_connections.add()
@@ -25,7 +25,7 @@ class KB_OT_remove_connection(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        return nvb_utils.is_path_point(context.object) and (len(context.object.nvb.path_connections) > 0)
+        return kb_utils.is_path_point(context.object) and (len(context.object.nvb.path_connections) > 0)
 
     def execute(self, context):
         context.object.nvb.path_connections.remove(context.object.nvb.active_path_connection)
@@ -61,7 +61,7 @@ class KB_OT_import_path(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
                 point_object = bpy.data.objects.new(line[0], None)
                 point_object.parent = path_object
                 point_object.location = [float(x) for x in line[1:4]]
-                point_object.nvb.dummytype = nvb_def.Dummytype.PATHPOINT
+                point_object.nvb.dummytype = kb_def.Dummytype.PATHPOINT
                 bpy.context.collection.objects.link(point_object)
 
         # Second pass: read connections, append to point objects
@@ -95,7 +95,7 @@ class KB_OT_export_path(bpy.types.Operator, bpy_extras.io_utils.ExportHelper):
     def execute(self, context):
         with open(self.filepath, "w") as f:
             for o in bpy.data.objects:
-                if nvb_utils.is_path_point(o):
+                if kb_utils.is_path_point(o):
                     f.write("{} {:.7g} {:.7g} {:.7g} {}\n".format(o.name, *o.location, len(o.nvb.path_connections)))
                     for conn in o.nvb.path_connections:
                         f.write("  {}\n".format(conn.point))

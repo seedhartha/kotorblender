@@ -1,7 +1,7 @@
 import bpy
 from mathutils import Matrix, Quaternion, Vector
 
-from . import nvb_def, nvb_utils
+from . import kb_def, kb_utils
 
 
 def recreate_armature(mdl_root):
@@ -9,10 +9,10 @@ def recreate_armature(mdl_root):
     Recreate an armature from bone nodes of the MDL root.
     :param mdl_root: MDL root object - must contain at least one skinmesh
     """
-    if not nvb_utils.is_root_dummy(mdl_root):
+    if not kb_utils.is_root_dummy(mdl_root):
         return None
 
-    skinmeshes = nvb_utils.search_node_all(mdl_root, lambda o: o.nvb.meshtype == nvb_def.Meshtype.SKIN)
+    skinmeshes = kb_utils.search_node_all(mdl_root, lambda o: o.nvb.meshtype == kb_def.Meshtype.SKIN)
     if not skinmeshes:
         print("KotorBlender: WARNING - skinmeshes not found under the MDL root - armature creation aborted")
         return None
@@ -53,7 +53,7 @@ def _create_bones_recursive(armature, obj, parent_bone=None):
     Recursively create armature bones from bone nodes.
     """
     mat_trans = Matrix.Translation(obj.nvb.restloc)
-    mat_rot = nvb_utils.nwangle2quat(obj.nvb.restrot).to_matrix().to_4x4()
+    mat_rot = kb_utils.nwangle2quat(obj.nvb.restrot).to_matrix().to_4x4()
     mat_bone = mat_trans @ mat_rot
     if parent_bone:
         mat_bone = parent_bone.matrix @ mat_bone
@@ -79,7 +79,7 @@ def create_armature_animations(mdl_root, armature_object):
 
     # Copy keyframes from objects to armature bones
     mdl_objects = []
-    nvb_utils.get_children_recursive(mdl_root, mdl_objects)
+    kb_utils.get_children_recursive(mdl_root, mdl_objects)
     for obj in mdl_objects:
         if not obj.animation_data:
             continue
