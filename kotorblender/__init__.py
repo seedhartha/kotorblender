@@ -50,6 +50,7 @@ if 'bpy' in locals():
     reload(kb_parse)
     reload(kb_props)
     reload(kb_readbin)
+    reload(kb_savebinmdl)
     reload(kb_teximage)
     reload(kb_txi)
     reload(kb_ui)
@@ -76,6 +77,7 @@ else:
         kb_parse,
         kb_props,
         kb_readbin,
+        kb_savebinmdl,
         kb_teximage,
         kb_txi,
         kb_ui,
