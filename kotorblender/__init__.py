@@ -40,6 +40,7 @@ if 'bpy' in locals():
     reload(kb_io)
     reload(kb_light)
     reload(kb_loadbinmdl)
+    reload(kb_loadgff)
     reload(kb_material)
     reload(kb_mdl)
     reload(kb_minimap)
@@ -51,6 +52,7 @@ if 'bpy' in locals():
     reload(kb_props)
     reload(kb_readbin)
     reload(kb_savebinmdl)
+    reload(kb_savegff)
     reload(kb_teximage)
     reload(kb_txi)
     reload(kb_ui)
@@ -67,6 +69,7 @@ else:
         kb_io,
         kb_light,
         kb_loadbinmdl,
+        kb_loadgff,
         kb_material,
         kb_mdl,
         kb_minimap,
@@ -78,6 +81,7 @@ else:
         kb_props,
         kb_readbin,
         kb_savebinmdl,
+        kb_savegff,
         kb_teximage,
         kb_txi,
         kb_ui,
