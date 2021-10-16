@@ -31,9 +31,15 @@ bl_info = {
 
 if 'bpy' in locals():
     from importlib import reload
+    reload(animeventslist)
+    reload(animlistpanel)
+    reload(animlistspecialsmenu)
     reload(animops)
+    reload(animslist)
     reload(binreader)
     reload(binwriter)
+    reload(emitterpanel)
+    reload(emptypanel)
     reload(gffloader)
     reload(gffsaver)
     reload(kb_aabb)
@@ -52,12 +58,18 @@ if 'bpy' in locals():
     reload(kb_props)
     reload(kb_teximage)
     reload(kb_txi)
-    reload(kb_ui)
     reload(kb_utils)
+    reload(lightflareslist)
+    reload(lightpanel)
     reload(mainops)
     reload(mdlloader)
     reload(mdlsaver)
+    reload(meshpanel)
     reload(pathops)
+    reload(pathpointpanel)
+    reload(pathpointslist)
+    reload(smoothgroupspanel)
+    reload(texturepanel)
 else:
     from . import (
         kb_aabb,
@@ -76,7 +88,6 @@ else:
         kb_props,
         kb_teximage,
         kb_txi,
-        kb_ui,
         kb_utils)
     from .format import (
         binreader,
@@ -91,6 +102,21 @@ else:
         anim as animops,
         main as mainops,
         path as pathops)
+    from .ui.list import (
+        animevents as animeventslist,
+        anims as animslist,
+        lightflares as lightflareslist,
+        pathpoints as pathpointslist)
+    from .ui.menu import animlistspecials as animlistspecialsmenu
+    from .ui.panel import (
+        animlist as animlistpanel,
+        emitter as emitterpanel,
+        empty as emptypanel,
+        light as lightpanel,
+        mesh as meshpanel,
+        pathpoint as pathpointpanel,
+        smoothgroups as smoothgroupspanel,
+        texture as texturepanel)
 
 import addon_utils
 import bpy
@@ -180,29 +206,30 @@ classes = (
 
     # Panels
 
-    kb_ui.KB_PT_animlist,
-    kb_ui.KB_PT_emitter,
-    kb_ui.KB_PT_empty,
-    kb_ui.KB_PT_light,
-    kb_ui.KB_PT_mesh,
-    kb_ui.KB_PT_path_point,
-    kb_ui.KB_PT_smoothgroups,
-    kb_ui.KB_PT_texture,
+    animlistpanel.KB_PT_animlist,
+    emitterpanel.KB_PT_emitter,
+    emptypanel.KB_PT_empty,
+    lightpanel.KB_PT_light,
+    meshpanel.KB_PT_mesh,
+    pathpointpanel.KB_PT_path_point,
+    smoothgroupspanel.KB_PT_smoothgroups,
+    texturepanel.KB_PT_texture,
 
     # Menus
 
-    kb_ui.KB_MT_animlist_specials,
+    animlistspecialsmenu.KB_MT_animlist_specials,
 
     # UI Lists
 
-    kb_ui.KB_UL_anim_events,
-    kb_ui.KB_UL_anims,
-    kb_ui.KB_UL_lightflares,
-    kb_ui.KB_UL_path_points
-)
+    animeventslist.KB_UL_anim_events,
+    animslist.KB_UL_anims,
+    lightflareslist.KB_UL_lightflares,
+    pathpointslist.KB_UL_path_points
+    )
+
 
 def register():
-    (load_dflt, kb_loaded) = addon_utils.check('neverblender')
+    (_, kb_loaded) = addon_utils.check('neverblender')
     if kb_loaded:
         raise Exception("Do not enable both KotorBlender and NeverBlender at the same time!")
 
