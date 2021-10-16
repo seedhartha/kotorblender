@@ -16,6 +16,9 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+from kotorblender.ops import addskingroup
+
+
 bl_info = {
     "name": "KotorBlender",
     "author": "Attila Gyoerkoes & J.W. Brandon & Vsevolod Kremianskii",
@@ -31,17 +34,32 @@ bl_info = {
 
 if 'bpy' in locals():
     from importlib import reload
+    reload(addpathconnectionop)
+    reload(addskingroupop)
     reload(animeventslist)
     reload(animlistpanel)
     reload(animlistspecialsmenu)
-    reload(animops)
     reload(animslist)
     reload(binreader)
     reload(binwriter)
+    reload(childrensmoothgroupop)
+    reload(cloneanimop)
+    reload(cropanimop)
+    reload(deleteanimeventop)
+    reload(deleteanimop)
+    reload(deletelightflareop)
     reload(emitterpanel)
     reload(emptypanel)
+    reload(exportlytop)
+    reload(exportmdlop)
+    reload(exportpathop)
+    reload(focusanimop)
+    reload(generatesmoothgroupop)
     reload(gffloader)
     reload(gffsaver)
+    reload(importlytop)
+    reload(importmdlop)
+    reload(importpathop)
     reload(kb_aabb)
     reload(kb_anim)
     reload(kb_animnode)
@@ -61,15 +79,32 @@ if 'bpy' in locals():
     reload(kb_utils)
     reload(lightflareslist)
     reload(lightpanel)
-    reload(mainops)
+    reload(loadwokmaterialsop)
     reload(mdlloader)
     reload(mdlsaver)
     reload(meshpanel)
-    reload(pathops)
+    reload(moveanimeventop)
+    reload(moveanimop)
+    reload(movebackanimop)
+    reload(movelightflareop)
+    reload(newanimeventop)
+    reload(newanimop)
+    reload(newlightflareop)
+    reload(padanimop)
     reload(pathpointpanel)
     reload(pathpointslist)
+    reload(rebuildmaterialnodesop)
+    reload(recreatearmatureop)
+    reload(removepathconnection)
+    reload(renderminimapop)
+    reload(scaleanimop)
+    reload(selectsmoothgroupop)
     reload(smoothgroupspanel)
+    reload(textureboxtxiop)
+    reload(textureiotxiop)
+    reload(textureopstxiop)
     reload(texturepanel)
+    reload(togglesmoothgroupop)
 else:
     from . import (
         kb_aabb,
@@ -99,9 +134,49 @@ else:
         loader as mdlloader,
         saver as mdlsaver)
     from .ops import (
-        anim as animops,
-        main as mainops,
-        path as pathops)
+        addskingroup as addskingroupop,
+        loadwokmaterials as loadwokmaterialsop,
+        rebuildmaterialnodes as rebuildmaterialnodesop,
+        recreatearmature as recreatearmatureop,
+        renderminimap as renderminimapop)
+    from .ops.anim import (
+        clone as cloneanimop,
+        crop as cropanimop,
+        delete as deleteanimop,
+        focus as focusanimop,
+        move as moveanimop,
+        moveback as movebackanimop,
+        new as newanimop,
+        pad as padanimop,
+        scale as scaleanimop)
+    from .ops.anim.event import (
+        delete as deleteanimeventop,
+        move as moveanimeventop,
+        new as newanimeventop)
+    from .ops.lightflare import (
+        delete as deletelightflareop,
+        move as movelightflareop,
+        new as newlightflareop)
+    from .ops.lyt import (
+        export as exportlytop,
+        importop as importlytop)
+    from .ops.mdl import (
+        export as exportmdlop,
+        importop as importmdlop)
+    from .ops.path import (
+        addconnection as addpathconnectionop,
+        export as exportpathop,
+        importop as importpathop,
+        removeconnection as removepathconnection)
+    from .ops.smoothgroup import (
+        children as childrensmoothgroupop,
+        generate as generatesmoothgroupop,
+        select as selectsmoothgroupop,
+        toggle as togglesmoothgroupop)
+    from .ops.txi import (
+        textureboxops as textureboxtxiop,
+        textureio as textureiotxiop,
+        textureops as textureopstxiop)
     from .ui.list import (
         animevents as animeventslist,
         anims as animslist,
@@ -120,30 +195,32 @@ else:
 
 import addon_utils
 import bpy
+from kotorblender.ops.smoothgroup import select
+from kotorblender.ops.txi import textureboxops
 
 
 def menu_func_import_mdl(self, context):
-    self.layout.operator(mainops.KB_OT_import_mdl.bl_idname, text="KotOR Model (.mdl)")
+    self.layout.operator(importmdlop.KB_OT_import_mdl.bl_idname, text="KotOR Model (.mdl)")
 
 
 def menu_func_import_lyt(self, context):
-    self.layout.operator(mainops.KB_OT_import_lyt.bl_idname, text="KotOR Layout (.lyt)")
+    self.layout.operator(importlytop.KB_OT_import_lyt.bl_idname, text="KotOR Layout (.lyt)")
 
 
 def menu_func_import_pth(self, context):
-    self.layout.operator(pathops.KB_OT_import_path.bl_idname, text="KotOR Path (.pth.ascii)")
+    self.layout.operator(importpathop.KB_OT_import_path.bl_idname, text="KotOR Path (.pth.ascii)")
 
 
 def menu_func_export_mdl(self, context):
-    self.layout.operator(mainops.KB_OT_export_mdl.bl_idname, text="KotOR Model (.mdl)")
+    self.layout.operator(exportmdlop.KB_OT_export_mdl.bl_idname, text="KotOR Model (.mdl)")
 
 
 def menu_func_export_lyt(self, context):
-    self.layout.operator(mainops.KB_OT_export_lyt.bl_idname, text="KotOR Layout (.lyt)")
+    self.layout.operator(exportlytop.KB_OT_export_lyt.bl_idname, text="KotOR Layout (.lyt)")
 
 
 def menu_func_export_pth(self, context):
-    self.layout.operator(pathops.KB_OT_export_path.bl_idname, text="KotOR Path (.pth.ascii)")
+    self.layout.operator(exportpathop.KB_OT_export_path.bl_idname, text="KotOR Path (.pth.ascii)")
 
 
 classes = (
@@ -160,49 +237,41 @@ classes = (
 
     # Operators
 
-    mainops.KB_OT_add_skingroup,
-    mainops.KB_OT_children_smoothgroup,
-    mainops.KB_OT_delete_lightflare,
-    mainops.KB_OT_export_lyt,
-    mainops.KB_OT_export_mdl,
-    mainops.KB_OT_generate_smoothgroup,
-    mainops.KB_OT_import_lyt,
-    mainops.KB_OT_import_mdl,
-    mainops.KB_OT_load_wok_materials,
-    mainops.KB_OT_move_lightflare,
-    mainops.KB_OT_new_lightflare,
-    mainops.KB_OT_rebuild_material_nodes,
-    mainops.KB_OT_recreate_armature,
-    mainops.KB_OT_render_minimap,
-    mainops.KB_OT_select_smoothgroup,
-    mainops.KB_OT_texture_box_ops,
-    mainops.KB_OT_texture_io,
-    mainops.KB_OT_texture_ops,
-    mainops.KB_OT_toggle_smoothgroup,
-
-    # Animation Operators
-
-    animops.KB_OT_amt_event_delete,
-    animops.KB_OT_amt_event_new,
-    animops.KB_OT_anim_clone,
-    animops.KB_OT_anim_crop,
-    animops.KB_OT_anim_delete,
-    animops.KB_OT_anim_event_delete,
-    animops.KB_OT_anim_event_move,
-    animops.KB_OT_anim_event_new,
-    animops.KB_OT_anim_focus,
-    animops.KB_OT_anim_move,
-    animops.KB_OT_anim_moveback,
-    animops.KB_OT_anim_new,
-    animops.KB_OT_anim_pad,
-    animops.KB_OT_anim_scale,
-
-    # Path Operators
-
-    pathops.KB_OT_add_connection,
-    pathops.KB_OT_export_path,
-    pathops.KB_OT_import_path,
-    pathops.KB_OT_remove_connection,
+    addpathconnectionop.KB_OT_add_connection,
+    childrensmoothgroupop.KB_OT_children_smoothgroup,
+    cloneanimop.KB_OT_anim_clone,
+    cropanimop.KB_OT_anim_crop,
+    deleteanimeventop.KB_OT_anim_event_delete,
+    deleteanimop.KB_OT_anim_delete,
+    deletelightflareop.KB_OT_delete_lightflare,
+    exportlytop.KB_OT_export_lyt,
+    exportmdlop.KB_OT_export_mdl,
+    exportpathop.KB_OT_export_path,
+    focusanimop.KB_OT_anim_focus,
+    generatesmoothgroupop.KB_OT_generate_smoothgroup,
+    importlytop.KB_OT_import_lyt,
+    importmdlop.KB_OT_import_mdl,
+    importpathop.KB_OT_import_path,
+    addskingroupop.KB_OT_add_skingroup,
+    loadwokmaterialsop.KB_OT_load_wok_materials,
+    rebuildmaterialnodesop.KB_OT_rebuild_material_nodes,
+    recreatearmatureop.KB_OT_recreate_armature,
+    renderminimapop.KB_OT_render_minimap,
+    moveanimeventop.KB_OT_anim_event_move,
+    moveanimop.KB_OT_anim_move,
+    movebackanimop.KB_OT_anim_moveback,
+    movelightflareop.KB_OT_move_lightflare,
+    newanimeventop.KB_OT_anim_event_new,
+    newanimop.KB_OT_anim_new,
+    newlightflareop.KB_OT_new_lightflare,
+    padanimop.KB_OT_anim_pad,
+    removepathconnection.KB_OT_remove_connection,
+    scaleanimop.KB_OT_anim_scale,
+    selectsmoothgroupop.KB_OT_select_smoothgroup,
+    textureboxtxiop.KB_OT_texture_box_ops,
+    textureiotxiop.KB_OT_texture_io,
+    textureopstxiop.KB_OT_texture_ops,
+    togglesmoothgroupop.KB_OT_toggle_smoothgroup,
 
     # Panels
 

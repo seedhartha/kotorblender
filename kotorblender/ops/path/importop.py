@@ -3,33 +3,7 @@ import os
 import bpy
 import bpy_extras
 
-from .. import kb_def, kb_utils
-
-
-class KB_OT_add_connection(bpy.types.Operator):
-    bl_idname = "kb.add_path_connection"
-    bl_label = "Add Odyssey Path Connection"
-
-    @classmethod
-    def poll(cls, context):
-        return kb_utils.is_path_point(context.object)
-
-    def execute(self, context):
-        context.object.nvb.path_connections.add()
-        return {'FINISHED'}
-
-
-class KB_OT_remove_connection(bpy.types.Operator):
-    bl_idname = "kb.remove_path_connection"
-    bl_label = "Remove Odyssey Path Connection"
-
-    @classmethod
-    def poll(cls, context):
-        return kb_utils.is_path_point(context.object) and (len(context.object.nvb.path_connections) > 0)
-
-    def execute(self, context):
-        context.object.nvb.path_connections.remove(context.object.nvb.active_path_connection)
-        return {'FINISHED'}
+from ... import kb_def
 
 
 class KB_OT_import_path(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
@@ -76,28 +50,5 @@ class KB_OT_import_path(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
                 if name in bpy.data.objects:
                     conn = point.nvb.path_connections.add()
                     conn.point = name
-
-        return {'FINISHED'}
-
-
-class KB_OT_export_path(bpy.types.Operator, bpy_extras.io_utils.ExportHelper):
-    """Export Odyssey Engine path (.pth.ascii)"""
-
-    bl_idname = "kb.pthexport"
-    bl_label  = "Export Odyssey PTH"
-
-    filename_ext = ".ascii"
-
-    filter_glob : bpy.props.StringProperty(
-            default = "*.pth.ascii",
-            options = {'HIDDEN'})
-
-    def execute(self, context):
-        with open(self.filepath, "w") as f:
-            for o in bpy.data.objects:
-                if kb_utils.is_path_point(o):
-                    f.write("{} {:.7g} {:.7g} {:.7g} {}\n".format(o.name, *o.location, len(o.nvb.path_connections)))
-                    for conn in o.nvb.path_connections:
-                        f.write("  {}\n".format(conn.point))
 
         return {'FINISHED'}
