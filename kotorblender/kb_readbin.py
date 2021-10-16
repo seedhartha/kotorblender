@@ -1,7 +1,4 @@
-
 import struct
-
-from sys import byteorder
 
 class BinaryReader:
 
@@ -31,7 +28,7 @@ class BinaryReader:
         return int.from_bytes(self.file.read(4), self.byteorder, signed=False)
 
     def get_float(self):
-        bo_literal = '>' if byteorder == 'big' else '<'
+        bo_literal = '>' if self.byteorder == 'big' else '<'
         [val] = struct.unpack(bo_literal + "f", self.file.read(4))
         return val
 

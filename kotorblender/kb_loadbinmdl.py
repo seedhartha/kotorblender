@@ -1,11 +1,10 @@
 from kotorblender.kb_def import MalformedMdlFile
-
-from . import kb_readbin
+from kotorblender.kb_readbin import BinaryReader
 
 class BinaryMdlLoader:
 
     def __init__(self, path):
-        self.reader = kb_readbin.BinaryReader(path, 'little')
+        self.reader = BinaryReader(path, 'little')
 
     def load(self):
         self.load_file_header()
