@@ -1,11 +1,10 @@
 import bpy
-from mathutils import Color
 
-from . import kb_def, kb_light, kb_txi, kb_utils
+from .. import (kb_def, kb_light, kb_utils)
 
-
-def KB_anim_root_obj_poll(self, object):
-    return kb_utils.ancestor_node(object, kb_utils.is_root_dummy) is not None
+from .anim import AnimPropertyGroup
+from .flare import FlarePropertyGroup
+from .pathconnection import PathConnectionPropertyGroup
 
 
 def kb_update_light_power(self, context):
@@ -19,153 +18,6 @@ def kb_update_shadow_prop(self, context):
     """
     if context.object and context.object.type == 'LIGHT':
         context.object.data.use_shadow = self.shadow != 0
-
-
-class FlarePropertyGroup(bpy.types.PropertyGroup):
-    """
-    Properties for a single flare in the flare list
-    """
-
-    texture : bpy.props.StringProperty(name = "Texture",
-                                       description = "Texture name",
-                                       default = kb_def.null)
-    size : bpy.props.FloatProperty(name = "Size",
-                                 description = "Flare size",
-                                 default = 1)
-    position : bpy.props.FloatProperty(name = "Position",
-                                       description = "Flare position",
-                                       default = 1)
-    colorshift : bpy.props.FloatVectorProperty( name = "Colorshift",
-                                                description = "Colorshift",
-                                                subtype = 'COLOR_GAMMA',
-                                                default = (0.0, 0.0, 0.0),
-                                                min = -1.0, max = 1.0,
-                                                soft_min = 0.0, soft_max = 1.0)
-
-
-class TexturePropertyGroup(bpy.types.PropertyGroup):
-    """
-    This class defines all additional properties needed by the txi file
-    format. It hold the properties for image textures.
-    """
-
-    class PropListItem(bpy.types.PropertyGroup):
-        name : bpy.props.StringProperty(name="Property Name")
-
-    # Metaproperties,
-    # list of properties edited, these are the ones that will be exported
-    modified_properties : bpy.props.CollectionProperty(type=PropListItem)
-    # visible UI boxes
-    box_visible_summary    : bpy.props.BoolProperty(default=True)
-    box_visible_textures   : bpy.props.BoolProperty(default=True)
-    box_visible_bumpmap    : bpy.props.BoolProperty(default=False)
-    box_visible_envmap     : bpy.props.BoolProperty(default=False)
-    box_visible_procedural : bpy.props.BoolProperty(default=False)
-    box_visible_general    : bpy.props.BoolProperty(default=False)
-    box_visible_font       : bpy.props.BoolProperty(default=False)
-
-    def prop_update(self, context):
-        """
-        Update list of modified TXI properties
-        by testing against default values
-        """
-        self.modified_properties.clear()
-        for tok in kb_txi.tokens:
-            attr_def = TexturePropertyGroup.__annotations__[tok][1]
-            default_value = attr_def["default"]
-            if tok == "specularcolor":
-                default_value = Color(default_value)
-            if getattr(self, tok) != default_value:
-                self.modified_properties.add().name = tok
-
-    # TXI props
-    blending : bpy.props.EnumProperty(items=[
-        ("none", "", ""),
-        ("additive", "additive", "additive"),
-        ("punchthrough", "punchthrough", "punchthrough"),
-    ], default="none", update=prop_update)
-    proceduretype : bpy.props.EnumProperty(items=[
-        ("none", "", ""),
-        ("dirty", "dirty", "dirty"),
-        ("dirty2", "dirty2", "dirty2"),
-        ("dirty3", "dirty3", "dirty3"),
-        ("water", "water", "water"),
-        ("life", "life", "life"),
-        ("perlin", "perlin", "perlin"),
-        ("arturo", "arturo", "arturo"),
-        ("wave", "wave", "wave"),
-        ("cycle", "cycle", "cycle"),
-        ("random", "random", "random"),
-        ("ringtexdistort", "ringtexdistort", "ringtexdistort"),
-    ], default="none", update=prop_update)
-    filter : bpy.props.EnumProperty(items=[
-        ("none", "", ""),
-        ("nearest", "nearest", "nearest"),
-        ("linear", "linear", "linear"),
-    ], default="none", update=prop_update)
-    filerange : bpy.props.IntProperty(default=0, update=prop_update)
-    defaultwidth : bpy.props.IntProperty(default=0, update=prop_update)
-    defaultheight : bpy.props.IntProperty(default=0, update=prop_update)
-    downsamplemax : bpy.props.IntProperty(default=15, update=prop_update)
-    downsamplemin : bpy.props.IntProperty(default=0, update=prop_update)
-    mipmap : bpy.props.BoolProperty(default=True, update=prop_update)
-    maptexelstopixels : bpy.props.BoolProperty(default=False, update=prop_update)
-    gamma : bpy.props.FloatProperty(default=1.0, update=prop_update)
-    isbumpmap : bpy.props.BoolProperty(default=False, update=prop_update)
-    clamp : bpy.props.IntProperty(default=1, update=prop_update)
-    alphamean : bpy.props.FloatProperty(default=0.0, update=prop_update)
-    isdiffusebumpmap : bpy.props.BoolProperty(default=False, update=prop_update)
-    isspecularbumpmap : bpy.props.BoolProperty(default=False, update=prop_update)
-    bumpmapscaling : bpy.props.FloatProperty(default=0.0, update=prop_update)
-    specularcolor : bpy.props.FloatVectorProperty(default=(1.0, 1.0, 1.0), subtype='COLOR', min=0.0, max=1.0, update=prop_update)
-    islightmap : bpy.props.BoolProperty(default=False, update=prop_update) # found
-    compresstexture : bpy.props.BoolProperty(default=False, update=prop_update) # found
-    numx : bpy.props.IntProperty(default=1, update=prop_update)
-    numy : bpy.props.IntProperty(default=1, update=prop_update)
-    cube : bpy.props.BoolProperty(default=False, update=prop_update)
-    bumpintensity : bpy.props.FloatProperty(default=0.0, update=prop_update)
-    temporary : bpy.props.BoolProperty(default=False, update=prop_update)
-    useglobalalpha : bpy.props.BoolProperty(default=False, update=prop_update)
-    isenvironmentmapped : bpy.props.BoolProperty(default=False, update=prop_update)
-    envmapalpha : bpy.props.FloatProperty(default=0.0, update=prop_update)
-    diffusebumpintensity : bpy.props.FloatProperty(default=0.0, update=prop_update)
-    specularbumpintensity : bpy.props.FloatProperty(default=0.0, update=prop_update)
-    bumpmaptexture : bpy.props.StringProperty(default="", update=prop_update)
-    bumpyshinytexture : bpy.props.StringProperty(default="", update=prop_update)
-    envmaptexture : bpy.props.StringProperty(default="", update=prop_update)
-    decal : bpy.props.BoolProperty(default=False, update=prop_update)
-    renderbmlmtype : bpy.props.BoolProperty(default=False, update=prop_update)
-    wateralpha : bpy.props.FloatProperty(default=0.0, update=prop_update)
-    arturowidth : bpy.props.IntProperty(default=15, update=prop_update)
-    arturoheight : bpy.props.IntProperty(default=15, update=prop_update)
-    forcecyclespeed : bpy.props.FloatProperty(default=0.0, update=prop_update)
-    anglecyclespeed : bpy.props.FloatProperty(default=0.0, update=prop_update)
-    waterwidth : bpy.props.IntProperty(default=0, update=prop_update)
-    waterheight : bpy.props.IntProperty(default=0, update=prop_update)
-    channelscale : bpy.props.IntProperty(default=4, update=prop_update)
-    channeltranslate : bpy.props.IntProperty(default=4, update=prop_update)
-    distort : bpy.props.BoolProperty(default=False, update=prop_update)
-    distortangle : bpy.props.BoolProperty(default=False, update=prop_update)
-    distortionamplitude : bpy.props.FloatProperty(default=0.0, update=prop_update)
-    speed : bpy.props.FloatProperty(default=1.0, update=prop_update)
-    fps : bpy.props.FloatProperty(default=1.0, update=prop_update)
-    channelscale0 : bpy.props.FloatProperty(default=0.0, update=prop_update)
-    channelscale1 : bpy.props.FloatProperty(default=0.0, update=prop_update)
-    channelscale2 : bpy.props.FloatProperty(default=0.0, update=prop_update)
-    channelscale3 : bpy.props.FloatProperty(default=0.0, update=prop_update)
-    channeltranslate0 : bpy.props.FloatProperty(default=0.0, update=prop_update)
-    channeltranslate1 : bpy.props.FloatProperty(default=0.0, update=prop_update)
-    channeltranslate2 : bpy.props.FloatProperty(default=0.0, update=prop_update)
-    channeltranslate3 : bpy.props.FloatProperty(default=0.0, update=prop_update)
-
-    numchars : bpy.props.BoolProperty(default=False, update=prop_update)
-    fontheight : bpy.props.FloatProperty(default=0.0, update=prop_update)
-    baselineheight : bpy.props.FloatProperty(default=0.0, update=prop_update)
-    texturewidth : bpy.props.FloatProperty(default=0.0, update=prop_update)
-    spacingR : bpy.props.FloatProperty(default=0.0, update=prop_update)
-    spacingB : bpy.props.FloatProperty(default=0.0, update=prop_update)
-    upperleftcoords : bpy.props.StringProperty(default="", update=prop_update)
-    lowerrightcoords : bpy.props.StringProperty(default="", update=prop_update)
 
 
 def kb_update_emitter_prop(self, context):
@@ -185,49 +37,6 @@ def kb_update_emitter_prop(self, context):
         obj.nvb.p2p_sel = 1
     elif obj.nvb.p2p_type == "Gravity":
         obj.nvb.p2p_sel = 0
-
-
-class AnimEventPropertyGroup(bpy.types.PropertyGroup):
-    """Properties for a single event in the even list."""
-
-    name : bpy.props.StringProperty(name="Name", default="unnamed",
-                                    description="Name for this event",
-                                    options=set())
-    frame : bpy.props.IntProperty(
-        name="Frame", default=1,
-        description="Frame at which the event should fire",
-        options=set())
-
-
-class AnimPropertyGroup(bpy.types.PropertyGroup):
-    """Properties for a single animation in the animation list."""
-
-    name : bpy.props.StringProperty(name="Name",
-                                    description="Name of this animation",
-                                    default="unnamed", options=set())
-    ttime : bpy.props.FloatProperty(
-        name="Transitiontime", subtype='TIME', options=set(),
-        description="Blending time between animations in seconds",
-        default=0.25, min=0.0, soft_max=60.0)
-    transtime : bpy.props.FloatProperty(
-        name="Transitiontime", subtype='TIME', options=set(),
-        description="Blending time between animations in frames",
-        default=7.5, min=0.0, soft_max=60.0)
-    root : bpy.props.StringProperty(name="Root", default="", options=set(),
-                                    description="Entry point of the animation")
-    root_obj : bpy.props.StringProperty(
-        name="Root", description="Entry point of the animation",
-        default="unnamed", options=set())
-    mute : bpy.props.BoolProperty(name="Export", default=False, options=set(),
-                                  description="Export animation to MDL")
-    frameStart : bpy.props.IntProperty(name="Start", default=0, options=set(),
-                                       description="Animation Start", min=0)
-    frameEnd : bpy.props.IntProperty(name="End", default=0, options=set(),
-                                     description="Animation End", min=0)
-
-    eventList : bpy.props.CollectionProperty(type=AnimEventPropertyGroup)
-    eventListIdx : bpy.props.IntProperty(name="Index for event List",
-                                         default=0, options=set())
 
 
 class ObjectPropertyGroup(bpy.types.PropertyGroup):
@@ -540,10 +349,6 @@ class ObjectPropertyGroup(bpy.types.PropertyGroup):
     inherit_part : bpy.props.BoolProperty(name="Part", description="???", default = False, options=set())
     depth_texture : bpy.props.BoolProperty(name="Use Depth Texture", description="Use Depth Texture", default = False, options=set())
 
-    # Path points
-
-    class PathConnection(bpy.types.PropertyGroup):
-        point : bpy.props.StringProperty(name="Point")
-
-    path_connections : bpy.props.CollectionProperty(type=PathConnection)
+    # Path connections
+    path_connections : bpy.props.CollectionProperty(type=PathConnectionPropertyGroup)
     active_path_connection : bpy.props.IntProperty()
