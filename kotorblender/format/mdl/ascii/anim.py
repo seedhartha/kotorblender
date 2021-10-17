@@ -3,7 +3,9 @@ import collections
 import bpy
 from mathutils import Matrix, Quaternion, Vector
 
-from . import kb_animnode, kb_def, kb_utils
+from .... import kb_def, kb_utils
+
+from . import animnode
 
 
 class Animation():
@@ -63,10 +65,10 @@ class Animation():
         return result
 
     def _create_rest_pose(self, obj, frame=1):
-        kb_animnode.Animnode.create_restpose(obj, frame)
+        animnode.Animnode.create_restpose(obj, frame)
 
     def add_ascii_node(self, asciiBlock):
-        node = kb_animnode.Node()
+        node = animnode.Node()
         node.load_ascii(asciiBlock)
         key  = node.parentName + node.name
         if key in self.nodeList:
@@ -147,12 +149,12 @@ class Animation():
         node_list = [dlm + s for s in ascii_data.split(dlm) if s != ""]
         for idx, ascii_node in enumerate(node_list):
             ascii_lines = [l.strip().split() for l in ascii_node.splitlines()]
-            node = kb_animnode.Animnode()
+            node = animnode.Animnode()
             node.load_ascii(ascii_lines, idx)
             self.nodes.append(node)
 
     def anim_node_to_ascii(self, bObject, asciiLines):
-        node = kb_animnode.Node()
+        node = animnode.Node()
         node.to_ascii(bObject, asciiLines, self.name)
 
         # If this mdl was imported, we need to retain the order of the
@@ -169,7 +171,7 @@ class Animation():
 
     @staticmethod
     def generate_ascii_nodes(obj, anim, ascii_lines, options):
-        kb_animnode.Animnode.generate_ascii(obj, anim, ascii_lines, options)
+        animnode.Animnode.generate_ascii(obj, anim, ascii_lines, options)
 
         # Sort children to restore original order before import
         # (important for supermodels/animations to work)

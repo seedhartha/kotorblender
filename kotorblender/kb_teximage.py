@@ -3,13 +3,14 @@ Image/texture helper functions.
 """
 
 import bpy
-import bpy_extras
+
+from bpy_extras import image_utils
 
 from . import kb_glob, kb_txi
 
 
 def _create_image(name, path):
-    image = bpy_extras.image_utils.load_image(
+    image = image_utils.load_image(
         name + ".tga",
         path,
         recursive=kb_glob.textureSearch,

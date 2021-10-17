@@ -4,7 +4,7 @@ Functions related to material building.
 
 import bpy
 
-from . import kb_glob, kb_teximage, kb_utils
+from . import kb_teximage, kb_utils
 
 
 def _get_material_name(obj):

@@ -1,12 +1,16 @@
 import collections
-import enum
 import os
 import re
 from datetime import datetime
 
 import bpy
 
-from . import kb_anim, kb_armature, kb_def, kb_glob, kb_node, kb_utils
+from .... import kb_armature, kb_def, kb_glob, kb_utils
+
+from . import (
+    anim as mdlanim,
+    node as mdlnode
+    )
 
 
 class Mdl():
@@ -39,16 +43,16 @@ class Mdl():
             raise kb_def.MalformedMdlFile("Invalid node type")
 
         switch = {
-            kb_def.Nodetype.DUMMY:      kb_node.Dummy,
-            kb_def.Nodetype.PATCH:      kb_node.Patch,
-            kb_def.Nodetype.REFERENCE:  kb_node.Reference,
-            kb_def.Nodetype.TRIMESH:    kb_node.Trimesh,
-            kb_def.Nodetype.DANGLYMESH: kb_node.Danglymesh,
-            kb_def.Nodetype.LIGHTSABER: kb_node.Lightsaber,
-            kb_def.Nodetype.SKIN:       kb_node.Skinmesh,
-            kb_def.Nodetype.EMITTER:    kb_node.Emitter,
-            kb_def.Nodetype.LIGHT:      kb_node.Light,
-            kb_def.Nodetype.AABB:       kb_node.Aabb
+            kb_def.Nodetype.DUMMY:      mdlnode.Dummy,
+            kb_def.Nodetype.PATCH:      mdlnode.Patch,
+            kb_def.Nodetype.REFERENCE:  mdlnode.Reference,
+            kb_def.Nodetype.TRIMESH:    mdlnode.Trimesh,
+            kb_def.Nodetype.DANGLYMESH: mdlnode.Danglymesh,
+            kb_def.Nodetype.LIGHTSABER: mdlnode.Lightsaber,
+            kb_def.Nodetype.SKIN:       mdlnode.Skinmesh,
+            kb_def.Nodetype.EMITTER:    mdlnode.Emitter,
+            kb_def.Nodetype.LIGHT:      mdlnode.Light,
+            kb_def.Nodetype.AABB:       mdlnode.Aabb
         }
         try:
             node = switch[nodeType]()
@@ -97,7 +101,7 @@ class Mdl():
             # If the first node has a parent or isn't a dummy we don't
             # even try to import the mdl
             (_, node) = next(it)
-            if (type(node) == kb_node.Dummy) and \
+            if (type(node) == mdlnode.Dummy) and \
                (kb_utils.is_null(node.parentName)):
                 obj                    = node.add_to_collection(collection)
                 obj.location           = position
@@ -234,7 +238,7 @@ class Mdl():
         delim = "newanim "
         animList = [delim + b for b in ascii_block.split(delim) if b]
         self.animations = list(map(
-            lambda txt: kb_anim.Animation(ascii_data=txt),
+            lambda txt: mdlanim.Animation(ascii_data=txt),
             animList
         ))
         for anim in self.animations:
@@ -318,15 +322,15 @@ class Mdl():
 
     def geometry_to_ascii(self, bObject, asciiLines, simple = False, nameDict = None):
         nodeType = kb_utils.get_node_type(bObject)
-        switch = {"dummy":      kb_node.Dummy,
-                  "patch":      kb_node.Patch,
-                  "reference":  kb_node.Reference,
-                  "trimesh":    kb_node.Trimesh,
-                  "danglymesh": kb_node.Danglymesh,
-                  "skin":       kb_node.Skinmesh,
-                  "emitter":    kb_node.Emitter,
-                  "light":      kb_node.Light,
-                  "aabb":       kb_node.Aabb}
+        switch = {"dummy":      mdlnode.Dummy,
+                  "patch":      mdlnode.Patch,
+                  "reference":  mdlnode.Reference,
+                  "trimesh":    mdlnode.Trimesh,
+                  "danglymesh": mdlnode.Danglymesh,
+                  "skin":       mdlnode.Skinmesh,
+                  "emitter":    mdlnode.Emitter,
+                  "light":      mdlnode.Light,
+                  "aabb":       mdlnode.Aabb}
         try:
             node = switch[nodeType]()
         except KeyError:
@@ -346,7 +350,7 @@ class Mdl():
         if rootDummy.nvb.animList:
             for anim in rootDummy.nvb.animList:
                 print("export animation " + anim.name)
-                kb_anim.Animation.generate_ascii(rootDummy, anim,
+                mdlanim.Animation.generate_ascii(rootDummy, anim,
                                                  ascii_lines, options)
 
     def generate_ascii(self, asciiLines, rootDummy, exports = {"ANIMATION", "WALKMESH"}):
@@ -505,7 +509,7 @@ class Xwk(Mdl):
                     wkm_name += "_" + self.walkmeshType
                 if mdl_name.lower().endswith("_" + self.walkmeshType):
                     mdl_name = mdl_name[0:-4]
-                node = kb_node.Dummy(wkm_name)
+                node = mdlnode.Dummy(wkm_name)
                 if self.walkmeshType == "dwk":
                     node.dummytype = kb_def.Dummytype.DWKROOT
                 else:
@@ -582,7 +586,7 @@ class Wok(Xwk):
     def geometry_to_ascii(self, bObject, asciiLines, simple):
         nodeType = kb_utils.get_node_type(bObject)
         if nodeType == "aabb":
-            node = kb_node.Aabb()
+            node = mdlnode.Aabb()
             node.roottype = "wok"
             node.nodetype = "trimesh"
             node.get_room_links(bObject.data)

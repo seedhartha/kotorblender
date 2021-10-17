@@ -42,6 +42,11 @@ if 'bpy' in locals():
     reload(animlistspecialsmenu)
     reload(animprops)
     reload(animslist)
+    reload(asciianim)
+    reload(asciianimnode)
+    reload(asciimdl)
+    reload(asciinode)
+    reload(asciiparse)
     reload(binreader)
     reload(binwriter)
     reload(childrensmoothgroupop)
@@ -64,18 +69,13 @@ if 'bpy' in locals():
     reload(importmdlop)
     reload(importpathop)
     reload(kb_aabb)
-    reload(kb_anim)
-    reload(kb_animnode)
     reload(kb_armature)
     reload(kb_def)
     reload(kb_glob)
     reload(kb_io)
     reload(kb_light)
     reload(kb_material)
-    reload(kb_mdl)
     reload(kb_minimap)
-    reload(kb_node)
-    reload(kb_parse)
     reload(kb_teximage)
     reload(kb_txi)
     reload(kb_utils)
@@ -114,18 +114,13 @@ if 'bpy' in locals():
 else:
     from . import (
         kb_aabb,
-        kb_anim,
-        kb_animnode,
         kb_armature,
         kb_def,
         kb_glob,
         kb_io,
         kb_light,
         kb_material,
-        kb_mdl,
         kb_minimap,
-        kb_node,
-        kb_parse,
         kb_teximage,
         kb_txi,
         kb_utils)
@@ -138,6 +133,12 @@ else:
     from .format.mdl import (
         loader as mdlloader,
         saver as mdlsaver)
+    from .format.mdl.ascii import (
+        anim as asciianim,
+        animnode as asciianimnode,
+        mdl as asciimdl,
+        node as asciinode,
+        parse as asciiparse)
     from .ops import (
         addskingroup as addskingroupop,
         loadwokmaterials as loadwokmaterialsop,
