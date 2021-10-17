@@ -36,9 +36,11 @@ if 'bpy' in locals():
     from importlib import reload
     reload(addpathconnectionop)
     reload(addskingroupop)
+    reload(animeventprops)
     reload(animeventslist)
     reload(animlistpanel)
     reload(animlistspecialsmenu)
+    reload(animprops)
     reload(animslist)
     reload(binreader)
     reload(binwriter)
@@ -53,6 +55,7 @@ if 'bpy' in locals():
     reload(exportlytop)
     reload(exportmdlop)
     reload(exportpathop)
+    reload(flareprops)
     reload(focusanimop)
     reload(generatesmoothgroupop)
     reload(gffloader)
@@ -73,12 +76,12 @@ if 'bpy' in locals():
     reload(kb_minimap)
     reload(kb_node)
     reload(kb_parse)
-    reload(kb_props)
     reload(kb_teximage)
     reload(kb_txi)
     reload(kb_utils)
     reload(lightflareslist)
     reload(lightpanel)
+    reload(listitemprops)
     reload(loadwokmaterialsop)
     reload(mdlloader)
     reload(mdlsaver)
@@ -90,7 +93,9 @@ if 'bpy' in locals():
     reload(newanimeventop)
     reload(newanimop)
     reload(newlightflareop)
+    reload(objectprops)
     reload(padanimop)
+    reload(pathconnectionprops)
     reload(pathpointpanel)
     reload(pathpointslist)
     reload(rebuildmaterialnodesop)
@@ -104,6 +109,7 @@ if 'bpy' in locals():
     reload(textureiotxiop)
     reload(textureopstxiop)
     reload(texturepanel)
+    reload(textureprops)
     reload(togglesmoothgroupop)
 else:
     from . import (
@@ -120,7 +126,6 @@ else:
         kb_minimap,
         kb_node,
         kb_parse,
-        kb_props,
         kb_teximage,
         kb_txi,
         kb_utils)
@@ -177,6 +182,14 @@ else:
         textureboxops as textureboxtxiop,
         textureio as textureiotxiop,
         textureops as textureopstxiop)
+    from .props import (
+        anim as animprops,
+        animevent as animeventprops,
+        flare as flareprops,
+        listitem as listitemprops,
+        object as objectprops,
+        pathconnection as pathconnectionprops,
+        texture as textureprops)
     from .ui.list import (
         animevents as animeventslist,
         anims as animslist,
@@ -195,8 +208,6 @@ else:
 
 import addon_utils
 import bpy
-from kotorblender.ops.smoothgroup import select
-from kotorblender.ops.txi import textureboxops
 
 
 def menu_func_import_mdl(self, context):
@@ -224,16 +235,15 @@ def menu_func_export_pth(self, context):
 
 
 classes = (
-    kb_props.ObjectPropertyGroup.PathConnection,
-    kb_props.TexturePropertyGroup.PropListItem,
-
     # Property Groups
 
-    kb_props.AnimEventPropertyGroup,
-    kb_props.AnimPropertyGroup,
-    kb_props.FlarePropertyGroup,
-    kb_props.ObjectPropertyGroup,
-    kb_props.TexturePropertyGroup,
+    pathconnectionprops.PathConnectionPropertyGroup,
+    listitemprops.ListItemPropertyGroup,
+    animeventprops.AnimEventPropertyGroup,
+    animprops.AnimPropertyGroup,
+    flareprops.FlarePropertyGroup,
+    objectprops.ObjectPropertyGroup,
+    textureprops.TexturePropertyGroup,
 
     # Operators
 
@@ -305,8 +315,8 @@ def register():
     for cls in classes:
         bpy.utils.register_class(cls)
 
-    bpy.types.Object.nvb = bpy.props.PointerProperty(type=kb_props.ObjectPropertyGroup)
-    bpy.types.ImageTexture.nvb = bpy.props.PointerProperty(type=kb_props.TexturePropertyGroup)
+    bpy.types.Object.nvb = bpy.props.PointerProperty(type=objectprops.ObjectPropertyGroup)
+    bpy.types.ImageTexture.nvb = bpy.props.PointerProperty(type=textureprops.TexturePropertyGroup)
 
     bpy.types.TOPBAR_MT_file_import.append(menu_func_import_mdl)
     bpy.types.TOPBAR_MT_file_import.append(menu_func_import_lyt)
