@@ -1,9 +1,7 @@
 ﻿import math
-import os
-import sys
 
 import bpy
-from mathutils import Quaternion, Vector
+from mathutils import Quaternion
 
 from . import kb_def
 

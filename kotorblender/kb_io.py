@@ -3,7 +3,9 @@ import re
 
 import bpy
 
-from . import kb_def, kb_glob, kb_mdl, kb_utils
+from .format.mdl.ascii import (mdl as mdlformat)
+
+from . import kb_def, kb_glob, kb_utils
 
 
 def _load_mdl(filepath, position = (0.0, 0.0, 0.0)):
@@ -28,7 +30,7 @@ def _load_mdl(filepath, position = (0.0, 0.0, 0.0)):
                 fp = os.fsencode(wkmFilepath + ".ascii")
             try:
                 asciiLines = [line.strip().split() for line in open(fp, "r")]
-                wkm = kb_mdl.Xwk(wkmType)
+                wkm = mdlformat.Xwk(wkmType)
                 wkm.load_ascii(asciiLines)
             except IOError:
                 print(
@@ -58,7 +60,7 @@ def _load_mdl(filepath, position = (0.0, 0.0, 0.0)):
     asciiLines = [line.strip().split() for line in ascii_mdl.splitlines()]
 
     print("Importing: " + filepath)
-    mdl = kb_mdl.Mdl()
+    mdl = mdlformat.Mdl()
     mdl.load_ascii(ascii_mdl)
     mdl.import_to_collection(collection, wkm, position)
 
@@ -202,7 +204,7 @@ def save_mdl(operator,
     mdlRoot = kb_utils.get_mdl_root_from_context()
     if mdlRoot:
         print("KotorBlender: Exporting " + mdlRoot.name)
-        mdl = kb_mdl.Mdl()
+        mdl = mdlformat.Mdl()
         asciiLines = []
         mdl.generate_ascii(asciiLines, mdlRoot)
         with open(os.fsencode(filepath), "w") as f:
@@ -212,7 +214,7 @@ def save_mdl(operator,
             wkmRoot = None
             aabb = kb_utils.search_node(mdlRoot, lambda x: x.nvb.meshtype == kb_def.Meshtype.AABB)
             if aabb is not None:
-                wkm     = kb_mdl.Wok()
+                wkm     = mdlformat.Wok()
                 wkmRoot = aabb
                 wkmType = "wok"
             else:
@@ -220,20 +222,20 @@ def save_mdl(operator,
                 wkmRootName = mdl.name + "_pwk"
                 if (wkmRootName in bpy.data.objects):
                     wkmRoot = bpy.data.objects[wkmRootName]
-                    wkm     = kb_mdl.Xwk("pwk")
+                    wkm     = mdlformat.Xwk("pwk")
                 wkmRootName = mdl.name + "_PWK"
                 if (not wkmRoot) and (wkmRootName in bpy.data.objects):
                     wkmRoot = bpy.data.objects[wkmRootName]
-                    wkm     = kb_mdl.Xwk("pwk")
+                    wkm     = mdlformat.Xwk("pwk")
 
                 wkmRootName = mdl.name + "_dwk"
                 if (not wkmRoot) and (wkmRootName in bpy.data.objects):
                     wkmRoot = bpy.data.objects[wkmRootName]
-                    wkm     = kb_mdl.Xwk("dwk")
+                    wkm     = mdlformat.Xwk("dwk")
                 wkmRootName = mdl.name + "_DWK"
                 if (not wkmRoot) and (wkmRootName in bpy.data.objects):
                     wkmRoot = bpy.data.objects[wkmRootName]
-                    wkm     = kb_mdl.Xwk("dwk")
+                    wkm     = mdlformat.Xwk("dwk")
 
             if wkmRoot:
                 asciiLines = []

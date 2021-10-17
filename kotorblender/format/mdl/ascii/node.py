@@ -2,12 +2,13 @@ import re
 
 import bmesh
 import bpy
-import bpy_extras.image_utils
-from bpy_extras.io_utils import unpack_face_list, unpack_list
+
+from bpy_extras.io_utils import unpack_list
 from mathutils import Color, Matrix, Vector
 
-from . import (kb_aabb, kb_def, kb_glob, kb_light, kb_material, kb_parse,
-               kb_teximage, kb_txi, kb_utils)
+from .... import kb_aabb, kb_def, kb_glob, kb_light, kb_material, kb_utils
+
+from . import parse
 
 
 class FaceList():
@@ -457,7 +458,7 @@ class Trimesh(GeometryNode):
                     self.parsed_lines.append(idx)
                 elif (label == "verts"):
                     numVals = l_int(line[1])
-                    kb_parse.f3(asciiNode[idx+1:idx+numVals+1], self.verts)
+                    parse.f3(asciiNode[idx+1:idx+numVals+1], self.verts)
                     self.parsed_lines.extend(range(idx,idx+numVals+1))
                 elif (label == "faces"):
                     numVals = l_int(line[1])
@@ -465,22 +466,22 @@ class Trimesh(GeometryNode):
                     self.parsed_lines.extend(range(idx,idx+numVals+1))
                 elif (label == "tverts"):
                     numVals = l_int(line[1])
-                    kb_parse.f2(asciiNode[idx+1:idx+numVals+1], self.tverts)
+                    parse.f2(asciiNode[idx+1:idx+numVals+1], self.tverts)
                     self.parsed_lines.extend(range(idx,idx+numVals+1))
                 elif (label == "tverts1"):
                     numVals = l_int(line[1])
-                    kb_parse.f2(asciiNode[idx+1:idx+numVals+1], self.tverts1)
+                    parse.f2(asciiNode[idx+1:idx+numVals+1], self.tverts1)
                     self.parsed_lines.extend(range(idx,idx+numVals+1))
                 elif (label == "texindices1"):
                     numVals = l_int(line[1])
-                    kb_parse.i3(asciiNode[idx+1:idx+numVals+1], self.texindices1, initialFloat=False)
+                    parse.i3(asciiNode[idx+1:idx+numVals+1], self.texindices1, initialFloat=False)
                     self.parsed_lines.extend(range(idx,idx+numVals+1))
                 elif (label == "roomlinks"):
                     try:
                         numVals = l_int(line[1])
                     except:
                         numVals = next((i for i, v in enumerate(asciiNode[idx+1:]) if not l_is_number(v[0])), -1)
-                    kb_parse.i2(asciiNode[idx+1:idx+numVals+1], self.roomlinks)
+                    parse.i2(asciiNode[idx+1:idx+numVals+1], self.roomlinks)
                     self.parsed_lines.extend(range(idx,idx+numVals+1))
         if (self.nodetype == "trimesh"):
             self.add_unparsed_to_raw(asciiNode)
@@ -944,7 +945,7 @@ class Danglymesh(Trimesh):
                     self.parsed_lines.append(idx)
                 elif (label == "constraints"):
                     numVals = l_int(line[1])
-                    kb_parse.f1(asciiNode[idx+1:idx+numVals+1], self.constraints)
+                    parse.f1(asciiNode[idx+1:idx+numVals+1], self.constraints)
                     self.parsed_lines.extend(range(idx,idx+numVals+1))
         if (self.nodetype == "danglymesh"):
             self.add_unparsed_to_raw(asciiNode)
@@ -1537,17 +1538,17 @@ class Light(GeometryNode):
                 elif (label == "flaresizes"):
                     # List of floats
                     numVals = next((i for i, v in enumerate(asciiNode[idx+1:]) if not l_is_number(v[0])), -1)
-                    kb_parse.f1(asciiNode[idx+1:idx+numVals+1], self.flareList.sizes)
+                    parse.f1(asciiNode[idx+1:idx+numVals+1], self.flareList.sizes)
                     self.parsed_lines.extend(range(idx,idx+numVals+1))
                 elif (label == "flarepositions"):
                     # List of floats
                     numVals = next((i for i, v in enumerate(asciiNode[idx+1:]) if not l_is_number(v[0])), -1)
-                    kb_parse.f1(asciiNode[idx+1:idx+numVals+1], self.flareList.positions)
+                    parse.f1(asciiNode[idx+1:idx+numVals+1], self.flareList.positions)
                     self.parsed_lines.extend(range(idx,idx+numVals+1))
                 elif (label == "flarecolorshifts"):
                     # List of float 3-tuples
                     numVals = next((i for i, v in enumerate(asciiNode[idx+1:]) if not l_is_number(v[0])), -1)
-                    kb_parse.f3(asciiNode[idx+1:idx+numVals+1], self.flareList.colorshifts)
+                    parse.f3(asciiNode[idx+1:idx+numVals+1], self.flareList.colorshifts)
                     self.parsed_lines.extend(range(idx,idx+numVals+1))
 
         # Load flare texture names:

@@ -5,7 +5,9 @@ from math import asin, cos, sqrt
 import bpy
 from mathutils import Matrix, Quaternion, Vector
 
-from . import kb_def, kb_parse, kb_utils
+from .... import kb_def, kb_utils
+
+from . import parse
 
 
 class Keys():
@@ -338,28 +340,28 @@ class Node():
         """
         Parse animation keys containing 9 floats (not counting the time value)
         """
-        kb_parse._f(asciiBlock, keyList, 10)
+        parse._f(asciiBlock, keyList, 10)
         self.isEmpty = False
 
     def parse_keys_3f(self, asciiBlock, keyList):
         """
         Parse animation keys containing 3 floats (not counting the time value)
         """
-        kb_parse.f4(asciiBlock, keyList)
+        parse.f4(asciiBlock, keyList)
         self.isEmpty = False
 
     def parse_keys_4f(self, asciiBlock, keyList):
         """
         Parse animation keys containing 4 floats (not counting the time value)
         """
-        kb_parse.f5(asciiBlock, keyList)
+        parse.f5(asciiBlock, keyList)
         self.isEmpty = False
 
     def parse_keys_1f(self, asciiBlock, keyList):
         """
         Parse animation keys containing 1 float (not counting the time value)
         """
-        kb_parse.f2(asciiBlock, keyList)
+        parse.f2(asciiBlock, keyList)
         self.isEmpty = False
 
     def parse_keys_incompat(self, asciiBlock):
@@ -418,7 +420,7 @@ class Node():
                     numKeys = 1
                     subblock = [[0.0] + line[1:]]
                 # parse numvals plus one for time
-                kb_parse._f(subblock, getattr(self.keys, attrname), numVals + 1)
+                parse._f(subblock, getattr(self.keys, attrname), numVals + 1)
                 self.isEmpty = False
             elif label in (attr.lower() for attr in self.EMITTER_KEY_TYPE.keys()) or \
                  label in (attr.lower() + "key" for attr in self.EMITTER_KEY_TYPE.keys()) or \
@@ -441,9 +443,9 @@ class Node():
                     subblock = [[0.0] + line[1:]]
                 # parse numvals plus one for time
                 if "conversion" in attr_type and attr_type["conversion"] is int:
-                    kb_parse._i(subblock, getattr(self.keys, propname), numVals + 1)
+                    parse._i(subblock, getattr(self.keys, propname), numVals + 1)
                 else:
-                    kb_parse._f(subblock, getattr(self.keys, propname), numVals + 1)
+                    parse._f(subblock, getattr(self.keys, propname), numVals + 1)
                 self.isEmpty = False
             # Some unknown text.
             # Probably keys for emitters = incompatible with blender. Import as text.
@@ -735,10 +737,6 @@ class Node():
         self.add_keys_to_ascii(animObj, originalObj, asciiLines)
         self.add_keys_to_ascii_incompat(animObj, asciiLines)
         asciiLines.append("  endnode")
-
-import copy
-
-from . import kb_node
 
 
 class Animnode():
