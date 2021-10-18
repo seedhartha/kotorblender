@@ -2,7 +2,7 @@ import math
 
 import bpy
 
-from ... import kb_utils
+from ... import utils
 
 
 class KB_OT_anim_scale(bpy.types.Operator):
@@ -19,7 +19,7 @@ class KB_OT_anim_scale(bpy.types.Operator):
     @classmethod
     def poll(cls, context):
         """Prevent execution if no rootdummy was found."""
-        mdl_base = kb_utils.get_mdl_root_from_object(context.object)
+        mdl_base = utils.get_mdl_root_from_object(context.object)
         if mdl_base is not None:
             return (len(mdl_base.nvb.animList) > 0)
         return False
@@ -72,8 +72,8 @@ class KB_OT_anim_scale(bpy.types.Operator):
                 self.scale_frames_down(target, animStart, animEnd, scaleFactor)
 
     def execute(self, context):
-        mdl_base = kb_utils.get_mdl_root_from_object(context.object)
-        if not kb_utils.check_anim_bounds(mdl_base):
+        mdl_base = utils.get_mdl_root_from_object(context.object)
+        if not utils.check_anim_bounds(mdl_base):
             self.report({'INFO'}, "Error: Nested animations.")
             return {'CANCELLED'}
         anim = mdl_base.nvb.animList[mdl_base.nvb.animListIdx]
@@ -88,7 +88,7 @@ class KB_OT_anim_scale(bpy.types.Operator):
             return {'CANCELLED'}
         # Adjust keyframes
         obj_list = [mdl_base]
-        kb_utils.get_children_recursive(mdl_base, obj_list)
+        utils.get_children_recursive(mdl_base, obj_list)
         for obj in obj_list:
             # Adjust the objects animation
             self.scale_frames(obj, anim.frameStart,
@@ -119,7 +119,7 @@ class KB_OT_anim_scale(bpy.types.Operator):
             e.frame = (e.frame - anim.frameStart) * \
                 self.scaleFactor + anim.frameStart
         # Re-adjust the timeline to the new bounds
-        kb_utils.toggle_anim_focus(context.scene, mdl_base)
+        utils.toggle_anim_focus(context.scene, mdl_base)
         return {'FINISHED'}
 
     def draw(self, context):

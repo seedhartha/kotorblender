@@ -1,6 +1,6 @@
 import bpy
 
-from ... import (kb_def, kb_utils)
+from ... import (defines, utils)
 
 
 class KB_PT_emitter(bpy.types.Panel):
@@ -19,7 +19,7 @@ class KB_PT_emitter(bpy.types.Panel):
         try:
             return context.object and \
                    context.object.type == 'MESH' and \
-                   context.object.nvb.meshtype == kb_def.Meshtype.EMITTER
+                   context.object.nvb.meshtype == defines.Meshtype.EMITTER
         except:
             return False
 
@@ -39,16 +39,16 @@ class KB_PT_emitter(bpy.types.Panel):
         row = box.row()
         row.prop(obj.nvb, "render_emitter")
         if obj.nvb.update == "Lightning" or \
-           not kb_utils.is_null(obj.nvb.chunkName):
+           not utils.is_null(obj.nvb.chunkName):
             row.enabled = False
         row = box.row()
         row.prop(obj.nvb, "blend")
-        if not kb_utils.is_null(obj.nvb.chunkName):
+        if not utils.is_null(obj.nvb.chunkName):
             row.enabled = False
         row = box.row()
         row.prop(obj.nvb, "spawntype")
         if obj.nvb.update != "Fountain" or \
-           not kb_utils.is_null(obj.nvb.chunkName):
+           not utils.is_null(obj.nvb.chunkName):
             row.enabled = False
 
         box.separator()
@@ -204,11 +204,11 @@ class KB_PT_emitter(bpy.types.Panel):
         row.label(text="Texture / Chunk", icon='TEXTURE')
         row = box.row()
         row.prop(obj.nvb, "texture")
-        if not kb_utils.is_null(obj.nvb.chunkName):
+        if not utils.is_null(obj.nvb.chunkName):
             row.enabled = False
         row = box.row()
         row.prop(obj.nvb, "twosidedtex")
-        if not kb_utils.is_null(obj.nvb.chunkName):
+        if not utils.is_null(obj.nvb.chunkName):
             row.enabled = False
 
         box.separator()
@@ -219,7 +219,7 @@ class KB_PT_emitter(bpy.types.Panel):
         row.label(text="Grid")
         row.prop(obj.nvb, "xgrid", text="X")
         row.prop(obj.nvb, "ygrid", text="Y")
-        if not kb_utils.is_null(obj.nvb.chunkName):
+        if not utils.is_null(obj.nvb.chunkName):
             row.enabled = False
         row = box.row()
         row.prop(obj.nvb, "fps")

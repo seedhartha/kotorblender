@@ -1,7 +1,7 @@
 import bpy
 import bpy_extras
 
-from ... import kb_io
+from ... import io
 
 
 class KB_OT_import_mdl(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
@@ -67,4 +67,4 @@ class KB_OT_import_mdl(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
             options = {'HIDDEN'})
 
     def execute(self, context):
-        return kb_io.load_mdl(self, context, **self.as_keywords(ignore=("filter_glob",)))
+        return io.load_mdl(self, context, **self.as_keywords(ignore=("filter_glob",)))

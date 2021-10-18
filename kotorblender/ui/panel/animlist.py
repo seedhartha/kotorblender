@@ -1,6 +1,6 @@
 import bpy
 
-from ... import kb_utils
+from ... import utils
 
 
 class KB_PT_animlist(bpy.types.Panel):
@@ -19,12 +19,12 @@ class KB_PT_animlist(bpy.types.Panel):
     @classmethod
     def poll(cls, context):
         """Draw only if part of a valid mdl is selected."""
-        return kb_utils.is_root_dummy(context.object)
+        return utils.is_root_dummy(context.object)
 
     def draw(self, context):
         """Draw the panel."""
         layout = self.layout
-        mdl_base = kb_utils.get_mdl_root_from_object(context.object)
+        mdl_base = utils.get_mdl_root_from_object(context.object)
         if mdl_base:
             # Display and add/remove animations
             row = layout.row()

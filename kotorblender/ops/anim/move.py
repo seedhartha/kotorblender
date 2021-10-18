@@ -1,6 +1,6 @@
 import bpy
 
-from ... import kb_utils
+from ... import utils
 
 
 class KB_OT_anim_move(bpy.types.Operator):
@@ -16,14 +16,14 @@ class KB_OT_anim_move(bpy.types.Operator):
     @classmethod
     def poll(self, context):
         """Prevent execution if animation list has less than 2 elements."""
-        mdl_base = kb_utils.get_mdl_root_from_object(context.object)
+        mdl_base = utils.get_mdl_root_from_object(context.object)
         if mdl_base is not None:
             return (len(mdl_base.nvb.animList) > 1)
         return False
 
     def execute(self, context):
         """Move an item in the animation list."""
-        mdl_base = kb_utils.get_mdl_root_from_object(context.object)
+        mdl_base = utils.get_mdl_root_from_object(context.object)
         anim_list = mdl_base.nvb.animList
 
         currentIdx = mdl_base.nvb.animListIdx

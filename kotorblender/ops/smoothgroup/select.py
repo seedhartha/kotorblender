@@ -1,7 +1,7 @@
 import bmesh
 import bpy
 
-from ... import kb_def
+from ... import defines
 
 class KB_OT_select_smoothgroup(bpy.types.Operator):
     bl_idname = "kb.smoothgroup_select"
@@ -25,7 +25,7 @@ class KB_OT_select_smoothgroup(bpy.types.Operator):
         bm = bmesh.from_edit_mesh(context.object.data)
         bm.faces.ensure_lookup_table()
         # the smoothgroup data layer
-        sg_layer = bm.faces.layers.int.get(kb_def.sg_layer_name)
+        sg_layer = bm.faces.layers.int.get(defines.sg_layer_name)
         # convert sg_number to actual sg bitflag value
         sg_value = pow(2, self.sg_number)
 

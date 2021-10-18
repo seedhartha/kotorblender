@@ -1,6 +1,6 @@
 import bpy
 
-from .. import (kb_def, kb_utils)
+from .. import (defines, utils)
 
 
 class KB_OT_render_minimap(bpy.types.Operator):
@@ -15,8 +15,8 @@ class KB_OT_render_minimap(bpy.types.Operator):
         obj   = context.object
         scene = bpy.context.scene
         if obj and (obj.type == 'EMPTY'):
-            if (obj.nvb.dummytype == kb_def.Dummytype.MDLROOT):
-                kb_utils.setup_minimap_render(obj, scene)
+            if (obj.nvb.dummytype == defines.Dummytype.MDLROOT):
+                utils.setup_minimap_render(obj, scene)
                 bpy.ops.render.render(use_viewport = True)
 
                 self.report({'INFO'}, "Ready to render")

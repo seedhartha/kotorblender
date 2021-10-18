@@ -1,6 +1,6 @@
 import bpy
 
-from .. import kb_def
+from .. import defines
 
 
 class FlarePropertyGroup(bpy.types.PropertyGroup):
@@ -10,7 +10,7 @@ class FlarePropertyGroup(bpy.types.PropertyGroup):
 
     texture : bpy.props.StringProperty(name = "Texture",
                                        description = "Texture name",
-                                       default = kb_def.null)
+                                       default = defines.null)
     size : bpy.props.FloatProperty(name = "Size",
                                  description = "Flare size",
                                  default = 1)

@@ -1,6 +1,6 @@
 import bpy
 
-from ... import kb_utils
+from ... import utils
 
 
 class KB_OT_anim_new(bpy.types.Operator):
@@ -12,13 +12,13 @@ class KB_OT_anim_new(bpy.types.Operator):
     @classmethod
     def poll(self, context):
         """Prevent execution if no object is selected."""
-        mdl_base = kb_utils.get_mdl_root_from_object(context.object)
+        mdl_base = utils.get_mdl_root_from_object(context.object)
         return (mdl_base is not None)
 
     def execute(self, context):
         """Create the animation"""
-        mdl_base = kb_utils.get_mdl_root_from_object(context.object)
-        anim = kb_utils.create_anim_list_item(mdl_base, True)
+        mdl_base = utils.get_mdl_root_from_object(context.object)
+        anim = utils.create_anim_list_item(mdl_base, True)
         anim.root_obj = mdl_base.name
         # Create an unique name
         name_list = [an.name for an in mdl_base.nvb.animList]

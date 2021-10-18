@@ -1,6 +1,6 @@
 import bpy
 
-from ... import kb_utils
+from ... import utils
 
 
 class KB_OT_anim_pad(bpy.types.Operator):
@@ -20,7 +20,7 @@ class KB_OT_anim_pad(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        mdl_base = kb_utils.get_mdl_root_from_object(context.object)
+        mdl_base = utils.get_mdl_root_from_object(context.object)
         if mdl_base is not None:
             return (len(mdl_base.nvb.animList) > 0)
         return False
@@ -40,8 +40,8 @@ class KB_OT_anim_pad(bpy.types.Operator):
                 fcurve.update()
 
     def execute(self, context):
-        mdl_base = kb_utils.get_mdl_root_from_object(context.object)
-        if not kb_utils.check_anim_bounds(mdl_base):
+        mdl_base = utils.get_mdl_root_from_object(context.object)
+        if not utils.check_anim_bounds(mdl_base):
             self.report({'INFO'}, "Failure: Convoluted animations.")
             return {'CANCELLED'}
         anim = mdl_base.nvb.animList[mdl_base.nvb.animListIdx]
@@ -53,7 +53,7 @@ class KB_OT_anim_pad(bpy.types.Operator):
             return {'CANCELLED'}
         # Pad keyframes
         obj_list = [mdl_base]
-        kb_utils.get_children_recursive(mdl_base, obj_list)
+        utils.get_children_recursive(mdl_base, obj_list)
         for obj in obj_list:
             # Objects animation
             self.pad_frames(obj, frame_start, frame_end)
@@ -77,7 +77,7 @@ class KB_OT_anim_pad(bpy.types.Operator):
         for ev in anim.eventList:
             ev.frame += self.pad_front
         # Re-adjust the timeline to the new bounds
-        kb_utils.toggle_anim_focus(context.scene, mdl_base)
+        utils.toggle_anim_focus(context.scene, mdl_base)
         return {'FINISHED'}
 
     def draw(self, context):

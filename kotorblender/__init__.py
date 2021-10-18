@@ -34,6 +34,7 @@ bl_info = {
 
 if 'bpy' in locals():
     from importlib import reload
+    reload(aabb)
     reload(addpathconnectionop)
     reload(addskingroupop)
     reload(animeventprops)
@@ -42,6 +43,7 @@ if 'bpy' in locals():
     reload(animlistspecialsmenu)
     reload(animprops)
     reload(animslist)
+    reload(armature)
     reload(asciianim)
     reload(asciianimnode)
     reload(asciimdl)
@@ -52,6 +54,7 @@ if 'bpy' in locals():
     reload(childrensmoothgroupop)
     reload(cloneanimop)
     reload(cropanimop)
+    reload(defines)
     reload(deleteanimeventop)
     reload(deleteanimop)
     reload(deletelightflareop)
@@ -65,26 +68,21 @@ if 'bpy' in locals():
     reload(generatesmoothgroupop)
     reload(gffloader)
     reload(gffsaver)
+    reload(glob)
     reload(importlytop)
     reload(importmdlop)
     reload(importpathop)
-    reload(kb_aabb)
-    reload(kb_armature)
-    reload(kb_def)
-    reload(kb_glob)
-    reload(kb_io)
-    reload(kb_light)
-    reload(kb_material)
-    reload(kb_minimap)
-    reload(kb_teximage)
-    reload(kb_utils)
+    reload(io)
+    reload(light)
     reload(lightflareslist)
     reload(lightpanel)
     reload(listitemprops)
     reload(loadwokmaterialsop)
+    reload(material)
     reload(mdlloader)
     reload(mdlsaver)
     reload(meshpanel)
+    reload(minimap)
     reload(moveanimeventop)
     reload(moveanimop)
     reload(movebackanimop)
@@ -104,6 +102,7 @@ if 'bpy' in locals():
     reload(scaleanimop)
     reload(selectsmoothgroupop)
     reload(smoothgroupspanel)
+    reload(teximage)
     reload(textureboxtxiop)
     reload(textureiotxiop)
     reload(textureopstxiop)
@@ -111,18 +110,19 @@ if 'bpy' in locals():
     reload(textureprops)
     reload(togglesmoothgroupop)
     reload(txiformat)
+    reload(utils)
 else:
     from . import (
-        kb_aabb,
-        kb_armature,
-        kb_def,
-        kb_glob,
-        kb_io,
-        kb_light,
-        kb_material,
-        kb_minimap,
-        kb_teximage,
-        kb_utils)
+        aabb,
+        armature,
+        defines,
+        glob,
+        io,
+        light,
+        material,
+        minimap,
+        teximage,
+        utils)
     from .format import (
         binreader,
         binwriter,
@@ -309,8 +309,8 @@ classes = (
 
 
 def register():
-    (_, kb_loaded) = addon_utils.check('neverblender')
-    if kb_loaded:
+    (_, loaded) = addon_utils.check('neverblender')
+    if loaded:
         raise Exception("Do not enable both KotorBlender and NeverBlender at the same time!")
 
     for cls in classes:

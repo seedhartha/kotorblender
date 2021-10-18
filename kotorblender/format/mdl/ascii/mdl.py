@@ -5,7 +5,7 @@ from datetime import datetime
 
 import bpy
 
-from .... import kb_armature, kb_def, kb_glob, kb_utils
+from .... import armature, defines, glob, utils
 
 from . import (
     anim as mdlanim,
@@ -19,9 +19,9 @@ class Mdl():
         self.animDict      = dict() # No need to retain order
 
         self.name           = "UNNAMED"
-        self.supermodel     = kb_def.null
+        self.supermodel     = defines.null
         self.animscale      = 1.0
-        self.classification = kb_def.Classification.UNKNOWN
+        self.classification = defines.Classification.UNKNOWN
         self.unknownC1      = 0
         self.ignorefog      = False
         self.compress_quats = False
@@ -34,30 +34,30 @@ class Mdl():
 
     def load_ascii_node(self, asciiBlock):
         if asciiBlock is None:
-            raise kb_def.MalformedMdlFile("Empty Node")
+            raise defines.MalformedMdlFile("Empty Node")
 
         nodeType = ""
         try:
             nodeType = asciiBlock[0][1].lower()
         except (IndexError, AttributeError):
-            raise kb_def.MalformedMdlFile("Invalid node type")
+            raise defines.MalformedMdlFile("Invalid node type")
 
         switch = {
-            kb_def.Nodetype.DUMMY:      mdlnode.Dummy,
-            kb_def.Nodetype.PATCH:      mdlnode.Patch,
-            kb_def.Nodetype.REFERENCE:  mdlnode.Reference,
-            kb_def.Nodetype.TRIMESH:    mdlnode.Trimesh,
-            kb_def.Nodetype.DANGLYMESH: mdlnode.Danglymesh,
-            kb_def.Nodetype.LIGHTSABER: mdlnode.Lightsaber,
-            kb_def.Nodetype.SKIN:       mdlnode.Skinmesh,
-            kb_def.Nodetype.EMITTER:    mdlnode.Emitter,
-            kb_def.Nodetype.LIGHT:      mdlnode.Light,
-            kb_def.Nodetype.AABB:       mdlnode.Aabb
+            defines.Nodetype.DUMMY:      mdlnode.Dummy,
+            defines.Nodetype.PATCH:      mdlnode.Patch,
+            defines.Nodetype.REFERENCE:  mdlnode.Reference,
+            defines.Nodetype.TRIMESH:    mdlnode.Trimesh,
+            defines.Nodetype.DANGLYMESH: mdlnode.Danglymesh,
+            defines.Nodetype.LIGHTSABER: mdlnode.Lightsaber,
+            defines.Nodetype.SKIN:       mdlnode.Skinmesh,
+            defines.Nodetype.EMITTER:    mdlnode.Emitter,
+            defines.Nodetype.LIGHT:      mdlnode.Light,
+            defines.Nodetype.AABB:       mdlnode.Aabb
         }
         try:
             node = switch[nodeType]()
         except KeyError:
-            raise kb_def.MalformedMdlFile("Invalid node type")
+            raise defines.MalformedMdlFile("Invalid node type")
 
         # tell the node if it is part of a walkmesh (mdl is default)
         if isinstance(self, Xwk):
@@ -94,7 +94,7 @@ class Mdl():
     def import_to_collection(self, collection, wkm, position = (0.0, 0.0, 0.0)):
         mdl_root = None
         objIdx = 0
-        if (kb_glob.importGeometry) and self.nodeDict:
+        if (glob.importGeometry) and self.nodeDict:
             it = iter(self.nodeDict.items())
 
             # The first node should be the rootdummy.
@@ -102,10 +102,10 @@ class Mdl():
             # even try to import the mdl
             (_, node) = next(it)
             if (type(node) == mdlnode.Dummy) and \
-               (kb_utils.is_null(node.parentName)):
+               (utils.is_null(node.parentName)):
                 obj                    = node.add_to_collection(collection)
                 obj.location           = position
-                obj.nvb.dummytype      = kb_def.Dummytype.MDLROOT
+                obj.nvb.dummytype      = defines.Dummytype.MDLROOT
                 obj.nvb.supermodel     = self.supermodel
                 obj.nvb.classification = self.classification
                 obj.nvb.unknownC1      = self.unknownC1
@@ -118,7 +118,7 @@ class Mdl():
                 obj.nvb.imporder = objIdx
                 objIdx += 1
             else:
-                raise kb_def.MalformedMdlFile("First node has to be a dummy without a parent.")
+                raise defines.MalformedMdlFile("First node has to be a dummy without a parent.")
 
             for (_, node) in it:
                 obj = node.add_to_collection(collection)
@@ -130,18 +130,18 @@ class Mdl():
                     node.lytposition = self.lytposition
                     obj.nvb.lytposition = self.lytposition
 
-                if (kb_utils.is_null(node.parentName)):
+                if (utils.is_null(node.parentName)):
                     # Node without parent and not the mdl root.
-                    raise kb_def.MalformedMdlFile(node.name + " has no parent.")
+                    raise defines.MalformedMdlFile(node.name + " has no parent.")
                 else:
                     # Check if such an object exists
                     if obj.parent is not None:
                         print("WARNING: Node already parented: {}".format(obj.name))
                         pass
                     elif mdl_root and node.parentName in bpy.data.objects and \
-                         kb_utils.ancestor_node(
+                         utils.ancestor_node(
                              bpy.data.objects[node.parentName],
-                             kb_utils.is_root_dummy
+                             utils.is_root_dummy
                          ).name == mdl_root.name:
                         # parent named node exists and is in our model
                         obj.parent = bpy.data.objects[node.parentName]
@@ -158,9 +158,9 @@ class Mdl():
                         found = False
                         for altname in [node.parentName + ".{:03d}".format(i) for i in range(1,30)]:
                             if altname in bpy.data.objects and \
-                               kb_utils.ancestor_node(
+                               utils.ancestor_node(
                                    bpy.data.objects[altname],
-                                   kb_utils.is_root_dummy
+                                   utils.is_root_dummy
                                ).name == mdl_root.name:
                                 # parent node in our model exists with suffix
                                 obj.parent = bpy.data.objects[altname]
@@ -169,18 +169,18 @@ class Mdl():
                                 break
                         # Node with invalid parent.
                         if not found:
-                            raise kb_def.MalformedMdlFile(node.name + " has no parent " + node.parentName)
+                            raise defines.MalformedMdlFile(node.name + " has no parent " + node.parentName)
 
         # Import the walkmesh, it will use any placeholder dummies just imported,
         # and the walkmesh nodes will be copied during animation import
-        if (kb_glob.importWalkmesh) and not wkm is None and wkm.walkmeshType != "wok":
+        if (glob.importWalkmesh) and not wkm is None and wkm.walkmeshType != "wok":
             wkm.import_to_collection(collection)
 
         # Attempt to import animations
         # Search for the MDL root if not already present
         if not mdl_root:
             for obj in collection.objects:
-                if kb_utils.is_root_dummy(obj, kb_def.Dummytype.MDLROOT):
+                if utils.is_root_dummy(obj, defines.Dummytype.MDLROOT):
                     mdl_root = obj
                     break
             # Still none ? Don't try to import anims then
@@ -188,11 +188,11 @@ class Mdl():
                 return
 
         armature_object = None
-        if kb_glob.createArmature:
-            armature_object = kb_armature.recreate_armature(mdl_root)
+        if glob.createArmature:
+            armature_object = armature.recreate_armature(mdl_root)
         else:
             # When armature creation is disabled, see if the MDL root already has an armature and use that
-            skinmeshes = kb_utils.search_node_all(mdl_root, lambda o: o.nvb.meshtype == kb_def.Meshtype.SKIN)
+            skinmeshes = utils.search_node_all(mdl_root, lambda o: o.nvb.meshtype == defines.Meshtype.SKIN)
             for skinmesh in skinmeshes:
                 for modifier in skinmesh.modifiers:
                     if modifier.type == 'ARMATURE':
@@ -213,7 +213,7 @@ class Mdl():
         for a in anims:
             a.add_to_objects(mdl_root)
         if armature_object:
-            kb_armature.create_armature_animations(mdl_root, armature_object)
+            armature.create_armature_animations(mdl_root, armature_object)
 
     def load_ascii(self, ascii_block):
         geom_start = ascii_block.find("node ")
@@ -221,16 +221,16 @@ class Mdl():
         geom_end   = ascii_block.find("endmodelgeom ")
 
         if (anim_start > 0) and (geom_start > anim_start):
-            raise kb_def.MalformedMdlFile("Animations before geometry")
+            raise defines.MalformedMdlFile("Animations before geometry")
         if (geom_start < 0):
-            raise kb_def.MalformedMdlFile("Unable to find geometry")
+            raise defines.MalformedMdlFile("Unable to find geometry")
 
         self.read_ascii_header(ascii_block[:geom_start-1])
         # Import Geometry
         self.read_ascii_geom(ascii_block[geom_start:geom_end],
                             self.mdlnodes)
         # Import Animations
-        if kb_glob.importAnim and (anim_start > 0):
+        if glob.importAnim and (anim_start > 0):
             self.read_ascii_anims(ascii_block[anim_start:])
 
     def read_ascii_anims(self, ascii_block):
@@ -254,11 +254,11 @@ class Mdl():
             try:  # Read node type
                 ascii_lines[0][1].lower()
             except (IndexError, AttributeError):
-                raise kb_def.MalformedMdlFile("Unable to read node type")
+                raise defines.MalformedMdlFile("Unable to read node type")
             try:  # Read node name
                 ascii_lines[0][2].lower()
             except (IndexError, AttributeError):
-                raise kb_def.MalformedMdlFile("Unable to read node name")
+                raise defines.MalformedMdlFile("Unable to read node name")
             self.load_ascii_node(ascii_lines)
             nodelist.append(node)
 
@@ -287,9 +287,9 @@ class Mdl():
                     print("KotorBlender: WARNING - unable to read \
                            classification. \
                            Using Default value " + self.classification)
-                if self.classification not in kb_def.Classification.ALL:
+                if self.classification not in defines.Classification.ALL:
                     print("KotorBlender: WARNING - invalid classification '{}'".format(self.classification))
-                    self.classification = kb_def.Classification.UNKNOWN
+                    self.classification = defines.Classification.UNKNOWN
             elif label == "classification_unk1":
                 try:
                     self.unknownC1 = int(line[1])
@@ -321,7 +321,7 @@ class Mdl():
                 self.lytposition = [float(x) for x in line[1:]]
 
     def geometry_to_ascii(self, bObject, asciiLines, simple = False, nameDict = None):
-        nodeType = kb_utils.get_node_type(bObject)
+        nodeType = utils.get_node_type(bObject)
         switch = {"dummy":      mdlnode.Dummy,
                   "patch":      mdlnode.Patch,
                   "reference":  mdlnode.Reference,
@@ -334,7 +334,7 @@ class Mdl():
         try:
             node = switch[nodeType]()
         except KeyError:
-            raise kb_def.MalformedMdlFile("Invalid node type")
+            raise defines.MalformedMdlFile("Invalid node type")
 
         node.to_ascii(bObject, asciiLines, self.classification, simple, nameDict=nameDict)
 
@@ -367,7 +367,7 @@ class Mdl():
         # construct a name map that points any NAME.00n names to their base name,
         # needed for model and node names as well as parent node references
         object_name_map = {}
-        all_nodes = kb_utils.search_node_all(rootDummy, bool)
+        all_nodes = utils.search_node_all(rootDummy, bool)
         for node in all_nodes:
             match = re.match(r'^(.+)\.\d\d\d$', node.name)
             if match:
@@ -414,7 +414,7 @@ class Mdl():
         asciiLines.append("setanimationscale " + str(round(self.animscale, 7)))
         # Geometry
         asciiLines.append("beginmodelgeom " + self.name)
-        aabb = kb_utils.search_node(rootDummy, lambda x: x.nvb.meshtype == kb_def.Meshtype.AABB)
+        aabb = utils.search_node(rootDummy, lambda x: x.nvb.meshtype == defines.Meshtype.AABB)
         if aabb is not None and aabb.nvb.lytposition != (0.0, 0.0, 0.0):
             lytposition = (aabb.nvb.lytposition[0],
                            aabb.nvb.lytposition[1],
@@ -462,7 +462,7 @@ class Xwk(Mdl):
                     blockStart = -1
                 else:
                     # "endnode" before "node"
-                    raise kb_def.MalformedMdlFile("Unexpected 'endnode' at line " + str(idx))
+                    raise defines.MalformedMdlFile("Unexpected 'endnode' at line " + str(idx))
 
     def generate_ascii(self, asciiLines, rootDummy, exports = {"ANIMATION", "WALKMESH"}):
         self.name = rootDummy.name
@@ -495,12 +495,12 @@ class Xwk(Mdl):
                     nameList.append(node.parentName)
             self.name = nameList[0]
 
-            if self.name in collection.objects and bpy.data.objects[self.name].nvb.dummytype != kb_def.Dummytype.MDLROOT:
+            if self.name in collection.objects and bpy.data.objects[self.name].nvb.dummytype != defines.Dummytype.MDLROOT:
                 node = bpy.data.objects[self.name].nvb
                 if self.walkmeshType == "dwk":
-                    node.dummytype = kb_def.Dummytype.DWKROOT
+                    node.dummytype = defines.Dummytype.DWKROOT
                 else:
-                    node.dummytype = kb_def.Dummytype.PWKROOT
+                    node.dummytype = defines.Dummytype.PWKROOT
                 rootdummy = bpy.data.objects[self.name]
             else:
                 mdl_name = self.name
@@ -511,30 +511,30 @@ class Xwk(Mdl):
                     mdl_name = mdl_name[0:-4]
                 node = mdlnode.Dummy(wkm_name)
                 if self.walkmeshType == "dwk":
-                    node.dummytype = kb_def.Dummytype.DWKROOT
+                    node.dummytype = defines.Dummytype.DWKROOT
                 else:
-                    node.dummytype = kb_def.Dummytype.PWKROOT
+                    node.dummytype = defines.Dummytype.PWKROOT
                 node.name = wkm_name
                 rootdummy = node.add_to_collection(collection)
                 if mdl_name in bpy.data.objects:
                     rootdummy.parent = bpy.data.objects[mdl_name]
                 else:
                     pass
-            mdlroot = kb_utils.ancestor_node(rootdummy, lambda o: o.nvb.dummytype == kb_def.Dummytype.MDLROOT)
+            mdlroot = utils.ancestor_node(rootdummy, lambda o: o.nvb.dummytype == defines.Dummytype.MDLROOT)
             if mdlroot is None and rootdummy.parent:
                 mdlroot = rootdummy.parent
             if self.walkmeshType == "dwk":
-                dp_open1 = kb_utils.search_node(mdlroot, lambda o: "dwk_dp" in o.name.lower() and o.name.lower().endswith("open1_01"))
-                dp_open2 = kb_utils.search_node(mdlroot, lambda o: "dwk_dp" in o.name.lower() and o.name.lower().endswith("open2_01"))
-                dp_closed01 = kb_utils.search_node(mdlroot, lambda o: "dwk_dp" in o.name.lower() and o.name.lower().endswith("closed_01"))
-                dp_closed02 = kb_utils.search_node(mdlroot, lambda o: "dwk_dp" in o.name.lower() and o.name.lower().endswith("closed_02"))
-                wg_open1 = kb_utils.search_node(mdlroot, lambda o: "dwk_wg" in o.name.lower() and o.name.lower().endswith("open1"))
-                wg_open2 = kb_utils.search_node(mdlroot, lambda o: "dwk_wg" in o.name.lower() and o.name.lower().endswith("open2"))
-                wg_closed = kb_utils.search_node(mdlroot, lambda o: "dwk_wg" in o.name.lower() and o.name.lower().endswith("closed"))
+                dp_open1 = utils.search_node(mdlroot, lambda o: "dwk_dp" in o.name.lower() and o.name.lower().endswith("open1_01"))
+                dp_open2 = utils.search_node(mdlroot, lambda o: "dwk_dp" in o.name.lower() and o.name.lower().endswith("open2_01"))
+                dp_closed01 = utils.search_node(mdlroot, lambda o: "dwk_dp" in o.name.lower() and o.name.lower().endswith("closed_01"))
+                dp_closed02 = utils.search_node(mdlroot, lambda o: "dwk_dp" in o.name.lower() and o.name.lower().endswith("closed_02"))
+                wg_open1 = utils.search_node(mdlroot, lambda o: "dwk_wg" in o.name.lower() and o.name.lower().endswith("open1"))
+                wg_open2 = utils.search_node(mdlroot, lambda o: "dwk_wg" in o.name.lower() and o.name.lower().endswith("open2"))
+                wg_closed = utils.search_node(mdlroot, lambda o: "dwk_wg" in o.name.lower() and o.name.lower().endswith("closed"))
             if self.walkmeshType == "pwk":
-                pwk_wg = kb_utils.search_node(mdlroot, lambda o: o.name.lower().endswith("_wg"))
-                pwk_use01 = kb_utils.search_node(mdlroot, lambda o: o.name.lower().endswith("pwk_use01"))
-                pwk_use02 = kb_utils.search_node(mdlroot, lambda o: o.name.lower().endswith("pwk_use02"))
+                pwk_wg = utils.search_node(mdlroot, lambda o: o.name.lower().endswith("_wg"))
+                pwk_use01 = utils.search_node(mdlroot, lambda o: o.name.lower().endswith("pwk_use01"))
+                pwk_use02 = utils.search_node(mdlroot, lambda o: o.name.lower().endswith("pwk_use02"))
 
             for (_, node) in self.nodeDict.items():
                 # the node names may only be recorded in the MDL,
@@ -568,12 +568,12 @@ class Xwk(Mdl):
                 obj = node.add_to_collection(collection)
                 # Check if such an object exists
                 if node.parentName.lower() in [k.lower() for k in bpy.data.objects.keys()]:
-                    parent_name = kb_utils.get_real_name(node.parentName)
+                    parent_name = utils.get_real_name(node.parentName)
                     obj.parent = bpy.data.objects[parent_name]
                     obj.matrix_parent_inverse = obj.parent.matrix_world.inverted()
                 else:
                     # Node with invalid parent.
-                    raise kb_def.MalformedMdlFile(node.name + " has no parent " + node.parentName)
+                    raise defines.MalformedMdlFile(node.name + " has no parent " + node.parentName)
 
 
 class Wok(Xwk):
@@ -581,10 +581,10 @@ class Wok(Xwk):
         self.nodeDict       = collections.OrderedDict()
         self.name           = name
         self.walkmeshType   = "wok"
-        self.classification = kb_def.Classification.UNKNOWN
+        self.classification = defines.Classification.UNKNOWN
 
     def geometry_to_ascii(self, bObject, asciiLines, simple):
-        nodeType = kb_utils.get_node_type(bObject)
+        nodeType = utils.get_node_type(bObject)
         if nodeType == "aabb":
             node = mdlnode.Aabb()
             node.roottype = "wok"

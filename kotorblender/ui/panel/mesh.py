@@ -1,6 +1,6 @@
 import bpy
 
-from ... import kb_def
+from ... import defines
 
 
 class KB_PT_mesh(bpy.types.Panel):
@@ -20,7 +20,7 @@ class KB_PT_mesh(bpy.types.Panel):
     def poll(cls, context):
         return (context.object and \
                 context.object.type == 'MESH' and \
-                context.object.nvb.meshtype != kb_def.Meshtype.EMITTER)
+                context.object.nvb.meshtype != defines.Meshtype.EMITTER)
 
     def draw(self, context):
         obj      = context.object
@@ -31,7 +31,7 @@ class KB_PT_mesh(bpy.types.Panel):
 
         layout.separator()
 
-        if (obj.nvb.meshtype == kb_def.Meshtype.EMITTER):
+        if (obj.nvb.meshtype == defines.Meshtype.EMITTER):
             row = layout.row()
             box = row.box()
 
@@ -99,7 +99,7 @@ class KB_PT_mesh(bpy.types.Panel):
             row.prop(obj.nvb, "smoothgroup", text="Smooth Group", expand = True)
 
             # Additional props for danglymeshes
-            if (obj.nvb.meshtype == kb_def.Meshtype.DANGLYMESH):
+            if (obj.nvb.meshtype == defines.Meshtype.DANGLYMESH):
                 layout.separator()
 
                 row = layout.row()
@@ -116,7 +116,7 @@ class KB_PT_mesh(bpy.types.Panel):
                 row.prop(obj.nvb, "displacement", text="Displacement")
 
             # Additional props for skins
-            elif (obj.nvb.meshtype == kb_def.Meshtype.SKIN):
+            elif (obj.nvb.meshtype == defines.Meshtype.SKIN):
                 layout.separator()
 
                 row = layout.row()
@@ -128,7 +128,7 @@ class KB_PT_mesh(bpy.types.Panel):
                 row.operator("kb.skingroup_add", text = "", icon='ADD')
 
             # Additional props for aabb walkmeshes
-            elif (obj.nvb.meshtype == kb_def.Meshtype.AABB):
+            elif (obj.nvb.meshtype == defines.Meshtype.AABB):
                 layout.separator()
 
                 row = layout.row()

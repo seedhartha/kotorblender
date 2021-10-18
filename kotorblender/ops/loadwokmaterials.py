@@ -1,6 +1,6 @@
 import bpy
 
-from .. import kb_def
+from .. import defines
 
 
 class KB_OT_load_wok_materials(bpy.types.Operator):
@@ -25,7 +25,7 @@ class KB_OT_load_wok_materials(bpy.types.Operator):
                 bpy.ops.object.material_slot_remove()
 
             # Create materials
-            for matDef in kb_def.wok_materials:
+            for matDef in defines.wok_materials:
                 matName = matDef[0]
 
                 # Walkmesh materials should be shared across multiple

@@ -1,6 +1,6 @@
 import bpy
 
-from ... import kb_utils
+from ... import utils
 
 
 class KB_OT_anim_clone(bpy.types.Operator):
@@ -12,7 +12,7 @@ class KB_OT_anim_clone(bpy.types.Operator):
     @classmethod
     def poll(cls, context):
         """Prevent execution if no rootdummy was found."""
-        mdl_base = kb_utils.get_mdl_root_from_object(context.object)
+        mdl_base = utils.get_mdl_root_from_object(context.object)
         if mdl_base is not None:
             return (len(mdl_base.nvb.animList) > 0)
         return False
@@ -41,12 +41,12 @@ class KB_OT_anim_clone(bpy.types.Operator):
 
     def execute(self, context):
         """Clone the animation."""
-        mdl_base = kb_utils.get_mdl_root_from_object(context.object)
+        mdl_base = utils.get_mdl_root_from_object(context.object)
         source_anim = mdl_base.nvb.animList[mdl_base.nvb.animListIdx]
         animStart = source_anim.frameStart
         animEnd = source_anim.frameEnd
         # Adds a new animation to the end of the list
-        cloned_anim = kb_utils.create_anim_list_item(mdl_base, True)
+        cloned_anim = utils.create_anim_list_item(mdl_base, True)
         # Copy data
         cloned_anim.frameEnd = cloned_anim.frameStart + (animEnd - animStart)
         cloned_anim.transtime = source_anim.transtime
@@ -56,7 +56,7 @@ class KB_OT_anim_clone(bpy.types.Operator):
         self.clone_events(source_anim, cloned_anim)
         # Copy keyframes
         obj_list = [mdl_base]
-        kb_utils.get_children_recursive(mdl_base, obj_list)
+        utils.get_children_recursive(mdl_base, obj_list)
         for obj in obj_list:
             # Object keyframes
             self.clone_frames(obj, animStart, animEnd, cloned_anim.frameStart)

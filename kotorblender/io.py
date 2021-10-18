@@ -5,7 +5,7 @@ import bpy
 
 from .format.mdl.ascii import (mdl as mdlformat)
 
-from . import kb_def, kb_glob, kb_utils
+from . import defines, glob, utils
 
 
 def _load_mdl(filepath, position = (0.0, 0.0, 0.0)):
@@ -14,7 +14,7 @@ def _load_mdl(filepath, position = (0.0, 0.0, 0.0)):
     # Try to load walkmeshes ... pwk (placeable) and dwk (door)
     # If the files are and the option is activated we'll import them
     wkm = None
-    if kb_glob.importWalkmesh:
+    if glob.importWalkmesh:
         filetypes = ["pwk", "dwk", "wok"]
         (wkmPath, wkmFilename) = os.path.split(filepath)
         using_extra_extension = False
@@ -98,16 +98,16 @@ def load_mdl(operator,
     """
     Called from blender ui
     """
-    kb_glob.importGeometry = importGeometry
-    kb_glob.importWalkmesh = importWalkmesh
-    kb_glob.importSmoothGroups = importSmoothGroups
-    kb_glob.importMaterials = importMaterials
-    kb_glob.importAnim = importAnim
-    kb_glob.texturePath = os.path.dirname(filepath)
-    kb_glob.textureSearch = textureSearch
-    kb_glob.createArmature = createArmature
-    kb_glob.minimapMode = minimapMode
-    kb_glob.minimapSkipFade = minimapSkipFade
+    glob.importGeometry = importGeometry
+    glob.importWalkmesh = importWalkmesh
+    glob.importSmoothGroups = importSmoothGroups
+    glob.importMaterials = importMaterials
+    glob.importAnim = importAnim
+    glob.texturePath = os.path.dirname(filepath)
+    glob.textureSearch = textureSearch
+    glob.createArmature = createArmature
+    glob.minimapMode = minimapMode
+    glob.minimapSkipFade = minimapSkipFade
 
     _load_mdl(filepath)
 
@@ -163,13 +163,13 @@ def load_lyt(operator,
     """
     Called from blender ui
     """
-    kb_glob.importGeometry = importGeometry
-    kb_glob.importWalkmesh = importWalkmesh
-    kb_glob.importSmoothGroups = importSmoothGroups
-    kb_glob.importMaterials = importMaterials
-    kb_glob.importAnim = importAnim
-    kb_glob.texturePath = os.path.dirname(filepath)
-    kb_glob.textureSearch = textureSearch
+    glob.importGeometry = importGeometry
+    glob.importWalkmesh = importWalkmesh
+    glob.importSmoothGroups = importSmoothGroups
+    glob.importMaterials = importMaterials
+    glob.importAnim = importAnim
+    glob.texturePath = os.path.dirname(filepath)
+    glob.textureSearch = textureSearch
 
     _load_lyt(filepath)
 
@@ -186,9 +186,9 @@ def save_mdl(operator,
     """
     Called from blender ui
     """
-    kb_glob.exports            = exports
-    kb_glob.exportSmoothGroups = exportSmoothGroups
-    kb_glob.applyModifiers     = applyModifiers
+    glob.exports            = exports
+    glob.exportSmoothGroups = exportSmoothGroups
+    glob.applyModifiers     = applyModifiers
     # temporary forced options:
     frame_set_zero              = True
 
@@ -201,7 +201,7 @@ def save_mdl(operator,
         frame_set_current = bpy.context.scene.frame_current
         bpy.context.scene.frame_set(0)
 
-    mdlRoot = kb_utils.get_mdl_root_from_context()
+    mdlRoot = utils.get_mdl_root_from_context()
     if mdlRoot:
         print("KotorBlender: Exporting " + mdlRoot.name)
         mdl = mdlformat.Mdl()
@@ -212,7 +212,7 @@ def save_mdl(operator,
 
         if "WALKMESH" in exports:
             wkmRoot = None
-            aabb = kb_utils.search_node(mdlRoot, lambda x: x.nvb.meshtype == kb_def.Meshtype.AABB)
+            aabb = utils.search_node(mdlRoot, lambda x: x.nvb.meshtype == defines.Meshtype.AABB)
             if aabb is not None:
                 wkm     = mdlformat.Wok()
                 wkmRoot = aabb

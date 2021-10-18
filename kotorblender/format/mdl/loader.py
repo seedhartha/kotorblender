@@ -1,4 +1,4 @@
-from ...kb_def import MalformedMdlFile
+from ...defines import MalformedMdlFile
 
 from ..binreader import BinaryReader
 

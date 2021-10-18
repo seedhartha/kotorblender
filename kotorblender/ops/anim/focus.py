@@ -1,6 +1,6 @@
 import bpy
 
-from ... import kb_utils
+from ... import utils
 
 
 class KB_OT_anim_focus(bpy.types.Operator):
@@ -12,13 +12,13 @@ class KB_OT_anim_focus(bpy.types.Operator):
     @classmethod
     def poll(self, context):
         """Prevent execution if animation list is empty."""
-        mdl_base = kb_utils.get_mdl_root_from_object(context.object)
+        mdl_base = utils.get_mdl_root_from_object(context.object)
         if mdl_base is not None:
             return (len(mdl_base.nvb.animList) > 0)
         return False
 
     def execute(self, context):
         """Set the timeline to this animation."""
-        mdl_base = kb_utils.get_mdl_root_from_object(context.object)
-        kb_utils.toggle_anim_focus(context.scene, mdl_base)
+        mdl_base = utils.get_mdl_root_from_object(context.object)
+        utils.toggle_anim_focus(context.scene, mdl_base)
         return {'FINISHED'}
