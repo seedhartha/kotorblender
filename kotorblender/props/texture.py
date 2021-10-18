@@ -1,7 +1,7 @@
 import bpy
 from mathutils import Color
 
-from .. import kb_txi
+from ..format import txi as txiformat
 
 from .listitem import ListItemPropertyGroup
 
@@ -30,7 +30,7 @@ class TexturePropertyGroup(bpy.types.PropertyGroup):
         by testing against default values
         """
         self.modified_properties.clear()
-        for tok in kb_txi.tokens:
+        for tok in txiformat.tokens:
             attr_def = TexturePropertyGroup.__annotations__[tok][1]
             default_value = attr_def["default"]
             if tok == "specularcolor":

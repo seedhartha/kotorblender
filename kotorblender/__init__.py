@@ -77,7 +77,6 @@ if 'bpy' in locals():
     reload(kb_material)
     reload(kb_minimap)
     reload(kb_teximage)
-    reload(kb_txi)
     reload(kb_utils)
     reload(lightflareslist)
     reload(lightpanel)
@@ -111,6 +110,7 @@ if 'bpy' in locals():
     reload(texturepanel)
     reload(textureprops)
     reload(togglesmoothgroupop)
+    reload(txiformat)
 else:
     from . import (
         kb_aabb,
@@ -122,11 +122,11 @@ else:
         kb_material,
         kb_minimap,
         kb_teximage,
-        kb_txi,
         kb_utils)
     from .format import (
         binreader,
-        binwriter)
+        binwriter,
+        txi as txiformat)
     from .format.gff import (
         loader as gffloader,
         saver as gffsaver)
