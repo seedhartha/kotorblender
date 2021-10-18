@@ -1,6 +1,6 @@
 import bpy
 
-from ... import kb_txi
+from ...format import txi as txiformat
 
 
 class KB_OT_texture_io(bpy.types.Operator):
@@ -16,7 +16,7 @@ class KB_OT_texture_io(bpy.types.Operator):
 
     def execute(self, context):
         if self.action == "SAVE":
-            kb_txi.save_txi(context.texture, self)
+            txiformat.save_txi(context.texture, self)
         else:
-            kb_txi.load_txi(context.texture, self)
+            txiformat.load_txi(context.texture, self)
         return {'FINISHED'}

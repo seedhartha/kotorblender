@@ -6,7 +6,9 @@ import bpy
 
 from bpy_extras import image_utils
 
-from . import kb_glob, kb_txi
+from .format import txi as txiformat
+
+from . import kb_glob
 
 
 def _create_image(name, path):
@@ -43,6 +45,6 @@ def load_texture_image(name):
         texture = bpy.data.textures.new(name, type='IMAGE')
         texture.image = image
         texture.use_fake_user = True
-        kb_txi.load_txi(texture)
+        txiformat.load_txi(texture)
 
     return texture.image
