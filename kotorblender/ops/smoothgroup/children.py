@@ -1,6 +1,6 @@
 import bpy
 
-from ... import kb_utils
+from ... import utils
 
 
 class KB_OT_children_smoothgroup(bpy.types.Operator):
@@ -11,7 +11,7 @@ class KB_OT_children_smoothgroup(bpy.types.Operator):
     action : bpy.props.StringProperty()
 
     def execute(self, context):
-        descendants = kb_utils.search_node_all(
+        descendants = utils.search_node_all(
             context.object, lambda o: o.type == 'MESH'
         )
         for d in descendants:

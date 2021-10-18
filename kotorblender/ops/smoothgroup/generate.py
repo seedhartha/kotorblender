@@ -1,6 +1,6 @@
 import bpy
 
-from ... import kb_def
+from ... import defines
 
 
 class KB_OT_generate_smoothgroup(bpy.types.Operator):
@@ -25,9 +25,9 @@ class KB_OT_generate_smoothgroup(bpy.types.Operator):
         mesh = ob.to_mesh(scene=context.scene, apply_modifiers=True, settings='RENDER')
 
         # get, or create, the smoothgroups data layer on the object mesh (not the copy)
-        sg_list = ob.data.polygon_layers_int.get(kb_def.sg_layer_name)
+        sg_list = ob.data.polygon_layers_int.get(defines.sg_layer_name)
         if sg_list is None:
-            sg_list = ob.data.polygon_layers_int.new(name=kb_def.sg_layer_name)
+            sg_list = ob.data.polygon_layers_int.new(name=defines.sg_layer_name)
 
         # make all the faces on mesh copy smooth,
         # allowing calc_smooth_groups to work

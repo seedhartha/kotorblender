@@ -1,7 +1,7 @@
 import bpy
 import bpy_extras
 
-from ... import kb_io
+from ... import io
 
 
 class KB_OT_import_lyt(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
@@ -49,4 +49,4 @@ class KB_OT_import_lyt(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
             default=False)
 
     def execute(self, context):
-        return kb_io.load_lyt(self, context, **self.as_keywords(ignore=("filter_glob",)))
+        return io.load_lyt(self, context, **self.as_keywords(ignore=("filter_glob",)))

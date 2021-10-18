@@ -1,6 +1,6 @@
 import bpy
 
-from ... import kb_utils
+from ... import utils
 
 
 class KB_OT_anim_delete(bpy.types.Operator):
@@ -12,7 +12,7 @@ class KB_OT_anim_delete(bpy.types.Operator):
     @classmethod
     def poll(self, context):
         """Prevent execution if animation list is empty."""
-        mdl_base = kb_utils.get_mdl_root_from_object(context.object)
+        mdl_base = utils.get_mdl_root_from_object(context.object)
         if mdl_base is not None:
             return (len(mdl_base.nvb.animList) > 0)
         return False
@@ -30,7 +30,7 @@ class KB_OT_anim_delete(bpy.types.Operator):
 
     def execute(self, context):
         """Delete the animation."""
-        mdl_base = kb_utils.get_mdl_root_from_object(context.object)
+        mdl_base = utils.get_mdl_root_from_object(context.object)
         anim_list = mdl_base.nvb.animList
         anim_list_idx = mdl_base.nvb.animListIdx
         anim = anim_list[anim_list_idx]
@@ -39,7 +39,7 @@ class KB_OT_anim_delete(bpy.types.Operator):
         frame_end = anim.frameEnd
         # Remove keyframes
         obj_list = [mdl_base]
-        kb_utils.get_children_recursive(mdl_base, obj_list)
+        utils.get_children_recursive(mdl_base, obj_list)
         for obj in obj_list:
             # Objects animation
             self.delete_frames(obj, frame_start, frame_end)

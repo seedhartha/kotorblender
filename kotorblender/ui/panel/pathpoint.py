@@ -1,6 +1,6 @@
 import bpy
 
-from ... import kb_utils
+from ... import utils
 
 
 class KB_PT_path_point(bpy.types.Panel):
@@ -11,7 +11,7 @@ class KB_PT_path_point(bpy.types.Panel):
 
     @classmethod
     def poll(cls, context):
-        return kb_utils.is_path_point(context.object)
+        return utils.is_path_point(context.object)
 
     def draw(self, context):
         row = self.layout.row()

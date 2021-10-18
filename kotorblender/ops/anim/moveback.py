@@ -2,7 +2,7 @@ import math
 
 import bpy
 
-from ... import (kb_def, kb_utils)
+from ... import (defines, utils)
 
 class KB_OT_anim_moveback(bpy.types.Operator):
     """Move an animation and its keyframes to the end of the animation list"""
@@ -13,7 +13,7 @@ class KB_OT_anim_moveback(bpy.types.Operator):
     @classmethod
     def poll(self, context):
         """Prevent execution if animation list is empty."""
-        mdl_base = kb_utils.get_mdl_root_from_object(context.object)
+        mdl_base = utils.get_mdl_root_from_object(context.object)
         if mdl_base is not None:
             return (len(mdl_base.nvb.animList) > 1)
         return False
@@ -43,8 +43,8 @@ class KB_OT_anim_moveback(bpy.types.Operator):
 
     def execute(self, context):
         """Move the animation."""
-        mdl_base = kb_utils.get_mdl_root_from_object(context.object)
-        if not kb_utils.check_anim_bounds(mdl_base):
+        mdl_base = utils.get_mdl_root_from_object(context.object)
+        if not utils.check_anim_bounds(mdl_base):
             self.report({'INFO'}, "Failure: Convoluted animations.")
             return {'CANCELLED'}
         anim_list = mdl_base.nvb.animList
@@ -54,11 +54,11 @@ class KB_OT_anim_moveback(bpy.types.Operator):
         old_start = anim.frameStart
         old_end = anim.frameEnd
         # Grab a new starting frame
-        last_frame = kb_utils.get_last_keyframe(mdl_base)
-        start = int(math.ceil((last_frame + kb_def.anim_offset) / 10.0)) * 10
+        last_frame = utils.get_last_keyframe(mdl_base)
+        start = int(math.ceil((last_frame + defines.anim_offset) / 10.0)) * 10
         # Move keyframes
         obj_list = [mdl_base]
-        kb_utils.get_children_recursive(mdl_base, obj_list)
+        utils.get_children_recursive(mdl_base, obj_list)
         for obj in obj_list:
             # Object animation
             self.move_frames(obj, old_start, old_end, start)
@@ -80,5 +80,5 @@ class KB_OT_anim_moveback(bpy.types.Operator):
         anim_list.move(currentAnimIdx, newAnimIdx)
         mdl_base.nvb.animListIdx = newAnimIdx
         # Re-adjust the timeline to the new bounds
-        kb_utils.toggle_anim_focus(context.scene, mdl_base)
+        utils.toggle_anim_focus(context.scene, mdl_base)
         return {'FINISHED'}

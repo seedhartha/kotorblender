@@ -1,6 +1,6 @@
 import bpy
 
-from ... import kb_def
+from ... import defines
 
 
 class KB_PT_empty(bpy.types.Panel):
@@ -27,7 +27,7 @@ class KB_PT_empty(bpy.types.Panel):
         layout.separator()
 
         # Display properties depending on type of the empty
-        if (obj.nvb.dummytype == kb_def.Dummytype.MDLROOT):
+        if (obj.nvb.dummytype == defines.Dummytype.MDLROOT):
             row = layout.row()
             box = row.box()
             split = box.split()
@@ -36,14 +36,14 @@ class KB_PT_empty(bpy.types.Panel):
             col.label(text = "Supermodel:")
             col.label(text = "Ignore Fog:")
             col.label(text = "Animation Scale:")
-            if obj.nvb.classification == kb_def.Classification.CHARACTER:
+            if obj.nvb.classification == defines.Classification.CHARACTER:
                 col.label(text = "Head Model:")
             col = split.column()
             col.prop(obj.nvb, "classification", text = "")
             col.prop(obj.nvb, "supermodel", text = "")
             col.prop(obj.nvb, "ignorefog", text = "")
             col.prop(obj.nvb, "animscale", text = "")
-            if obj.nvb.classification == kb_def.Classification.CHARACTER:
+            if obj.nvb.classification == defines.Classification.CHARACTER:
                 col.prop(obj.nvb, "headlink", text = "")
             box.operator("kb.recreate_armature")
             layout.separator()
@@ -78,13 +78,13 @@ class KB_PT_empty(bpy.types.Panel):
             op = row.operator("kb.children_smoothgroup", text="Separate")
             op.action = "SEPR"
 
-        elif (obj.nvb.dummytype == kb_def.Dummytype.PWKROOT):
+        elif (obj.nvb.dummytype == defines.Dummytype.PWKROOT):
             pass
 
-        elif (obj.nvb.dummytype == kb_def.Dummytype.DWKROOT):
+        elif (obj.nvb.dummytype == defines.Dummytype.DWKROOT):
             pass
 
-        elif (obj.nvb.dummytype == kb_def.Dummytype.REFERENCE):
+        elif (obj.nvb.dummytype == defines.Dummytype.REFERENCE):
             row = layout.row()
             box = row.box()
 

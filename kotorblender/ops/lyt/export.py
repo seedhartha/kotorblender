@@ -1,7 +1,7 @@
 import bpy
 import bpy_extras
 
-from ... import kb_def, kb_utils
+from ... import defines, utils
 
 
 class KB_OT_export_lyt(bpy.types.Operator, bpy_extras.io_utils.ExportHelper):
@@ -17,7 +17,7 @@ class KB_OT_export_lyt(bpy.types.Operator, bpy_extras.io_utils.ExportHelper):
             options = {'HIDDEN'})
 
     def _describe_object(self, obj):
-        parent = kb_utils.get_mdl_root(obj)
+        parent = utils.get_mdl_root(obj)
         orientation = obj.rotation_euler.to_quaternion()
         return "{} {} {:.7g} {:.7g} {:.7g} {:.7g} {:.7g} {:.7g} {:.7g}".format(parent.name if parent else "NULL", obj.name, *obj.matrix_world.translation, *orientation)
 
@@ -30,7 +30,7 @@ class KB_OT_export_lyt(bpy.types.Operator, bpy_extras.io_utils.ExportHelper):
             objects = bpy.context.selected_objects if len(bpy.context.selected_objects) > 0 else bpy.context.collection.objects
             for obj in objects:
                 if obj.type == 'EMPTY':
-                    if obj.nvb.dummytype == kb_def.Dummytype.MDLROOT:
+                    if obj.nvb.dummytype == defines.Dummytype.MDLROOT:
                         rooms.append(obj)
                     elif obj.name.lower().startswith("door"):
                         doors.append(obj)

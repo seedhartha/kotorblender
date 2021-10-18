@@ -3,7 +3,7 @@ import os
 import bpy
 import bpy_extras
 
-from ... import kb_def
+from ... import defines
 
 
 class KB_OT_import_path(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
@@ -35,7 +35,7 @@ class KB_OT_import_path(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
                 point_object = bpy.data.objects.new(line[0], None)
                 point_object.parent = path_object
                 point_object.location = [float(x) for x in line[1:4]]
-                point_object.nvb.dummytype = kb_def.Dummytype.PATHPOINT
+                point_object.nvb.dummytype = defines.Dummytype.PATHPOINT
                 bpy.context.collection.objects.link(point_object)
 
         # Second pass: read connections, append to point objects

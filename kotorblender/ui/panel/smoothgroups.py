@@ -1,7 +1,7 @@
 import bmesh
 import bpy
 
-from ... import kb_def
+from ... import defines
 
 
 class KB_PT_smoothgroups(bpy.types.Panel):
@@ -31,7 +31,7 @@ class KB_PT_smoothgroups(bpy.types.Panel):
             return
 
         # the smoothgroup data layer
-        sg_layer = bm.faces.layers.int.get(kb_def.sg_layer_name)
+        sg_layer = bm.faces.layers.int.get(defines.sg_layer_name)
         # count of faces per smoothgroup in this mesh
         sg = { i: 0 for i in range(0, 32) }
         # smoothgroups in use on selected faces

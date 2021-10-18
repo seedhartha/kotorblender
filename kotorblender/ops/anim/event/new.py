@@ -1,6 +1,6 @@
 import bpy
 
-from .... import kb_utils
+from .... import utils
 
 
 class KB_OT_anim_event_new(bpy.types.Operator):
@@ -13,7 +13,7 @@ class KB_OT_anim_event_new(bpy.types.Operator):
     @classmethod
     def poll(self, context):
         """Enable only if there is an animation."""
-        mdl_base = kb_utils.get_mdl_root_from_object(context.object)
+        mdl_base = utils.get_mdl_root_from_object(context.object)
         if mdl_base is not None:
             anim_list = mdl_base.nvb.animList
             anim_list_idx = mdl_base.nvb.animListIdx
@@ -22,7 +22,7 @@ class KB_OT_anim_event_new(bpy.types.Operator):
 
     def execute(self, context):
         """Add the new item."""
-        mdl_base = kb_utils.get_mdl_root_from_object(context.object)
+        mdl_base = utils.get_mdl_root_from_object(context.object)
         anim = mdl_base.nvb.animList[mdl_base.nvb.animListIdx]
 
         eventList = anim.eventList

@@ -3,11 +3,11 @@
 import bpy
 from mathutils import Quaternion
 
-from . import kb_def
+from . import defines
 
 
 def is_null(s):
-    return (not s or s.lower() == kb_def.null.lower())
+    return (not s or s.lower() == defines.null.lower())
 
 
 def isclose(a, b, rel_tol=1e-09, abs_tol=0.0):
@@ -93,7 +93,7 @@ def search_node_in_model(obj, test):
     return search_node(ancestor_node(obj, is_root_dummy), test)
 
 
-def is_root_dummy(obj, dummytype = kb_def.Dummytype.MDLROOT):
+def is_root_dummy(obj, dummytype = defines.Dummytype.MDLROOT):
     return obj and (obj.type == 'EMPTY') and (obj.nvb.dummytype == dummytype)
 
 
@@ -103,20 +103,20 @@ def get_node_type(obj):
     """
     objType  = obj.type
     if objType == 'EMPTY':
-        if   obj.nvb.dummytype == kb_def.Dummytype.PATCH:
+        if   obj.nvb.dummytype == defines.Dummytype.PATCH:
             return "patch"
-        elif obj.nvb.dummytype == kb_def.Dummytype.REFERENCE:
+        elif obj.nvb.dummytype == defines.Dummytype.REFERENCE:
             return "reference"
     elif objType == 'MESH':
-        if   obj.nvb.meshtype == kb_def.Meshtype.TRIMESH:
+        if   obj.nvb.meshtype == defines.Meshtype.TRIMESH:
             return "trimesh"
-        elif obj.nvb.meshtype == kb_def.Meshtype.DANGLYMESH:
+        elif obj.nvb.meshtype == defines.Meshtype.DANGLYMESH:
             return "danglymesh"
-        elif obj.nvb.meshtype == kb_def.Meshtype.SKIN:
+        elif obj.nvb.meshtype == defines.Meshtype.SKIN:
             return "skin"
-        elif obj.nvb.meshtype == kb_def.Meshtype.EMITTER:
+        elif obj.nvb.meshtype == defines.Meshtype.EMITTER:
             return "emitter"
-        elif obj.nvb.meshtype == kb_def.Meshtype.AABB:
+        elif obj.nvb.meshtype == defines.Meshtype.AABB:
             return "aabb"
     elif objType == 'LIGHT':
         return "light"
@@ -192,7 +192,7 @@ def get_action(target, action_name):
 def get_last_keyframe(root_obj):
     """Get the last keyed frame of this object and its children."""
     def get_max_frame(target):
-        frame = kb_def.anim_globstart
+        frame = defines.anim_globstart
         if target:
             if target.animation_data and target.animation_data.action:
                 for fcu in target.animation_data.action.fcurves:
@@ -201,7 +201,7 @@ def get_last_keyframe(root_obj):
             return frame
     obj_list = [root_obj]
     get_children_recursive(root_obj, obj_list)
-    frame_list = [kb_def.anim_globstart]
+    frame_list = [defines.anim_globstart]
     for obj in obj_list:
         frame_list.append(get_max_frame(obj))
         mat = obj.active_material
@@ -215,13 +215,13 @@ def get_last_keyframe(root_obj):
 
 def create_anim_list_item(mdl_base, check_keyframes=False):
     """Append a new animation at the and of the animation list."""
-    last_frame = max([kb_def.anim_globstart] +
+    last_frame = max([defines.anim_globstart] +
                      [a.frameEnd for a in mdl_base.nvb.animList])
     if check_keyframes:
         last_frame = max(last_frame, get_last_keyframe(mdl_base))
     anim = mdl_base.nvb.animList.add()
     anim.name = mdl_base.name
-    start = int(math.ceil((last_frame + kb_def.anim_offset) / 10.0)) * 10
+    start = int(math.ceil((last_frame + defines.anim_offset) / 10.0)) * 10
     anim.frameStart = start
     anim.frameEnd = start
     return anim
@@ -229,7 +229,7 @@ def create_anim_list_item(mdl_base, check_keyframes=False):
 
 def str2identifier(s):
     """Convert to lower case. Convert 'null' to empty string."""
-    if (not s or s.lower() == kb_def.null):
+    if (not s or s.lower() == defines.null):
         return ""
     return s.lower()
 
@@ -300,14 +300,14 @@ def get_aurora_scale(obj):
     return 1.0
 
 
-def nwtime2frame(time, fps = kb_def.fps):
+def nwtime2frame(time, fps = defines.fps):
     """
     For animations: Convert key time to frame number
     """
     return round(fps*time)
 
 
-def frame2nwtime(frame, fps = kb_def.fps):
+def frame2nwtime(frame, fps = defines.fps):
     return round(frame / fps, 7)
 
 
@@ -336,14 +336,14 @@ def color_to_hex(color):
 
 
 def is_path_point(obj):
-    return obj and (obj.type == 'EMPTY') and (obj.nvb.dummytype == kb_def.Dummytype.PATHPOINT)
+    return obj and (obj.type == 'EMPTY') and (obj.nvb.dummytype == defines.Dummytype.PATHPOINT)
 
 
 def get_mdl_root(obj):
     """
     :returns: MDL root object for the specified object.
     """
-    if (obj.type == 'EMPTY') and (obj.nvb.dummytype == kb_def.Dummytype.MDLROOT):
+    if (obj.type == 'EMPTY') and (obj.nvb.dummytype == defines.Dummytype.MDLROOT):
         return obj
 
     if not obj.parent:

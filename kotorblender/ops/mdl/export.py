@@ -1,7 +1,7 @@
 import bpy
 import bpy_extras
 
-from ... import kb_io
+from ... import io
 
 
 class KB_OT_export_mdl(bpy.types.Operator, bpy_extras.io_utils.ExportHelper):
@@ -36,4 +36,4 @@ class KB_OT_export_mdl(bpy.types.Operator, bpy_extras.io_utils.ExportHelper):
             default=True)
 
     def execute(self, context):
-        return kb_io.save_mdl(self, context, **self.as_keywords(ignore=("filter_glob","check_existing")))
+        return io.save_mdl(self, context, **self.as_keywords(ignore=("filter_glob","check_existing")))
