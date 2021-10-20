@@ -1,4 +1,4 @@
-from ...defines import MalformedMdlFile
+from ...exception.malformedmdl import MalformedMdlFile
 
 from ..binreader import BinaryReader
 
