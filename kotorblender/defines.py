@@ -1,15 +1,6 @@
 ﻿# Null value for parents, textures, etc.
 null = "NULL"
 
-
-class MalformedMdlFile(Exception):
-    def __init__(self, value):
-        self.parameter = value
-
-    def __str__(self):
-        return repr(self.parameter)
-
-
 # Some presets
 # Frame at which to start all animations
 anim_globstart = 1

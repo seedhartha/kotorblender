@@ -1,7 +1,8 @@
 import collections
 
 import bpy
-from mathutils import Matrix, Quaternion, Vector
+
+from ....exception.malformedmdl import MalformedMdlFile
 
 from .... import defines, utils
 
@@ -111,7 +112,7 @@ class Animation():
                     self.add_ascii_node(asciiBlock[blockStart:idx+1])
                     blockStart = -1
                 elif (label == "node"):
-                    raise defines.MalformedMdlFile("Unexpected 'endnode'")
+                    raise MalformedMdlFile("Unexpected 'endnode'")
 
     def load_ascii(self, ascii_data):
         """Load an animation from a block from an ascii mdl file."""
