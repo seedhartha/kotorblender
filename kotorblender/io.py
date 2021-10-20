@@ -92,9 +92,7 @@ def load_mdl(operator,
             importMaterials = True,
             importAnim = True,
             textureSearch = False,
-            createArmature = False,
-            minimapMode = False,
-            minimapSkipFade = False):
+            createArmature = False):
     """
     Called from blender ui
     """
@@ -106,8 +104,6 @@ def load_mdl(operator,
     glob.texturePath = os.path.dirname(filepath)
     glob.textureSearch = textureSearch
     glob.createArmature = createArmature
-    glob.minimapMode = minimapMode
-    glob.minimapSkipFade = minimapSkipFade
 
     _load_mdl(filepath)
 

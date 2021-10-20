@@ -48,20 +48,6 @@ class KB_PT_empty(bpy.types.Panel):
             box.operator("kb.recreate_armature")
             layout.separator()
 
-            # Minimap Helper.
-            # TODO: uncomment when compatible with Blender 2.8
-            '''
-            row = layout.row()
-            box = row.box()
-            box.label(text = 'Minimap Helper')
-            row = box.row()
-            row.prop(obj.nvb, 'minimapzoffset', text = 'z Offset')
-            row = box.row()
-            row.prop(obj.nvb, 'minimapsize', text = 'Minimap size')
-            row = box.row()
-            row.operator('kb.render_minimap', text = 'Render Minimap', icon='NONE')
-            '''
-
             # All Children Settings Helper
             row = layout.row()
             box = row.box()

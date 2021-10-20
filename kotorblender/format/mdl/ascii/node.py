@@ -654,11 +654,6 @@ class Trimesh(GeometryNode):
         obj.nvb.lytposition      = self.lytposition
 
     def add_to_collection(self, collection):
-        if glob.minimapMode and not self.render:
-            # Fading objects won't be imported in minimap mode
-            # We may need it for the tree stucture, so import it as an empty
-            return Dummy.add_to_collection(self, collection)
-
         mesh = self.create_mesh(self.name)
         obj  = bpy.data.objects.new(self.name, mesh)
         self.set_object_data(obj)
@@ -1409,11 +1404,6 @@ class Emitter(GeometryNode):
             setattr(obj.nvb, attrname, value)
 
     def add_to_collection(self, collection):
-        if glob.minimapMode:
-            # We don't need emitters in minimap mode
-            # We may need it for the tree stucture, so import it as an empty
-            return GeometryNode.add_to_collection(self, collection)
-
         mesh = self.create_mesh(self.name)
         obj  = bpy.data.objects.new(self.name, mesh)
 
@@ -1603,10 +1593,6 @@ class Light(GeometryNode):
         light.calc_light_power(obj)
 
     def add_to_collection(self, collection):
-        if glob.minimapMode:
-            # We don't need lights in minimap mode
-            # We may need it for the tree stucture, so import it as an empty
-            return GeometryNode.add_to_collection(self, collection)
         light = self.create_light(self.name)
         obj  = bpy.data.objects.new(self.name, light)
         self.set_object_data(obj)
@@ -1848,10 +1834,6 @@ class Aabb(Trimesh):
         return mesh
 
     def add_to_collection(self, collection):
-        if glob.minimapMode:
-            # No walkmeshes in minimap mode and we don't need an empty as
-            # replacement either as AABB nodes never have children
-            return GeometryNode.add_to_collection(self, collection)
         mesh = self.create_mesh(self.name)
         obj = bpy.data.objects.new(self.name, mesh)
         self.set_object_data(obj)
