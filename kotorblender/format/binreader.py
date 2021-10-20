@@ -9,6 +9,12 @@ class BinaryReader:
     def __del__(self):
         self.file.close()
 
+    def seek(self, offset):
+        self.file.seek(offset)
+
+    def tell(self):
+        return self.tell()
+
     def get_int8(self):
         return int.from_bytes(self.file.read(1), self.byteorder, signed=True)
 
@@ -43,3 +49,6 @@ class BinaryReader:
                 break
             str += ch
         return str
+
+    def get_bytes(self, count):
+        return self.file.read(count)
