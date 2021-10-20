@@ -10,9 +10,6 @@ textureSearch = False
 
 createArmature = False
 
-minimapMode     = False
-minimapSkipFade = False
-
 # Export
 exportSmoothGroups = True
 

@@ -118,9 +118,6 @@ class ObjectPropertyGroup(bpy.types.PropertyGroup):
     # For reference emptys
     refmodel     : bpy.props.StringProperty(name = "Reference Model", description = "Name of another mdl file", default = "fx_ref")
     reattachable : bpy.props.BoolProperty(name = "Reattachable", default = False)
-    # Minimap generation
-    minimapzoffset : bpy.props.FloatProperty(name = "Minimap Z Offset", default = 0.00, min = 0.00)
-    minimapsize    : bpy.props.IntProperty(name = "Size", default = 512, min = 16)
 
     # For mesh objects
     meshtype   : bpy.props.EnumProperty(name = "Type",

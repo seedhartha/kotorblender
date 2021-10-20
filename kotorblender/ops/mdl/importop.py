@@ -53,18 +53,5 @@ class KB_OT_import_mdl(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
                           " (Warning, may be slow)",
             default = False)
 
-    # Hidden option, only used for batch minimap creation
-    minimapMode : bpy.props.BoolProperty(
-            name = "Minimap Mode",
-            description = "Ignore lights and walkmeshes",
-            default = False,
-            options = {'HIDDEN'})
-
-    minimapSkipFade : bpy.props.BoolProperty(
-            name = "Minimap Mode: Import Fading Objects",
-            description = "Ignore fading objects",
-            default = False,
-            options = {'HIDDEN'})
-
     def execute(self, context):
         return io.load_mdl(self, context, **self.as_keywords(ignore=("filter_glob",)))

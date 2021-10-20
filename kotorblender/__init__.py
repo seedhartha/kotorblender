@@ -82,7 +82,6 @@ if 'bpy' in locals():
     reload(mdlloader)
     reload(mdlsaver)
     reload(meshpanel)
-    reload(minimap)
     reload(moveanimeventop)
     reload(moveanimop)
     reload(movebackanimop)
@@ -98,7 +97,6 @@ if 'bpy' in locals():
     reload(rebuildmaterialnodesop)
     reload(recreatearmatureop)
     reload(removepathconnection)
-    reload(renderminimapop)
     reload(scaleanimop)
     reload(selectsmoothgroupop)
     reload(smoothgroupspanel)
@@ -120,7 +118,6 @@ else:
         io,
         light,
         material,
-        minimap,
         teximage,
         utils)
     from .format import (
@@ -143,8 +140,7 @@ else:
         addskingroup as addskingroupop,
         loadwokmaterials as loadwokmaterialsop,
         rebuildmaterialnodes as rebuildmaterialnodesop,
-        recreatearmature as recreatearmatureop,
-        renderminimap as renderminimapop)
+        recreatearmature as recreatearmatureop)
     from .ops.anim import (
         clone as cloneanimop,
         crop as cropanimop,
@@ -267,7 +263,6 @@ classes = (
     loadwokmaterialsop.KB_OT_load_wok_materials,
     rebuildmaterialnodesop.KB_OT_rebuild_material_nodes,
     recreatearmatureop.KB_OT_recreate_armature,
-    renderminimapop.KB_OT_render_minimap,
     moveanimeventop.KB_OT_anim_event_move,
     moveanimop.KB_OT_anim_move,
     movebackanimop.KB_OT_anim_moveback,
