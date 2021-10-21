@@ -60,6 +60,7 @@ if 'bpy' in locals():
     reload(deletelightflareop)
     reload(emitterpanel)
     reload(emptypanel)
+    reload(exportasciimdlop)
     reload(exportlytop)
     reload(exportmdlop)
     reload(exportpathop)
@@ -69,6 +70,7 @@ if 'bpy' in locals():
     reload(gffloader)
     reload(gffsaver)
     reload(glob)
+    reload(importasciimdlop)
     reload(importlytop)
     reload(importmdlop)
     reload(importpathop)
@@ -165,6 +167,9 @@ else:
     from .ops.mdl import (
         export as exportmdlop,
         importop as importmdlop)
+    from .ops.mdl.ascii import (
+        export as exportasciimdlop,
+        importop as importasciimdlop)
     from .ops.path import (
         addconnection as addpathconnectionop,
         export as exportpathop,
@@ -211,6 +216,10 @@ def menu_func_import_mdl(self, context):
     self.layout.operator(importmdlop.KB_OT_import_mdl.bl_idname, text="KotOR Model (.mdl)")
 
 
+def menu_func_import_ascii_mdl(self, context):
+    self.layout.operator(importasciimdlop.KB_OT_import_ascii_mdl.bl_idname, text="KotOR Model (.mdl.ascii)")
+
+
 def menu_func_import_lyt(self, context):
     self.layout.operator(importlytop.KB_OT_import_lyt.bl_idname, text="KotOR Layout (.lyt)")
 
@@ -221,6 +230,10 @@ def menu_func_import_pth(self, context):
 
 def menu_func_export_mdl(self, context):
     self.layout.operator(exportmdlop.KB_OT_export_mdl.bl_idname, text="KotOR Model (.mdl)")
+
+
+def menu_func_export_ascii_mdl(self, context):
+    self.layout.operator(exportasciimdlop.KB_OT_export_ascii_mdl.bl_idname, text="KotOR Model (.mdl.ascii)")
 
 
 def menu_func_export_lyt(self, context):
@@ -251,11 +264,13 @@ classes = (
     deleteanimeventop.KB_OT_anim_event_delete,
     deleteanimop.KB_OT_anim_delete,
     deletelightflareop.KB_OT_delete_lightflare,
+    exportasciimdlop.KB_OT_export_ascii_mdl,
     exportlytop.KB_OT_export_lyt,
     exportmdlop.KB_OT_export_mdl,
     exportpathop.KB_OT_export_path,
     focusanimop.KB_OT_anim_focus,
     generatesmoothgroupop.KB_OT_generate_smoothgroup,
+    importasciimdlop.KB_OT_import_ascii_mdl,
     importlytop.KB_OT_import_lyt,
     importmdlop.KB_OT_import_mdl,
     importpathop.KB_OT_import_path,
@@ -315,9 +330,11 @@ def register():
     bpy.types.ImageTexture.nvb = bpy.props.PointerProperty(type=textureprops.TexturePropertyGroup)
 
     bpy.types.TOPBAR_MT_file_import.append(menu_func_import_mdl)
+    bpy.types.TOPBAR_MT_file_import.append(menu_func_import_ascii_mdl)
     bpy.types.TOPBAR_MT_file_import.append(menu_func_import_lyt)
     bpy.types.TOPBAR_MT_file_import.append(menu_func_import_pth)
     bpy.types.TOPBAR_MT_file_export.append(menu_func_export_mdl)
+    bpy.types.TOPBAR_MT_file_export.append(menu_func_export_ascii_mdl)
     bpy.types.TOPBAR_MT_file_export.append(menu_func_export_lyt)
     bpy.types.TOPBAR_MT_file_export.append(menu_func_export_pth)
 
@@ -325,6 +342,7 @@ def register():
 def unregister():
     bpy.types.TOPBAR_MT_file_export.remove(menu_func_export_pth)
     bpy.types.TOPBAR_MT_file_export.remove(menu_func_export_lyt)
+    bpy.types.TOPBAR_MT_file_export.remove(menu_func_export_ascii_mdl)
     bpy.types.TOPBAR_MT_file_export.remove(menu_func_export_mdl)
     bpy.types.TOPBAR_MT_file_import.remove(menu_func_import_pth)
     bpy.types.TOPBAR_MT_file_import.remove(menu_func_import_lyt)
