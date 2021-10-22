@@ -21,7 +21,7 @@ class KB_OT_anim_new(bpy.types.Operator):
         anim = utils.create_anim_list_item(mdl_base, True)
         anim.root_obj = mdl_base.name
         # Create an unique name
-        name_list = [an.name for an in mdl_base.nvb.animList]
+        name_list = [an.name for an in mdl_base.kb.animList]
         name_idx = 0
         new_name = "anim.{:0>3d}".format(name_idx)
         while new_name in name_list:

@@ -8,9 +8,9 @@ from . import teximage, utils
 
 
 def _get_material_name(obj):
-    if utils.is_null(obj.nvb.bitmap) and utils.is_null(obj.nvb.bitmap2):
-        diffuse = utils.color_to_hex(obj.nvb.diffuse)
-        alpha = utils.int_to_hex(utils.float_to_byte(obj.nvb.alpha))
+    if utils.is_null(obj.kb.bitmap) and utils.is_null(obj.kb.bitmap2):
+        diffuse = utils.color_to_hex(obj.kb.diffuse)
+        alpha = utils.int_to_hex(utils.float_to_byte(obj.kb.alpha))
         name = "D{}__A{}".format(diffuse, alpha)
     else:
         name = obj.name
@@ -28,7 +28,7 @@ def _get_or_create_material(obj):
 
 def _rebuild_material_simple(material, obj):
     material.use_nodes = False
-    material.diffuse_color = [*obj.nvb.diffuse, 1.0]
+    material.diffuse_color = [*obj.kb.diffuse, 1.0]
 
 
 def _rebuild_material_nodes(material, obj):
@@ -43,7 +43,7 @@ def _rebuild_material_nodes(material, obj):
     output.location = (1200, 0)
 
     # Shader node
-    selfillumed = not utils.isclose_3f(obj.nvb.selfillumcolor, [0.0] * 3)
+    selfillumed = not utils.isclose_3f(obj.kb.selfillumcolor, [0.0] * 3)
     if selfillumed:
         shader = nodes.new("ShaderNodeEmission")
     else:
@@ -62,25 +62,25 @@ def _rebuild_material_nodes(material, obj):
     mul_alpha.location = (600, -300)
     mul_alpha.operation = 'MULTIPLY'
     mul_alpha.inputs[0].default_value = 1.0
-    mul_alpha.inputs[1].default_value = obj.nvb.alpha
+    mul_alpha.inputs[1].default_value = obj.kb.alpha
 
     # Diffuse map node
-    if not utils.is_null(obj.nvb.bitmap):
+    if not utils.is_null(obj.kb.bitmap):
         diffuse = nodes.new("ShaderNodeTexImage")
         diffuse.location = (300, 0)
-        diffuse.image = teximage.load_texture_image(obj.nvb.bitmap)
+        diffuse.image = teximage.load_texture_image(obj.kb.bitmap)
         links.new(mul_diffuse_by_lightmap.inputs[0], diffuse.outputs[0])
         links.new(mul_alpha.inputs[0], diffuse.outputs[1])
 
     # Lightmap node
-    if not utils.is_null(obj.nvb.bitmap2):
+    if not utils.is_null(obj.kb.bitmap2):
         lightmap_uv = nodes.new("ShaderNodeUVMap")
         lightmap_uv.location = (0, -300)
         lightmap_uv.uv_map = "UVMap_lm"
 
         lightmap = nodes.new("ShaderNodeTexImage")
         lightmap.location = (300, -300)
-        lightmap.image = teximage.load_texture_image(obj.nvb.bitmap2)
+        lightmap.image = teximage.load_texture_image(obj.kb.bitmap2)
 
         material.shadow_method = 'NONE'
         links.new(lightmap.inputs[0], lightmap_uv.outputs[0])
@@ -106,7 +106,7 @@ def rebuild_material(obj):
     mesh.materials.append(material)
 
     # Only use nodes when object has at least one texture
-    if (not utils.is_null(obj.nvb.bitmap)) or (not utils.is_null(obj.nvb.bitmap2)):
+    if (not utils.is_null(obj.kb.bitmap)) or (not utils.is_null(obj.kb.bitmap2)):
         _rebuild_material_nodes(material, obj)
     else:
         _rebuild_material_simple(material, obj)

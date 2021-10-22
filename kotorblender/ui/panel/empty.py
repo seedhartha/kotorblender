@@ -23,11 +23,11 @@ class KB_PT_empty(bpy.types.Panel):
         layout = self.layout
 
         row = layout.row()
-        row.prop(obj.nvb, "dummytype", text="Type")
+        row.prop(obj.kb, "dummytype", text="Type")
         layout.separator()
 
         # Display properties depending on type of the empty
-        if (obj.nvb.dummytype == defines.Dummytype.MDLROOT):
+        if (obj.kb.dummytype == defines.Dummytype.MDLROOT):
             row = layout.row()
             box = row.box()
             split = box.split()
@@ -36,15 +36,15 @@ class KB_PT_empty(bpy.types.Panel):
             col.label(text = "Supermodel:")
             col.label(text = "Ignore Fog:")
             col.label(text = "Animation Scale:")
-            if obj.nvb.classification == defines.Classification.CHARACTER:
+            if obj.kb.classification == defines.Classification.CHARACTER:
                 col.label(text = "Head Model:")
             col = split.column()
-            col.prop(obj.nvb, "classification", text = "")
-            col.prop(obj.nvb, "supermodel", text = "")
-            col.prop(obj.nvb, "ignorefog", text = "")
-            col.prop(obj.nvb, "animscale", text = "")
-            if obj.nvb.classification == defines.Classification.CHARACTER:
-                col.prop(obj.nvb, "headlink", text = "")
+            col.prop(obj.kb, "classification", text = "")
+            col.prop(obj.kb, "supermodel", text = "")
+            col.prop(obj.kb, "ignorefog", text = "")
+            col.prop(obj.kb, "animscale", text = "")
+            if obj.kb.classification == defines.Classification.CHARACTER:
+                col.prop(obj.kb, "headlink", text = "")
             box.operator("kb.recreate_armature")
             layout.separator()
 
@@ -64,26 +64,26 @@ class KB_PT_empty(bpy.types.Panel):
             op = row.operator("kb.children_smoothgroup", text="Separate")
             op.action = "SEPR"
 
-        elif (obj.nvb.dummytype == defines.Dummytype.PWKROOT):
+        elif (obj.kb.dummytype == defines.Dummytype.PWKROOT):
             pass
 
-        elif (obj.nvb.dummytype == defines.Dummytype.DWKROOT):
+        elif (obj.kb.dummytype == defines.Dummytype.DWKROOT):
             pass
 
-        elif (obj.nvb.dummytype == defines.Dummytype.REFERENCE):
+        elif (obj.kb.dummytype == defines.Dummytype.REFERENCE):
             row = layout.row()
             box = row.box()
 
             row = box.row()
-            row.prop(obj.nvb, "refmodel")
+            row.prop(obj.kb, "refmodel")
             row = box.row()
-            row.prop(obj.nvb, "reattachable")
+            row.prop(obj.kb, "reattachable")
 
         else:
             row = layout.row()
             box = row.box()
 
             row = box.row()
-            row.prop(obj.nvb, "wirecolor")
+            row.prop(obj.kb, "wirecolor")
             row = box.row()
-            row.prop(obj.nvb, "dummysubtype")
+            row.prop(obj.kb, "dummysubtype")

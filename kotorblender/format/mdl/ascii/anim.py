@@ -164,7 +164,7 @@ class Animation():
         # Otherwise supermodels don't work correctly.
         childList = []
         for child in bObject.children:
-            childList.append((child.nvb.imporder, child))
+            childList.append((child.kb.imporder, child))
         childList.sort(key=lambda tup: tup[0])
 
         for (_, child) in childList:
@@ -178,7 +178,7 @@ class Animation():
         # (important for supermodels/animations to work)
         children = [c for c in obj.children]
         children.sort(key=lambda c: c.name)
-        children.sort(key=lambda c: c.nvb.imporder)
+        children.sort(key=lambda c: c.kb.imporder)
         for c in children:
             Animation.generate_ascii_nodes(c, anim, ascii_lines, options)
 
@@ -209,17 +209,17 @@ class Animation():
         ascii_lines.append("")
 
     def to_ascii(self, animScene, animRootDummy, asciiLines, mdlName = ""):
-        self.name      = animRootDummy.nvb.animname
+        self.name      = animRootDummy.kb.animname
         self.length    = utils.frame2nwtime(animScene.frame_end, animScene.render.fps)
-        self.transtime = animRootDummy.nvb.transtime
-        self.root      = animRootDummy.nvb.animroot
+        self.transtime = animRootDummy.kb.transtime
+        self.root      = animRootDummy.kb.animroot
 
         asciiLines.append("newanim " + self.name + " " + mdlName)
         asciiLines.append("  length " + str(round(self.length, 5)))
         asciiLines.append("  transtime " + str(round(self.transtime, 3)))
         asciiLines.append("  animroot " + self.root)
 
-        for event in animRootDummy.nvb.eventList:
+        for event in animRootDummy.kb.eventList:
             eventTime = utils.frame2nwtime(event.frame, animScene.render.fps)
             asciiLines.append("  event " + str(round(eventTime, 5)) + " " + event.name)
 

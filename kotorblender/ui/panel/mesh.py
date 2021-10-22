@@ -20,43 +20,43 @@ class KB_PT_mesh(bpy.types.Panel):
     def poll(cls, context):
         return (context.object and \
                 context.object.type == 'MESH' and \
-                context.object.nvb.meshtype != defines.Meshtype.EMITTER)
+                context.object.kb.meshtype != defines.Meshtype.EMITTER)
 
     def draw(self, context):
         obj      = context.object
         layout   = self.layout
 
         row = layout.row()
-        row.prop(obj.nvb, "meshtype", text="Type")
+        row.prop(obj.kb, "meshtype", text="Type")
 
         layout.separator()
 
-        if (obj.nvb.meshtype == defines.Meshtype.EMITTER):
+        if (obj.kb.meshtype == defines.Meshtype.EMITTER):
             row = layout.row()
             box = row.box()
 
             row = box.row()
-            row.prop(obj.nvb, "wirecolor", text="Wirecolor")
+            row.prop(obj.kb, "wirecolor", text="Wirecolor")
             row = box.row()
-            row.prop_search(obj.nvb, "rawascii", bpy.data, "texts", text="Data")
+            row.prop_search(obj.kb, "rawascii", bpy.data, "texts", text="Data")
 
         else: # Trimesh, danglymesh, skin
             row = layout.row()
             box = row.box()
             row = box.row()
-            row.prop_search(obj.nvb, "bitmap", bpy.data, "images")
+            row.prop_search(obj.kb, "bitmap", bpy.data, "images")
             row = box.row()
-            row.prop_search(obj.nvb, "bitmap2", bpy.data, "images")
+            row.prop_search(obj.kb, "bitmap2", bpy.data, "images")
             row = box.row()
-            row.prop(obj.nvb, "diffuse")
+            row.prop(obj.kb, "diffuse")
             row = box.row()
-            row.prop(obj.nvb, "ambient")
+            row.prop(obj.kb, "ambient")
             row = box.row()
-            row.prop(obj.nvb, "selfillumcolor")
+            row.prop(obj.kb, "selfillumcolor")
             row = box.row()
-            row.prop(obj.nvb, "wirecolor")
+            row.prop(obj.kb, "wirecolor")
             row = box.row()
-            row.prop(obj.nvb, "alpha")
+            row.prop(obj.kb, "alpha")
             row = box.row()
             row.operator("kb.rebuild_material_nodes")
 
@@ -64,42 +64,42 @@ class KB_PT_mesh(bpy.types.Panel):
             box = row.box()
             split = box.split()
             col = split.column()
-            col.prop(obj.nvb, "render", text="Render")
-            col.prop(obj.nvb, "shadow", text="Shadow")
-            col.prop(obj.nvb, "lightmapped", text="Lightmapped")
-            col.prop(obj.nvb, "tangentspace", text="Tangentspace")
-            col.prop(obj.nvb, "m_bIsBackgroundGeometry", text="Background Geometry")
+            col.prop(obj.kb, "render", text="Render")
+            col.prop(obj.kb, "shadow", text="Shadow")
+            col.prop(obj.kb, "lightmapped", text="Lightmapped")
+            col.prop(obj.kb, "tangentspace", text="Tangentspace")
+            col.prop(obj.kb, "m_bIsBackgroundGeometry", text="Background Geometry")
             col = split.column()
-            col.prop(obj.nvb, "beaming", text="Beaming")
-            col.prop(obj.nvb, "inheritcolor", text="Inherit Color")
-            col.prop(obj.nvb, "rotatetexture", text="Rotate Texture")
-            col.prop(obj.nvb, "hologram_donotdraw")
+            col.prop(obj.kb, "beaming", text="Beaming")
+            col.prop(obj.kb, "inheritcolor", text="Inherit Color")
+            col.prop(obj.kb, "rotatetexture", text="Rotate Texture")
+            col.prop(obj.kb, "hologram_donotdraw")
             row = box.row()
-            row.prop(obj.nvb, "transparencyhint", text="Transparency Hint")
+            row.prop(obj.kb, "transparencyhint", text="Transparency Hint")
             row = box.row()
-            row.prop(obj.nvb, "animateuv")
-            if obj.nvb.animateuv:
+            row.prop(obj.kb, "animateuv")
+            if obj.kb.animateuv:
                 row = box.row()
                 split = box.split()
                 col = split.column()
-                col.prop(obj.nvb, "uvdirectionx")
-                col.prop(obj.nvb, "uvjitter")
+                col.prop(obj.kb, "uvdirectionx")
+                col.prop(obj.kb, "uvjitter")
                 col = split.column()
-                col.prop(obj.nvb, "uvdirectiony")
-                col.prop(obj.nvb, "uvjitterspeed")
+                col.prop(obj.kb, "uvdirectiony")
+                col.prop(obj.kb, "uvjitterspeed")
             row = box.row()
-            row.prop(obj.nvb, "dirt_enabled")
-            if obj.nvb.dirt_enabled:
+            row.prop(obj.kb, "dirt_enabled")
+            if obj.kb.dirt_enabled:
                 row = box.row()
-                row.prop(obj.nvb, "dirt_texture")
+                row.prop(obj.kb, "dirt_texture")
                 row = box.row()
-                row.prop(obj.nvb, "dirt_worldspace")
+                row.prop(obj.kb, "dirt_worldspace")
             row = box.row()
             row.label(text = "Smoothgroups")
-            row.prop(obj.nvb, "smoothgroup", text="Smooth Group", expand = True)
+            row.prop(obj.kb, "smoothgroup", text="Smooth Group", expand = True)
 
             # Additional props for danglymeshes
-            if (obj.nvb.meshtype == defines.Meshtype.DANGLYMESH):
+            if (obj.kb.meshtype == defines.Meshtype.DANGLYMESH):
                 layout.separator()
 
                 row = layout.row()
@@ -107,16 +107,16 @@ class KB_PT_mesh(bpy.types.Panel):
                 row = box.row()
                 row.label(text = "Danglymesh Properties")
                 row = box.row()
-                row.prop_search(obj.nvb, "constraints", obj, "vertex_groups", text="Constraints")
+                row.prop_search(obj.kb, "constraints", obj, "vertex_groups", text="Constraints")
                 row = box.row()
-                row.prop(obj.nvb, "period", text="Period")
+                row.prop(obj.kb, "period", text="Period")
                 row = box.row()
-                row.prop(obj.nvb, "tightness", text="Tightness")
+                row.prop(obj.kb, "tightness", text="Tightness")
                 row = box.row()
-                row.prop(obj.nvb, "displacement", text="Displacement")
+                row.prop(obj.kb, "displacement", text="Displacement")
 
             # Additional props for skins
-            elif (obj.nvb.meshtype == defines.Meshtype.SKIN):
+            elif (obj.kb.meshtype == defines.Meshtype.SKIN):
                 layout.separator()
 
                 row = layout.row()
@@ -124,16 +124,16 @@ class KB_PT_mesh(bpy.types.Panel):
                 row = box.row()
                 row.label(text = "Create vertex group: ")
                 row = box.row(align = True)
-                row.prop_search(obj.nvb, "skingroup_obj", context.scene, "objects")
+                row.prop_search(obj.kb, "skingroup_obj", context.scene, "objects")
                 row.operator("kb.skingroup_add", text = "", icon='ADD')
 
             # Additional props for aabb walkmeshes
-            elif (obj.nvb.meshtype == defines.Meshtype.AABB):
+            elif (obj.kb.meshtype == defines.Meshtype.AABB):
                 layout.separator()
 
                 row = layout.row()
                 box = row.box()
                 row = box.row()
-                row.prop(obj.nvb, "lytposition", text="LYT Position")
+                row.prop(obj.kb, "lytposition", text="LYT Position")
                 row = box.row()
                 row.operator("kb.load_wok_mats", text = "Load walkmesh materials", icon='NONE')

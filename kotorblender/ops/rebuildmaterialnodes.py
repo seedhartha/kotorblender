@@ -11,7 +11,7 @@ class KB_OT_rebuild_material_nodes(bpy.types.Operator):
 
     def execute(self, context):
         obj = context.object
-        if obj and (obj.type == 'MESH') and (obj.nvb.meshtype != defines.Meshtype.EMITTER):
+        if obj and (obj.type == 'MESH') and (obj.kb.meshtype != defines.Meshtype.EMITTER):
             material.rebuild_material(obj)
 
         return {'FINISHED'}

@@ -19,7 +19,7 @@ class KB_PT_emitter(bpy.types.Panel):
         try:
             return context.object and \
                    context.object.type == 'MESH' and \
-                   context.object.nvb.meshtype == defines.Meshtype.EMITTER
+                   context.object.kb.meshtype == defines.Meshtype.EMITTER
         except:
             return False
 
@@ -29,26 +29,26 @@ class KB_PT_emitter(bpy.types.Panel):
         layout = self.layout
 
         row = layout.row()
-        row.prop(obj.nvb, "meshtype", text="Type")
+        row.prop(obj.kb, "meshtype", text="Type")
 
         layout.separator()
 
         box = layout.row().box()
         row = box.row()
-        row.prop(obj.nvb, "update")
+        row.prop(obj.kb, "update")
         row = box.row()
-        row.prop(obj.nvb, "render_emitter")
-        if obj.nvb.update == "Lightning" or \
-           not utils.is_null(obj.nvb.chunkName):
+        row.prop(obj.kb, "render_emitter")
+        if obj.kb.update == "Lightning" or \
+           not utils.is_null(obj.kb.chunkName):
             row.enabled = False
         row = box.row()
-        row.prop(obj.nvb, "blend")
-        if not utils.is_null(obj.nvb.chunkName):
+        row.prop(obj.kb, "blend")
+        if not utils.is_null(obj.kb.chunkName):
             row.enabled = False
         row = box.row()
-        row.prop(obj.nvb, "spawntype")
-        if obj.nvb.update != "Fountain" or \
-           not utils.is_null(obj.nvb.chunkName):
+        row.prop(obj.kb, "spawntype")
+        if obj.kb.update != "Fountain" or \
+           not utils.is_null(obj.kb.chunkName):
             row.enabled = False
 
         box.separator()
@@ -56,8 +56,8 @@ class KB_PT_emitter(bpy.types.Panel):
         row = box.row()
         row.label(text="Emitter Size (cm)")
         row = box.row(align=True)
-        row.prop(obj.nvb, "xsize")
-        row.prop(obj.nvb, "ysize")
+        row.prop(obj.kb, "xsize")
+        row.prop(obj.kb, "ysize")
 
         box.separator()
 
@@ -65,31 +65,31 @@ class KB_PT_emitter(bpy.types.Panel):
         row = box.row()
         row.label(text="Inheritance")
         row = box.row()
-        row.prop(obj.nvb, "inherit")
-        row.prop(obj.nvb, "inherit_local")
+        row.prop(obj.kb, "inherit")
+        row.prop(obj.kb, "inherit_local")
         row = box.row()
-        row.prop(obj.nvb, "inheritvel")
-        if obj.nvb.update == "Lightning":
+        row.prop(obj.kb, "inheritvel")
+        if obj.kb.update == "Lightning":
             row.enabled = False
-        row.prop(obj.nvb, "inherit_part")
+        row.prop(obj.kb, "inherit_part")
 
         box.separator()
 
         row = box.row()
         row.label(text="Miscellaneous")
         row = box.row()
-        row.prop(obj.nvb, "numBranches")
+        row.prop(obj.kb, "numBranches")
         row = box.row()
-        row.prop(obj.nvb, "renderorder")
+        row.prop(obj.kb, "renderorder")
         row = box.row()
-        row.prop(obj.nvb, "threshold")
+        row.prop(obj.kb, "threshold")
 
         row = box.row()
         box.label(text="Blur")
         row = box.row()
-        row.prop(obj.nvb, "combinetime")
+        row.prop(obj.kb, "combinetime")
         row = box.row()
-        row.prop(obj.nvb, "deadspace")
+        row.prop(obj.kb, "deadspace")
 
         box = layout.row().box()
         row = box.row()
@@ -101,29 +101,29 @@ class KB_PT_emitter(bpy.types.Panel):
         row.label(text="End")
         row = box.row()
         row.label(text="Percent")
-        row.prop(obj.nvb, "percentstart", text="")
-        row.prop(obj.nvb, "percentmid", text="")
-        row.prop(obj.nvb, "percentend", text="")
+        row.prop(obj.kb, "percentstart", text="")
+        row.prop(obj.kb, "percentmid", text="")
+        row.prop(obj.kb, "percentend", text="")
         row = box.row()
         row.label(text="Color")
-        row.prop(obj.nvb, "colorstart", text="")
-        row.prop(obj.nvb, "colormid", text="")
-        row.prop(obj.nvb, "colorend", text="")
+        row.prop(obj.kb, "colorstart", text="")
+        row.prop(obj.kb, "colormid", text="")
+        row.prop(obj.kb, "colorend", text="")
         row = box.row()
         row.label(text="Alpha")
-        row.prop(obj.nvb, "alphastart", text="")
-        row.prop(obj.nvb, "alphamid", text="")
-        row.prop(obj.nvb, "alphaend", text="")
+        row.prop(obj.kb, "alphastart", text="")
+        row.prop(obj.kb, "alphamid", text="")
+        row.prop(obj.kb, "alphaend", text="")
         row = box.row()
         row.label(text="Size X")
-        row.prop(obj.nvb, "sizestart", text="")
-        row.prop(obj.nvb, "sizemid", text="")
-        row.prop(obj.nvb, "sizeend", text="")
+        row.prop(obj.kb, "sizestart", text="")
+        row.prop(obj.kb, "sizemid", text="")
+        row.prop(obj.kb, "sizeend", text="")
         row = box.row()
         row.label(text="Size Y")
-        row.prop(obj.nvb, "sizestart_y", text="")
-        row.prop(obj.nvb, "sizemid_y", text="")
-        row.prop(obj.nvb, "sizeend_y", text="")
+        row.prop(obj.kb, "sizestart_y", text="")
+        row.prop(obj.kb, "sizemid_y", text="")
+        row.prop(obj.kb, "sizeend_y", text="")
 
         box.separator()
 
@@ -131,84 +131,84 @@ class KB_PT_emitter(bpy.types.Panel):
         row.label(text="Birthrate")
         row = box.row()
         col = row.column()
-        col.prop(obj.nvb, "birthrate", text="")
-        if obj.nvb.update == "Lightning":
+        col.prop(obj.kb, "birthrate", text="")
+        if obj.kb.update == "Lightning":
             col.enabled = False
         col = row.column()
-        col.prop(obj.nvb, "m_frandombirthrate", text="Random")
-        if obj.nvb.update == "Lightning":
+        col.prop(obj.kb, "m_frandombirthrate", text="Random")
+        if obj.kb.update == "Lightning":
             col.enabled = False
         row = box.row()
         col = row.column()
-        col.prop(obj.nvb, "lifeexp")
-        if obj.nvb.update == "Lightning":
+        col.prop(obj.kb, "lifeexp")
+        if obj.kb.update == "Lightning":
             col.enabled = False
         col = row.column()
-        col.prop(obj.nvb, "mass")
-        if obj.nvb.update == "Lightning":
+        col.prop(obj.kb, "mass")
+        if obj.kb.update == "Lightning":
             col.enabled = False
         row = box.row()
         col = row.column()
-        col.prop(obj.nvb, "spread")
-        if obj.nvb.update == "Lightning":
+        col.prop(obj.kb, "spread")
+        if obj.kb.update == "Lightning":
             col.enabled = False
         col = row.column()
-        col.prop(obj.nvb, "particlerot")
-        if obj.nvb.update == "Lightning":
+        col.prop(obj.kb, "particlerot")
+        if obj.kb.update == "Lightning":
             col.enabled = False
         row = box.row()
         col = row.column()
-        col.prop(obj.nvb, "velocity")
-        if obj.nvb.update == "Lightning":
+        col.prop(obj.kb, "velocity")
+        if obj.kb.update == "Lightning":
             col.enabled = False
         col = row.column()
-        col.prop(obj.nvb, "randvel")
-        if obj.nvb.update == "Lightning":
+        col.prop(obj.kb, "randvel")
+        if obj.kb.update == "Lightning":
             col.enabled = False
         row = box.row()
-        row.prop(obj.nvb, "blurlength")
+        row.prop(obj.kb, "blurlength")
         row = box.row()
-        row.prop(obj.nvb, "targetsize")
+        row.prop(obj.kb, "targetsize")
         row = box.row()
         row.label(text="Tangent")
         row = box.row()
-        row.prop(obj.nvb, "tangentspread", text="Spread")
-        row.prop(obj.nvb, "tangentlength", text="Length")
+        row.prop(obj.kb, "tangentspread", text="Spread")
+        row.prop(obj.kb, "tangentlength", text="Length")
         # detonate
         row = box.row()
         col = row.column()
-        col.prop(obj.nvb, "bounce")
-        if obj.nvb.update == "Lightning":
+        col.prop(obj.kb, "bounce")
+        if obj.kb.update == "Lightning":
             col.enabled = False
         col = row.column()
-        col.prop(obj.nvb, "bounce_co")
-        if obj.nvb.update == "Lightning":
+        col.prop(obj.kb, "bounce_co")
+        if obj.kb.update == "Lightning":
             col.enabled = False
         row = box.row()
         col = row.column()
-        col.prop(obj.nvb, "loop")
-        if obj.nvb.update != "Single" and \
-           obj.nvb.update != "Explosion":
+        col.prop(obj.kb, "loop")
+        if obj.kb.update != "Single" and \
+           obj.kb.update != "Explosion":
             col.enabled = False
         col = row.column()
-        col.prop(obj.nvb, "splat")
+        col.prop(obj.kb, "splat")
         row = box.row()
-        row.prop(obj.nvb, "affectedByWind")
-        if obj.nvb.update == "Lightning":
+        row.prop(obj.kb, "affectedByWind")
+        if obj.kb.update == "Lightning":
             row.enabled = False
         row = box.row()
-        row.prop(obj.nvb, "m_isTinted")
+        row.prop(obj.kb, "m_isTinted")
 
         box = layout.row().box()
         row = box.row()
         row.label(text="Texture / Chunk", icon='TEXTURE')
         row = box.row()
-        row.prop(obj.nvb, "texture")
-        if not utils.is_null(obj.nvb.chunkName):
+        row.prop(obj.kb, "texture")
+        if not utils.is_null(obj.kb.chunkName):
             row.enabled = False
         row = box.row()
-        row.prop(obj.nvb, "twosidedtex")
-        if not utils.is_null(obj.nvb.chunkName):
+        row.prop(obj.kb, "twosidedtex")
+        if not utils.is_null(obj.kb.chunkName):
             row.enabled = False
 
         box.separator()
@@ -217,35 +217,35 @@ class KB_PT_emitter(bpy.types.Panel):
         row.label(text="Texture Animation")
         row = box.row()
         row.label(text="Grid")
-        row.prop(obj.nvb, "xgrid", text="X")
-        row.prop(obj.nvb, "ygrid", text="Y")
-        if not utils.is_null(obj.nvb.chunkName):
+        row.prop(obj.kb, "xgrid", text="X")
+        row.prop(obj.kb, "ygrid", text="Y")
+        if not utils.is_null(obj.kb.chunkName):
             row.enabled = False
         row = box.row()
-        row.prop(obj.nvb, "fps")
+        row.prop(obj.kb, "fps")
         row = box.row()
-        row.prop(obj.nvb, "framestart")
-        row.prop(obj.nvb, "frameend")
+        row.prop(obj.kb, "framestart")
+        row.prop(obj.kb, "frameend")
         row = box.row()
-        row.prop(obj.nvb, "m_bFrameBlending")
+        row.prop(obj.kb, "m_bFrameBlending")
         row = box.row()
-        row.prop(obj.nvb, "random")
+        row.prop(obj.kb, "random")
 
         box.separator()
 
         row = box.row()
         row.label(text="Depth Texture")
         row = box.row()
-        row.prop(obj.nvb, "depth_texture")
+        row.prop(obj.kb, "depth_texture")
         row = box.row()
-        row.prop(obj.nvb, "m_sDepthTextureName", text="")
+        row.prop(obj.kb, "m_sDepthTextureName", text="")
 
         box.separator()
 
         row = box.row()
         row.label(text="Chunk Model")
         row = box.row()
-        row.prop(obj.nvb, "chunkName", text="")
+        row.prop(obj.kb, "chunkName", text="")
 
         box = layout.row().box()
         row = box.row()
@@ -254,20 +254,20 @@ class KB_PT_emitter(bpy.types.Panel):
         # Lightning
         parent_box = box
         box = box.row().box()
-        if obj.nvb.update != "Lightning":
+        if obj.kb.update != "Lightning":
             box.enabled = False
         row = box.row()
         row.label(text="Lightning")
         row = box.row()
-        row.prop(obj.nvb, "lightningdelay")
+        row.prop(obj.kb, "lightningdelay")
         row = box.row()
-        row.prop(obj.nvb, "lightningradius")
+        row.prop(obj.kb, "lightningradius")
         row = box.row()
-        row.prop(obj.nvb, "lightningsubdiv")
+        row.prop(obj.kb, "lightningsubdiv")
         row = box.row()
-        row.prop(obj.nvb, "lightningscale")
+        row.prop(obj.kb, "lightningscale")
         row = box.row()
-        row.prop(obj.nvb, "lightningzigzag")
+        row.prop(obj.kb, "lightningzigzag")
         box = parent_box
 
         box.separator()
@@ -278,9 +278,9 @@ class KB_PT_emitter(bpy.types.Panel):
         row =  box.row()
         row.label(text="Blast")
         row =  box.row()
-        row.prop(obj.nvb, "blastradius")
+        row.prop(obj.kb, "blastradius")
         row =  box.row()
-        row.prop(obj.nvb, "blastlength")
+        row.prop(obj.kb, "blastlength")
         box = parent_box
 
         box.separator()
@@ -288,38 +288,38 @@ class KB_PT_emitter(bpy.types.Panel):
         # p2p settings
         parent_box = box
         box = box.row().box()
-        if obj.nvb.update != "Fountain" and\
-           obj.nvb.update != "Single":
+        if obj.kb.update != "Fountain" and\
+           obj.kb.update != "Single":
             box.enabled = False
         row = box.row()
         row.label(text="P2P Settings")
         row = box.row()
-        row.prop(obj.nvb, "p2p")
+        row.prop(obj.kb, "p2p")
         row = box.row()
-        row.prop(obj.nvb, "p2p_type")
-        if not obj.nvb.p2p:
+        row.prop(obj.kb, "p2p_type")
+        if not obj.kb.p2p:
             row.enabled = False
-        if not obj.nvb.p2p:
-            row.enabled = False
-        row = box.row()
-        row.prop(obj.nvb, "p2p_bezier2")
-        if not obj.nvb.p2p or \
-           obj.nvb.p2p_type == "Gravity":
+        if not obj.kb.p2p:
             row.enabled = False
         row = box.row()
-        row.prop(obj.nvb, "p2p_bezier3")
-        if not obj.nvb.p2p or \
-           obj.nvb.p2p_type == "Gravity":
+        row.prop(obj.kb, "p2p_bezier2")
+        if not obj.kb.p2p or \
+           obj.kb.p2p_type == "Gravity":
             row.enabled = False
         row = box.row()
-        row.prop(obj.nvb, "grav")
-        if not obj.nvb.p2p or \
-           obj.nvb.p2p_type == "Bezier":
+        row.prop(obj.kb, "p2p_bezier3")
+        if not obj.kb.p2p or \
+           obj.kb.p2p_type == "Gravity":
             row.enabled = False
         row = box.row()
-        row.prop(obj.nvb, "drag")
-        if not obj.nvb.p2p or \
-           obj.nvb.p2p_type == "Bezier":
+        row.prop(obj.kb, "grav")
+        if not obj.kb.p2p or \
+           obj.kb.p2p_type == "Bezier":
+            row.enabled = False
+        row = box.row()
+        row.prop(obj.kb, "drag")
+        if not obj.kb.p2p or \
+           obj.kb.p2p_type == "Bezier":
             row.enabled = False
         box = parent_box
 
@@ -330,11 +330,11 @@ class KB_PT_emitter(bpy.types.Panel):
         row = box.row()
         row.label(text="Control Points")
         row = box.row()
-        row.prop(obj.nvb, "numcontrolpts")
+        row.prop(obj.kb, "numcontrolpts")
         row = box.row()
-        row.prop(obj.nvb, "controlptradius")
+        row.prop(obj.kb, "controlptradius")
         row = box.row()
-        row.prop(obj.nvb, "controlptdelay")
+        row.prop(obj.kb, "controlptdelay")
         row = box.row()
-        row.prop(obj.nvb, "controlptsmoothing")
+        row.prop(obj.kb, "controlptsmoothing")
         box = parent_box

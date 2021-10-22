@@ -11,11 +11,11 @@ class KB_OT_move_lightflare(bpy.types.Operator):
 
     @classmethod
     def poll(self, context):
-        return len(context.object.nvb.flareList) > 0
+        return len(context.object.kb.flareList) > 0
 
     def move_index(self, context):
-        flareList = context.object.nvb.flareList
-        flareIdx  = context.object.nvb.flareListIdx
+        flareList = context.object.kb.flareList
+        flareIdx  = context.object.kb.flareListIdx
 
         listLength = len(flareList) - 1 # (index starts at 0)
         newIdx = 0
@@ -25,11 +25,11 @@ class KB_OT_move_lightflare(bpy.types.Operator):
             newIdx = flareIdx + 1
 
         newIdx   = max(0, min(newIdx, listLength))
-        context.object.nvb.flareListIdx = newIdx
+        context.object.kb.flareListIdx = newIdx
 
     def execute(self, context):
-        flareList = context.object.nvb.flareList
-        flareIdx  = context.object.nvb.flareListIdx
+        flareList = context.object.kb.flareList
+        flareIdx  = context.object.kb.flareListIdx
 
         if self.direction == "DOWN":
             neighbour = flareIdx + 1

@@ -15,15 +15,15 @@ class KB_OT_anim_event_new(bpy.types.Operator):
         """Enable only if there is an animation."""
         mdl_base = utils.get_mdl_root_from_object(context.object)
         if mdl_base is not None:
-            anim_list = mdl_base.nvb.animList
-            anim_list_idx = mdl_base.nvb.animListIdx
+            anim_list = mdl_base.kb.animList
+            anim_list_idx = mdl_base.kb.animListIdx
             return (anim_list_idx >= 0) and len(anim_list) > anim_list_idx
         return False
 
     def execute(self, context):
         """Add the new item."""
         mdl_base = utils.get_mdl_root_from_object(context.object)
-        anim = mdl_base.nvb.animList[mdl_base.nvb.animListIdx]
+        anim = mdl_base.kb.animList[mdl_base.kb.animListIdx]
 
         eventList = anim.eventList
         newEvent = eventList.add()

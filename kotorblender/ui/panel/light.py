@@ -23,7 +23,7 @@ class KB_PT_light(bpy.types.Panel):
         layout = self.layout
 
         row = layout.row()
-        row.prop(obj.nvb, "lighttype", text="Type")
+        row.prop(obj.kb, "lighttype", text="Type")
 
         layout.separator()
 
@@ -31,52 +31,52 @@ class KB_PT_light(bpy.types.Panel):
         box = row.box()
 
         row = box.row()
-        row.prop(obj.nvb, "wirecolor", text="Wirecolor")
+        row.prop(obj.kb, "wirecolor", text="Wirecolor")
         row = box.row()
-        row.prop(obj.nvb, "lightpriority", text="Priority")
+        row.prop(obj.kb, "lightpriority", text="Priority")
         row = box.row()
-        row.prop(obj.nvb, "radius", text="Radius")
+        row.prop(obj.kb, "radius", text="Radius")
         row = box.row()
-        row.prop(obj.nvb, "multiplier", text="Multiplier")
+        row.prop(obj.kb, "multiplier", text="Multiplier")
 
         split = box.split()
         col = split.column(align=True)
-        col.prop(obj.nvb, "ambientonly", text="Ambient Only")
-        col.prop(obj.nvb, "shadow", text="Shadows")
+        col.prop(obj.kb, "ambientonly", text="Ambient Only")
+        col.prop(obj.kb, "shadow", text="Shadows")
         col = split.column(align=True)
-        col.prop(obj.nvb, "fadinglight", text="Fading")
-        col.prop(obj.nvb, "isdynamic", text="Dynamic Type")
-        col.prop(obj.nvb, "affectdynamic", text="Affect dynamic")
+        col.prop(obj.kb, "fadinglight", text="Fading")
+        col.prop(obj.kb, "isdynamic", text="Dynamic Type")
+        col.prop(obj.kb, "affectdynamic", text="Affect dynamic")
 
         layout.separator()
 
         # Lens flares
         row = layout.row()
-        row.enabled = (obj.nvb.lighttype == "NONE")
+        row.enabled = (obj.kb.lighttype == "NONE")
         box = row.box()
         row = box.row()
-        row.prop(obj.nvb, "lensflares")
+        row.prop(obj.kb, "lensflares")
         sub = row.row(align=True)
-        sub.active = obj.nvb.lensflares
-        sub.prop(obj.nvb, "flareradius", text="Radius")
+        sub.active = obj.kb.lensflares
+        sub.prop(obj.kb, "flareradius", text="Radius")
         row = box.row()
-        row.active = obj.nvb.lensflares
-        row.template_list("KB_UL_lightflares", "The_List", obj.nvb, "flareList", obj.nvb, "flareListIdx")
+        row.active = obj.kb.lensflares
+        row.template_list("KB_UL_lightflares", "The_List", obj.kb, "flareList", obj.kb, "flareListIdx")
         col = row.column(align = True)
         col.operator("kb.lightflare_new", icon='ADD', text = "")
         col.operator("kb.lightflare_delete", icon='REMOVE', text = "")
         col.separator()
         col.operator("kb.lightflare_move", icon='TRIA_UP', text = "").direction = "UP"
         col.operator("kb.lightflare_move", icon='TRIA_DOWN', text = "").direction = "DOWN"
-        if obj.nvb.flareListIdx >= 0 and len(obj.nvb.flareList) > 0:
-            item = obj.nvb.flareList[obj.nvb.flareListIdx]
+        if obj.kb.flareListIdx >= 0 and len(obj.kb.flareList) > 0:
+            item = obj.kb.flareList[obj.kb.flareListIdx]
             row = box.row()
-            row.active = obj.nvb.lensflares
+            row.active = obj.kb.lensflares
             row.prop(item, "texture")
             row = box.row()
-            row.active = obj.nvb.lensflares
+            row.active = obj.kb.lensflares
             row.prop(item, "colorshift")
             row = box.row()
-            row.active = obj.nvb.lensflares
+            row.active = obj.kb.lensflares
             row.prop(item, "size")
             row.prop(item, "position")

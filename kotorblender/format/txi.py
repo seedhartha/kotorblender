@@ -168,12 +168,12 @@ def load_txi(imagetexture, operator=None):
                     value = (line[1], line[2], line[3])
                 elif line[0] == "channelscale":
                     for scale_counter in range(0,int(line[1])):
-                        setattr(imagetexture.nvb,
+                        setattr(imagetexture.kb,
                                 "channelscale" + str(scale_counter),
                                 asciiLines[line_idx + 1 + scale_counter][0])
                 elif line[0] == "channeltranslate":
                     for scale_counter in range(0,int(line[1])):
-                        setattr(imagetexture.nvb,
+                        setattr(imagetexture.kb,
                                 "channeltranslate" + str(scale_counter),
                                 asciiLines[line_idx + 1 + scale_counter][0])
                 # the generalized types
@@ -186,7 +186,7 @@ def load_txi(imagetexture, operator=None):
                     value = int(value)
                 elif line[0] in float_tokens:
                     value = float(value)
-                setattr(imagetexture.nvb, line[0], value)
+                setattr(imagetexture.kb, line[0], value)
         except:
             pass
     
@@ -212,7 +212,7 @@ def save_txi(imagetexture, operator=None):
         return False
     filepath = os.path.splitext(filepath)[0] + ".new.txi"
 
-    if len(imagetexture.nvb.modified_properties) < 1:
+    if len(imagetexture.kb.modified_properties) < 1:
         # do not write empty files
         return False
 
@@ -222,7 +222,7 @@ def save_txi(imagetexture, operator=None):
     asciiLines = []
     asciiLines.append("# Exported from blender " + datetime.now().strftime("%A, %Y-%m-%d"))
     # filter modified to unique, reduce channel{scale,translate}
-    for _, propname in enumerate(imagetexture.nvb.modified_properties):
+    for _, propname in enumerate(imagetexture.kb.modified_properties):
         propname = propname.name
         if propname == "channelscale" or \
            propname == "channelscale0" or \
@@ -248,24 +248,24 @@ def save_txi(imagetexture, operator=None):
         if propname == "channelscale":
             asciiLines.extend([
                 "channelscale 4",
-                str(imagetexture.nvb.channelscale0),
-                str(imagetexture.nvb.channelscale1),
-                str(imagetexture.nvb.channelscale2),
-                str(imagetexture.nvb.channelscale3),
+                str(imagetexture.kb.channelscale0),
+                str(imagetexture.kb.channelscale1),
+                str(imagetexture.kb.channelscale2),
+                str(imagetexture.kb.channelscale3),
                 ""
             ])
             continue
         if propname == "channeltranslate":
             asciiLines.extend([
                 "channeltranslate 4",
-                str(imagetexture.nvb.channeltranslate0),
-                str(imagetexture.nvb.channeltranslate1),
-                str(imagetexture.nvb.channeltranslate2),
-                str(imagetexture.nvb.channeltranslate3),
+                str(imagetexture.kb.channeltranslate0),
+                str(imagetexture.kb.channeltranslate1),
+                str(imagetexture.kb.channeltranslate2),
+                str(imagetexture.kb.channeltranslate3),
                 ""
             ])
             continue
-        value = getattr(imagetexture.nvb, propname)
+        value = getattr(imagetexture.kb, propname)
         if propname == "specularcolor":
             value = tuple(propname)
             value = "{} {} {}".format(*value)

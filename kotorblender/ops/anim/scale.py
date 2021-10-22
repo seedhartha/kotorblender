@@ -21,7 +21,7 @@ class KB_OT_anim_scale(bpy.types.Operator):
         """Prevent execution if no rootdummy was found."""
         mdl_base = utils.get_mdl_root_from_object(context.object)
         if mdl_base is not None:
-            return (len(mdl_base.nvb.animList) > 0)
+            return (len(mdl_base.kb.animList) > 0)
         return False
 
     def scale_frames_up(self, target, animStart, animEnd, scaleFactor):
@@ -76,7 +76,7 @@ class KB_OT_anim_scale(bpy.types.Operator):
         if not utils.check_anim_bounds(mdl_base):
             self.report({'INFO'}, "Error: Nested animations.")
             return {'CANCELLED'}
-        anim = mdl_base.nvb.animList[mdl_base.nvb.animListIdx]
+        anim = mdl_base.kb.animList[mdl_base.kb.animListIdx]
         # Check resulting length (has to be >= 1)
         oldSize = anim.frameEnd - anim.frameStart
         newSize = self.scaleFactor * oldSize
@@ -107,7 +107,7 @@ class KB_OT_anim_scale(bpy.types.Operator):
         # target (scaled) animation
         padding = newSize - oldSize
         if padding > 0:
-            for a in reversed(mdl_base.nvb.animList):
+            for a in reversed(mdl_base.kb.animList):
                 if a.frameStart > anim.frameEnd:
                     a.frameStart += padding
                     a.frameEnd += padding

@@ -38,7 +38,7 @@ class KB_OT_import_path(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
             object = bpy.data.objects.new(name, None)
             object.parent = path_object
             object.location = [point["X"], point["Y"], 0.0]
-            object.nvb.dummytype = defines.Dummytype.PATHPOINT
+            object.kb.dummytype = defines.Dummytype.PATHPOINT
             bpy.context.collection.objects.link(object)
             points.append((point, object))
 
@@ -49,7 +49,7 @@ class KB_OT_import_path(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
             for conection in conections:
                 name = self.get_point_name(conection["Destination"])
                 if name in bpy.data.objects:
-                    connection = object.nvb.path_connections.add()
+                    connection = object.kb.path_connections.add()
                     connection.point = name
 
         return {'FINISHED'}

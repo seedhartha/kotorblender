@@ -17,7 +17,7 @@ class KB_OT_texture_ops(bpy.types.Operator):
         if self.propname == "":
             return {'FINISHED'}
         if self.action == "RESET":
-            attr_def = getattr(bpy.types.ImageTexture.nvb[1]["type"], self.propname)[1]
+            attr_def = getattr(bpy.types.ImageTexture.kb[1]["type"], self.propname)[1]
             if "default" in attr_def:
-                setattr(context.texture.nvb, self.propname, attr_def["default"])
+                setattr(context.texture.kb, self.propname, attr_def["default"])
         return {'FINISHED'}

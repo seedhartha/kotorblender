@@ -15,5 +15,5 @@ class KB_OT_children_smoothgroup(bpy.types.Operator):
             context.object, lambda o: o.type == 'MESH'
         )
         for d in descendants:
-            d.nvb.smoothgroup = self.action
+            d.kb.smoothgroup = self.action
         return {'FINISHED'}

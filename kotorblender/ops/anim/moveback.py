@@ -15,7 +15,7 @@ class KB_OT_anim_moveback(bpy.types.Operator):
         """Prevent execution if animation list is empty."""
         mdl_base = utils.get_mdl_root_from_object(context.object)
         if mdl_base is not None:
-            return (len(mdl_base.nvb.animList) > 1)
+            return (len(mdl_base.kb.animList) > 1)
         return False
 
     def move_frames(self, obj, frame_start, frame_end, new_start):
@@ -47,8 +47,8 @@ class KB_OT_anim_moveback(bpy.types.Operator):
         if not utils.check_anim_bounds(mdl_base):
             self.report({'INFO'}, "Failure: Convoluted animations.")
             return {'CANCELLED'}
-        anim_list = mdl_base.nvb.animList
-        currentAnimIdx = mdl_base.nvb.animListIdx
+        anim_list = mdl_base.kb.animList
+        currentAnimIdx = mdl_base.kb.animListIdx
         anim = anim_list[currentAnimIdx]
         # Grab some data for speed
         old_start = anim.frameStart
@@ -78,7 +78,7 @@ class KB_OT_anim_moveback(bpy.types.Operator):
         # Set index
         newAnimIdx = len(anim_list) - 1
         anim_list.move(currentAnimIdx, newAnimIdx)
-        mdl_base.nvb.animListIdx = newAnimIdx
+        mdl_base.kb.animListIdx = newAnimIdx
         # Re-adjust the timeline to the new bounds
         utils.toggle_anim_focus(context.scene, mdl_base)
         return {'FINISHED'}

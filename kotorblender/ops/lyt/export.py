@@ -30,7 +30,7 @@ class KB_OT_export_lyt(bpy.types.Operator, bpy_extras.io_utils.ExportHelper):
             objects = bpy.context.selected_objects if len(bpy.context.selected_objects) > 0 else bpy.context.collection.objects
             for obj in objects:
                 if obj.type == 'EMPTY':
-                    if obj.nvb.dummytype == defines.Dummytype.MDLROOT:
+                    if obj.kb.dummytype == defines.Dummytype.MDLROOT:
                         rooms.append(obj)
                     elif obj.name.lower().startswith("door"):
                         doors.append(obj)

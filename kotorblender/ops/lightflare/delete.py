@@ -10,11 +10,11 @@ class KB_OT_delete_lightflare(bpy.types.Operator):
     @classmethod
     def poll(self, context):
         """ Enable only if the list isn't empty """
-        return len(context.object.nvb.flareList) > 0
+        return len(context.object.kb.flareList) > 0
 
     def execute(self, context):
-        flareList = context.object.nvb.flareList
-        flareIdx  = context.object.nvb.flareListIdx
+        flareList = context.object.kb.flareList
+        flareIdx  = context.object.kb.flareListIdx
 
         flareList.remove(flareIdx)
         if flareIdx > 0:
