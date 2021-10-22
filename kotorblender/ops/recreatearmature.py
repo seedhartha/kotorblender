@@ -18,8 +18,9 @@
 
 import bpy
 
-from .. import (armature, utils)
+from ..model import armature
 
+from .. import utils
 
 class KB_OT_recreate_armature(bpy.types.Operator):
     """Recreate an armature from bone nodes."""

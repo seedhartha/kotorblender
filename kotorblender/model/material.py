@@ -22,7 +22,7 @@ Functions related to material building.
 
 import bpy
 
-from . import teximage, utils
+from .. import teximage, utils
 
 
 def _get_material_name(obj):

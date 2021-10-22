@@ -19,7 +19,7 @@
 import bpy
 from mathutils import Matrix, Quaternion, Vector
 
-from . import defines, utils
+from .. import defines, utils
 
 
 def recreate_armature(mdl_root):
