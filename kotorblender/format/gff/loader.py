@@ -14,31 +14,31 @@ FIELD_TYPE_LIST = 15
 
 class GffLoader:
 
-    def __init__(self, path, fileType):
+    def __init__(self, path, file_type):
         self.reader = BinaryReader(path, 'little')
-        self.fileType = fileType.ljust(4)
+        self.file_type = file_type.ljust(4)
 
     def load(self):
-        fileType = self.reader.get_string(4)
-        fileVersion = self.reader.get_string(4)
+        file_type = self.reader.get_string(4)
+        file_version = self.reader.get_string(4)
 
-        if fileType != self.fileType:
-            raise MalformedGff("GFF file type is invalid: expected={}, actual={}".format(self.fileType, fileType))
-        if fileVersion != FILE_VERSION:
-            raise MalformedGff("GFF file version is invalid: expected={}, actual={}".format(FILE_VERSION, fileVersion))
+        if file_type != self.file_type:
+            raise MalformedGff("GFF file type is invalid: expected={}, actual={}".format(self.file_type, file_type))
+        if file_version != FILE_VERSION:
+            raise MalformedGff("GFF file version is invalid: expected={}, actual={}".format(FILE_VERSION, file_version))
 
-        self.offStructs = self.reader.get_uint32()
-        self.numStructs = self.reader.get_uint32()
-        self.offFields = self.reader.get_uint32()
-        self.numFields = self.reader.get_uint32()
-        self.offLabels = self.reader.get_uint32()
-        self.numLabels = self.reader.get_uint32()
-        self.offFieldData = self.reader.get_uint32()
-        self.numFieldData = self.reader.get_uint32()
-        self.offFieldIndices = self.reader.get_uint32()
-        self.numFieldIndices = self.reader.get_uint32()
-        self.offListIndices = self.reader.get_uint32()
-        self.numListIndices = self.reader.get_uint32()
+        self.off_structs = self.reader.get_uint32()
+        self.num_structs = self.reader.get_uint32()
+        self.off_fields = self.reader.get_uint32()
+        self.num_fields = self.reader.get_uint32()
+        self.off_labels = self.reader.get_uint32()
+        self.num_labels = self.reader.get_uint32()
+        self.off_field_data = self.reader.get_uint32()
+        self.num_field_data = self.reader.get_uint32()
+        self.off_field_indices = self.reader.get_uint32()
+        self.num_field_indices = self.reader.get_uint32()
+        self.off_list_indices = self.reader.get_uint32()
+        self.num_list_indices = self.reader.get_uint32()
 
         self.load_structs()
         self.load_fields()
@@ -50,70 +50,70 @@ class GffLoader:
 
     def load_structs(self):
         self.structs = []
-        self.reader.seek(self.offStructs)
-        for _ in range(0, self.numStructs):
+        self.reader.seek(self.off_structs)
+        for _ in range(0, self.num_structs):
             struct = Expando()
             struct.type = self.reader.get_uint32()
-            struct.dataOrDataOffset = self.reader.get_uint32()
-            struct.numFields = self.reader.get_uint32()
+            struct.data_or_data_offset = self.reader.get_uint32()
+            struct.num_fields = self.reader.get_uint32()
             self.structs.append(struct)
 
     def load_fields(self):
         self.fields = []
-        self.reader.seek(self.offFields)
-        for _ in range(0, self.numFields):
+        self.reader.seek(self.off_fields)
+        for _ in range(0, self.num_fields):
             field = Expando()
             field.type = self.reader.get_uint32()
-            field.labelIdx = self.reader.get_uint32()
-            field.dataOrDataOffset = self.reader.get_uint32()
+            field.label_idx = self.reader.get_uint32()
+            field.data_or_data_offset = self.reader.get_uint32()
             self.fields.append(field)
 
     def load_labels(self):
-        self.reader.seek(self.offLabels)
-        self.labels = [self.reader.get_string(16).rstrip('\0') for _ in range(0, self.numLabels)]
+        self.reader.seek(self.off_labels)
+        self.labels = [self.reader.get_string(16).rstrip('\0') for _ in range(0, self.num_labels)]
 
     def load_field_data(self):
-        self.reader.seek(self.offFieldData)
-        self.fieldData = self.reader.get_bytes(self.numFieldData)
+        self.reader.seek(self.off_field_data)
+        self.field_data = self.reader.get_bytes(self.num_field_data)
 
     def load_field_indices(self):
-        self.reader.seek(self.offFieldIndices)
-        self.fieldIndices = [self.reader.get_uint32() for _ in range(0, self.numFieldIndices // 4)]
+        self.reader.seek(self.off_field_indices)
+        self.field_indices = [self.reader.get_uint32() for _ in range(0, self.num_field_indices // 4)]
 
     def load_list_indices(self):
-        self.reader.seek(self.offListIndices)
-        self.listIndices = [self.reader.get_uint32() for _ in range(0, self.numListIndices // 4)]
+        self.reader.seek(self.off_list_indices)
+        self.list_indices = [self.reader.get_uint32() for _ in range(0, self.num_list_indices // 4)]
 
     def new_tree_struct(self, structIdx):
         tree = dict()
         struct = self.structs[structIdx]
         nodes = []
-        if struct.numFields == 1:
-            nodes.append(self.new_tree_field(struct.dataOrDataOffset))
+        if struct.num_fields == 1:
+            nodes.append(self.new_tree_field(struct.data_or_data_offset))
         else:
-            start = struct.dataOrDataOffset // 4
-            stop = start + struct.numFields
-            for index in self.fieldIndices[start:stop]:
+            start = struct.data_or_data_offset // 4
+            stop = start + struct.num_fields
+            for index in self.field_indices[start:stop]:
                 nodes.append(self.new_tree_field(index))
         for node in nodes:
             tree[node.key] = node.value
         return tree
 
-    def new_tree_field(self, fieldIdx):
-        field = self.fields[fieldIdx]
-        label = self.labels[field.labelIdx]
+    def new_tree_field(self, field_idx):
+        field = self.fields[field_idx]
+        label = self.labels[field.label_idx]
 
         if field.type == FIELD_TYPE_DWORD:
-            data = field.dataOrDataOffset
+            data = field.data_or_data_offset
         elif field.type == FIELD_TYPE_FLOAT:
-            data = self.repack_int_to_float(field.dataOrDataOffset)
+            data = self.repack_int_to_float(field.data_or_data_offset)
         elif field.type == FIELD_TYPE_STRUCT:
-            data = self.new_tree_struct(field.dataOrDataOffset)
+            data = self.new_tree_struct(field.data_or_data_offset)
         elif field.type == FIELD_TYPE_LIST:
-            size = self.listIndices[field.dataOrDataOffset // 4]
-            start = field.dataOrDataOffset // 4 + 1
+            size = self.list_indices[field.data_or_data_offset // 4]
+            start = field.data_or_data_offset // 4 + 1
             stop = start + size
-            indices = self.listIndices[start:stop]
+            indices = self.list_indices[start:stop]
             data = [self.new_tree_struct(idx) for idx in indices]
         else:
             raise NotImplementedError("Field type {} is not supported".format(field.type))
