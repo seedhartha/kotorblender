@@ -1,6 +1,6 @@
 from struct import pack, unpack
 
-from ...exception.malformedgff import MalformedGffFile
+from ...exception.malformedgff import MalformedGff
 from ...expando import Expando
 
 from ..binreader import BinaryReader
@@ -23,9 +23,9 @@ class GffLoader:
         fileVersion = self.reader.get_string(4)
 
         if fileType != self.fileType:
-            raise MalformedGffFile("GFF file type is invalid: expected={}, actual={}".format(self.fileType, fileType))
+            raise MalformedGff("GFF file type is invalid: expected={}, actual={}".format(self.fileType, fileType))
         if fileVersion != FILE_VERSION:
-            raise MalformedGffFile("GFF file version is invalid: expected={}, actual={}".format(FILE_VERSION, fileVersion))
+            raise MalformedGff("GFF file version is invalid: expected={}, actual={}".format(FILE_VERSION, fileVersion))
 
         self.offStructs = self.reader.get_uint32()
         self.numStructs = self.reader.get_uint32()
