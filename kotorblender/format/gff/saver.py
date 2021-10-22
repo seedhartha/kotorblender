@@ -83,8 +83,11 @@ class GffSaver:
             for label, field_type in tree["_fields"].items():
                 field_indices.append(len(self.fields))
 
-                label_idx = len(self.labels)
-                self.labels.append(label)
+                try:
+                    label_idx = self.labels.index(label)
+                except ValueError:
+                    label_idx = len(self.labels)
+                    self.labels.append(label)
 
                 value = tree[label]
                 if field_type == FIELD_TYPE_DWORD:
