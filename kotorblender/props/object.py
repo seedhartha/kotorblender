@@ -18,7 +18,9 @@
 
 import bpy
 
-from .. import (defines, light, utils)
+from ..model import light
+
+from .. import defines, utils
 
 from .anim import AnimPropertyGroup
 from .flare import FlarePropertyGroup

@@ -18,7 +18,9 @@
 
 import bpy
 
-from .. import (defines, material)
+from ..model import material
+
+from .. import defines
 
 
 class KB_OT_rebuild_material_nodes(bpy.types.Operator):

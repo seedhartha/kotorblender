@@ -24,8 +24,9 @@ from datetime import datetime
 import bpy
 
 from ....exception.malformedmdl import MalformedMdl
+from ....model import armature
 
-from .... import armature, defines, glob, utils
+from .... import defines, glob, utils
 
 from . import (
     anim as mdlanim,
