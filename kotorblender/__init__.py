@@ -16,8 +16,65 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-from kotorblender.ops import addskingroup
+import addon_utils
+import bpy
 
+from .ops.addskingroup import KB_OT_add_skingroup
+from .ops.anim.clone import KB_OT_anim_clone
+from .ops.anim.crop import KB_OT_anim_crop
+from .ops.anim.delete import KB_OT_anim_delete
+from .ops.anim.event.delete import KB_OT_anim_event_delete
+from .ops.anim.event.move import KB_OT_anim_event_move
+from .ops.anim.event.new import KB_OT_anim_event_new
+from .ops.anim.focus import KB_OT_anim_focus
+from .ops.anim.move import KB_OT_anim_move
+from .ops.anim.moveback import KB_OT_anim_moveback
+from .ops.anim.new import KB_OT_anim_new
+from .ops.anim.pad import KB_OT_anim_pad
+from .ops.anim.scale import KB_OT_anim_scale
+from .ops.lightflare.delete import KB_OT_delete_lightflare
+from .ops.lightflare.move import KB_OT_move_lightflare
+from .ops.lightflare.new import KB_OT_new_lightflare
+from .ops.loadwokmaterials import KB_OT_load_wok_materials
+from .ops.lyt.export import KB_OT_export_lyt
+from .ops.lyt.importop import KB_OT_import_lyt
+from .ops.mdl.ascii.export import KB_OT_export_ascii_mdl
+from .ops.mdl.ascii.importop import KB_OT_import_ascii_mdl
+from .ops.mdl.export import KB_OT_export_mdl
+from .ops.mdl.importop import KB_OT_import_mdl
+from .ops.path.addconnection import KB_OT_add_connection
+from .ops.path.export import KB_OT_export_path
+from .ops.path.importop import KB_OT_import_path
+from .ops.path.removeconnection import KB_OT_remove_connection
+from .ops.rebuildmaterialnodes import KB_OT_rebuild_material_nodes
+from .ops.recreatearmature import KB_OT_recreate_armature
+from .ops.smoothgroup.children import KB_OT_children_smoothgroup
+from .ops.smoothgroup.generate import KB_OT_generate_smoothgroup
+from .ops.smoothgroup.select import KB_OT_select_smoothgroup
+from .ops.smoothgroup.toggle import KB_OT_toggle_smoothgroup
+from .ops.txi.textureboxops import KB_OT_texture_box_ops
+from .ops.txi.textureio import KB_OT_texture_io
+from .ops.txi.textureops import KB_OT_texture_ops
+from .props.anim import AnimPropertyGroup
+from .props.animevent import AnimEventPropertyGroup
+from .props.flare import FlarePropertyGroup
+from .props.listitem import ListItemPropertyGroup
+from .props.object import ObjectPropertyGroup
+from .props.pathconnection import PathConnectionPropertyGroup
+from .props.texture import TexturePropertyGroup
+from .ui.list.animevents import KB_UL_anim_events
+from .ui.list.anims import KB_UL_anims
+from .ui.list.lightflares import KB_UL_lightflares
+from .ui.list.pathpoints import KB_UL_path_points
+from .ui.menu.animlistspecials import KB_MT_animlist_specials
+from .ui.panel.animlist import KB_PT_animlist
+from .ui.panel.emitter import KB_PT_emitter
+from .ui.panel.empty import KB_PT_empty
+from .ui.panel.light import KB_PT_light
+from .ui.panel.mesh import KB_PT_mesh
+from .ui.panel.pathpoint import KB_PT_path_point
+from .ui.panel.smoothgroups import KB_PT_smoothgroups
+from .ui.panel.texture import KB_PT_texture
 
 bl_info = {
     "name": "KotorBlender",
@@ -32,289 +89,110 @@ bl_info = {
     "tracker_url": "",
     "category": "Import-Export"}
 
-if 'bpy' in locals():
-    from importlib import reload
-    reload(aabb)
-    reload(addpathconnectionop)
-    reload(addskingroupop)
-    reload(animeventprops)
-    reload(animeventslist)
-    reload(animlistpanel)
-    reload(animlistspecialsmenu)
-    reload(animprops)
-    reload(animslist)
-    reload(armature)
-    reload(asciianim)
-    reload(asciianimnode)
-    reload(asciimdl)
-    reload(asciinode)
-    reload(asciiparse)
-    reload(binreader)
-    reload(binwriter)
-    reload(childrensmoothgroupop)
-    reload(cloneanimop)
-    reload(cropanimop)
-    reload(defines)
-    reload(deleteanimeventop)
-    reload(deleteanimop)
-    reload(deletelightflareop)
-    reload(emitterpanel)
-    reload(emptypanel)
-    reload(exportasciimdlop)
-    reload(exportlytop)
-    reload(exportmdlop)
-    reload(exportpathop)
-    reload(flareprops)
-    reload(focusanimop)
-    reload(generatesmoothgroupop)
-    reload(gffloader)
-    reload(gffsaver)
-    reload(glob)
-    reload(importasciimdlop)
-    reload(importlytop)
-    reload(importmdlop)
-    reload(importpathop)
-    reload(io)
-    reload(light)
-    reload(lightflareslist)
-    reload(lightpanel)
-    reload(listitemprops)
-    reload(loadwokmaterialsop)
-    reload(material)
-    reload(mdlloader)
-    reload(mdlsaver)
-    reload(meshpanel)
-    reload(moveanimeventop)
-    reload(moveanimop)
-    reload(movebackanimop)
-    reload(movelightflareop)
-    reload(newanimeventop)
-    reload(newanimop)
-    reload(newlightflareop)
-    reload(objectprops)
-    reload(padanimop)
-    reload(pathconnectionprops)
-    reload(pathpointpanel)
-    reload(pathpointslist)
-    reload(rebuildmaterialnodesop)
-    reload(recreatearmatureop)
-    reload(removepathconnection)
-    reload(scaleanimop)
-    reload(selectsmoothgroupop)
-    reload(smoothgroupspanel)
-    reload(teximage)
-    reload(textureboxtxiop)
-    reload(textureiotxiop)
-    reload(textureopstxiop)
-    reload(texturepanel)
-    reload(textureprops)
-    reload(togglesmoothgroupop)
-    reload(txiformat)
-    reload(utils)
-else:
-    from . import (
-        aabb,
-        armature,
-        defines,
-        glob,
-        io,
-        light,
-        material,
-        teximage,
-        utils)
-    from .format import (
-        binreader,
-        binwriter,
-        txi as txiformat)
-    from .format.gff import (
-        loader as gffloader,
-        saver as gffsaver)
-    from .format.mdl import (
-        loader as mdlloader,
-        saver as mdlsaver)
-    from .format.mdl.ascii import (
-        anim as asciianim,
-        animnode as asciianimnode,
-        mdl as asciimdl,
-        node as asciinode,
-        parse as asciiparse)
-    from .ops import (
-        addskingroup as addskingroupop,
-        loadwokmaterials as loadwokmaterialsop,
-        rebuildmaterialnodes as rebuildmaterialnodesop,
-        recreatearmature as recreatearmatureop)
-    from .ops.anim import (
-        clone as cloneanimop,
-        crop as cropanimop,
-        delete as deleteanimop,
-        focus as focusanimop,
-        move as moveanimop,
-        moveback as movebackanimop,
-        new as newanimop,
-        pad as padanimop,
-        scale as scaleanimop)
-    from .ops.anim.event import (
-        delete as deleteanimeventop,
-        move as moveanimeventop,
-        new as newanimeventop)
-    from .ops.lightflare import (
-        delete as deletelightflareop,
-        move as movelightflareop,
-        new as newlightflareop)
-    from .ops.lyt import (
-        export as exportlytop,
-        importop as importlytop)
-    from .ops.mdl import (
-        export as exportmdlop,
-        importop as importmdlop)
-    from .ops.mdl.ascii import (
-        export as exportasciimdlop,
-        importop as importasciimdlop)
-    from .ops.path import (
-        addconnection as addpathconnectionop,
-        export as exportpathop,
-        importop as importpathop,
-        removeconnection as removepathconnection)
-    from .ops.smoothgroup import (
-        children as childrensmoothgroupop,
-        generate as generatesmoothgroupop,
-        select as selectsmoothgroupop,
-        toggle as togglesmoothgroupop)
-    from .ops.txi import (
-        textureboxops as textureboxtxiop,
-        textureio as textureiotxiop,
-        textureops as textureopstxiop)
-    from .props import (
-        anim as animprops,
-        animevent as animeventprops,
-        flare as flareprops,
-        listitem as listitemprops,
-        object as objectprops,
-        pathconnection as pathconnectionprops,
-        texture as textureprops)
-    from .ui.list import (
-        animevents as animeventslist,
-        anims as animslist,
-        lightflares as lightflareslist,
-        pathpoints as pathpointslist)
-    from .ui.menu import animlistspecials as animlistspecialsmenu
-    from .ui.panel import (
-        animlist as animlistpanel,
-        emitter as emitterpanel,
-        empty as emptypanel,
-        light as lightpanel,
-        mesh as meshpanel,
-        pathpoint as pathpointpanel,
-        smoothgroups as smoothgroupspanel,
-        texture as texturepanel)
-
-import addon_utils
-import bpy
-
 
 def menu_func_import_mdl(self, context):
-    self.layout.operator(importmdlop.KB_OT_import_mdl.bl_idname, text="KotOR Model (.mdl)")
+    self.layout.operator(KB_OT_import_mdl.bl_idname, text="KotOR Model (.mdl)")
 
 
 def menu_func_import_ascii_mdl(self, context):
-    self.layout.operator(importasciimdlop.KB_OT_import_ascii_mdl.bl_idname, text="KotOR Model (.mdl.ascii)")
+    self.layout.operator(KB_OT_import_ascii_mdl.bl_idname, text="KotOR Model (.mdl.ascii)")
 
 
 def menu_func_import_lyt(self, context):
-    self.layout.operator(importlytop.KB_OT_import_lyt.bl_idname, text="KotOR Layout (.lyt)")
+    self.layout.operator(KB_OT_import_lyt.bl_idname, text="KotOR Layout (.lyt)")
 
 
 def menu_func_import_pth(self, context):
-    self.layout.operator(importpathop.KB_OT_import_path.bl_idname, text="KotOR Path (.pth)")
+    self.layout.operator(KB_OT_import_path.bl_idname, text="KotOR Path (.pth)")
 
 
 def menu_func_export_mdl(self, context):
-    self.layout.operator(exportmdlop.KB_OT_export_mdl.bl_idname, text="KotOR Model (.mdl)")
+    self.layout.operator(KB_OT_export_mdl.bl_idname, text="KotOR Model (.mdl)")
 
 
 def menu_func_export_ascii_mdl(self, context):
-    self.layout.operator(exportasciimdlop.KB_OT_export_ascii_mdl.bl_idname, text="KotOR Model (.mdl.ascii)")
+    self.layout.operator(KB_OT_export_ascii_mdl.bl_idname, text="KotOR Model (.mdl.ascii)")
 
 
 def menu_func_export_lyt(self, context):
-    self.layout.operator(exportlytop.KB_OT_export_lyt.bl_idname, text="KotOR Layout (.lyt)")
+    self.layout.operator(KB_OT_export_lyt.bl_idname, text="KotOR Layout (.lyt)")
 
 
 def menu_func_export_pth(self, context):
-    self.layout.operator(exportpathop.KB_OT_export_path.bl_idname, text="KotOR Path (.pth)")
+    self.layout.operator(KB_OT_export_path.bl_idname, text="KotOR Path (.pth)")
 
 
 classes = (
     # Property Groups
 
-    pathconnectionprops.PathConnectionPropertyGroup,
-    listitemprops.ListItemPropertyGroup,
-    animeventprops.AnimEventPropertyGroup,
-    animprops.AnimPropertyGroup,
-    flareprops.FlarePropertyGroup,
-    objectprops.ObjectPropertyGroup,
-    textureprops.TexturePropertyGroup,
+    PathConnectionPropertyGroup,
+    ListItemPropertyGroup,
+    AnimEventPropertyGroup,
+    AnimPropertyGroup,
+    FlarePropertyGroup,
+    ObjectPropertyGroup,
+    TexturePropertyGroup,
 
     # Operators
 
-    addpathconnectionop.KB_OT_add_connection,
-    childrensmoothgroupop.KB_OT_children_smoothgroup,
-    cloneanimop.KB_OT_anim_clone,
-    cropanimop.KB_OT_anim_crop,
-    deleteanimeventop.KB_OT_anim_event_delete,
-    deleteanimop.KB_OT_anim_delete,
-    deletelightflareop.KB_OT_delete_lightflare,
-    exportasciimdlop.KB_OT_export_ascii_mdl,
-    exportlytop.KB_OT_export_lyt,
-    exportmdlop.KB_OT_export_mdl,
-    exportpathop.KB_OT_export_path,
-    focusanimop.KB_OT_anim_focus,
-    generatesmoothgroupop.KB_OT_generate_smoothgroup,
-    importasciimdlop.KB_OT_import_ascii_mdl,
-    importlytop.KB_OT_import_lyt,
-    importmdlop.KB_OT_import_mdl,
-    importpathop.KB_OT_import_path,
-    addskingroupop.KB_OT_add_skingroup,
-    loadwokmaterialsop.KB_OT_load_wok_materials,
-    rebuildmaterialnodesop.KB_OT_rebuild_material_nodes,
-    recreatearmatureop.KB_OT_recreate_armature,
-    moveanimeventop.KB_OT_anim_event_move,
-    moveanimop.KB_OT_anim_move,
-    movebackanimop.KB_OT_anim_moveback,
-    movelightflareop.KB_OT_move_lightflare,
-    newanimeventop.KB_OT_anim_event_new,
-    newanimop.KB_OT_anim_new,
-    newlightflareop.KB_OT_new_lightflare,
-    padanimop.KB_OT_anim_pad,
-    removepathconnection.KB_OT_remove_connection,
-    scaleanimop.KB_OT_anim_scale,
-    selectsmoothgroupop.KB_OT_select_smoothgroup,
-    textureboxtxiop.KB_OT_texture_box_ops,
-    textureiotxiop.KB_OT_texture_io,
-    textureopstxiop.KB_OT_texture_ops,
-    togglesmoothgroupop.KB_OT_toggle_smoothgroup,
+    KB_OT_add_connection,
+    KB_OT_children_smoothgroup,
+    KB_OT_anim_clone,
+    KB_OT_anim_crop,
+    KB_OT_anim_event_delete,
+    KB_OT_anim_delete,
+    KB_OT_delete_lightflare,
+    KB_OT_export_ascii_mdl,
+    KB_OT_export_lyt,
+    KB_OT_export_mdl,
+    KB_OT_export_path,
+    KB_OT_anim_focus,
+    KB_OT_generate_smoothgroup,
+    KB_OT_import_ascii_mdl,
+    KB_OT_import_lyt,
+    KB_OT_import_mdl,
+    KB_OT_import_path,
+    KB_OT_add_skingroup,
+    KB_OT_load_wok_materials,
+    KB_OT_rebuild_material_nodes,
+    KB_OT_recreate_armature,
+    KB_OT_anim_event_move,
+    KB_OT_anim_move,
+    KB_OT_anim_moveback,
+    KB_OT_move_lightflare,
+    KB_OT_anim_event_new,
+    KB_OT_anim_new,
+    KB_OT_new_lightflare,
+    KB_OT_anim_pad,
+    KB_OT_remove_connection,
+    KB_OT_anim_scale,
+    KB_OT_select_smoothgroup,
+    KB_OT_texture_box_ops,
+    KB_OT_texture_io,
+    KB_OT_texture_ops,
+    KB_OT_toggle_smoothgroup,
 
     # Panels
 
-    animlistpanel.KB_PT_animlist,
-    emitterpanel.KB_PT_emitter,
-    emptypanel.KB_PT_empty,
-    lightpanel.KB_PT_light,
-    meshpanel.KB_PT_mesh,
-    pathpointpanel.KB_PT_path_point,
-    smoothgroupspanel.KB_PT_smoothgroups,
-    texturepanel.KB_PT_texture,
+    KB_PT_animlist,
+    KB_PT_emitter,
+    KB_PT_empty,
+    KB_PT_light,
+    KB_PT_mesh,
+    KB_PT_path_point,
+    KB_PT_smoothgroups,
+    KB_PT_texture,
 
     # Menus
 
-    animlistspecialsmenu.KB_MT_animlist_specials,
+    KB_MT_animlist_specials,
 
     # UI Lists
 
-    animeventslist.KB_UL_anim_events,
-    animslist.KB_UL_anims,
-    lightflareslist.KB_UL_lightflares,
-    pathpointslist.KB_UL_path_points
+    KB_UL_anim_events,
+    KB_UL_anims,
+    KB_UL_lightflares,
+    KB_UL_path_points
     )
 
 
@@ -326,8 +204,8 @@ def register():
     for cls in classes:
         bpy.utils.register_class(cls)
 
-    bpy.types.Object.nvb = bpy.props.PointerProperty(type=objectprops.ObjectPropertyGroup)
-    bpy.types.ImageTexture.nvb = bpy.props.PointerProperty(type=textureprops.TexturePropertyGroup)
+    bpy.types.Object.nvb = bpy.props.PointerProperty(type=ObjectPropertyGroup)
+    bpy.types.ImageTexture.nvb = bpy.props.PointerProperty(type=TexturePropertyGroup)
 
     bpy.types.TOPBAR_MT_file_import.append(menu_func_import_mdl)
     bpy.types.TOPBAR_MT_file_import.append(menu_func_import_ascii_mdl)
