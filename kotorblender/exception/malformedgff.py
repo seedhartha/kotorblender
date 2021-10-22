@@ -1,6 +1,6 @@
-class MalformedGffFile(Exception):
-    def __init__(self, value):
-        self.parameter = value
+class MalformedGff(Exception):
+    def __init__(self, message):
+        self.message = message
 
     def __str__(self):
-        return repr(self.parameter)
+        return repr(self.message)

@@ -12,6 +12,9 @@ class BinaryReader:
     def seek(self, offset):
         self.file.seek(offset)
 
+    def skip(self, offset):
+        self.file.seek(offset, 1)
+
     def tell(self):
         return self.tell()
 
@@ -48,6 +51,19 @@ class BinaryReader:
             if ch == '\0':
                 break
             str += ch
+        return str
+
+    def get_c_string_up_to(self, max_len):
+        str = ""
+        len = max_len
+        while len > 0:
+            ch = self.file.read(1).decode("utf-8")
+            len -= 1
+            if ch == '\0':
+                break
+            str += ch
+        if len > 0:
+            self.file.seek(len, 1)
         return str
 
     def get_bytes(self, count):

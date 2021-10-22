@@ -1,4 +1,4 @@
-class MalformedMdl(Exception):
+class MdxNotFound(Exception):
     def __init__(self, message):
         self.message = message
 

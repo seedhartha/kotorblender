@@ -5,7 +5,7 @@ from datetime import datetime
 
 import bpy
 
-from ....exception.malformedmdl import MalformedMdlFile
+from ....exception.malformedmdl import MalformedMdl
 
 from .... import armature, defines, glob, utils
 
@@ -36,13 +36,13 @@ class Mdl():
 
     def load_ascii_node(self, asciiBlock):
         if asciiBlock is None:
-            raise MalformedMdlFile("Empty Node")
+            raise MalformedMdl("Empty Node")
 
         nodeType = ""
         try:
             nodeType = asciiBlock[0][1].lower()
         except (IndexError, AttributeError):
-            raise MalformedMdlFile("Invalid node type")
+            raise MalformedMdl("Invalid node type")
 
         switch = {
             defines.Nodetype.DUMMY:      mdlnode.Dummy,
@@ -59,7 +59,7 @@ class Mdl():
         try:
             node = switch[nodeType]()
         except KeyError:
-            raise MalformedMdlFile("Invalid node type")
+            raise MalformedMdl("Invalid node type")
 
         # tell the node if it is part of a walkmesh (mdl is default)
         if isinstance(self, Xwk):
@@ -120,7 +120,7 @@ class Mdl():
                 obj.nvb.imporder = objIdx
                 objIdx += 1
             else:
-                raise MalformedMdlFile("First node has to be a dummy without a parent.")
+                raise MalformedMdl("First node has to be a dummy without a parent.")
 
             for (_, node) in it:
                 obj = node.add_to_collection(collection)
@@ -134,7 +134,7 @@ class Mdl():
 
                 if (utils.is_null(node.parentName)):
                     # Node without parent and not the mdl root.
-                    raise MalformedMdlFile(node.name + " has no parent.")
+                    raise MalformedMdl(node.name + " has no parent.")
                 else:
                     # Check if such an object exists
                     if obj.parent is not None:
@@ -171,7 +171,7 @@ class Mdl():
                                 break
                         # Node with invalid parent.
                         if not found:
-                            raise MalformedMdlFile(node.name + " has no parent " + node.parentName)
+                            raise MalformedMdl(node.name + " has no parent " + node.parentName)
 
         # Import the walkmesh, it will use any placeholder dummies just imported,
         # and the walkmesh nodes will be copied during animation import
@@ -223,9 +223,9 @@ class Mdl():
         geom_end   = ascii_block.find("endmodelgeom ")
 
         if (anim_start > 0) and (geom_start > anim_start):
-            raise MalformedMdlFile("Animations before geometry")
+            raise MalformedMdl("Animations before geometry")
         if (geom_start < 0):
-            raise MalformedMdlFile("Unable to find geometry")
+            raise MalformedMdl("Unable to find geometry")
 
         self.read_ascii_header(ascii_block[:geom_start-1])
         # Import Geometry
@@ -256,11 +256,11 @@ class Mdl():
             try:  # Read node type
                 ascii_lines[0][1].lower()
             except (IndexError, AttributeError):
-                raise MalformedMdlFile("Unable to read node type")
+                raise MalformedMdl("Unable to read node type")
             try:  # Read node name
                 ascii_lines[0][2].lower()
             except (IndexError, AttributeError):
-                raise MalformedMdlFile("Unable to read node name")
+                raise MalformedMdl("Unable to read node name")
             self.load_ascii_node(ascii_lines)
             nodelist.append(node)
 
@@ -336,7 +336,7 @@ class Mdl():
         try:
             node = switch[nodeType]()
         except KeyError:
-            raise MalformedMdlFile("Invalid node type")
+            raise MalformedMdl("Invalid node type")
 
         node.to_ascii(bObject, asciiLines, self.classification, simple, nameDict=nameDict)
 
@@ -464,7 +464,7 @@ class Xwk(Mdl):
                     blockStart = -1
                 else:
                     # "endnode" before "node"
-                    raise MalformedMdlFile("Unexpected 'endnode' at line " + str(idx))
+                    raise MalformedMdl("Unexpected 'endnode' at line " + str(idx))
 
     def generate_ascii(self, asciiLines, rootDummy, exports = {"ANIMATION", "WALKMESH"}):
         self.name = rootDummy.name
@@ -575,7 +575,7 @@ class Xwk(Mdl):
                     obj.matrix_parent_inverse = obj.parent.matrix_world.inverted()
                 else:
                     # Node with invalid parent.
-                    raise MalformedMdlFile(node.name + " has no parent " + node.parentName)
+                    raise MalformedMdl(node.name + " has no parent " + node.parentName)
 
 
 class Wok(Xwk):

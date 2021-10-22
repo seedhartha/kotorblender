@@ -1,6 +1,6 @@
 from ..binwriter import BinaryWriter
 
-class BinaryMdlSaver:
+class MdlSaver:
 
     def __init__(self, path):
         self.writer = BinaryWriter(path, 'little')
