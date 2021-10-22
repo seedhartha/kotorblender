@@ -14,7 +14,7 @@ class KB_OT_anim_clone(bpy.types.Operator):
         """Prevent execution if no rootdummy was found."""
         mdl_base = utils.get_mdl_root_from_object(context.object)
         if mdl_base is not None:
-            return (len(mdl_base.nvb.animList) > 0)
+            return (len(mdl_base.kb.animList) > 0)
         return False
 
     def clone_events(self, source_anim, target_anim):
@@ -42,7 +42,7 @@ class KB_OT_anim_clone(bpy.types.Operator):
     def execute(self, context):
         """Clone the animation."""
         mdl_base = utils.get_mdl_root_from_object(context.object)
-        source_anim = mdl_base.nvb.animList[mdl_base.nvb.animListIdx]
+        source_anim = mdl_base.kb.animList[mdl_base.kb.animListIdx]
         animStart = source_anim.frameStart
         animEnd = source_anim.frameEnd
         # Adds a new animation to the end of the list

@@ -14,7 +14,7 @@ class KB_OT_anim_focus(bpy.types.Operator):
         """Prevent execution if animation list is empty."""
         mdl_base = utils.get_mdl_root_from_object(context.object)
         if mdl_base is not None:
-            return (len(mdl_base.nvb.animList) > 0)
+            return (len(mdl_base.kb.animList) > 0)
         return False
 
     def execute(self, context):

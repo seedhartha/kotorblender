@@ -94,7 +94,7 @@ def search_node_in_model(obj, test):
 
 
 def is_root_dummy(obj, dummytype = defines.Dummytype.MDLROOT):
-    return obj and (obj.type == 'EMPTY') and (obj.nvb.dummytype == dummytype)
+    return obj and (obj.type == 'EMPTY') and (obj.kb.dummytype == dummytype)
 
 
 def get_node_type(obj):
@@ -103,20 +103,20 @@ def get_node_type(obj):
     """
     objType  = obj.type
     if objType == 'EMPTY':
-        if   obj.nvb.dummytype == defines.Dummytype.PATCH:
+        if   obj.kb.dummytype == defines.Dummytype.PATCH:
             return "patch"
-        elif obj.nvb.dummytype == defines.Dummytype.REFERENCE:
+        elif obj.kb.dummytype == defines.Dummytype.REFERENCE:
             return "reference"
     elif objType == 'MESH':
-        if   obj.nvb.meshtype == defines.Meshtype.TRIMESH:
+        if   obj.kb.meshtype == defines.Meshtype.TRIMESH:
             return "trimesh"
-        elif obj.nvb.meshtype == defines.Meshtype.DANGLYMESH:
+        elif obj.kb.meshtype == defines.Meshtype.DANGLYMESH:
             return "danglymesh"
-        elif obj.nvb.meshtype == defines.Meshtype.SKIN:
+        elif obj.kb.meshtype == defines.Meshtype.SKIN:
             return "skin"
-        elif obj.nvb.meshtype == defines.Meshtype.EMITTER:
+        elif obj.kb.meshtype == defines.Meshtype.EMITTER:
             return "emitter"
-        elif obj.nvb.meshtype == defines.Meshtype.AABB:
+        elif obj.kb.meshtype == defines.Meshtype.AABB:
             return "aabb"
     elif objType == 'LIGHT':
         return "light"
@@ -216,10 +216,10 @@ def get_last_keyframe(root_obj):
 def create_anim_list_item(mdl_base, check_keyframes=False):
     """Append a new animation at the and of the animation list."""
     last_frame = max([defines.anim_globstart] +
-                     [a.frameEnd for a in mdl_base.nvb.animList])
+                     [a.frameEnd for a in mdl_base.kb.animList])
     if check_keyframes:
         last_frame = max(last_frame, get_last_keyframe(mdl_base))
-    anim = mdl_base.nvb.animList.add()
+    anim = mdl_base.kb.animList.add()
     anim.name = mdl_base.name
     start = int(math.ceil((last_frame + defines.anim_offset) / 10.0)) * 10
     anim.frameStart = start
@@ -236,8 +236,8 @@ def str2identifier(s):
 
 def toggle_anim_focus(scene, mdl_base):
     """Set the Start and end frames of the timeline."""
-    animList = mdl_base.nvb.animList
-    animIdx = mdl_base.nvb.animListIdx
+    animList = mdl_base.kb.animList
+    animIdx = mdl_base.kb.animListIdx
 
     anim = animList[animIdx]
     if (scene.frame_start == anim.frameStart) and \
@@ -262,11 +262,11 @@ def check_anim_bounds(mdl_base):
 
     Returns true, if are non-overlapping and only use by one object.
     """
-    if len(mdl_base.nvb.animList) < 2:
+    if len(mdl_base.kb.animList) < 2:
         return True
     # TODO: use an interval tree
     animBounds = [(a.frameStart, a.frameEnd, idx) for idx, a in
-                  enumerate(mdl_base.nvb.animList)]
+                  enumerate(mdl_base.kb.animList)]
     for a1 in animBounds:
         for a2 in animBounds:
             if (a1[0] <= a2[1]) and (a2[0] <= a1[1]) and (a1[2] != a2[2]):
@@ -336,14 +336,14 @@ def color_to_hex(color):
 
 
 def is_path_point(obj):
-    return obj and (obj.type == 'EMPTY') and (obj.nvb.dummytype == defines.Dummytype.PATHPOINT)
+    return obj and (obj.type == 'EMPTY') and (obj.kb.dummytype == defines.Dummytype.PATHPOINT)
 
 
 def get_mdl_root(obj):
     """
     :returns: MDL root object for the specified object.
     """
-    if (obj.type == 'EMPTY') and (obj.nvb.dummytype == defines.Dummytype.MDLROOT):
+    if (obj.type == 'EMPTY') and (obj.kb.dummytype == defines.Dummytype.MDLROOT):
         return obj
 
     if not obj.parent:

@@ -120,16 +120,16 @@ class GeometryNode():
     def set_object_data(self, obj):
         self.objref = obj.name  # used to resolve naming conflicts
         utils.set_object_rotation_aurora(obj, self.orientation)
-        obj.nvb.restrot   = self.orientation
+        obj.kb.restrot   = self.orientation
         obj.scale         = (self.scale, self.scale, self.scale)
         obj.location      = self.position
-        obj.nvb.restloc   = obj.location
-        obj.nvb.wirecolor = self.wirecolor
+        obj.kb.restloc   = obj.location
+        obj.kb.wirecolor = self.wirecolor
         # add unprocessed data as text objects
         if (len(self.rawascii)):
             txt = bpy.data.texts.new(obj.name)
             txt.write(self.rawascii)
-            obj.nvb.rawascii = txt.name
+            obj.kb.rawascii = txt.name
 
     def add_to_collection(self, collection):
         obj = bpy.data.objects.new(self.name, None)
@@ -168,7 +168,7 @@ class GeometryNode():
         s = "  orientation {: .7g} {: .7g} {: .7g} {: .7g}".format(round(rot[0], 7), round(rot[1], 7), round(rot[2], 7), round(rot[3], 7))
         asciiLines.append(s)
 
-        color = obj.nvb.wirecolor
+        color = obj.kb.wirecolor
         asciiLines.append("  wirecolor " + str(round(color[0], 2)) + " " +
                                            str(round(color[1], 2)) + " " +
                                            str(round(color[2], 2)) )
@@ -177,8 +177,8 @@ class GeometryNode():
             asciiLines.append("  scale " + str(scale))
 
         # Write out the unprocessed data
-        if obj.nvb.rawascii and obj.nvb.rawascii in bpy.data.texts:
-            asciiLines.append("  " + "\n  ".join(bpy.data.texts[obj.nvb.rawascii].as_string().strip().split("\n")))
+        if obj.kb.rawascii and obj.kb.rawascii in bpy.data.texts:
+            asciiLines.append("  " + "\n  ".join(bpy.data.texts[obj.kb.rawascii].as_string().strip().split("\n")))
 
     def to_ascii(self, obj, asciiLines, classification = defines.Classification.UNKNOWN, simple = False, nameDict = None):
         if nameDict and obj.name in nameDict:
@@ -208,13 +208,13 @@ class Dummy(GeometryNode):
     def set_object_data(self, obj):
         GeometryNode.set_object_data(self, obj)
 
-        obj.nvb.dummytype = self.dummytype
+        obj.kb.dummytype = self.dummytype
 
-        obj.nvb.dummysubtype = defines.DummySubtype.NONE
+        obj.kb.dummysubtype = defines.DummySubtype.NONE
         subtypes = defines.DummySubtype.SUFFIX_LIST
         for element in subtypes:
             if self.name.endswith(element[0]):
-                obj.nvb.dummysubtype = element[1]
+                obj.kb.dummysubtype = element[1]
                 break
 
     def add_data_to_ascii(self, obj, asciiLines, classification = defines.Classification.UNKNOWN, simple = False, nameDict=None):
@@ -225,7 +225,7 @@ class Dummy(GeometryNode):
         else:
             asciiLines.append("  parent " + defines.null)
 
-        dummytype = obj.nvb.dummytype
+        dummytype = obj.kb.dummytype
         if dummytype == defines.Dummytype.MDLROOT:
             # Only parent for rootdummys
             return
@@ -244,13 +244,13 @@ class Dummy(GeometryNode):
         s = "  orientation {: .7g} {: .7g} {: .7g} {: .7g}".format(round(rot[0], 7), round(rot[1], 7), round(rot[2], 7), round(rot[3], 7))
         asciiLines.append(s)
 
-        color = obj.nvb.wirecolor
+        color = obj.kb.wirecolor
         asciiLines.append("  wirecolor " + str(round(color[0], 2)) + " " +
                                            str(round(color[1], 2)) + " " +
                                            str(round(color[2], 2)) )
 
         # TODO: Handle types and subtypes, i.e. Check and modify name
-        subtype = obj.nvb.dummysubtype
+        subtype = obj.kb.dummysubtype
         if subtype == defines.Dummytype.NONE:
             pass
 
@@ -267,7 +267,7 @@ class Patch(GeometryNode):
     def set_object_data(self, obj):
         GeometryNode.set_object_data(self, obj)
 
-        obj.nvb.dummytype = self.dummytype
+        obj.kb.dummytype = self.dummytype
 
 
 class Reference(GeometryNode):
@@ -304,14 +304,14 @@ class Reference(GeometryNode):
 
     def set_object_data(self, obj):
         GeometryNode.set_object_data(self, obj)
-        obj.nvb.dummytype    = self.dummytype
-        obj.nvb.refmodel     = self.refmodel
-        obj.nvb.reattachable = (self.reattachable == 1)
+        obj.kb.dummytype    = self.dummytype
+        obj.kb.refmodel     = self.refmodel
+        obj.kb.reattachable = (self.reattachable == 1)
 
     def add_data_to_ascii(self, obj, asciiLines, classification = defines.Classification.UNKNOWN, simple = False, nameDict=None):
         GeometryNode.add_data_to_ascii(self, obj, asciiLines, classification, nameDict=nameDict)
-        asciiLines.append("  refmodel " + obj.nvb.refmodel)
-        asciiLines.append("  reattachable " + str(int(obj.nvb.reattachable)))
+        asciiLines.append("  refmodel " + obj.kb.refmodel)
+        asciiLines.append("  reattachable " + str(int(obj.kb.reattachable)))
 
 
 class Trimesh(GeometryNode):
@@ -626,32 +626,32 @@ class Trimesh(GeometryNode):
     def set_object_data(self, obj):
         GeometryNode.set_object_data(self, obj)
 
-        obj.nvb.meshtype         = self.meshtype
-        obj.nvb.bitmap           = self.bitmap if not utils.is_null(self.bitmap) else ""
-        obj.nvb.bitmap2          = self.bitmap2 if not utils.is_null(self.bitmap2) else ""
-        obj.nvb.alpha            = self.alpha
-        obj.nvb.lightmapped      = (self.lightmapped == 1)
-        obj.nvb.render           = (self.render == 1)
-        obj.nvb.shadow           = (self.shadow == 1)
-        obj.nvb.beaming          = (self.beaming == 1)
-        obj.nvb.tangentspace     = (self.tangentspace == 1)
-        obj.nvb.inheritcolor     = (self.inheritcolor == 1)
-        obj.nvb.rotatetexture    = (self.rotatetexture == 1)
-        obj.nvb.m_bIsBackgroundGeometry = (self.m_bIsBackgroundGeometry == 1)
-        obj.nvb.dirt_enabled     = (self.dirt_enabled == 1)
-        obj.nvb.dirt_texture     = self.dirt_texture
-        obj.nvb.dirt_worldspace  = self.dirt_worldspace
-        obj.nvb.hologram_donotdraw = (self.hologram_donotdraw == 1)
-        obj.nvb.animateuv        = (self.animateuv == 1)
-        obj.nvb.uvdirectionx     = self.uvdirectionx
-        obj.nvb.uvdirectiony     = self.uvdirectiony
-        obj.nvb.uvjitter         = self.uvjitter
-        obj.nvb.uvjitterspeed    = self.uvjitterspeed
-        obj.nvb.transparencyhint = self.transparencyhint
-        obj.nvb.selfillumcolor   = self.selfillumcolor
-        obj.nvb.diffuse          = self.diffuse
-        obj.nvb.ambient          = self.ambient
-        obj.nvb.lytposition      = self.lytposition
+        obj.kb.meshtype         = self.meshtype
+        obj.kb.bitmap           = self.bitmap if not utils.is_null(self.bitmap) else ""
+        obj.kb.bitmap2          = self.bitmap2 if not utils.is_null(self.bitmap2) else ""
+        obj.kb.alpha            = self.alpha
+        obj.kb.lightmapped      = (self.lightmapped == 1)
+        obj.kb.render           = (self.render == 1)
+        obj.kb.shadow           = (self.shadow == 1)
+        obj.kb.beaming          = (self.beaming == 1)
+        obj.kb.tangentspace     = (self.tangentspace == 1)
+        obj.kb.inheritcolor     = (self.inheritcolor == 1)
+        obj.kb.rotatetexture    = (self.rotatetexture == 1)
+        obj.kb.m_bIsBackgroundGeometry = (self.m_bIsBackgroundGeometry == 1)
+        obj.kb.dirt_enabled     = (self.dirt_enabled == 1)
+        obj.kb.dirt_texture     = self.dirt_texture
+        obj.kb.dirt_worldspace  = self.dirt_worldspace
+        obj.kb.hologram_donotdraw = (self.hologram_donotdraw == 1)
+        obj.kb.animateuv        = (self.animateuv == 1)
+        obj.kb.uvdirectionx     = self.uvdirectionx
+        obj.kb.uvdirectiony     = self.uvdirectiony
+        obj.kb.uvjitter         = self.uvjitter
+        obj.kb.uvjitterspeed    = self.uvjitterspeed
+        obj.kb.transparencyhint = self.transparencyhint
+        obj.kb.selfillumcolor   = self.selfillumcolor
+        obj.kb.diffuse          = self.diffuse
+        obj.kb.ambient          = self.ambient
+        obj.kb.lytposition      = self.lytposition
 
     def add_to_collection(self, collection):
         mesh = self.create_mesh(self.name)
@@ -665,19 +665,19 @@ class Trimesh(GeometryNode):
         return obj
 
     def add_material_data_to_ascii(self, obj, asciiLines):
-        asciiLines.append("  alpha " + str(round(obj.nvb.alpha, 2)))
+        asciiLines.append("  alpha " + str(round(obj.kb.alpha, 2)))
 
-        asciiLines.append("  diffuse " + str(round(obj.nvb.diffuse[0], 2)) + " " +
-                                         str(round(obj.nvb.diffuse[1], 2)) + " " +
-                                         str(round(obj.nvb.diffuse[2], 2)))
+        asciiLines.append("  diffuse " + str(round(obj.kb.diffuse[0], 2)) + " " +
+                                         str(round(obj.kb.diffuse[1], 2)) + " " +
+                                         str(round(obj.kb.diffuse[2], 2)))
 
-        tangentspace = 1 if obj.nvb.tangentspace else 0
+        tangentspace = 1 if obj.kb.tangentspace else 0
         asciiLines.append("  tangentspace " + str(tangentspace))
 
-        imgName = obj.nvb.bitmap if obj.nvb.bitmap else defines.null
+        imgName = obj.kb.bitmap if obj.kb.bitmap else defines.null
         asciiLines.append("  bitmap " + imgName)
 
-        imgName = obj.nvb.bitmap2 if obj.nvb.bitmap2 else defines.null
+        imgName = obj.kb.bitmap2 if obj.kb.bitmap2 else defines.null
         asciiLines.append("  bitmap2 " + imgName)
 
     def add_uv_to_list(self, uv, uvList, vert, vertList):
@@ -722,11 +722,11 @@ class Trimesh(GeometryNode):
         # Calculate smooth groups
         smoothGroups    = []
         numSmoothGroups = 0
-        if (obj.nvb.smoothgroup == "SEPR") or (not glob.exportSmoothGroups):
+        if (obj.kb.smoothgroup == "SEPR") or (not glob.exportSmoothGroups):
             # 0 = Do not use smoothgroups
             smoothGroups    = [0] * len(mesh.polygons)
             numSmoothGroups = 1
-        elif (obj.nvb.smoothgroup == "SING"):
+        elif (obj.kb.smoothgroup == "SING"):
             # All faces belong to smooth group 1
             smoothGroups    = [1] * len(mesh.polygons)
             numSmoothGroups = 1
@@ -741,10 +741,10 @@ class Trimesh(GeometryNode):
         uvVertListLM = [] # Temp list of uv verts used for each geometry vert
 
         abs_pos = (0.0, 0.0, 0.0)
-        if self.roottype == "wok" and obj.nvb.lytposition:
-            abs_pos = (obj.nvb.lytposition[0] + obj.location[0],
-                       obj.nvb.lytposition[1] + obj.location[1],
-                       obj.nvb.lytposition[2] + obj.location[2])
+        if self.roottype == "wok" and obj.kb.lytposition:
+            abs_pos = (obj.kb.lytposition[0] + obj.location[0],
+                       obj.kb.lytposition[1] + obj.location[1],
+                       obj.kb.lytposition[2] + obj.location[2])
         # Add vertices
         asciiLines.append("  verts " + str(len(mesh.vertices)))
         l_round = round
@@ -772,7 +772,7 @@ class Trimesh(GeometryNode):
         for i in range(len(mesh.polygons)):
             polygon = mesh.polygons[i]
             smGroup = smoothGroups[i]
-            if obj.nvb.smoothgroup == "DRCT" and smgroups_layer is not None and smgroups_layer.data[i].value != 0:
+            if obj.kb.smoothgroup == "DRCT" and smgroups_layer is not None and smgroups_layer.data[i].value != 0:
                 smGroup = smgroups_layer.data[i].value
             if uv_layer:
                 uv1 = self.add_uv_to_list(uv_layer.data[3 * i + 0].uv, uvList, polygon.vertices[0], uvVertList)
@@ -868,7 +868,7 @@ class Trimesh(GeometryNode):
     def add_data_to_ascii(self, obj, asciiLines, classification = defines.Classification.UNKNOWN, simple = False, nameDict=None):
         GeometryNode.add_data_to_ascii(self, obj, asciiLines, classification, simple, nameDict=nameDict)
 
-        color = obj.nvb.ambient
+        color = obj.kb.ambient
         asciiLines.append("  ambient " +    str(round(color[0], 2)) + " " +
                                             str(round(color[1], 2)) + " " +
                                             str(round(color[2], 2))  )
@@ -876,30 +876,30 @@ class Trimesh(GeometryNode):
         if not simple:
 
 
-            color = obj.nvb.selfillumcolor
+            color = obj.kb.selfillumcolor
             asciiLines.append("  selfillumcolor " + str(round(color[0], 2)) + " " +
                                                     str(round(color[1], 2)) + " " +
                                                     str(round(color[2], 2))  )
 
-            asciiLines.append("  render " + str(int(obj.nvb.render)))
-            asciiLines.append("  shadow " + str(int(obj.nvb.shadow)))
-            asciiLines.append("  lightmapped " + str(int(obj.nvb.lightmapped)))
-            asciiLines.append("  beaming " + str(int(obj.nvb.beaming)))
-            asciiLines.append("  inheritcolor " + str(int(obj.nvb.inheritcolor)))
-            asciiLines.append("  m_bIsBackgroundGeometry " + str(int(obj.nvb.m_bIsBackgroundGeometry)))
-            asciiLines.append("  dirt_enabled " + str(int(obj.nvb.dirt_enabled)))
-            asciiLines.append("  dirt_texture " + str(obj.nvb.dirt_texture))
-            asciiLines.append("  dirt_worldspace " + str(obj.nvb.dirt_worldspace))
-            asciiLines.append("  hologram_donotdraw " + str(int(obj.nvb.hologram_donotdraw)))
-            asciiLines.append("  animateuv " + str(int(obj.nvb.animateuv)))
-            asciiLines.append("  uvdirectionx " + str(obj.nvb.uvdirectionx))
-            asciiLines.append("  uvdirectiony " + str(obj.nvb.uvdirectiony))
-            asciiLines.append("  uvjitter " + str(obj.nvb.uvjitter))
-            asciiLines.append("  uvjitterspeed " + str(obj.nvb.uvjitterspeed))
-            asciiLines.append("  transparencyhint " + str(obj.nvb.transparencyhint))
+            asciiLines.append("  render " + str(int(obj.kb.render)))
+            asciiLines.append("  shadow " + str(int(obj.kb.shadow)))
+            asciiLines.append("  lightmapped " + str(int(obj.kb.lightmapped)))
+            asciiLines.append("  beaming " + str(int(obj.kb.beaming)))
+            asciiLines.append("  inheritcolor " + str(int(obj.kb.inheritcolor)))
+            asciiLines.append("  m_bIsBackgroundGeometry " + str(int(obj.kb.m_bIsBackgroundGeometry)))
+            asciiLines.append("  dirt_enabled " + str(int(obj.kb.dirt_enabled)))
+            asciiLines.append("  dirt_texture " + str(obj.kb.dirt_texture))
+            asciiLines.append("  dirt_worldspace " + str(obj.kb.dirt_worldspace))
+            asciiLines.append("  hologram_donotdraw " + str(int(obj.kb.hologram_donotdraw)))
+            asciiLines.append("  animateuv " + str(int(obj.kb.animateuv)))
+            asciiLines.append("  uvdirectionx " + str(obj.kb.uvdirectionx))
+            asciiLines.append("  uvdirectiony " + str(obj.kb.uvdirectiony))
+            asciiLines.append("  uvjitter " + str(obj.kb.uvjitter))
+            asciiLines.append("  uvjitterspeed " + str(obj.kb.uvjitterspeed))
+            asciiLines.append("  transparencyhint " + str(obj.kb.transparencyhint))
             # These two are for tiles only
             if classification == "TILE":
-                asciiLines.append("  rotatetexture " + str(int(obj.nvb.rotatetexture)))
+                asciiLines.append("  rotatetexture " + str(int(obj.kb.rotatetexture)))
 
         self.add_mesh_data_to_ascii(obj, asciiLines, simple)
 
@@ -955,18 +955,18 @@ class Danglymesh(Trimesh):
         for vertexIdx, constraint in enumerate(self.constraints):
             weight = constraint/255
             vgroup.add([vertexIdx], weight, 'REPLACE')
-        obj.nvb.constraints = vgroup.name
+        obj.kb.constraints = vgroup.name
 
     def set_object_data(self, obj):
         Trimesh.set_object_data(self, obj)
 
-        obj.nvb.period       = self.period
-        obj.nvb.tightness    = self.tightness
-        obj.nvb.displacement = self.displacement
+        obj.kb.period       = self.period
+        obj.kb.tightness    = self.tightness
+        obj.kb.displacement = self.displacement
         self.add_constraints_to_object(obj)
 
     def add_constraints_to_ascii(self, obj, asciiLines):
-        vgroupName = obj.nvb.constraints
+        vgroupName = obj.kb.constraints
         vgroup     = obj.vertex_groups[vgroupName]
 
         mesh = self.get_export_mesh(obj)
@@ -986,9 +986,9 @@ class Danglymesh(Trimesh):
     def add_data_to_ascii(self, obj, asciiLines, classification = defines.Classification.UNKNOWN, simple = False, nameDict=None):
         Trimesh.add_data_to_ascii(self, obj, asciiLines, classification, nameDict=nameDict)
 
-        asciiLines.append("  period "       + str(round(obj.nvb.period, 3)))
-        asciiLines.append("  tightness "    + str(round(obj.nvb.tightness, 3)))
-        asciiLines.append("  displacement " + str(round(obj.nvb.displacement, 3)))
+        asciiLines.append("  period "       + str(round(obj.kb.period, 3)))
+        asciiLines.append("  tightness "    + str(round(obj.kb.tightness, 3)))
+        asciiLines.append("  displacement " + str(round(obj.kb.displacement, 3)))
         self.add_constraints_to_ascii(obj, asciiLines)
 
 
@@ -1359,12 +1359,12 @@ class Emitter(GeometryNode):
     def add_raw_ascii(self, obj):
         txt = bpy.data.texts.new(obj.name)
         txt.write(self.rawascii)
-        obj.nvb.rawascii = txt.name
+        obj.kb.rawascii = txt.name
 
     def set_object_data(self, obj):
         GeometryNode.set_object_data(self, obj)
 
-        obj.nvb.meshtype = self.meshtype
+        obj.kb.meshtype = self.meshtype
 
         for attrname in self.emitter_attrs:
             value = getattr(self, attrname)
@@ -1394,14 +1394,14 @@ class Emitter(GeometryNode):
             # translate p2p_sel to metaproperty p2p_type
             elif attrname == "p2p_sel":
                 if self.p2p_sel:
-                    obj.nvb.p2p_type = "Bezier"
+                    obj.kb.p2p_type = "Bezier"
                 else:
-                    obj.nvb.p2p_type = "Gravity"
+                    obj.kb.p2p_type = "Gravity"
                 # p2p_type has update method, sets p2p_sel
                 # except it doesn't seem to initially
-                obj.nvb.p2p_sel = self.p2p_sel
+                obj.kb.p2p_sel = self.p2p_sel
                 continue
-            setattr(obj.nvb, attrname, value)
+            setattr(obj.kb, attrname, value)
 
     def add_to_collection(self, collection):
         mesh = self.create_mesh(self.name)
@@ -1417,9 +1417,9 @@ class Emitter(GeometryNode):
         # export the copious amounts of emitter data
         for attrname in self.emitter_attrs:
             if attrname == "render":
-                value = obj.nvb.render_emitter
+                value = obj.kb.render_emitter
             else:
-                value = getattr(obj.nvb, attrname)
+                value = getattr(obj.kb, attrname)
             if attrname == "spawntype":
                 if value == "Normal":
                     value = 0
@@ -1567,29 +1567,29 @@ class Light(GeometryNode):
                   "sl1": "SOURCELIGHT1",
                   "sl2": "SOURCELIGHT2"}
         #TODO: Check light names when exporting tiles
-        obj.nvb.multiplier    = self.multiplier
-        obj.nvb.radius        = self.radius
-        obj.nvb.ambientonly   = (self.ambientonly >= 1)
-        obj.nvb.lighttype     = switch.get(self.name[-3:], "NONE")
-        obj.nvb.shadow        = (self.shadow >= 1)
-        obj.nvb.lightpriority = self.lightpriority
-        obj.nvb.fadinglight   = (self.fadinglight >= 1)
-        obj.nvb.isdynamic     = self.ndynamictype
-        if obj.nvb.isdynamic == 0 and self.isdynamic >= 1:
-            obj.nvb.isdynamic = 1
-        obj.nvb.affectdynamic = (self.affectdynamic >= 1)
+        obj.kb.multiplier    = self.multiplier
+        obj.kb.radius        = self.radius
+        obj.kb.ambientonly   = (self.ambientonly >= 1)
+        obj.kb.lighttype     = switch.get(self.name[-3:], "NONE")
+        obj.kb.shadow        = (self.shadow >= 1)
+        obj.kb.lightpriority = self.lightpriority
+        obj.kb.fadinglight   = (self.fadinglight >= 1)
+        obj.kb.isdynamic     = self.ndynamictype
+        if obj.kb.isdynamic == 0 and self.isdynamic >= 1:
+            obj.kb.isdynamic = 1
+        obj.kb.affectdynamic = (self.affectdynamic >= 1)
 
         if (self.flareradius > 0) or (self.lensflares >= 1):
-            obj.nvb.lensflares = True
+            obj.kb.lensflares = True
             numFlares = len(self.flareList.textures)
             for i in range(numFlares):
-                newItem = obj.nvb.flareList.add()
+                newItem = obj.kb.flareList.add()
                 newItem.texture    = self.flareList.textures[i]
                 newItem.colorshift = self.flareList.colorshifts[i]
                 newItem.size       = self.flareList.sizes[i]
                 newItem.position   = self.flareList.positions[i]
 
-        obj.nvb.flareradius = self.flareradius
+        obj.kb.flareradius = self.flareradius
         light.calc_light_power(obj)
 
     def add_to_collection(self, collection):
@@ -1600,44 +1600,44 @@ class Light(GeometryNode):
         return obj
 
     def add_flares_to_ascii(self, obj, asciiLines):
-        if obj.nvb.lensflares:
-            num_flares = int(obj.nvb.lensflares)
+        if obj.kb.lensflares:
+            num_flares = int(obj.kb.lensflares)
             asciiLines.append("  lensflares " + str(num_flares))
-            if len(obj.nvb.flareList) > 0:
+            if len(obj.kb.flareList) > 0:
 
                 # TODO: Clean this up
                 asciiLines.append("  texturenames " + str(num_flares))
-                for flare in obj.nvb.flareList:
+                for flare in obj.kb.flareList:
                     asciiLines.append("    " + flare.texture)
                 asciiLines.append("  flarepositions " + str(num_flares))
-                for flare in obj.nvb.flareList:
+                for flare in obj.kb.flareList:
                     asciiLines.append("    " + str(round(flare.position, 7)))
                 asciiLines.append("  flaresizes " + str(num_flares))
-                for flare in obj.nvb.flareList:
+                for flare in obj.kb.flareList:
                     asciiLines.append("    " + str(flare.size))
                 asciiLines.append("  flarecolorshifts " + str(num_flares))
-                for flare in obj.nvb.flareList:
+                for flare in obj.kb.flareList:
                     asciiLines.append("    " +  str(round(flare.colorshift[0], 2)) + " " +
                                                 str(round(flare.colorshift[1], 2)) + " " +
                                                 str(round(flare.colorshift[2], 2)) )
-        asciiLines.append("  flareradius " + str(round(obj.nvb.flareradius, 1)))
+        asciiLines.append("  flareradius " + str(round(obj.kb.flareradius, 1)))
 
     def add_data_to_ascii(self, obj, asciiLines, classification = defines.Classification.UNKNOWN, simple = False, nameDict=None):
         GeometryNode.add_data_to_ascii(self, obj, asciiLines, classification, nameDict=nameDict)
 
         light = obj.data
         color = (light.color[0], light.color[1], light.color[2])
-        asciiLines.append("  radius " + str(round(obj.nvb.radius, 1)))
-        asciiLines.append("  multiplier " + str(round(obj.nvb.multiplier, 1)))
+        asciiLines.append("  radius " + str(round(obj.kb.radius, 1)))
+        asciiLines.append("  multiplier " + str(round(obj.kb.multiplier, 1)))
         asciiLines.append("  color " +  str(round(color[0], 2)) + " " +
                                         str(round(color[1], 2)) + " " +
                                         str(round(color[2], 2)))
-        asciiLines.append("  ambientonly " + str(int(obj.nvb.ambientonly)))
-        asciiLines.append("  nDynamicType " + str(obj.nvb.isdynamic))
-        asciiLines.append("  affectDynamic " + str(int(obj.nvb.affectdynamic)))
-        asciiLines.append("  shadow " + str(int(obj.nvb.shadow)))
-        asciiLines.append("  lightpriority " + str(obj.nvb.lightpriority))
-        asciiLines.append("  fadingLight " + str(int(obj.nvb.fadinglight)))
+        asciiLines.append("  ambientonly " + str(int(obj.kb.ambientonly)))
+        asciiLines.append("  nDynamicType " + str(obj.kb.isdynamic))
+        asciiLines.append("  affectDynamic " + str(int(obj.kb.affectdynamic)))
+        asciiLines.append("  shadow " + str(int(obj.kb.shadow)))
+        asciiLines.append("  lightpriority " + str(obj.kb.lightpriority))
+        asciiLines.append("  fadingLight " + str(int(obj.kb.fadinglight)))
         self.add_flares_to_ascii(obj, asciiLines)
 
 
@@ -1664,7 +1664,7 @@ class Aabb(Trimesh):
                                     round(wkmv1[1] - v1[1], 6),
                                     round(wkmv1[2] - v1[2], 6))
                 break
-        bpy.data.objects[self.objref].nvb.lytposition = self.lytposition
+        bpy.data.objects[self.objref].kb.lytposition = self.lytposition
 
     def add_aabb_to_ascii(self, obj, asciiLines):
         if glob.applyModifiers:
@@ -1759,7 +1759,7 @@ class Aabb(Trimesh):
                                              str(round(rot[1], 7)) + " " +
                                              str(round(rot[2], 7)) + " " +
                                              str(round(rot[3], 7)) )
-        color = obj.nvb.wirecolor
+        color = obj.kb.wirecolor
         asciiLines.append("  wirecolor " + str(round(color[0], 2)) + " " +
                                            str(round(color[1], 2)) + " " +
                                            str(round(color[2], 2))  )
@@ -1772,12 +1772,12 @@ class Aabb(Trimesh):
     def add_material_data_to_ascii(self, obj, asciiLines):
         asciiLines.append("  diffuse 1.0 1.0 1.0")
 
-        imgName = obj.nvb.bitmap2 if obj.nvb.bitmap2 else defines.null
+        imgName = obj.kb.bitmap2 if obj.kb.bitmap2 else defines.null
 
         asciiLines.append("  bitmap " + defines.null)
         asciiLines.append("  bitmap2 " + imgName)
 
-        lightmapped = 1 if obj.nvb.lightmapped else 0
+        lightmapped = 1 if obj.kb.lightmapped else 0
         asciiLines.append("  lightmapped " + str(lightmapped))
 
     def create_mesh(self, name):

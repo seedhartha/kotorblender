@@ -31,7 +31,7 @@ class KB_OT_export_path(bpy.types.Operator, bpy_extras.io_utils.ExportHelper):
         conections = []
         for obj in point_objects:
             first_conection = len(conections)
-            for object_connection in obj.nvb.path_connections:
+            for object_connection in obj.kb.path_connections:
                 conection = dict()
                 conection["_type"] = 3
                 conection["_fields"] = {
@@ -48,7 +48,7 @@ class KB_OT_export_path(bpy.types.Operator, bpy_extras.io_utils.ExportHelper):
                 "X": 8,
                 "Y": 8
                 }
-            point["Conections"] = len(obj.nvb.path_connections)
+            point["Conections"] = len(obj.kb.path_connections)
             point["First_Conection"] = first_conection
             point["X"] = obj.location[0]
             point["Y"] = obj.location[1]

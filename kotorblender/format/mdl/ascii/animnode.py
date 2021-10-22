@@ -95,12 +95,12 @@ class Node():
         "alpha": {
             "values": 1,
             "axes": 1,
-            "objdata": "nvb.alpha",
+            "objdata": "kb.alpha",
         },
         "selfillumcolor": {
             "values": 3,
             "axes": 3,
-            "objdata": "nvb.selfillumcolor",
+            "objdata": "kb.selfillumcolor",
         },
         "color": {
             "values": 3,
@@ -469,7 +469,7 @@ class Node():
                     name = keyname + "key"
                     break
             for keyname in Node.EMITTER_KEY_TYPE.keys():
-                if dataPath == "nvb." + keyname.lower():
+                if dataPath == "kb." + keyname.lower():
                     ktype = Node.EMITTER_KEY_TYPE[keyname]
                     name = keyname + "key"
                     break
@@ -551,9 +551,9 @@ class Node():
 
     @staticmethod
     def generate_ascii_keys_incompat(obj, asciiLines, options={}):
-        if obj.nvb.rawascii not in bpy.data.texts:
+        if obj.kb.rawascii not in bpy.data.texts:
             return
-        txt      = bpy.data.texts[obj.nvb.rawascii]
+        txt      = bpy.data.texts[obj.kb.rawascii]
         txtLines = [l.split() for l in txt.as_string().split("\n")]
         for line in txtLines:
             try:
@@ -728,7 +728,7 @@ class Node():
         if animObj.parent:
             originalParent = Node.get_original_name(animObj.parent.name, animName)
 
-        if originalObj.nvb.meshtype == defines.Meshtype.EMITTER:
+        if originalObj.kb.meshtype == defines.Meshtype.EMITTER:
             asciiLines.append("  node emitter " + originalName)
             asciiLines.append("    parent " + originalParent)
         else:
@@ -908,7 +908,7 @@ class Animnode():
         for label, (data, _, data_dim) in self.emitter_data.items():
             frames = [fps * d[0] + frame_start for d in data]
             values = [d[1:data_dim+1] for d in data]
-            dp = "nvb.{}".format(label)
+            dp = "kb.{}".format(label)
             dp_dim = data_dim
             Animnode.insert_kfp(frames, values, action, dp, dp_dim,
                                 "Odyssey Emitter")
@@ -930,15 +930,15 @@ class Animnode():
             return  # No action = no animation = no need for rest pose
         fcu = [action.fcurves.find("rotation_quaternion", index=i) for i in range(4)]
         if fcu.count(None) < 1:
-            rr = obj.nvb.restrot
+            rr = obj.kb.restrot
             q = Quaternion((rr[0], rr[1], rr[2]), rr[3])
             insert_kfp(fcu, frame, [q.w, q.x, q.y, q.z], 4)
         fcu = [action.fcurves.find("location", index=i) for i in range(3)]
         if fcu.count(None) < 1:
-            insert_kfp(fcu, frame, obj.nvb.restloc, 3)
+            insert_kfp(fcu, frame, obj.kb.restloc, 3)
         fcu = [action.fcurves.find("scale", index=i) for i in range(3)]
         if fcu.count(None) < 1:
-            insert_kfp(fcu, frame, [obj.nvb.restscl] * 3, 3)
+            insert_kfp(fcu, frame, [obj.kb.restscl] * 3, 3)
 
     def add_object_keyframes(self, obj, anim, options={}):
         if self.object_data:
@@ -952,7 +952,7 @@ class Animnode():
             return
         # Type + Name
         node_type = "dummy"
-        if obj.nvb.meshtype == defines.Meshtype.EMITTER:
+        if obj.kb.meshtype == defines.Meshtype.EMITTER:
             node_type = "emitter"
         node_name = Node.get_original_name(obj.name, anim.name)
         asciiLines.append("  node " + node_type + " " + node_name)

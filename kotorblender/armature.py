@@ -12,7 +12,7 @@ def recreate_armature(mdl_root):
     if not utils.is_root_dummy(mdl_root):
         return None
 
-    skinmeshes = utils.search_node_all(mdl_root, lambda o: o.nvb.meshtype == defines.Meshtype.SKIN)
+    skinmeshes = utils.search_node_all(mdl_root, lambda o: o.kb.meshtype == defines.Meshtype.SKIN)
     if not skinmeshes:
         print("KotorBlender: WARNING - skinmeshes not found under the MDL root - armature creation aborted")
         return None
@@ -52,8 +52,8 @@ def _create_bones_recursive(armature, obj, parent_bone=None):
     """
     Recursively create armature bones from bone nodes.
     """
-    mat_trans = Matrix.Translation(obj.nvb.restloc)
-    mat_rot = utils.nwangle2quat(obj.nvb.restrot).to_matrix().to_4x4()
+    mat_trans = Matrix.Translation(obj.kb.restloc)
+    mat_rot = utils.nwangle2quat(obj.kb.restrot).to_matrix().to_4x4()
     mat_bone = mat_trans @ mat_rot
     if parent_bone:
         mat_bone = parent_bone.matrix @ mat_bone

@@ -29,8 +29,8 @@ class KB_PT_animlist(bpy.types.Panel):
             # Display and add/remove animations
             row = layout.row()
             row.template_list("KB_UL_anims", "TheAnimList",
-                              mdl_base.nvb, "animList",
-                              mdl_base.nvb, "animListIdx",
+                              mdl_base.kb, "animList",
+                              mdl_base.kb, "animListIdx",
                               rows=7)
             col = row.column(align=True)
             col.operator("kb.anim_new", icon='ADD', text="")
@@ -45,8 +45,8 @@ class KB_PT_animlist(bpy.types.Panel):
                          icon='RENDER_ANIMATION', text="")
             col.menu("KB_MT_animlist_specials",
                      icon='DOWNARROW_HLT', text="")
-            anim_list = mdl_base.nvb.animList
-            anim_list_idx = mdl_base.nvb.animListIdx
+            anim_list = mdl_base.kb.animList
+            anim_list_idx = mdl_base.kb.animListIdx
             if anim_list_idx >= 0 and len(anim_list) > anim_list_idx:
                 anim = anim_list[anim_list_idx]
                 row = layout.row()

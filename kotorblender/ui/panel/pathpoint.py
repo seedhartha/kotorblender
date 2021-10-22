@@ -18,7 +18,7 @@ class KB_PT_path_point(bpy.types.Panel):
         box = row.box()
         box.label(text="Connections")
         row = box.row()
-        row.template_list("KB_UL_path_points", "", context.object.nvb, "path_connections", context.object.nvb, "active_path_connection")
+        row.template_list("KB_UL_path_points", "", context.object.kb, "path_connections", context.object.kb, "active_path_connection")
         col = row.column(align=True)
         col.operator("kb.add_path_connection", icon='ADD', text="")
         col.operator("kb.remove_path_connection", icon='REMOVE', text="")

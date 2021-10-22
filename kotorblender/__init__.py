@@ -197,15 +197,11 @@ classes = (
 
 
 def register():
-    (_, loaded) = addon_utils.check('neverblender')
-    if loaded:
-        raise Exception("Do not enable both KotorBlender and NeverBlender at the same time!")
-
     for cls in classes:
         bpy.utils.register_class(cls)
 
-    bpy.types.Object.nvb = bpy.props.PointerProperty(type=ObjectPropertyGroup)
-    bpy.types.ImageTexture.nvb = bpy.props.PointerProperty(type=TexturePropertyGroup)
+    bpy.types.Object.kb = bpy.props.PointerProperty(type=ObjectPropertyGroup)
+    bpy.types.ImageTexture.kb = bpy.props.PointerProperty(type=TexturePropertyGroup)
 
     bpy.types.TOPBAR_MT_file_import.append(menu_func_import_mdl)
     bpy.types.TOPBAR_MT_file_import.append(menu_func_import_ascii_mdl)
@@ -225,30 +221,6 @@ def unregister():
     bpy.types.TOPBAR_MT_file_import.remove(menu_func_import_pth)
     bpy.types.TOPBAR_MT_file_import.remove(menu_func_import_lyt)
     bpy.types.TOPBAR_MT_file_import.remove(menu_func_import_mdl)
-
-    # gracefully co-exist with neverblender, within reason.
-    # if neverblender is enabled and disabled while kotorblender
-    # is enabled, kotorblender will be left in an error state
-    # and must be re-enabled to resume normal functionality
-    try:
-        (load_dflt, nvb_loaded) = addon_utils.check('neverblender')
-        if nvb_loaded:
-            # this will cleanly reload neverblender so that nvb
-            # will function after kotorblender has been disabled
-            # NOTE: the user was warned not to do this, but help anyway
-            import neverblender
-            neverblender.unregister()
-            # these are the attributes we share with nvb,
-            # we could rename, but it would change a great deal of code,
-            # it is better to keep the code similar enough to contribute
-            if 'nvb' in dir(bpy.types.Object):
-                del bpy.types.Object.nvb
-            if 'nvb' in dir(bpy.types.ImageTexture):
-                del bpy.types.ImageTexture.nvb
-            neverblender.register()
-    except:
-        del bpy.types.Object.nvb
-        del bpy.types.ImageTexture.nvb
 
     for cls in classes:
         bpy.utils.unregister_class(cls)

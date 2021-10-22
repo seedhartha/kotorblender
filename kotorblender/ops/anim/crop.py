@@ -22,7 +22,7 @@ class KB_OT_anim_crop(bpy.types.Operator):
     def poll(cls, context):
         rootDummy = utils.get_mdl_root_from_object(context.object)
         if rootDummy is not None:
-            return (len(rootDummy.nvb.animList) > 0)
+            return (len(rootDummy.kb.animList) > 0)
         return False
 
     def crop_frames(self, target, animStart, animEnd):
@@ -65,8 +65,8 @@ class KB_OT_anim_crop(bpy.types.Operator):
         if not utils.check_anim_bounds(mdl_base):
             self.report({'INFO'}, "Failure: Convoluted animations.")
             return {'CANCELLED'}
-        animList = mdl_base.nvb.animList
-        currentAnimIdx = mdl_base.nvb.animListIdx
+        animList = mdl_base.kb.animList
+        currentAnimIdx = mdl_base.kb.animListIdx
         anim = animList[currentAnimIdx]
         # Grab some values for speed
         cf = self.cropFront
@@ -92,7 +92,7 @@ class KB_OT_anim_crop(bpy.types.Operator):
             if part_sys:
                 self.crop_frames(part_sys.settings, animStart, animEnd)
         # Update the animations in the list
-        for a in mdl_base.nvb.animList:
+        for a in mdl_base.kb.animList:
             if a.frameStart > animStart:
                 a.frameStart -= totalCrop
                 a.frameEnd -= totalCrop

@@ -208,7 +208,7 @@ def save_mdl(operator,
 
         if "WALKMESH" in exports:
             wkmRoot = None
-            aabb = utils.search_node(mdlRoot, lambda x: x.nvb.meshtype == defines.Meshtype.AABB)
+            aabb = utils.search_node(mdlRoot, lambda x: x.kb.meshtype == defines.Meshtype.AABB)
             if aabb is not None:
                 wkm     = mdlformat.Wok()
                 wkmRoot = aabb

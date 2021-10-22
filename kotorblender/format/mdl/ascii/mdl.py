@@ -107,30 +107,30 @@ class Mdl():
                (utils.is_null(node.parentName)):
                 obj                    = node.add_to_collection(collection)
                 obj.location           = position
-                obj.nvb.dummytype      = defines.Dummytype.MDLROOT
-                obj.nvb.supermodel     = self.supermodel
-                obj.nvb.classification = self.classification
-                obj.nvb.unknownC1      = self.unknownC1
-                obj.nvb.ignorefog      = (self.ignorefog >= 1)
-                obj.nvb.compress_quats = (self.compress_quats >= 1)
-                obj.nvb.headlink       = (self.headlink >= 1)
-                obj.nvb.animscale      = self.animscale
+                obj.kb.dummytype      = defines.Dummytype.MDLROOT
+                obj.kb.supermodel     = self.supermodel
+                obj.kb.classification = self.classification
+                obj.kb.unknownC1      = self.unknownC1
+                obj.kb.ignorefog      = (self.ignorefog >= 1)
+                obj.kb.compress_quats = (self.compress_quats >= 1)
+                obj.kb.headlink       = (self.headlink >= 1)
+                obj.kb.animscale      = self.animscale
                 mdl_root = obj
 
-                obj.nvb.imporder = objIdx
+                obj.kb.imporder = objIdx
                 objIdx += 1
             else:
                 raise MalformedMdl("First node has to be a dummy without a parent.")
 
             for (_, node) in it:
                 obj = node.add_to_collection(collection)
-                obj.nvb.imporder = objIdx
+                obj.kb.imporder = objIdx
                 objIdx += 1
 
                 # If LYT position is specified, set it for the AABB node
                 if self.lytposition and node.nodetype == "aabb":
                     node.lytposition = self.lytposition
-                    obj.nvb.lytposition = self.lytposition
+                    obj.kb.lytposition = self.lytposition
 
                 if (utils.is_null(node.parentName)):
                     # Node without parent and not the mdl root.
@@ -194,7 +194,7 @@ class Mdl():
             armature_object = armature.recreate_armature(mdl_root)
         else:
             # When armature creation is disabled, see if the MDL root already has an armature and use that
-            skinmeshes = utils.search_node_all(mdl_root, lambda o: o.nvb.meshtype == defines.Meshtype.SKIN)
+            skinmeshes = utils.search_node_all(mdl_root, lambda o: o.kb.meshtype == defines.Meshtype.SKIN)
             for skinmesh in skinmeshes:
                 for modifier in skinmesh.modifiers:
                     if modifier.type == 'ARMATURE':
@@ -342,28 +342,28 @@ class Mdl():
 
         childList = []
         for child in bObject.children:
-            childList.append((child.nvb.imporder, child))
+            childList.append((child.kb.imporder, child))
         childList.sort(key=lambda tup: tup[0])
 
         for (_, child) in childList:
             self.geometry_to_ascii(child, asciiLines, simple, nameDict=nameDict)
 
     def generate_ascii_animations(self, ascii_lines, rootDummy, options={}):
-        if rootDummy.nvb.animList:
-            for anim in rootDummy.nvb.animList:
+        if rootDummy.kb.animList:
+            for anim in rootDummy.kb.animList:
                 print("export animation " + anim.name)
                 mdlanim.Animation.generate_ascii(rootDummy, anim,
                                                  ascii_lines, options)
 
     def generate_ascii(self, asciiLines, rootDummy, exports = {"ANIMATION", "WALKMESH"}):
         self.name           = rootDummy.name
-        self.classification = rootDummy.nvb.classification
-        self.supermodel     = rootDummy.nvb.supermodel
-        self.unknownC1      = rootDummy.nvb.unknownC1
-        self.ignorefog      = rootDummy.nvb.ignorefog
-        self.compress_quats = rootDummy.nvb.compress_quats
-        self.headlink       = rootDummy.nvb.headlink
-        self.animscale      = rootDummy.nvb.animscale
+        self.classification = rootDummy.kb.classification
+        self.supermodel     = rootDummy.kb.supermodel
+        self.unknownC1      = rootDummy.kb.unknownC1
+        self.ignorefog      = rootDummy.kb.ignorefog
+        self.compress_quats = rootDummy.kb.compress_quats
+        self.headlink       = rootDummy.kb.headlink
+        self.animscale      = rootDummy.kb.animscale
 
         # feature: export of models loaded in scene multiple times
         # construct a name map that points any NAME.00n names to their base name,
@@ -416,11 +416,11 @@ class Mdl():
         asciiLines.append("setanimationscale " + str(round(self.animscale, 7)))
         # Geometry
         asciiLines.append("beginmodelgeom " + self.name)
-        aabb = utils.search_node(rootDummy, lambda x: x.nvb.meshtype == defines.Meshtype.AABB)
-        if aabb is not None and aabb.nvb.lytposition != (0.0, 0.0, 0.0):
-            lytposition = (aabb.nvb.lytposition[0],
-                           aabb.nvb.lytposition[1],
-                           aabb.nvb.lytposition[2])
+        aabb = utils.search_node(rootDummy, lambda x: x.kb.meshtype == defines.Meshtype.AABB)
+        if aabb is not None and aabb.kb.lytposition != (0.0, 0.0, 0.0):
+            lytposition = (aabb.kb.lytposition[0],
+                           aabb.kb.lytposition[1],
+                           aabb.kb.lytposition[2])
             if rootDummy.location.to_tuple() != (0.0, 0.0, 0.0):
                 lytposition = (rootDummy.location[0],
                                rootDummy.location[1],
@@ -497,8 +497,8 @@ class Xwk(Mdl):
                     nameList.append(node.parentName)
             self.name = nameList[0]
 
-            if self.name in collection.objects and bpy.data.objects[self.name].nvb.dummytype != defines.Dummytype.MDLROOT:
-                node = bpy.data.objects[self.name].nvb
+            if self.name in collection.objects and bpy.data.objects[self.name].kb.dummytype != defines.Dummytype.MDLROOT:
+                node = bpy.data.objects[self.name].kb
                 if self.walkmeshType == "dwk":
                     node.dummytype = defines.Dummytype.DWKROOT
                 else:
@@ -522,7 +522,7 @@ class Xwk(Mdl):
                     rootdummy.parent = bpy.data.objects[mdl_name]
                 else:
                     pass
-            mdlroot = utils.ancestor_node(rootdummy, lambda o: o.nvb.dummytype == defines.Dummytype.MDLROOT)
+            mdlroot = utils.ancestor_node(rootdummy, lambda o: o.kb.dummytype == defines.Dummytype.MDLROOT)
             if mdlroot is None and rootdummy.parent:
                 mdlroot = rootdummy.parent
             if self.walkmeshType == "dwk":

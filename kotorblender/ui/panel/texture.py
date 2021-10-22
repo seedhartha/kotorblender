@@ -19,8 +19,8 @@ class KB_PT_texture(bpy.types.Panel):
     def draw_summ_prop(self, texture, layout, propname):
         """UI Summary prop entries which include default-reset control"""
         row = layout.row(align=True)
-        row.prop(texture.nvb, propname)
-        prop_names = [o.name for o in texture.nvb.modified_properties]
+        row.prop(texture.kb, propname)
+        prop_names = [o.name for o in texture.kb.modified_properties]
         if propname in prop_names:
             row.label(icon='FILE_TICK')
             op = row.operator("kb.texture_info_ops", text="", icon='X', emboss=False)
@@ -33,7 +33,7 @@ class KB_PT_texture(bpy.types.Panel):
         """UI Title and visibility toggle for texture property sub-groups"""
         row = layout.row()
         row.alignment = 'LEFT'
-        state = getattr(texture.nvb, "box_visible_" + boxname)
+        state = getattr(texture.kb, "box_visible_" + boxname)
         if not state:
             row.operator("kb.texture_info_box_ops", text=text, icon='TRIA_RIGHT', emboss=False).boxname = boxname
             return False
@@ -51,94 +51,94 @@ class KB_PT_texture(bpy.types.Panel):
         row.operator("kb.texture_info_io", text=" Export", icon='EXPORT').action = "SAVE"
 
         # Texture type
-        if len(texture.nvb.modified_properties):
+        if len(texture.kb.modified_properties):
             box = layout.row().box()
             if self.draw_box_header(texture, box, "summary", "TXI File Summary"):
-                for propname in texture.nvb.modified_properties:
+                for propname in texture.kb.modified_properties:
                     self.draw_summ_prop(texture, box, propname.name)
 
         box = layout.row().box()
         if self.draw_box_header(texture, box, "textures", "Shader Textures"):
-            box.prop(texture.nvb, "envmaptexture")
-            box.prop(texture.nvb, "bumpmaptexture")
-            box.prop(texture.nvb, "bumpyshinytexture")
+            box.prop(texture.kb, "envmaptexture")
+            box.prop(texture.kb, "bumpmaptexture")
+            box.prop(texture.kb, "bumpyshinytexture")
 
         box = layout.row().box()
         if self.draw_box_header(texture, box, "procedural", "Procedural Properties"):
-            box.prop(texture.nvb, "proceduretype")
-            if texture.nvb.proceduretype == "water":
+            box.prop(texture.kb, "proceduretype")
+            if texture.kb.proceduretype == "water":
                 box.label(text="Water Settings")
-                box.prop(texture.nvb, "wateralpha")
-                box.prop(texture.nvb, "waterwidth")
-                box.prop(texture.nvb, "waterheight")
-            elif texture.nvb.proceduretype == "arturo":
+                box.prop(texture.kb, "wateralpha")
+                box.prop(texture.kb, "waterwidth")
+                box.prop(texture.kb, "waterheight")
+            elif texture.kb.proceduretype == "arturo":
                 box.label(text="Arturo Settings")
-                box.prop(texture.nvb, "arturowidth")
-                box.prop(texture.nvb, "arturoheight")
-            elif texture.nvb.proceduretype == "cycle":
+                box.prop(texture.kb, "arturowidth")
+                box.prop(texture.kb, "arturoheight")
+            elif texture.kb.proceduretype == "cycle":
                 box.label(text="Cycle Settings")
-                box.prop(texture.nvb, "defaultwidth")
-                box.prop(texture.nvb, "defaultheight")
-                box.prop(texture.nvb, "numx")
-                box.prop(texture.nvb, "numy")
-                box.prop(texture.nvb, "fps")
-                box.prop(texture.nvb, "filerange")
+                box.prop(texture.kb, "defaultwidth")
+                box.prop(texture.kb, "defaultheight")
+                box.prop(texture.kb, "numx")
+                box.prop(texture.kb, "numy")
+                box.prop(texture.kb, "fps")
+                box.prop(texture.kb, "filerange")
             box.separator()
-            box.prop(texture.nvb, "forcecyclespeed")
-            box.prop(texture.nvb, "anglecyclespeed")
-            box.prop(texture.nvb, "channelscale0")
-            box.prop(texture.nvb, "channelscale1")
-            box.prop(texture.nvb, "channelscale2")
-            box.prop(texture.nvb, "channelscale3")
-            box.prop(texture.nvb, "channeltranslate0")
-            box.prop(texture.nvb, "channeltranslate1")
-            box.prop(texture.nvb, "channeltranslate2")
-            box.prop(texture.nvb, "channeltranslate3")
-            box.prop(texture.nvb, "distort")
-            box.prop(texture.nvb, "distortangle")
-            box.prop(texture.nvb, "distortionamplitude")
-            box.prop(texture.nvb, "speed")
+            box.prop(texture.kb, "forcecyclespeed")
+            box.prop(texture.kb, "anglecyclespeed")
+            box.prop(texture.kb, "channelscale0")
+            box.prop(texture.kb, "channelscale1")
+            box.prop(texture.kb, "channelscale2")
+            box.prop(texture.kb, "channelscale3")
+            box.prop(texture.kb, "channeltranslate0")
+            box.prop(texture.kb, "channeltranslate1")
+            box.prop(texture.kb, "channeltranslate2")
+            box.prop(texture.kb, "channeltranslate3")
+            box.prop(texture.kb, "distort")
+            box.prop(texture.kb, "distortangle")
+            box.prop(texture.kb, "distortionamplitude")
+            box.prop(texture.kb, "speed")
 
         box = layout.row().box()
         if self.draw_box_header(texture, box, "bumpmap", "Bumpmap Properties"):
-            box.prop(texture.nvb, "isbumpmap")
-            box.prop(texture.nvb, "isdiffusebumpmap")
-            box.prop(texture.nvb, "isspecularbumpmap")
-            box.prop(texture.nvb, "bumpmapscaling")
-            box.prop(texture.nvb, "bumpintensity")
-            box.prop(texture.nvb, "diffusebumpintensity")
-            box.prop(texture.nvb, "specularbumpintensity")
-            box.prop(texture.nvb, "specularcolor")
+            box.prop(texture.kb, "isbumpmap")
+            box.prop(texture.kb, "isdiffusebumpmap")
+            box.prop(texture.kb, "isspecularbumpmap")
+            box.prop(texture.kb, "bumpmapscaling")
+            box.prop(texture.kb, "bumpintensity")
+            box.prop(texture.kb, "diffusebumpintensity")
+            box.prop(texture.kb, "specularbumpintensity")
+            box.prop(texture.kb, "specularcolor")
 
         box = layout.row().box()
         if self.draw_box_header(texture, box, "envmap", "Environment Map Properties"):
-            box.prop(texture.nvb, "isenvironmentmapped")
-            box.prop(texture.nvb, "envmapalpha")
+            box.prop(texture.kb, "isenvironmentmapped")
+            box.prop(texture.kb, "envmapalpha")
 
         box = layout.row().box()
         if self.draw_box_header(texture, box, "general", "General Properties"):
-            box.prop(texture.nvb, "blending")
-            box.prop(texture.nvb, "clamp")
-            box.prop(texture.nvb, "downsamplemin")
-            box.prop(texture.nvb, "downsamplemax")
-            box.prop(texture.nvb, "compresstexture")
-            box.prop(texture.nvb, "filter")
-            box.prop(texture.nvb, "mipmap")
-            box.prop(texture.nvb, "maptexelstopixels")
-            box.prop(texture.nvb, "gamma")
-            box.prop(texture.nvb, "alphamean")
-            box.prop(texture.nvb, "cube")
-            box.prop(texture.nvb, "islightmap")
-            box.prop(texture.nvb, "renderbmlmtype")
-            box.prop(texture.nvb, "temporary")
-            box.prop(texture.nvb, "useglobalalpha")
-            box.prop(texture.nvb, "decal")
+            box.prop(texture.kb, "blending")
+            box.prop(texture.kb, "clamp")
+            box.prop(texture.kb, "downsamplemin")
+            box.prop(texture.kb, "downsamplemax")
+            box.prop(texture.kb, "compresstexture")
+            box.prop(texture.kb, "filter")
+            box.prop(texture.kb, "mipmap")
+            box.prop(texture.kb, "maptexelstopixels")
+            box.prop(texture.kb, "gamma")
+            box.prop(texture.kb, "alphamean")
+            box.prop(texture.kb, "cube")
+            box.prop(texture.kb, "islightmap")
+            box.prop(texture.kb, "renderbmlmtype")
+            box.prop(texture.kb, "temporary")
+            box.prop(texture.kb, "useglobalalpha")
+            box.prop(texture.kb, "decal")
 
         box = layout.row().box()
         if self.draw_box_header(texture, box, "font", "Font Properties"):
-            box.prop(texture.nvb, "numchars")
-            box.prop(texture.nvb, "fontheight")
-            box.prop(texture.nvb, "baselineheight")
-            box.prop(texture.nvb, "texturewidth")
-            box.prop(texture.nvb, "spacingR")
-            box.prop(texture.nvb, "spacingB")
+            box.prop(texture.kb, "numchars")
+            box.prop(texture.kb, "fontheight")
+            box.prop(texture.kb, "baselineheight")
+            box.prop(texture.kb, "texturewidth")
+            box.prop(texture.kb, "spacingR")
+            box.prop(texture.kb, "spacingB")

@@ -22,7 +22,7 @@ class KB_OT_anim_pad(bpy.types.Operator):
     def poll(cls, context):
         mdl_base = utils.get_mdl_root_from_object(context.object)
         if mdl_base is not None:
-            return (len(mdl_base.nvb.animList) > 0)
+            return (len(mdl_base.kb.animList) > 0)
         return False
 
     def pad_frames(self, target, frame_start, frame_end):
@@ -44,7 +44,7 @@ class KB_OT_anim_pad(bpy.types.Operator):
         if not utils.check_anim_bounds(mdl_base):
             self.report({'INFO'}, "Failure: Convoluted animations.")
             return {'CANCELLED'}
-        anim = mdl_base.nvb.animList[mdl_base.nvb.animListIdx]
+        anim = mdl_base.kb.animList[mdl_base.kb.animListIdx]
         frame_start = anim.frameStart
         frame_end = anim.frameEnd
         # Cancel if padding is 0
@@ -66,7 +66,7 @@ class KB_OT_anim_pad(bpy.types.Operator):
                 self.pad_frames(part_sys.settings, frame_start, frame_end)
         # Update the animations in the list
         totalPadding = self.pad_back + self.pad_front
-        for a in mdl_base.nvb.animList:
+        for a in mdl_base.kb.animList:
             if a.frameStart > frame_end:
                 a.frameStart += totalPadding
                 a.frameEnd += totalPadding

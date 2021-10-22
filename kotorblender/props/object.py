@@ -24,19 +24,19 @@ def update_emitter_prop(self, context):
     obj = context.object
     if not obj:
         return
-    if obj.nvb.update == "Lightning":
-        obj.nvb.birthrate = pow(2, obj.nvb.lightningsubdiv) + 1
-        obj.nvb.lifeexp = 1
-        obj.nvb.render_emitter = "Linked"
-    if obj.nvb.update != "Explosion":
-        obj.nvb.loop = False
-    if not utils.is_null(obj.nvb.chunkName):
-        obj.nvb.render_emitter = "Normal"
-        obj.nvb.blend = "Normal"
-    if obj.nvb.p2p_type == "Bezier":
-        obj.nvb.p2p_sel = 1
-    elif obj.nvb.p2p_type == "Gravity":
-        obj.nvb.p2p_sel = 0
+    if obj.kb.update == "Lightning":
+        obj.kb.birthrate = pow(2, obj.kb.lightningsubdiv) + 1
+        obj.kb.lifeexp = 1
+        obj.kb.render_emitter = "Linked"
+    if obj.kb.update != "Explosion":
+        obj.kb.loop = False
+    if not utils.is_null(obj.kb.chunkName):
+        obj.kb.render_emitter = "Normal"
+        obj.kb.blend = "Normal"
+    if obj.kb.p2p_type == "Bezier":
+        obj.kb.p2p_sel = 1
+    elif obj.kb.p2p_type == "Gravity":
+        obj.kb.p2p_sel = 0
 
 
 class ObjectPropertyGroup(bpy.types.PropertyGroup):

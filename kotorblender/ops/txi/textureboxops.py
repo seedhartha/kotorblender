@@ -14,6 +14,6 @@ class KB_OT_texture_box_ops(bpy.types.Operator):
             return {'FINISHED'}
         attrname = "box_visible_" + self.boxname
         texture = context.texture
-        current_state = getattr(texture.nvb, attrname)
-        setattr(texture.nvb, attrname, not current_state)
+        current_state = getattr(texture.kb, attrname)
+        setattr(texture.kb, attrname, not current_state)
         return {'FINISHED'}
