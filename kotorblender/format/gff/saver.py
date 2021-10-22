@@ -13,115 +13,115 @@ FIELD_TYPE_LIST = 15
 
 class GffSaver:
 
-    def __init__(self, tree, path, fileType):
+    def __init__(self, tree, path, file_type):
         self.tree = tree
         self.writer = BinaryWriter(path, 'little')
-        self.fileType = fileType.ljust(4)
+        self.file_type = file_type.ljust(4)
 
     def save(self):
         self.structs = []
         self.fields = []
         self.labels = []
-        self.fieldData = []
-        self.fieldIndices = []
-        self.listIndices = []
+        self.field_data = []
+        self.field_indices = []
+        self.list_indices = []
         self.decompose_tree()
 
-        offStructs = 56
-        numStructs = len(self.structs)
-        offFields = offStructs + 12 * numStructs
-        numFields = len(self.fields)
-        offLabels = offFields + 12 * numFields
-        numLabels = len(self.labels)
-        offFieldData = offLabels + 16 * numLabels
-        numFieldData = len(self.fieldData)
-        offFieldIndices = offFieldData + numFieldData
-        numFieldIndices = 4 * len(self.fieldIndices)
-        offListIndices = offFieldIndices + numFieldIndices
-        numListIndices = 4 * len(self.listIndices)
+        off_structs = 56
+        num_structs = len(self.structs)
+        off_fields = off_structs + 12 * num_structs
+        num_fields = len(self.fields)
+        off_labels = off_fields + 12 * num_fields
+        num_labels = len(self.labels)
+        off_field_data = off_labels + 16 * num_labels
+        num_field_data = len(self.field_data)
+        off_field_indices = off_field_data + num_field_data
+        num_field_indices = 4 * len(self.field_indices)
+        off_list_indices = off_field_indices + num_field_indices
+        num_list_indices = 4 * len(self.list_indices)
 
-        self.writer.put_string(self.fileType)
+        self.writer.put_string(self.file_type)
         self.writer.put_string(FILE_VERSION)
-        self.writer.put_uint32(offStructs)
-        self.writer.put_uint32(numStructs)
-        self.writer.put_uint32(offFields)
-        self.writer.put_uint32(numFields)
-        self.writer.put_uint32(offLabels)
-        self.writer.put_uint32(numLabels)
-        self.writer.put_uint32(offFieldData)
-        self.writer.put_uint32(numFieldData)
-        self.writer.put_uint32(offFieldIndices)
-        self.writer.put_uint32(numFieldIndices)
-        self.writer.put_uint32(offListIndices)
-        self.writer.put_uint32(numListIndices)
+        self.writer.put_uint32(off_structs)
+        self.writer.put_uint32(num_structs)
+        self.writer.put_uint32(off_fields)
+        self.writer.put_uint32(num_fields)
+        self.writer.put_uint32(off_labels)
+        self.writer.put_uint32(num_labels)
+        self.writer.put_uint32(off_field_data)
+        self.writer.put_uint32(num_field_data)
+        self.writer.put_uint32(off_field_indices)
+        self.writer.put_uint32(num_field_indices)
+        self.writer.put_uint32(off_list_indices)
+        self.writer.put_uint32(num_list_indices)
 
         for struct in self.structs:
             self.writer.put_uint32(struct.type)
-            self.writer.put_uint32(struct.dataOrDataOffset)
-            self.writer.put_uint32(struct.numFields)
+            self.writer.put_uint32(struct.data_or_data_offset)
+            self.writer.put_uint32(struct.num_fields)
         for field in self.fields:
             self.writer.put_uint32(field.type)
-            self.writer.put_uint32(field.labelIdx)
-            self.writer.put_uint32(field.dataOrDataOffset)
+            self.writer.put_uint32(field.label_idx)
+            self.writer.put_uint32(field.data_or_data_offset)
         for label in self.labels:
             self.writer.put_string(label.ljust(16, '\0'))
-        if len(self.fieldData) > 0:
-            self.writer.put_bytes(bytearray(self.fieldData))
-        for idx in self.fieldIndices:
+        if len(self.field_data) > 0:
+            self.writer.put_bytes(bytearray(self.field_data))
+        for idx in self.field_indices:
             self.writer.put_uint32(idx)
-        for idx in self.listIndices:
+        for idx in self.list_indices:
             self.writer.put_uint32(idx)
 
     def decompose_tree(self):
-        numStructs = 0
+        num_structs = 0
         queue = [self.tree]
 
         while queue:
             tree = queue.pop(0)
-            fieldIndices = []
+            field_indices = []
 
-            for label, fieldType in tree["_fields"].items():
-                fieldIndices.append(len(self.fields))
+            for label, field_type in tree["_fields"].items():
+                field_indices.append(len(self.fields))
 
-                labelIdx = len(self.labels)
+                label_idx = len(self.labels)
                 self.labels.append(label)
 
                 value = tree[label]
-                if fieldType == FIELD_TYPE_DWORD:
-                    dataOrDataOffset = value
-                elif fieldType == FIELD_TYPE_FLOAT:
-                    dataOrDataOffset = self.repack_float_to_int(value)
-                elif fieldType == FIELD_TYPE_STRUCT:
-                    numStructs += 1
-                    dataOrDataOffset = numStructs
+                if field_type == FIELD_TYPE_DWORD:
+                    data_or_data_offset = value
+                elif field_type == FIELD_TYPE_FLOAT:
+                    data_or_data_offset = self.repack_float_to_int(value)
+                elif field_type == FIELD_TYPE_STRUCT:
+                    num_structs += 1
+                    data_or_data_offset = num_structs
                     queue.append(value)
-                elif fieldType == FIELD_TYPE_LIST:
-                    dataOrDataOffset = 4 * len(self.listIndices)
-                    self.listIndices.append(len(value))
+                elif field_type == FIELD_TYPE_LIST:
+                    data_or_data_offset = 4 * len(self.list_indices)
+                    self.list_indices.append(len(value))
                     for item in value:
-                        numStructs += 1
-                        self.listIndices.append(numStructs)
+                        num_structs += 1
+                        self.list_indices.append(num_structs)
                         queue.append(item)
                 else:
-                    raise NotImplementedError("Field type {} is not supported".format(fieldType))
+                    raise NotImplementedError("Field type {} is not supported".format(field_type))
 
                 field = Expando()
-                field.type = fieldType
-                field.labelIdx = labelIdx
-                field.dataOrDataOffset = dataOrDataOffset
+                field.type = field_type
+                field.label_idx = label_idx
+                field.data_or_data_offset = data_or_data_offset
                 self.fields.append(field)
 
-            if len(fieldIndices) == 1:
-                dataOrDataOffset = fieldIndices[0]
+            if len(field_indices) == 1:
+                data_or_data_offset = field_indices[0]
             else:
-                dataOrDataOffset = 4 * len(self.fieldIndices)
-                for idx in fieldIndices:
-                    self.fieldIndices.append(idx)
+                data_or_data_offset = 4 * len(self.field_indices)
+                for idx in field_indices:
+                    self.field_indices.append(idx)
 
             struct = Expando()
             struct.type = tree["_type"]
-            struct.dataOrDataOffset = dataOrDataOffset
-            struct.numFields = len(fieldIndices)
+            struct.data_or_data_offset = data_or_data_offset
+            struct.num_fields = len(field_indices)
             self.structs.append(struct)
 
     def repack_float_to_int(self, val):
