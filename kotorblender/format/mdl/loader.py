@@ -18,10 +18,12 @@
 
 import os
 
+from ...defines import Nodetype
 from ...exception.malformedmdl import MalformedMdl
 from ...exception.mdxnotfound import MdxNotFound
 from ...scene.model import Model
 from ...scene.modelnode import ModelNode
+from ...scene.types import FaceList
 
 from ..binreader import BinaryReader
 
@@ -124,7 +126,7 @@ class MdlLoader:
     def load_names(self):
         self.names = []
         self.mdl.seek(MDL_OFFSET + self.name_arr.offset)
-        offsets = [self.mdl.get_uint32() for _ in range(0, self.name_arr.count)]
+        offsets = [self.mdl.get_uint32() for _ in range(self.name_arr.count)]
         for off in offsets:
             self.mdl.seek(MDL_OFFSET + off)
             self.names.append(self.mdl.get_c_string())
@@ -146,20 +148,20 @@ class MdlLoader:
 
         node = ModelNode(
             self.names[name_index],
-            node_type,
+            self.get_node_type(node_type),
             parent,
             position,
             orientation
             )
 
-        if node.type & NODE_LIGHT:
+        if node_type & NODE_LIGHT:
             pass
-        if node.type & NODE_EMITTER:
+        if node_type & NODE_EMITTER:
             pass
-        if node.type & NODE_REFERENCE:
+        if node_type & NODE_REFERENCE:
             pass
 
-        if node.type & NODE_MESH:
+        if node_type & NODE_MESH:
             fn_ptr1 = self.mdl.get_uint32()
             fn_ptr2 = self.mdl.get_uint32()
             face_arr = self.get_array_def()
@@ -221,40 +223,64 @@ class MdlLoader:
             if not self.xbox:
                 off_vert_arr = self.mdl.get_uint32()
 
-        if node.type & NODE_SKIN:
+        if node_type & NODE_SKIN:
             pass
-        if node.type & NODE_DANGLY:
+        if node_type & NODE_DANGLY:
             pass
-        if node.type & NODE_AABB:
+        if node_type & NODE_AABB:
             pass
-        if node.type & NODE_SABER:
+        if node_type & NODE_SABER:
             pass
 
-        if node.type & NODE_MESH:
+        if node_type & NODE_MESH:
+            node.facelist = FaceList()
             if face_arr.count > 0:
                 self.mdl.seek(MDL_OFFSET + face_arr.offset)
-                for _ in range(0, face_arr.count):
+                for _ in range(face_arr.count):
                     normal = [self.mdl.get_float() for _ in range(3)]
                     plane_distance = self.mdl.get_float()
                     material_id = self.mdl.get_uint32()
                     adjacent_faces = [self.mdl.get_uint16() for _ in range(3)]
                     vert_indices = [self.mdl.get_uint16() for _ in range(3)]
+                    node.facelist.faces.append(tuple(vert_indices))
                 if index_count_arr.count > 0:
                     self.mdl.seek(MDL_OFFSET + index_count_arr.offset)
                     num_indices = self.mdl.get_uint32()
                 if index_offset_arr.count > 0:
                     self.mdl.seek(MDL_OFFSET + index_offset_arr.offset)
                     off_indices = self.mdl.get_uint32()
-            self.mdx.seek(mdx_offset)
-            verts_data = [self.mdx.get_float() for _ in range(mdx_data_size // 4)]
+
+            node.verts = []
+            for i in range(num_verts):
+                self.mdx.seek(mdx_offset + i * mdx_data_size + off_mdx_verts)
+                node.verts.append(tuple([self.mdx.get_float() for _ in range(3)]))
 
         self.mdl.seek(MDL_OFFSET + children_arr.offset)
-        child_offsets = [self.mdl.get_uint32() for _ in range(0, children_arr.count)]
+        child_offsets = [self.mdl.get_uint32() for _ in range(children_arr.count)]
         for off_child in child_offsets:
             child = self.load_nodes(off_child, node)
             node.children.append(child)
 
         return node
+
+    def get_node_type(self, flags):
+        if flags & NODE_SABER:
+            return Nodetype.LIGHTSABER
+        if flags & NODE_AABB:
+            return Nodetype.AABB
+        if flags & NODE_DANGLY:
+            return Nodetype.DANGLYMESH
+        if flags & NODE_SKIN:
+            return Nodetype.SKIN
+        if flags & NODE_MESH:
+            return Nodetype.TRIMESH
+        if flags & NODE_REFERENCE:
+            return Nodetype.REFERENCE
+        if flags & NODE_EMITTER:
+            return Nodetype.EMITTER
+        if flags & NODE_LIGHT:
+            return Nodetype.LIGHT
+        return Nodetype.DUMMY
 
     def get_array_def(self):
         offset = self.mdl.get_uint32()

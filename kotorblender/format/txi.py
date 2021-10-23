@@ -185,12 +185,12 @@ def load_txi(imagetexture, operator=None):
                 if line[0] == "specularcolor":
                     value = (line[1], line[2], line[3])
                 elif line[0] == "channelscale":
-                    for scale_counter in range(0,int(line[1])):
+                    for scale_counter in range(int(line[1])):
                         setattr(imagetexture.kb,
                                 "channelscale" + str(scale_counter),
                                 asciiLines[line_idx + 1 + scale_counter][0])
                 elif line[0] == "channeltranslate":
-                    for scale_counter in range(0,int(line[1])):
+                    for scale_counter in range(int(line[1])):
                         setattr(imagetexture.kb,
                                 "channeltranslate" + str(scale_counter),
                                 asciiLines[line_idx + 1 + scale_counter][0])
