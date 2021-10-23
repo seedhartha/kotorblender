@@ -16,11 +16,9 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-from os import path
 import bpy
 import bpy_extras
 
-from ...expando import Expando
 from ...format.gff.saver import GffSaver
 
 from ...utils import is_path_point

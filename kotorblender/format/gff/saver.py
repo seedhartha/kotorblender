@@ -18,16 +18,10 @@
 
 from struct import pack, unpack
 
-from ...expando import Expando
-
 from ..binwriter import BinaryWriter
 
-FILE_VERSION = "V3.2"
+from .types import *
 
-FIELD_TYPE_DWORD = 4
-FIELD_TYPE_FLOAT = 8
-FIELD_TYPE_STRUCT = 14
-FIELD_TYPE_LIST = 15
 
 class GffSaver:
 
@@ -126,10 +120,11 @@ class GffSaver:
                 else:
                     raise NotImplementedError("Field type {} is not supported".format(field_type))
 
-                field = Expando()
-                field.type = field_type
-                field.label_idx = label_idx
-                field.data_or_data_offset = data_or_data_offset
+                field = GffField(
+                    field_type,
+                    label_idx,
+                    data_or_data_offset
+                    )
                 self.fields.append(field)
 
             if len(field_indices) == 1:
@@ -139,10 +134,11 @@ class GffSaver:
                 for idx in field_indices:
                     self.field_indices.append(idx)
 
-            struct = Expando()
-            struct.type = tree["_type"]
-            struct.data_or_data_offset = data_or_data_offset
-            struct.num_fields = len(field_indices)
+            struct = GffStruct(
+                tree["_type"],
+                data_or_data_offset,
+                len(field_indices)
+                )
             self.structs.append(struct)
 
     def repack_float_to_int(self, val):
