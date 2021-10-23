@@ -16,10 +16,14 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+import os
+
 import bpy
 import bpy_extras
 
 from ...format.mdl.loader import MdlLoader
+
+from ... import glob
 
 
 class KB_OT_import_mdl(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
@@ -36,6 +40,9 @@ class KB_OT_import_mdl(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
             options = {'HIDDEN'})
 
     def execute(self, context):
+        glob.texturePath = os.path.dirname(self.filepath)
+        glob.textureSearch = True
+
         loader = MdlLoader(self.filepath)
         model = loader.load()
         model.add_to_collection()
