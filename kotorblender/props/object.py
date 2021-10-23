@@ -18,7 +18,7 @@
 
 import bpy
 
-from ..model import light
+from ..scene import light
 
 from .. import defines, utils
 

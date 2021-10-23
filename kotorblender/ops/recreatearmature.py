@@ -18,7 +18,7 @@
 
 import bpy
 
-from ..model import armature
+from ..scene import armature
 
 from .. import utils
 

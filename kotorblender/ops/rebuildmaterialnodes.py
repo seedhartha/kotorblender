@@ -18,7 +18,7 @@
 
 import bpy
 
-from ..model import material
+from ..scene import material
 
 from .. import defines
 

@@ -24,7 +24,7 @@ import bpy
 from bpy_extras.io_utils import unpack_list
 from mathutils import Color, Matrix, Vector
 
-from ....model import light, material
+from ....scene import light, material
 
 from .... import aabb, defines, glob, utils
 
