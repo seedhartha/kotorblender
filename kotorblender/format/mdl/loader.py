@@ -423,11 +423,10 @@ class MdlLoader:
 
     def load_animations(self):
         if self.animation_arr.count == 0:
-            return
+            return []
         self.mdl.seek(MDL_OFFSET + self.animation_arr.offset)
         offsets = [self.mdl.get_uint32() for _ in range(self.animation_arr.count)]
-        animations = [self.load_animation(offset) for offset in offsets]
-        return animations
+        return [self.load_animation(offset) for offset in offsets]
 
     def load_animation(self, offset):
         self.mdl.seek(MDL_OFFSET + offset)
@@ -442,8 +441,8 @@ class MdlLoader:
         model_type = self.mdl.get_uint8()
         self.mdl.skip(3) # padding
         length = self.mdl.get_float()
-        transition = self.mdl.get_float()
-        anim_root = self.mdl.get_c_string_up_to(32)
+        transtime = self.mdl.get_float()
+        animroot = self.mdl.get_c_string_up_to(32)
         event_arr = self.get_array_def()
         self.mdl.skip(4) # padding
 
@@ -456,9 +455,15 @@ class MdlLoader:
                 events.append((time, event_name))
 
         root_node = self.load_anim_nodes(off_root_node)
-        animation = Animation(name, length, root_node, events)
 
-        return animation
+        return Animation(
+            name,
+            length,
+            transtime,
+            animroot,
+            root_node,
+            events
+            )
 
     def load_anim_nodes(self, offset, parent=None):
         self.mdl.seek(MDL_OFFSET + offset)

@@ -30,3 +30,6 @@ class Model:
     def add_to_collection(self):
         obj = self.root_node.add_to_collection()
         armature.recreate_armature(obj)
+
+        for anim in self.animations:
+            anim.add_to_object(obj)
