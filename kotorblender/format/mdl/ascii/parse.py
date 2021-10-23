@@ -22,7 +22,7 @@ def _i(asciiBlock, intList, numVals, initialFloat=True):
     l_int = int
     for line in asciiBlock:
         vals = []
-        for idx in range(0, numVals):
+        for idx in range(numVals):
             if numVals < 2 or idx > 0 or not initialFloat:
                 try:
                     vals.append(l_int(line[idx]))
@@ -41,7 +41,7 @@ def _f(asciiBlock, floatList, numVals):
     l_float = float
     for line in asciiBlock:
         vals = []
-        for idx in range(0, numVals):
+        for idx in range(numVals):
             vals.append(l_float(line[idx]))
         if len(vals) > 1:
             floatList.append(tuple(vals))

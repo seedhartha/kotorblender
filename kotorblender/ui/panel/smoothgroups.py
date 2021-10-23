@@ -51,7 +51,7 @@ class KB_PT_smoothgroups(bpy.types.Panel):
         # the smoothgroup data layer
         sg_layer = bm.faces.layers.int.get(defines.sg_layer_name)
         # count of faces per smoothgroup in this mesh
-        sg = { i: 0 for i in range(0, 32) }
+        sg = { i: 0 for i in range(32) }
         # smoothgroups in use on selected faces
         sg_selected = set()
         for face in bm.faces:
@@ -72,7 +72,7 @@ class KB_PT_smoothgroups(bpy.types.Panel):
         ))
 
         # display readout of smoothgroups in use on this mesh
-        for i in range(0, 32):
+        for i in range(32):
             if sg[i]:
                 row = layout.row(align=True)
                 row.label("{}: {} faces".format(i + 1, sg[i]))
