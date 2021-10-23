@@ -17,27 +17,24 @@
 # ##### END GPL LICENSE BLOCK #####
 
 import bpy
-import bpy_extras
-
-from ...format.mdl.loader import MdlLoader
 
 
-class KB_OT_import_mdl(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
-    """Import Odyssey Engine model (.mdl)"""
+class ModelNode:
 
-    bl_idname = "kb.mdlimport"
-    bl_label = "Import Odyssey MDL"
-    bl_options = {'UNDO'}
+    def __init__(self, name, type, parent, position, orientation):
+        self.name = name
+        self.type = type
+        self.parent = parent
+        self.position = position
+        self.orientation = orientation
 
-    filename_ext = ".mdl"
+        self.children = []
 
-    filter_glob : bpy.props.StringProperty(
-            default = "*.mdl",
-            options = {'HIDDEN'})
+    def add_to_collection(self, parent_obj):
+        obj = bpy.data.objects.new(self.name, None)
+        obj.parent = parent_obj
 
-    def execute(self, context):
-        loader = MdlLoader(self.filepath)
-        model = loader.load()
-        model.add_to_collection()
+        bpy.context.collection.objects.link(obj)
 
-        return {'FINISHED'}
+        for child in self.children:
+            child.add_to_collection(obj)
