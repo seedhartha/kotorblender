@@ -16,7 +16,7 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-class FaceList():
+class FaceList:
     def __init__(self):
         self.faces = []  # int 3-tuple, vertex indices
         self.shdgr = []  # int, shading group for this face
