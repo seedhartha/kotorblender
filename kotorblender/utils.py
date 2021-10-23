@@ -296,11 +296,6 @@ def chunker(seq, size):
     return (seq[pos:pos + size] for pos in range(0, len(seq), size))
 
 
-def set_object_rotation_aurora(obj, nwangle):
-    obj.rotation_mode = 'QUATERNION'
-    obj.rotation_quaternion = Quaternion((nwangle[0], nwangle[1], nwangle[2]), nwangle[3])
-
-
 def get_aurora_rot_from_object(obj):
     q = obj.rotation_quaternion
     return [q.axis[0], q.axis[1], q.axis[2], q.angle]

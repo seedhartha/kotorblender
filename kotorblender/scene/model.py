@@ -16,6 +16,9 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+from . import armature
+
+
 class Model:
 
     def __init__(self, name, supermodel_name, root_node):
@@ -24,4 +27,5 @@ class Model:
         self.root_node = root_node
 
     def add_to_collection(self):
-        self.root_node.add_to_collection(None)
+        obj = self.root_node.add_to_collection()
+        armature.recreate_armature(obj)

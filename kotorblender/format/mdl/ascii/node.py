@@ -22,7 +22,7 @@ import bmesh
 import bpy
 
 from bpy_extras.io_utils import unpack_list
-from mathutils import Color, Matrix, Vector
+from mathutils import Color, Matrix, Quaternion, Vector
 
 from ....scene import light, material
 from ....scene.types import FaceList
@@ -132,12 +132,13 @@ class GeometryNode():
 
     def set_object_data(self, obj):
         self.objref = obj.name  # used to resolve naming conflicts
-        utils.set_object_rotation_aurora(obj, self.orientation)
-        obj.kb.restrot   = self.orientation
-        obj.scale         = (self.scale, self.scale, self.scale)
-        obj.location      = self.position
-        obj.kb.restloc   = obj.location
-        obj.kb.wirecolor = self.wirecolor
+        obj.rotation_mode       = 'QUATERNION'
+        obj.rotation_quaternion = Quaternion(self.orientation[0:3], self.orientation[3])
+        obj.kb.restrot          = self.orientation
+        obj.scale               = (self.scale, self.scale, self.scale)
+        obj.location            = self.position
+        obj.kb.restloc          = obj.location
+        obj.kb.wirecolor        = self.wirecolor
         # add unprocessed data as text objects
         if (len(self.rawascii)):
             txt = bpy.data.texts.new(obj.name)

@@ -21,7 +21,7 @@ import bpy
 from bpy_extras.io_utils import unpack_list
 from mathutils import Quaternion
 
-from ..defines import Nodetype
+from ..defines import Dummytype, Meshtype, Nodetype
 
 from . import light, material
 
@@ -37,14 +37,21 @@ class ModelNode:
 
         self.children = []
 
-    def add_to_collection(self, parent_obj):
+    def add_to_collection(self, parent_obj=None):
         obj = bpy.data.objects.new(self.name, self.new_object_data())
+
+        if parent_obj is None:
+            obj.kb.dummytype = Dummytype.MDLROOT
+        obj.kb.restloc = self.position
+        obj.kb.restrot = self.orientation
+
         obj.parent = parent_obj
         obj.location = self.position
         obj.rotation_mode = 'QUATERNION'
         obj.rotation_quaternion = Quaternion(self.orientation)
 
         if self.is_mesh_type():
+            obj.kb.meshtype = self.get_mesh_type()
             obj.kb.diffuse = self.diffuse
             obj.kb.ambient = self.ambient
             obj.kb.bitmap = self.bitmap
@@ -71,6 +78,8 @@ class ModelNode:
 
         for child in self.children:
             child.add_to_collection(obj)
+
+        return obj
 
     def new_object_data(self):
         if self.is_mesh_type():
@@ -118,3 +127,14 @@ class ModelNode:
             Nodetype.EMITTER,
             Nodetype.AABB,
             Nodetype.LIGHTSABER]
+
+    def get_mesh_type(self):
+        switch = {
+            Nodetype.TRIMESH: Meshtype.TRIMESH,
+            Nodetype.DANGLYMESH: Meshtype.DANGLYMESH,
+            Nodetype.SKIN: Meshtype.SKIN,
+            Nodetype.EMITTER: Meshtype.EMITTER,
+            Nodetype.AABB: Meshtype.AABB,
+            Nodetype.LIGHTSABER: Meshtype.LIGHTSABER
+        }
+        return switch[self.node_type]
