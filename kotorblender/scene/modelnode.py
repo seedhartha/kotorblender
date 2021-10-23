@@ -44,7 +44,7 @@ class ModelNode:
         obj.rotation_mode = 'QUATERNION'
         obj.rotation_quaternion = Quaternion(self.orientation)
 
-        if self.node_type is Nodetype.TRIMESH: # support all mesh types
+        if self.is_mesh_type():
             obj.kb.diffuse = self.diffuse
             obj.kb.ambient = self.ambient
             obj.kb.bitmap = self.bitmap
@@ -63,7 +63,7 @@ class ModelNode:
             child.add_to_collection(obj)
 
     def new_object_data(self):
-        if self.node_type is Nodetype.TRIMESH: # support all mesh types
+        if self.is_mesh_type():
             return self.new_mesh()
         if self.node_type is Nodetype.LIGHT:
             return self.new_light()
@@ -99,3 +99,12 @@ class ModelNode:
         light = bpy.data.lights.new(self.name, 'POINT')
         light.color = self.color
         return light
+
+    def is_mesh_type(self):
+        return self.node_type in [
+            Nodetype.TRIMESH,
+            Nodetype.DANGLYMESH,
+            Nodetype.SKIN,
+            Nodetype.EMITTER,
+            Nodetype.AABB,
+            Nodetype.LIGHTSABER]
