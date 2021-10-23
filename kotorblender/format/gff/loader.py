@@ -19,16 +19,11 @@
 from struct import pack, unpack
 
 from ...exception.malformedgff import MalformedGff
-from ...expando import Expando
 
 from ..binreader import BinaryReader
 
-FILE_VERSION = "V3.2"
+from .types import *
 
-FIELD_TYPE_DWORD = 4
-FIELD_TYPE_FLOAT = 8
-FIELD_TYPE_STRUCT = 14
-FIELD_TYPE_LIST = 15
 
 class GffLoader:
 
@@ -70,20 +65,22 @@ class GffLoader:
         self.structs = []
         self.reader.seek(self.off_structs)
         for _ in range(0, self.num_structs):
-            struct = Expando()
-            struct.type = self.reader.get_uint32()
-            struct.data_or_data_offset = self.reader.get_uint32()
-            struct.num_fields = self.reader.get_uint32()
+            struct = GffStruct(
+                self.reader.get_uint32(),
+                self.reader.get_uint32(),
+                self.reader.get_uint32()
+                )
             self.structs.append(struct)
 
     def load_fields(self):
         self.fields = []
         self.reader.seek(self.off_fields)
         for _ in range(0, self.num_fields):
-            field = Expando()
-            field.type = self.reader.get_uint32()
-            field.label_idx = self.reader.get_uint32()
-            field.data_or_data_offset = self.reader.get_uint32()
+            field = GffField(
+                self.reader.get_uint32(),
+                self.reader.get_uint32(),
+                self.reader.get_uint32()
+                )
             self.fields.append(field)
 
     def load_labels(self):
@@ -136,11 +133,7 @@ class GffLoader:
         else:
             raise NotImplementedError("Field type {} is not supported".format(field.type))
 
-        node = Expando()
-        node.key = label
-        node.value = data
-
-        return node
+        return KeyValue(label, data)
 
     def repack_int_to_float(self, val):
         packed = pack("i", val)
