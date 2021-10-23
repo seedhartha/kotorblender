@@ -52,6 +52,16 @@ class ModelNode:
             obj.kb.alpha = self.alpha
             obj.kb.selfillumcolor = self.selfillumcolor
             material.rebuild_material(obj)
+
+            if self.node_type is Nodetype.SKIN:
+                for vert_idx, vert_weights in enumerate(self.weights):
+                    for weight in vert_weights:
+                        if weight[0] in obj.vertex_groups:
+                            vert_group = obj.vertex_groups[weight[0]]
+                        else:
+                            vert_group = obj.vertex_groups.new(name=weight[0])
+                        vert_group.add([vert_idx], weight[1], 'REPLACE')
+
         elif self.node_type is Nodetype.LIGHT:
             obj.kb.radius = self.radius
             obj.kb.multiplier = self.multiplier

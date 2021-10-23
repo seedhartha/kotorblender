@@ -30,13 +30,9 @@ from ..binreader import BinaryReader
 MDL_OFFSET = 12
 
 FN_PTR_1_K1_PC = 4273776
-FN_PTR_1_K1_XBOX = 4254992
 FN_PTR_1_K2_PC = 4285200
-FN_PTR_1_K2_XBOX = 4285872
 FN_PTR_2_K1_PC = 4216096
-FN_PTR_2_K1_XBOX = 4255008
 FN_PTR_2_K2_PC = 4216320
-FN_PTR_2_K2_XBOX = 4216016
 
 NODE_BASE = 0x0001
 NODE_LIGHT = 0x0002
@@ -107,6 +103,7 @@ class MdlLoader:
             raise MdxNotFound("MDX file '{}' not found".format(mdx_path))
 
         self.mdx = BinaryReader(mdx_path, 'little')
+        self.node_names_df = [] # depth first array of node names
 
     def load(self):
         self.load_file_header()
@@ -130,8 +127,7 @@ class MdlLoader:
 
     def load_geometry_header(self):
         fn_ptr1 = self.mdl.get_uint32()
-        self.tsl = fn_ptr1 in [FN_PTR_1_K2_PC, FN_PTR_1_K2_XBOX]
-        self.xbox = fn_ptr1 in [FN_PTR_1_K1_XBOX, FN_PTR_1_K2_XBOX]
+        self.tsl = fn_ptr1 == FN_PTR_1_K2_PC
         fn_ptr2 = self.mdl.get_uint32()
         self.model_name = self.mdl.get_c_string_up_to(32)
         self.off_root_node = self.mdl.get_uint32()
@@ -175,7 +171,7 @@ class MdlLoader:
     def load_nodes(self, offset, parent=None):
         self.mdl.seek(MDL_OFFSET + offset)
 
-        node_type = self.mdl.get_uint16()
+        type_flags = self.mdl.get_uint16()
         supernode_number = self.mdl.get_uint16()
         name_index = self.mdl.get_uint16()
         self.mdl.skip(2) # padding
@@ -187,15 +183,18 @@ class MdlLoader:
         controller_arr = self.get_array_def()
         controller_data_arr = self.get_array_def()
 
+        name = self.names[name_index]
+        self.node_names_df.append(name)
+
         node = ModelNode(
-            self.names[name_index],
-            self.get_node_type(node_type),
+            name,
+            self.get_node_type(type_flags),
             parent,
             position,
             orientation
             )
 
-        if node_type & NODE_LIGHT:
+        if type_flags & NODE_LIGHT:
             flare_radius = self.mdl.get_float()
             unknown_arr = self.get_array_def()
             flare_size_arr = self.get_array_def()
@@ -210,12 +209,12 @@ class MdlLoader:
             flare = self.mdl.get_uint32()
             fading_light = self.mdl.get_uint32()
 
-        if node_type & NODE_EMITTER:
+        if type_flags & NODE_EMITTER:
             pass
-        if node_type & NODE_REFERENCE:
+        if type_flags & NODE_REFERENCE:
             pass
 
-        if node_type & NODE_MESH:
+        if type_flags & NODE_MESH:
             fn_ptr1 = self.mdl.get_uint32()
             fn_ptr2 = self.mdl.get_uint32()
             face_arr = self.get_array_def()
@@ -273,17 +272,26 @@ class MdlLoader:
             total_area = self.mdl.get_float()
             self.mdl.skip(4) # padding
             mdx_offset = self.mdl.get_uint32()
+            off_vert_arr = self.mdl.get_uint32()
 
-            if not self.xbox:
-                off_vert_arr = self.mdl.get_uint32()
+        if type_flags & NODE_SKIN:
+            unknown_arr = self.get_array_def()
+            off_mdx_bone_weights = self.mdl.get_uint32()
+            off_mdx_bone_indices = self.mdl.get_uint32()
+            off_bonemap = self.mdl.get_uint32()
+            num_bonemap = self.mdl.get_uint32()
+            qbone_arr = self.get_array_def()
+            tbone_arr = self.get_array_def()
+            garbage_arr = self.get_array_def()
+            for _ in range(16):
+                bone_indices = self.mdl.get_uint16()
+            self.mdl.skip(4) # padding
 
-        if node_type & NODE_SKIN:
+        if type_flags & NODE_DANGLY:
             pass
-        if node_type & NODE_DANGLY:
+        if type_flags & NODE_AABB:
             pass
-        if node_type & NODE_AABB:
-            pass
-        if node_type & NODE_SABER:
+        if type_flags & NODE_SABER:
             pass
 
         if controller_arr.count > 0:
@@ -312,15 +320,27 @@ class MdlLoader:
                         num_columns *= 3
                 values = [self.mdl.get_float() for _ in range(num_columns * key.num_rows)]
                 controllers[key.ctrl_type] = [ControllerRow(timekeys[i], values[i*key.num_columns:i*key.num_columns+num_columns]) for i in range(key.num_rows)]
-            if node_type & NODE_MESH:
+            if type_flags & NODE_MESH:
                 node.alpha = controllers[CTRL_MESH_ALPHA][0].values[0] if CTRL_MESH_ALPHA in controllers else 1.0
                 node.selfillumcolor = controllers[CTRL_MESH_SELFILLUMCOLOR][0].values if CTRL_MESH_SELFILLUMCOLOR in controllers else [0.0] * 3
-            elif node_type & NODE_LIGHT:
+            elif type_flags & NODE_LIGHT:
                 node.color = controllers[CTRL_LIGHT_COLOR][0].values if CTRL_LIGHT_COLOR in controllers else [1.0] * 3
                 node.radius = controllers[CTRL_LIGHT_RADIUS][0].values[0] if CTRL_LIGHT_RADIUS in controllers else 1.0
                 node.multiplier = controllers[CTRL_LIGHT_MULTIPLIER][0].values[0] if CTRL_LIGHT_MULTIPLIER in controllers else 1.0
 
-        if node_type & NODE_MESH:
+        if type_flags & NODE_SKIN:
+            if num_bonemap > 0:
+                self.mdl.seek(MDL_OFFSET + off_bonemap)
+                bonemap = [int(self.mdl.get_float()) for _ in range(num_bonemap)]
+            else:
+                bonemap = []
+            node_by_bone = dict()
+            for node_idx, bone_idx in enumerate(bonemap):
+                if bone_idx == -1:
+                    continue
+                node_by_bone[bone_idx] = node_idx
+
+        if type_flags & NODE_MESH:
             node.facelist = FaceList()
             if face_arr.count > 0:
                 self.mdl.seek(MDL_OFFSET + face_arr.offset)
@@ -342,6 +362,7 @@ class MdlLoader:
             node.verts = []
             node.tverts = []
             node.tverts1 = []
+            node.weights = []
             for i in range(num_verts):
                 self.mdx.seek(mdx_offset + i * mdx_data_size + off_mdx_verts)
                 node.verts.append(tuple([self.mdx.get_float() for _ in range(3)]))
@@ -351,7 +372,21 @@ class MdlLoader:
                 if mdx_data_bitmap & MDX_FLAG_UV2:
                     self.mdx.seek(mdx_offset + i * mdx_data_size + off_mdx_uv2)
                     node.tverts1.append(tuple([self.mdx.get_float() for _ in range(2)]))
-
+                if type_flags & NODE_SKIN:
+                    self.mdx.seek(mdx_offset + i * mdx_data_size + off_mdx_bone_weights)
+                    bone_weights = [self.mdx.get_float() for _ in range(4)]
+                    self.mdx.seek(mdx_offset + i * mdx_data_size + off_mdx_bone_indices)
+                    bone_indices = [self.mdx.get_float() for _ in range(4)]
+                    vert_weights = []
+                    for i in range(4):
+                        bone_idx = int(bone_indices[i])
+                        if bone_idx == -1:
+                            continue
+                        node_idx = node_by_bone[bone_idx]
+                        node_name = self.node_names_df[node_idx]
+                        vert_weights.append([node_name, bone_weights[i]])
+                    node.weights.append(vert_weights)
+    
         self.mdl.seek(MDL_OFFSET + children_arr.offset)
         child_offsets = [self.mdl.get_uint32() for _ in range(children_arr.count)]
         for off_child in child_offsets:
