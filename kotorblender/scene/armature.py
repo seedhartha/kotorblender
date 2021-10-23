@@ -71,7 +71,7 @@ def _create_bones_recursive(armature, obj, parent_bone=None):
     Recursively create armature bones from bone nodes.
     """
     mat_trans = Matrix.Translation(obj.kb.restloc)
-    mat_rot = utils.nwangle2quat(obj.kb.restrot).to_matrix().to_4x4()
+    mat_rot = Quaternion(obj.kb.restrot).to_matrix().to_4x4()
     mat_bone = mat_trans @ mat_rot
     if parent_bone:
         mat_bone = parent_bone.matrix @ mat_bone
