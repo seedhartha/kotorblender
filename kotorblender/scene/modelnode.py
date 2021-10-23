@@ -23,7 +23,7 @@ from mathutils import Quaternion
 
 from ..defines import Nodetype
 
-from . import light
+from . import light, material
 
 
 class ModelNode:
@@ -44,7 +44,15 @@ class ModelNode:
         obj.rotation_mode = 'QUATERNION'
         obj.rotation_quaternion = Quaternion(self.orientation)
 
-        if self.node_type is Nodetype.LIGHT:
+        if self.node_type is Nodetype.TRIMESH: # support all mesh types
+            obj.kb.diffuse = self.diffuse
+            obj.kb.ambient = self.ambient
+            obj.kb.bitmap = self.bitmap
+            obj.kb.bitmap2 = self.bitmap2
+            obj.kb.alpha = self.alpha
+            obj.kb.selfillumcolor = self.selfillumcolor
+            material.rebuild_material(obj)
+        elif self.node_type is Nodetype.LIGHT:
             obj.kb.radius = self.radius
             obj.kb.multiplier = self.multiplier
             light.calc_light_power(obj)
@@ -55,7 +63,7 @@ class ModelNode:
             child.add_to_collection(obj)
 
     def new_object_data(self):
-        if self.node_type is Nodetype.TRIMESH:
+        if self.node_type is Nodetype.TRIMESH: # support all mesh types
             return self.new_mesh()
         if self.node_type is Nodetype.LIGHT:
             return self.new_light()
@@ -71,6 +79,19 @@ class ModelNode:
         mesh.polygons.add(num_faces)
         mesh.polygons.foreach_set("loop_start", range(0, 3 * num_faces, 3))
         mesh.polygons.foreach_set("loop_total", (3,) * num_faces)
+
+        # Diffuse UV map
+        if len(self.tverts) > 0:
+            uv = unpack_list([self.tverts[i] for indices in self.facelist.uvIdx for i in indices])
+            uv_layer = mesh.uv_layers.new(name="UVMap", do_init=False)
+            uv_layer.data.foreach_set("uv", uv)
+
+        # Lightmap UV map
+        if len(self.tverts1) > 0:
+            uv = unpack_list([self.tverts1[i] for indices in self.facelist.uvIdx for i in indices])
+            uv_layer = mesh.uv_layers.new(name="UVMap_lm", do_init=False)
+            uv_layer.data.foreach_set("uv", uv)
+
         mesh.update()
         return mesh
 

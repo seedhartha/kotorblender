@@ -51,15 +51,25 @@ NODE_SABER = 0x0800
 CTRL_BASE_POSITION = 8
 CTRL_BASE_ORIENTATION = 20
 CTRL_BASE_SCALE = 36
-
 CTRL_MESH_SELFILLUMCOLOR = 100
 CTRL_MESH_ALPHA = 132
-
 CTRL_LIGHT_COLOR = 76
 CTRL_LIGHT_RADIUS = 88
 CTRL_LIGHT_SHADOWRADIUS = 96
 CTRL_LIGHT_VERTICALDISPLACEMENT = 100
 CTRL_LIGHT_MULTIPLIER = 140
+
+MDX_FLAG_VERTEX = 0x0001
+MDX_FLAG_UV1 = 0x0002
+MDX_FLAG_UV2 = 0x0004
+MDX_FLAG_UV3 = 0x0008
+MDX_FLAG_UV4 = 0x0010
+MDX_FLAG_NORMAL = 0x0020
+MDX_FLAG_COLOR = 0x0040
+MDX_FLAG_TANGENT1 = 0x0080
+MDX_FLAG_TANGENT2 = 0x0100
+MDX_FLAG_TANGENT3 = 0x0200
+MDX_FLAG_TANGENT4 = 0x0400
 
 
 class ControllerKey:
@@ -212,11 +222,11 @@ class MdlLoader:
             bouding_box = [self.mdl.get_float() for _ in range(6)]
             radius = self.mdl.get_float()
             average = [self.mdl.get_float() for _ in range(3)]
-            diffuse = [self.mdl.get_float() for _ in range(3)]
-            ambient = [self.mdl.get_float() for _ in range(3)]
+            node.diffuse = [self.mdl.get_float() for _ in range(3)]
+            node.ambient = [self.mdl.get_float() for _ in range(3)]
             transparency_hint = self.mdl.get_uint32()
-            bitmap1 = self.mdl.get_c_string_up_to(32)
-            bitmap2 = self.mdl.get_c_string_up_to(32)
+            node.bitmap = self.mdl.get_c_string_up_to(32)
+            node.bitmap2 = self.mdl.get_c_string_up_to(32)
             bitmap3 = self.mdl.get_c_string_up_to(12)
             bitmap4 = self.mdl.get_c_string_up_to(12)
             index_count_arr = self.get_array_def()
@@ -302,8 +312,11 @@ class MdlLoader:
                         num_columns *= 3
                 values = [self.mdl.get_float() for _ in range(num_columns * key.num_rows)]
                 controllers[key.ctrl_type] = [ControllerRow(timekeys[i], values[i*key.num_columns:i*key.num_columns+num_columns]) for i in range(key.num_rows)]
-            if node_type & NODE_LIGHT:
-                node.color = controllers[CTRL_LIGHT_COLOR][0].values if CTRL_LIGHT_COLOR in controllers else 3 * [1.0]
+            if node_type & NODE_MESH:
+                node.alpha = controllers[CTRL_MESH_ALPHA][0].values[0] if CTRL_MESH_ALPHA in controllers else 1.0
+                node.selfillumcolor = controllers[CTRL_MESH_SELFILLUMCOLOR][0].values if CTRL_MESH_SELFILLUMCOLOR in controllers else [0.0] * 3
+            elif node_type & NODE_LIGHT:
+                node.color = controllers[CTRL_LIGHT_COLOR][0].values if CTRL_LIGHT_COLOR in controllers else [1.0] * 3
                 node.radius = controllers[CTRL_LIGHT_RADIUS][0].values[0] if CTRL_LIGHT_RADIUS in controllers else 1.0
                 node.multiplier = controllers[CTRL_LIGHT_MULTIPLIER][0].values[0] if CTRL_LIGHT_MULTIPLIER in controllers else 1.0
 
@@ -318,6 +331,7 @@ class MdlLoader:
                     adjacent_faces = [self.mdl.get_uint16() for _ in range(3)]
                     vert_indices = [self.mdl.get_uint16() for _ in range(3)]
                     node.facelist.faces.append(tuple(vert_indices))
+                    node.facelist.uvIdx.append(tuple(vert_indices))
                 if index_count_arr.count > 0:
                     self.mdl.seek(MDL_OFFSET + index_count_arr.offset)
                     num_indices = self.mdl.get_uint32()
@@ -326,9 +340,17 @@ class MdlLoader:
                     off_indices = self.mdl.get_uint32()
 
             node.verts = []
+            node.tverts = []
+            node.tverts1 = []
             for i in range(num_verts):
                 self.mdx.seek(mdx_offset + i * mdx_data_size + off_mdx_verts)
                 node.verts.append(tuple([self.mdx.get_float() for _ in range(3)]))
+                if mdx_data_bitmap & MDX_FLAG_UV1:
+                    self.mdx.seek(mdx_offset + i * mdx_data_size + off_mdx_uv1)
+                    node.tverts.append(tuple([self.mdx.get_float() for _ in range(2)]))
+                if mdx_data_bitmap & MDX_FLAG_UV2:
+                    self.mdx.seek(mdx_offset + i * mdx_data_size + off_mdx_uv2)
+                    node.tverts1.append(tuple([self.mdx.get_float() for _ in range(2)]))
 
         self.mdl.seek(MDL_OFFSET + children_arr.offset)
         child_offsets = [self.mdl.get_uint32() for _ in range(children_arr.count)]
