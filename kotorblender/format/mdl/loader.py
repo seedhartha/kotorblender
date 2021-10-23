@@ -38,7 +38,7 @@ FN_PTR_2_K1_XBOX = 4255008
 FN_PTR_2_K2_PC = 4216320
 FN_PTR_2_K2_XBOX = 4216016
 
-NODE_HEADER = 0x0001
+NODE_BASE = 0x0001
 NODE_LIGHT = 0x0002
 NODE_EMITTER = 0x0004
 NODE_REFERENCE = 0x0010
@@ -47,6 +47,37 @@ NODE_SKIN = 0x0040
 NODE_DANGLY = 0x0100
 NODE_AABB = 0x0200
 NODE_SABER = 0x0800
+
+CTRL_BASE_POSITION = 8
+CTRL_BASE_ORIENTATION = 20
+CTRL_BASE_SCALE = 36
+
+CTRL_MESH_SELFILLUMCOLOR = 100
+CTRL_MESH_ALPHA = 132
+
+CTRL_LIGHT_COLOR = 76
+CTRL_LIGHT_RADIUS = 88
+CTRL_LIGHT_SHADOWRADIUS = 96
+CTRL_LIGHT_VERTICALDISPLACEMENT = 100
+CTRL_LIGHT_MULTIPLIER = 140
+
+
+class ControllerKey:
+    def __init__(self, ctrl_type, num_rows, timekeys_start, values_start, num_columns):
+        self.ctrl_type = ctrl_type
+        self.num_rows = num_rows
+        self.timekeys_start = timekeys_start
+        self.values_start = values_start
+        self.num_columns = num_columns
+
+
+class ControllerRow:
+    def __init__(self, timekey, values):
+        self.timekey = timekey
+        self.values = values
+
+    def __repr__(self):
+        return "{{timekey={}, values={}}}".format(self.timekey, self.values)
 
 
 class ArrayDefinition:
@@ -155,7 +186,20 @@ class MdlLoader:
             )
 
         if node_type & NODE_LIGHT:
-            pass
+            flare_radius = self.mdl.get_float()
+            unknown_arr = self.get_array_def()
+            flare_size_arr = self.get_array_def()
+            flare_position_arr = self.get_array_def()
+            flare_color_shift_arr = self.get_array_def()
+            flare_texture_name_arr = self.get_array_def()
+            light_priority = self.mdl.get_uint32()
+            ambient_only = self.mdl.get_uint32()
+            dynamic_type = self.mdl.get_uint32()
+            affect_dynamic = self.mdl.get_uint32()
+            shadow = self.mdl.get_uint32()
+            flare = self.mdl.get_uint32()
+            fading_light = self.mdl.get_uint32()
+
         if node_type & NODE_EMITTER:
             pass
         if node_type & NODE_REFERENCE:
@@ -231,6 +275,37 @@ class MdlLoader:
             pass
         if node_type & NODE_SABER:
             pass
+
+        if controller_arr.count > 0:
+            self.mdl.seek(MDL_OFFSET + controller_arr.offset)
+            keys = []
+            for _ in range(controller_arr.count):
+                ctrl_type = self.mdl.get_uint32()
+                self.mdl.skip(2) # unknown
+                num_rows = self.mdl.get_uint16()
+                timekeys_start = self.mdl.get_uint16()
+                values_start = self.mdl.get_uint16()
+                num_columns = self.mdl.get_uint8()
+                self.mdl.skip(3) # padding
+                keys.append(ControllerKey(ctrl_type, num_rows, timekeys_start, values_start, num_columns))
+            controllers = dict()
+            for key in keys:
+                self.mdl.seek(MDL_OFFSET + controller_data_arr.offset + 4 * key.timekeys_start)
+                timekeys = [self.mdl.get_float() for _ in range(key.num_rows)]
+                self.mdl.seek(MDL_OFFSET + controller_data_arr.offset + 4 * key.values_start)
+                if key.ctrl_type == CTRL_BASE_ORIENTATION and key.num_columns == 2:
+                    num_columns = 1
+                else:
+                    num_columns = key.num_columns & 0xf
+                    bezier = key.num_columns & 0x10
+                    if bezier:
+                        num_columns *= 3
+                values = [self.mdl.get_float() for _ in range(num_columns * key.num_rows)]
+                controllers[key.ctrl_type] = [ControllerRow(timekeys[i], values[i*key.num_columns:i*key.num_columns+num_columns]) for i in range(key.num_rows)]
+            if node_type & NODE_LIGHT:
+                node.color = controllers[CTRL_LIGHT_COLOR][0].values if CTRL_LIGHT_COLOR in controllers else 3 * [1.0]
+                node.radius = controllers[CTRL_LIGHT_RADIUS][0].values[0] if CTRL_LIGHT_RADIUS in controllers else 1.0
+                node.multiplier = controllers[CTRL_LIGHT_MULTIPLIER][0].values[0] if CTRL_LIGHT_MULTIPLIER in controllers else 1.0
 
         if node_type & NODE_MESH:
             node.facelist = FaceList()

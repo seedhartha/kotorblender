@@ -23,12 +23,14 @@ from mathutils import Quaternion
 
 from ..defines import Nodetype
 
+from . import light
+
 
 class ModelNode:
 
-    def __init__(self, name, type, parent, position, orientation):
+    def __init__(self, name, node_type, parent, position, orientation):
         self.name = name
-        self.type = type
+        self.node_type = node_type
         self.parent = parent
         self.position = position
         self.orientation = orientation
@@ -42,14 +44,21 @@ class ModelNode:
         obj.rotation_mode = 'QUATERNION'
         obj.rotation_quaternion = Quaternion(self.orientation)
 
+        if self.node_type is Nodetype.LIGHT:
+            obj.kb.radius = self.radius
+            obj.kb.multiplier = self.multiplier
+            light.calc_light_power(obj)
+
         bpy.context.collection.objects.link(obj)
 
         for child in self.children:
             child.add_to_collection(obj)
 
     def new_object_data(self):
-        if self.type is Nodetype.TRIMESH:
+        if self.node_type is Nodetype.TRIMESH:
             return self.new_mesh()
+        if self.node_type is Nodetype.LIGHT:
+            return self.new_light()
         return None
 
     def new_mesh(self):
@@ -64,3 +73,8 @@ class ModelNode:
         mesh.polygons.foreach_set("loop_total", (3,) * num_faces)
         mesh.update()
         return mesh
+
+    def new_light(self):
+        light = bpy.data.lights.new(self.name, 'POINT')
+        light.color = self.color
+        return light
