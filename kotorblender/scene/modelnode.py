@@ -124,7 +124,6 @@ class ModelNode:
             Nodetype.TRIMESH,
             Nodetype.DANGLYMESH,
             Nodetype.SKIN,
-            Nodetype.EMITTER,
             Nodetype.AABB,
             Nodetype.LIGHTSABER]
 
@@ -133,7 +132,6 @@ class ModelNode:
             Nodetype.TRIMESH: Meshtype.TRIMESH,
             Nodetype.DANGLYMESH: Meshtype.DANGLYMESH,
             Nodetype.SKIN: Meshtype.SKIN,
-            Nodetype.EMITTER: Meshtype.EMITTER,
             Nodetype.AABB: Meshtype.AABB,
             Nodetype.LIGHTSABER: Meshtype.LIGHTSABER
         }

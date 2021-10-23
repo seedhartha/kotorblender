@@ -21,6 +21,7 @@ import os
 from ...defines import Nodetype
 from ...exception.malformedmdl import MalformedMdl
 from ...exception.mdxnotfound import MdxNotFound
+from ...scene.animation import Animation
 from ...scene.model import Model
 from ...scene.modelnode import ModelNode
 from ...scene.types import FaceList
@@ -31,8 +32,6 @@ MDL_OFFSET = 12
 
 FN_PTR_1_K1_PC = 4273776
 FN_PTR_1_K2_PC = 4285200
-FN_PTR_2_K1_PC = 4216096
-FN_PTR_2_K2_PC = 4216320
 
 NODE_BASE = 0x0001
 NODE_LIGHT = 0x0002
@@ -54,6 +53,54 @@ CTRL_LIGHT_RADIUS = 88
 CTRL_LIGHT_SHADOWRADIUS = 96
 CTRL_LIGHT_VERTICALDISPLACEMENT = 100
 CTRL_LIGHT_MULTIPLIER = 140
+CTRL_EMITTER_ALPHAEND = 80
+CTRL_EMITTER_ALPHASTART = 84
+CTRL_EMITTER_BIRTHRATE = 88
+CTRL_EMITTER_BOUNCE_CO = 92
+CTRL_EMITTER_COMBINETIME = 96
+CTRL_EMITTER_DRAG = 100
+CTRL_EMITTER_FPS = 104
+CTRL_EMITTER_FRAMEEND = 108
+CTRL_EMITTER_FRAMESTART = 112
+CTRL_EMITTER_GRAV = 116
+CTRL_EMITTER_LIFEEXP = 120
+CTRL_EMITTER_MASS = 124
+CTRL_EMITTER_P2P_BEZIER2 = 128
+CTRL_EMITTER_P2P_BEZIER3 = 132
+CTRL_EMITTER_PARTICLEROT = 136
+CTRL_EMITTER_RANDVEL = 140
+CTRL_EMITTER_SIZESTART = 144
+CTRL_EMITTER_SIZEEND = 148
+CTRL_EMITTER_SIZESTART_Y = 152
+CTRL_EMITTER_SIZEEND_Y = 156
+CTRL_EMITTER_SPREAD = 160
+CTRL_EMITTER_THRESHOLD = 164
+CTRL_EMITTER_VELOCITY = 168
+CTRL_EMITTER_XSIZE = 172
+CTRL_EMITTER_YSIZE = 176
+CTRL_EMITTER_BLURLENGTH = 180
+CTRL_EMITTER_LIGHTNINGDELAY = 184
+CTRL_EMITTER_LIGHTNINGRADIUS = 188
+CTRL_EMITTER_LIGHTNINGSCALE = 192
+CTRL_EMITTER_LIGHTNINGSUBDIV = 196
+CTRL_EMITTER_LIGHTNINGZIGZAG = 200
+CTRL_EMITTER_ALPHAMID = 216
+CTRL_EMITTER_PERCENTSTART = 220
+CTRL_EMITTER_PERCENTMID = 224
+CTRL_EMITTER_PERCENTEND = 228
+CTRL_EMITTER_SIZEMID = 232
+CTRL_EMITTER_SIZEMID_Y = 236
+CTRL_EMITTER_RANDOMBIRTHRATE = 240
+CTRL_EMITTER_TARGETSIZE = 252
+CTRL_EMITTER_NUMCONTROLPTS = 256
+CTRL_EMITTER_CONTROLPTRADIUS = 260
+CTRL_EMITTER_CONTROLPTDELAY = 264
+CTRL_EMITTER_TANGENTSPREAD = 268
+CTRL_EMITTER_TANGENTLENGTH = 272
+CTRL_EMITTER_COLORMID = 284
+CTRL_EMITTER_COLOREND = 380
+CTRL_EMITTER_COLORSTART = 392
+CTRL_EMITTER_DETONATE = 502
 
 MDX_FLAG_VERTEX = 0x0001
 MDX_FLAG_UV1 = 0x0002
@@ -116,7 +163,8 @@ class MdlLoader:
         return Model(
             self.model_name,
             self.supermodel_name,
-            root_node
+            root_node,
+            self.load_animations()
             )
 
     def load_file_header(self):
@@ -146,7 +194,7 @@ class MdlLoader:
         self.mdl.skip(1) # unknown
         affected_by_fog = self.mdl.get_uint8()
         num_child_models = self.mdl.get_uint32()
-        animation_arr = self.get_array_def()
+        self.animation_arr = self.get_array_def()
         supermodel_ref = self.mdl.get_uint32()
         bounding_box = [self.mdl.get_float() for _ in range(6)]
         radius = self.mdl.get_float()
@@ -154,9 +202,11 @@ class MdlLoader:
         self.supermodel_name = self.mdl.get_c_string_up_to(32)
         off_head_root_node = self.mdl.get_uint32()
         self.mdl.skip(4) # padding
+
         mdx_size = self.mdl.get_uint32()
         if mdx_size != self.mdx_size:
             raise MalformedMdl("MDX size mismatch: expected={}, actual={}".format(self.mdx_size, mdx_size))
+
         mdx_offset = self.mdl.get_uint32()
         self.name_arr = self.get_array_def()
 
@@ -295,31 +345,7 @@ class MdlLoader:
             pass
 
         if controller_arr.count > 0:
-            self.mdl.seek(MDL_OFFSET + controller_arr.offset)
-            keys = []
-            for _ in range(controller_arr.count):
-                ctrl_type = self.mdl.get_uint32()
-                self.mdl.skip(2) # unknown
-                num_rows = self.mdl.get_uint16()
-                timekeys_start = self.mdl.get_uint16()
-                values_start = self.mdl.get_uint16()
-                num_columns = self.mdl.get_uint8()
-                self.mdl.skip(3) # padding
-                keys.append(ControllerKey(ctrl_type, num_rows, timekeys_start, values_start, num_columns))
-            controllers = dict()
-            for key in keys:
-                self.mdl.seek(MDL_OFFSET + controller_data_arr.offset + 4 * key.timekeys_start)
-                timekeys = [self.mdl.get_float() for _ in range(key.num_rows)]
-                self.mdl.seek(MDL_OFFSET + controller_data_arr.offset + 4 * key.values_start)
-                if key.ctrl_type == CTRL_BASE_ORIENTATION and key.num_columns == 2:
-                    num_columns = 1
-                else:
-                    num_columns = key.num_columns & 0xf
-                    bezier = key.num_columns & 0x10
-                    if bezier:
-                        num_columns *= 3
-                values = [self.mdl.get_float() for _ in range(num_columns * key.num_rows)]
-                controllers[key.ctrl_type] = [ControllerRow(timekeys[i], values[i*key.num_columns:i*key.num_columns+num_columns]) for i in range(key.num_rows)]
+            controllers = self.load_controllers(controller_arr, controller_data_arr)
             if type_flags & NODE_MESH:
                 node.alpha = controllers[CTRL_MESH_ALPHA][0].values[0] if CTRL_MESH_ALPHA in controllers else 1.0
                 node.selfillumcolor = controllers[CTRL_MESH_SELFILLUMCOLOR][0].values if CTRL_MESH_SELFILLUMCOLOR in controllers else [0.0] * 3
@@ -394,6 +420,108 @@ class MdlLoader:
             node.children.append(child)
 
         return node
+
+    def load_animations(self):
+        if self.animation_arr.count == 0:
+            return
+        self.mdl.seek(MDL_OFFSET + self.animation_arr.offset)
+        offsets = [self.mdl.get_uint32() for _ in range(self.animation_arr.count)]
+        animations = [self.load_animation(offset) for offset in offsets]
+        return animations
+
+    def load_animation(self, offset):
+        self.mdl.seek(MDL_OFFSET + offset)
+        fn_ptr1 = self.mdl.get_uint32()
+        fn_ptr2 = self.mdl.get_uint32()
+        name = self.mdl.get_c_string_up_to(32)
+        off_root_node = self.mdl.get_uint32()
+        total_num_nodes = self.mdl.get_uint32()
+        runtime_arr1 = self.get_array_def()
+        runtime_arr2 = self.get_array_def()
+        ref_count = self.mdl.get_uint32()
+        model_type = self.mdl.get_uint8()
+        self.mdl.skip(3) # padding
+        length = self.mdl.get_float()
+        transition = self.mdl.get_float()
+        anim_root = self.mdl.get_c_string_up_to(32)
+        event_arr = self.get_array_def()
+        self.mdl.skip(4) # padding
+
+        events = []
+        if event_arr.count > 0:
+            self.mdl.seek(MDL_OFFSET + event_arr.offset)
+            for _ in range(event_arr.count):
+                time = self.mdl.get_float()
+                event_name = self.mdl.get_c_string_up_to(32)
+                events.append((time, event_name))
+
+        root_node = self.load_anim_nodes(off_root_node)
+        animation = Animation(name, length, root_node, events)
+
+        return animation
+
+    def load_anim_nodes(self, offset, parent=None):
+        self.mdl.seek(MDL_OFFSET + offset)
+
+        type_flags = self.mdl.get_uint16()
+        supernode_number = self.mdl.get_uint16()
+        name_index = self.mdl.get_uint16()
+        self.mdl.skip(2) # padding
+        off_root = self.mdl.get_uint32()
+        off_parent = self.mdl.get_uint32()
+        position = [self.mdl.get_float() for _ in range(3)]
+        orientation = [self.mdl.get_float() for _ in range(4)]
+        children_arr = self.get_array_def()
+        controller_arr = self.get_array_def()
+        controller_data_arr = self.get_array_def()
+
+        name = self.names[name_index]
+        node = ModelNode(
+            name,
+            self.get_node_type(type_flags),
+            parent,
+            position,
+            orientation
+            )
+
+        if controller_arr.count > 0:
+            controllers = self.load_controllers(controller_arr, controller_data_arr)
+
+        self.mdl.seek(MDL_OFFSET + children_arr.offset)
+        child_offsets = [self.mdl.get_uint32() for _ in range(children_arr.count)]
+        for off_child in child_offsets:
+            child = self.load_anim_nodes(off_child, node)
+            node.children.append(child)
+
+        return node
+
+    def load_controllers(self, controller_arr, controller_data_arr):
+        self.mdl.seek(MDL_OFFSET + controller_arr.offset)
+        keys = []
+        for _ in range(controller_arr.count):
+            ctrl_type = self.mdl.get_uint32()
+            self.mdl.skip(2) # unknown
+            num_rows = self.mdl.get_uint16()
+            timekeys_start = self.mdl.get_uint16()
+            values_start = self.mdl.get_uint16()
+            num_columns = self.mdl.get_uint8()
+            self.mdl.skip(3) # padding
+            keys.append(ControllerKey(ctrl_type, num_rows, timekeys_start, values_start, num_columns))
+        controllers = dict()
+        for key in keys:
+            self.mdl.seek(MDL_OFFSET + controller_data_arr.offset + 4 * key.timekeys_start)
+            timekeys = [self.mdl.get_float() for _ in range(key.num_rows)]
+            self.mdl.seek(MDL_OFFSET + controller_data_arr.offset + 4 * key.values_start)
+            if key.ctrl_type == CTRL_BASE_ORIENTATION and key.num_columns == 2:
+                num_columns = 1
+            else:
+                num_columns = key.num_columns & 0xf
+                bezier = key.num_columns & 0x10
+                if bezier:
+                    num_columns *= 3
+            values = [self.mdl.get_float() for _ in range(num_columns * key.num_rows)]
+            controllers[key.ctrl_type] = [ControllerRow(timekeys[i], values[i*key.num_columns:i*key.num_columns+num_columns]) for i in range(key.num_rows)]
+        return controllers
 
     def get_node_type(self, flags):
         if flags & NODE_SABER:

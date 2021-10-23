@@ -16,17 +16,9 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-from . import armature
-
-
-class Model:
-
-    def __init__(self, name, supermodel_name, root_node, animations):
+class Animation:
+    def __init__(self, name, length, root_node, events):
         self.name = name
-        self.supermodel_name = supermodel_name
+        self.length = length
         self.root_node = root_node
-        self.animations = animations
-
-    def add_to_collection(self):
-        obj = self.root_node.add_to_collection()
-        armature.recreate_armature(obj)
+        self.events = events
