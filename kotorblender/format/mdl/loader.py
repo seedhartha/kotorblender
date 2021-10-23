@@ -20,7 +20,8 @@ import os
 
 from ...exception.malformedmdl import MalformedMdl
 from ...exception.mdxnotfound import MdxNotFound
-from ...expando import Expando
+from ...scene.model import Model
+from ...scene.modelnode import ModelNode
 
 from ..binreader import BinaryReader
 
@@ -45,6 +46,13 @@ NODE_DANGLY = 0x0100
 NODE_AABB = 0x0200
 NODE_SABER = 0x0800
 
+
+class ArrayDefinition:
+    def __init__(self, offset, count):
+        self.offset = offset
+        self.count = count
+
+
 class MdlLoader:
 
     def __init__(self, path):
@@ -65,12 +73,11 @@ class MdlLoader:
 
         root_node = self.load_nodes(self.off_root_node)
 
-        model = Expando()
-        model.name = self.model_name
-        model.supermodel_name = self.supermodel_name
-        model.root_node = root_node
-
-        return model
+        return Model(
+            self.model_name,
+            self.supermodel_name,
+            root_node
+            )
 
     def load_file_header(self):
         if self.mdl.get_uint32() != 0:
@@ -137,13 +144,13 @@ class MdlLoader:
         controller_arr = self.get_array_def()
         controller_data_arr = self.get_array_def()
 
-        node = Expando()
-        node.name = self.names[name_index]
-        node.type = node_type
-        node.parent = parent
-        node.position = position
-        node.orientation = orientation
-        node.children = []
+        node = ModelNode(
+            self.names[name_index],
+            node_type,
+            parent,
+            position,
+            orientation
+            )
 
         if node.type & NODE_LIGHT:
             pass
@@ -255,7 +262,5 @@ class MdlLoader:
         count2 = self.mdl.get_uint32()
         if count1 != count2:
             raise MalformedMdl("Array count mismatch: count1={}, count2={}".format(count1, count2))
-        result = Expando()
-        result.offset = offset
-        result.count = count1
-        return result
+
+        return ArrayDefinition(offset, count1)
