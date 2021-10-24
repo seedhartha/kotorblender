@@ -247,10 +247,10 @@ class MdlLoader:
         if type_flags & NODE_LIGHT:
             flare_radius = self.mdl.get_float()
             unknown_arr = self.get_array_def()
-            flare_size_arr = self.get_array_def()
-            flare_position_arr = self.get_array_def()
-            flare_color_shift_arr = self.get_array_def()
-            flare_texture_name_arr = self.get_array_def()
+            self.flare_size_arr = self.get_array_def()
+            self.flare_position_arr = self.get_array_def()
+            self.flare_color_shift_arr = self.get_array_def()
+            self.flare_tex_name_arr = self.get_array_def()
             light_priority = self.mdl.get_uint32()
             ambient_only = self.mdl.get_uint32()
             dynamic_type = self.mdl.get_uint32()
@@ -386,6 +386,26 @@ class MdlLoader:
                 node.radius = controllers[CTRL_LIGHT_RADIUS][0].values[0] if CTRL_LIGHT_RADIUS in controllers else 1.0
                 node.multiplier = controllers[CTRL_LIGHT_MULTIPLIER][0].values[0] if CTRL_LIGHT_MULTIPLIER in controllers else 1.0
 
+        if type_flags & NODE_LIGHT:
+            self.mdl.seek(MDL_OFFSET + self.flare_size_arr.offset)
+            flare_sizes = [self.mdl.get_float() for _ in range(self.flare_size_arr.count)]
+
+            self.mdl.seek(MDL_OFFSET + self.flare_position_arr.offset)
+            flare_positions = [self.mdl.get_float() for _ in range(self.flare_position_arr.count)]
+
+            self.mdl.seek(MDL_OFFSET + self.flare_color_shift_arr.offset)
+            flare_color_shifts = []
+            for _ in range(self.flare_color_shift_arr.count):
+                color_shift = [self.mdl.get_float() for _ in range(3)]
+                flare_color_shifts.append(color_shift)
+
+            self.mdl.seek(MDL_OFFSET + self.flare_tex_name_arr.offset)
+            tex_name_offsets = [self.mdl.get_uint32() for _ in range(self.flare_tex_name_arr.count)]
+            tex_names = []
+            for tex_name_offset in tex_name_offsets:
+                self.mdl.seek(MDL_OFFSET + tex_name_offset)
+                tex_names.append(self.mdl.get_c_string())
+
         if type_flags & NODE_SKIN:
             if num_bonemap > 0:
                 self.mdl.seek(MDL_OFFSET + off_bonemap)
@@ -486,8 +506,8 @@ class MdlLoader:
         model_type = self.mdl.get_uint8()
         self.mdl.skip(3) # padding
         length = self.mdl.get_float()
-        transtime = self.mdl.get_float()
-        animroot = self.mdl.get_c_string_up_to(32)
+        transition = self.mdl.get_float()
+        anim_root = self.mdl.get_c_string_up_to(32)
         event_arr = self.get_array_def()
         self.mdl.skip(4) # padding
 
@@ -504,8 +524,8 @@ class MdlLoader:
         return Animation(
             name,
             length,
-            transtime,
-            animroot,
+            transition,
+            anim_root,
             root_node,
             events
             )

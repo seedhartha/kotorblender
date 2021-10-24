@@ -25,4 +25,4 @@ class BwmSaver:
         self.bwm = BinaryWriter(path, 'little')
 
     def save(self):
-        pass
+        raise NotImplementedError()
