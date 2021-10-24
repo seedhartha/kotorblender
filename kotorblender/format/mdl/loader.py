@@ -260,9 +260,30 @@ class MdlLoader:
             fading_light = self.mdl.get_uint32()
 
         if type_flags & NODE_EMITTER:
-            pass
+            dead_space = self.mdl.get_float()
+            blast_radius = self.mdl.get_float()
+            blast_length = self.mdl.get_float()
+            num_branches = self.mdl.get_uint32()
+            ctrl_point_smoothing = self.mdl.get_float()
+            x_grid = self.mdl.get_float()
+            y_grid = self.mdl.get_float()
+            spawn_type = self.mdl.get_uint32()
+            update = self.mdl.get_c_string_up_to(32)
+            render = self.mdl.get_c_string_up_to(32)
+            blend = self.mdl.get_c_string_up_to(32)
+            texture = self.mdl.get_c_string_up_to(32)
+            chunk_name = self.mdl.get_c_string_up_to(16)
+            twosided_tex = self.mdl.get_uint32()
+            loop = self.mdl.get_uint32()
+            render_order = self.mdl.get_uint16()
+            frame_blending = self.mdl.get_uint8()
+            depth_texture_name = self.mdl.get_c_string_up_to(32)
+            self.mdl.skip(1) # padding
+            flags = self.mdl.get_uint32()
+
         if type_flags & NODE_REFERENCE:
-            pass
+            ref_model = self.mdl.get_c_string_up_to(32)
+            reattachable = self.mdl.get_uint32()
 
         if type_flags & NODE_MESH:
             fn_ptr1 = self.mdl.get_uint32()
@@ -338,11 +359,22 @@ class MdlLoader:
             self.mdl.skip(4) # padding
 
         if type_flags & NODE_DANGLY:
-            pass
+            constraint_arr = self.get_array_def()
+            displacement = self.mdl.get_float()
+            tightness = self.mdl.get_float()
+            period = self.mdl.get_float()
+            off_vert_data = self.mdl.get_uint32()
+
         if type_flags & NODE_AABB:
-            pass
+            off_root_aabb = self.mdl.get_uint32()
+            self.load_aabb(off_root_aabb)
+
         if type_flags & NODE_SABER:
-            pass
+            off_verts = self.mdl.get_uint32()
+            off_uv = self.mdl.get_uint32()
+            off_normals = self.mdl.get_uint32()
+            inv_count1 = self.mdl.get_uint32()
+            inv_count2 = self.mdl.get_uint32()
 
         if controller_arr.count > 0:
             controllers = self.load_controllers(controller_arr, controller_data_arr)
@@ -420,6 +452,19 @@ class MdlLoader:
             node.children.append(child)
 
         return node
+
+    def load_aabb(self, offset):
+        self.mdl.seek(MDL_OFFSET + offset)
+        bounding_box = [self.mdl.get_float() for _ in range(6)]
+        off_child1 = self.mdl.get_uint32()
+        off_child2 = self.mdl.get_uint32()
+        face_idx = self.mdl.get_int32()
+        most_significant_plane = self.mdl.get_uint32()
+
+        if off_child1 > 0:
+            self.load_aabb(off_child1)
+        if off_child2 > 0:
+            self.load_aabb(off_child2)
 
     def load_animations(self):
         if self.animation_arr.count == 0:
