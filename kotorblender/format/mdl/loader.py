@@ -359,7 +359,7 @@ class MdlLoader:
             self.mdl.skip(4) # padding
 
         if type_flags & NODE_DANGLY:
-            constraint_arr = self.get_array_def()
+            self.constraint_arr = self.get_array_def()
             displacement = self.mdl.get_float()
             tightness = self.mdl.get_float()
             period = self.mdl.get_float()
@@ -436,6 +436,10 @@ class MdlLoader:
                 if index_offset_arr.count > 0:
                     self.mdl.seek(MDL_OFFSET + index_offset_arr.offset)
                     off_indices = self.mdl.get_uint32()
+
+            if type_flags & NODE_DANGLY:
+                self.mdl.seek(MDL_OFFSET + self.constraint_arr.offset)
+                constraints = [self.mdl.get_float() for _ in range(self.constraint_arr.count)]
 
             node.verts = []
             node.tverts = []
