@@ -36,9 +36,9 @@ class GffLoader:
         file_version = self.reader.get_string(4)
 
         if file_type != self.file_type:
-            raise MalformedGff("GFF file type is invalid: expected={}, actual={}".format(self.file_type, file_type))
+            raise MalformedGff("GFF file type is invalid: expected='{}', actual='{}'".format(self.file_type, file_type))
         if file_version != FILE_VERSION:
-            raise MalformedGff("GFF file version is invalid: expected={}, actual={}".format(FILE_VERSION, file_version))
+            raise MalformedGff("GFF file version is invalid: expected='{}', actual='{}'".format(FILE_VERSION, file_version))
 
         self.off_structs = self.reader.get_uint32()
         self.num_structs = self.reader.get_uint32()
