@@ -16,6 +16,8 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+from ...exception.malformedbwm import MalformedBwm
+
 from ..binreader import BinaryReader
 
 
@@ -41,9 +43,12 @@ class AABB:
 class BwmLoader:
 
     def __init__(self, path):
+        self.path = path
         self.bwm = BinaryReader(path, 'little')
 
     def load(self):
+        print("Loading BWM '{}'".format(self.path))
+
         self.load_header()
         self.load_vertices()
         self.load_faces()
@@ -54,6 +59,9 @@ class BwmLoader:
 
     def load_header(self):
         file_type = self.bwm.get_string(4)
+        if file_type != "BWM ":
+            raise MalformedBwm("BWM file type is invalid: expected='BWM ', actual='{}'".format(file_type))
+
         version = self.bwm.get_string(4)
         type = self.bwm.get_uint32()
         rel_use_vec1 = [self.bwm.get_float() for _ in range(3)]

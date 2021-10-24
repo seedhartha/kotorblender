@@ -142,6 +142,7 @@ class ArrayDefinition:
 class MdlLoader:
 
     def __init__(self, path):
+        self.path = path
         self.mdl = BinaryReader(path, 'little')
 
         base, _ = os.path.splitext(path)
@@ -153,6 +154,8 @@ class MdlLoader:
         self.node_names_df = [] # depth first array of node names
 
     def load(self):
+        print("Loading MDL '{}'".format(self.path))
+
         self.load_file_header()
         self.load_geometry_header()
         self.load_model_header()
