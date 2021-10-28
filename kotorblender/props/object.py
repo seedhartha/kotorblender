@@ -95,7 +95,6 @@ class ObjectPropertyGroup(bpy.types.PropertyGroup):
                                                  (defines.Dummytype.MDLROOT,   "MDL Rootdummy",       "All children are considered part of a mdl",                  2), \
                                                  (defines.Dummytype.PWKROOT,   "PWK Rootdummy",       "All children are considered part of a placeable walkmesh",   3), \
                                                  (defines.Dummytype.REFERENCE, "Reference node",      "Used in spells. Points to 'fx_ref' by default",              4), \
-                                                 (defines.Dummytype.PATCH,     "Patch node",          "Used in spells. Unknown purpose. ",                          5), \
                                                  (defines.Dummytype.PATHPOINT, "Path point",          "Used when exporting paths",                                  6)],
                                         default = defines.Dummytype.NONE)
     # For MDL Rootdummy

@@ -271,21 +271,6 @@ class Dummy(GeometryNode):
             pass
 
 
-class Patch(GeometryNode):
-    """Same as a plain Dummy."""
-
-    def __init__(self, name = "UNNAMED"):
-        GeometryNode.__init__(self, name)
-        self.nodetype = "patch"
-
-        self.dummytype = defines.Dummytype.PATCH
-
-    def set_object_data(self, obj):
-        GeometryNode.set_object_data(self, obj)
-
-        obj.kb.dummytype = self.dummytype
-
-
 class Reference(GeometryNode):
     """Contains a reference to another mdl."""
 

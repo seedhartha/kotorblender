@@ -153,10 +153,9 @@ class Dummytype():
     MDLROOT   = "MDL"
     PWKROOT   = "PWK"
     REFERENCE = "REF"
-    PATCH     = "PAT"
     PATHPOINT = "PTH"
 
-    ALL = {NONE, DWKROOT, MDLROOT, PWKROOT, REFERENCE, PATCH, PATHPOINT}
+    ALL = {NONE, DWKROOT, MDLROOT, PWKROOT, REFERENCE, PATHPOINT}
 
 
 class Classification():
@@ -175,7 +174,6 @@ class Classification():
 
 class Nodetype():
     DUMMY       = "dummy"
-    PATCH       = "patch"
     REFERENCE   = "reference"
     TRIMESH     = "trimesh"
     DANGLYMESH  = "danglymesh"
