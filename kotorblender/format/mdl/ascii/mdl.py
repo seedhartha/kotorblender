@@ -65,7 +65,6 @@ class Mdl():
 
         switch = {
             defines.Nodetype.DUMMY:      mdlnode.Dummy,
-            defines.Nodetype.PATCH:      mdlnode.Patch,
             defines.Nodetype.REFERENCE:  mdlnode.Reference,
             defines.Nodetype.TRIMESH:    mdlnode.Trimesh,
             defines.Nodetype.DANGLYMESH: mdlnode.Danglymesh,
@@ -344,7 +343,6 @@ class Mdl():
     def geometry_to_ascii(self, bObject, asciiLines, simple = False, nameDict = None):
         nodeType = utils.get_node_type(bObject)
         switch = {"dummy":      mdlnode.Dummy,
-                  "patch":      mdlnode.Patch,
                   "reference":  mdlnode.Reference,
                   "trimesh":    mdlnode.Trimesh,
                   "danglymesh": mdlnode.Danglymesh,

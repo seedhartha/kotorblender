@@ -121,9 +121,7 @@ def get_node_type(obj):
     """
     objType  = obj.type
     if objType == 'EMPTY':
-        if   obj.kb.dummytype == defines.Dummytype.PATCH:
-            return "patch"
-        elif obj.kb.dummytype == defines.Dummytype.REFERENCE:
+        if obj.kb.dummytype == defines.Dummytype.REFERENCE:
             return "reference"
     elif objType == 'MESH':
         if   obj.kb.meshtype == defines.Meshtype.TRIMESH:
