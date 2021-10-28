@@ -65,7 +65,7 @@ class GeometryNode():
         self.rawascii         = "" # unprocessed directives
 
     def __eq__(self, other):
-        if isinstance(other, Base):
+        if isinstance(other, GeometryNode):
             return self.name == other.name
 
     def __ne__(self, other):
