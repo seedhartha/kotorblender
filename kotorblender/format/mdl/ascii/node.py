@@ -53,7 +53,7 @@ class GeometryNode():
         self.name        = name
         self.parentName  = defines.null
         self.position    = (0.0, 0.0, 0.0)
-        self.orientation = (0.0, 0.0, 0.0, 0.0)
+        self.orientation = (1.0, 0.0, 0.0, 0.0)
         self.scale       = 1.0
         self.wirecolor   = (0.0, 0.0, 0.0)
 
@@ -116,10 +116,12 @@ class GeometryNode():
                                      l_float(line[3]))
                     self.parsed_lines.append(index)
                 elif (label == "orientation"):
-                    self.orientation = (l_float(line[1]),
-                                        l_float(line[2]),
-                                        l_float(line[3]),
-                                        l_float(line[4]))
+                    axis_angle = (l_float(line[1]),
+                                  l_float(line[2]),
+                                  l_float(line[3]),
+                                  l_float(line[4]))
+                    quat = Quaternion(axis_angle[0:3], axis_angle[3])
+                    self.orientation = (quat.w, quat.x, quat.y, quat.z)
                     self.parsed_lines.append(index)
                 elif (label == "scale"):
                     self.scale = l_float(line[1])
@@ -133,7 +135,7 @@ class GeometryNode():
     def set_object_data(self, obj):
         self.objref = obj.name  # used to resolve naming conflicts
         obj.rotation_mode       = 'QUATERNION'
-        obj.rotation_quaternion = Quaternion(self.orientation[0:3], self.orientation[3])
+        obj.rotation_quaternion = Quaternion(self.orientation)
         obj.kb.restrot          = self.orientation
         obj.scale               = (self.scale, self.scale, self.scale)
         obj.location            = self.position
@@ -1325,10 +1327,11 @@ class Emitter(GeometryNode):
                                      l_float(line[2]),
                                      l_float(line[3]))
                 elif (label == "orientation"):
-                    self.orientation = (l_float(line[1]),
-                                        l_float(line[2]),
-                                        l_float(line[3]),
-                                        l_float(line[4]))
+                    axis_angle = (l_float(line[1]),
+                                  l_float(line[2]),
+                                  l_float(line[3]),
+                                  l_float(line[4]))
+                    self.orientation = Quaternion(axis_angle[0:3], axis_angle[3])
                 elif (label == "scale"):
                     self.scale = l_float(line[1])
                 elif (label == "wirecolor"):
