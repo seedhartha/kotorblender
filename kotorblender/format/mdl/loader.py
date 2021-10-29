@@ -33,6 +33,8 @@ from ...scene.modelnode.reference import ReferenceNode
 from ...scene.modelnode.skinmesh import SkinmeshNode
 from ...scene.modelnode.trimesh import FaceList, TrimeshNode
 
+from ... import defines
+
 from ..binreader import BinaryReader
 
 MDL_OFFSET = 12
@@ -129,6 +131,20 @@ MDX_FLAG_TANGENT1 = 0x0080
 MDX_FLAG_TANGENT2 = 0x0100
 MDX_FLAG_TANGENT3 = 0x0200
 MDX_FLAG_TANGENT4 = 0x0400
+
+EMITTER_FLAG_P2P = 0x0001
+EMITTER_FLAG_P2P_SEL = 0x0002
+EMITTER_FLAG_AFFECTED_WIND = 0x0004
+EMITTER_FLAG_TINTED = 0x0008
+EMITTER_FLAG_BOUNCE = 0x0010
+EMITTER_FLAG_RANDOM = 0x0020
+EMITTER_FLAG_INHERIT = 0x0040
+EMITTER_FLAG_INHERIT_VEL = 0x0080
+EMITTER_FLAG_INHERIT_LOCAL = 0x0100
+EMITTER_FLAG_SPLAT = 0x0200
+EMITTER_FLAG_INHERIT_PART = 0x0400
+EMITTER_FLAG_DEPTH_TEXTURE = 0x0800
+EMITTER_FLAG_13 = 0x1000
 
 CLASS_BY_VALUE = {
     CLASS_OTHER: Classification.UNKNOWN,
@@ -332,6 +348,39 @@ class MdlLoader:
             self.mdl.skip(1) # padding
             flags = self.mdl.get_uint32()
 
+            # object data
+            node.deadspace = dead_space
+            node.blastradius = blast_radius
+            node.blastlength = blast_length
+            node.numBranches = num_branches
+            node.controlptsmoothing = ctrl_point_smoothing
+            node.xgrid = x_grid
+            node.ygrid = y_grid
+            node.spawntype = spawn_type
+            node.update = update
+            node.render = render
+            node.blend = blend
+            node.texture = texture
+            node.chunkName = chunk_name
+            node.twosidedtex = twosided_tex != 0
+            node.loop = loop != 0
+            node.renderorder = render_order
+            node.m_bFrameBlending = frame_blending != 0
+            node.m_sDepthTextureName = depth_texture_name if len(depth_texture_name) > 0 and depth_texture_name.lower() != "null" else defines.null
+            # flags
+            node.p2p = flags & EMITTER_FLAG_P2P != 0
+            node.p2p_sel = flags & EMITTER_FLAG_P2P_SEL != 0
+            node.affectedByWind = flags & EMITTER_FLAG_AFFECTED_WIND != 0
+            node.m_isTinted = flags & EMITTER_FLAG_TINTED != 0
+            node.bounce = flags & EMITTER_FLAG_BOUNCE != 0
+            node.random = flags & EMITTER_FLAG_RANDOM != 0
+            node.inherit = flags & EMITTER_FLAG_INHERIT != 0
+            node.inheritvel = flags & EMITTER_FLAG_INHERIT_VEL != 0
+            node.inherit_local = flags & EMITTER_FLAG_INHERIT_LOCAL != 0
+            node.splat = flags & EMITTER_FLAG_SPLAT != 0
+            node.inherit_part = flags & EMITTER_FLAG_INHERIT_PART != 0
+            node.depth_texture = flags & EMITTER_FLAG_DEPTH_TEXTURE != 0
+
         if type_flags & NODE_REFERENCE:
             ref_model = self.mdl.get_c_string_up_to(32)
             reattachable = self.mdl.get_uint32()
@@ -471,6 +520,54 @@ class MdlLoader:
                 node.color = controllers[CTRL_LIGHT_COLOR][0].values if CTRL_LIGHT_COLOR in controllers else [1.0] * 3
                 node.radius = controllers[CTRL_LIGHT_RADIUS][0].values[0] if CTRL_LIGHT_RADIUS in controllers else 1.0
                 node.multiplier = controllers[CTRL_LIGHT_MULTIPLIER][0].values[0] if CTRL_LIGHT_MULTIPLIER in controllers else 1.0
+            elif type_flags & NODE_EMITTER:
+                node.alphastart = controllers[CTRL_EMITTER_ALPHASTART][0].values[0] if CTRL_EMITTER_ALPHASTART in controllers else 0.0
+                node.alphamid = controllers[CTRL_EMITTER_ALPHAMID][0].values[0] if CTRL_EMITTER_ALPHAMID in controllers else 0.0
+                node.alphaend = controllers[CTRL_EMITTER_ALPHAEND][0].values[0] if CTRL_EMITTER_ALPHAEND in controllers else 0.0
+                node.birthrate = controllers[CTRL_EMITTER_BIRTHRATE][0].values[0] if CTRL_EMITTER_BIRTHRATE in controllers else 0.0
+                node.m_frandombirthrate = controllers[CTRL_EMITTER_RANDOMBIRTHRATE][0].values[0] if CTRL_EMITTER_RANDOMBIRTHRATE in controllers else 0.0
+                node.bounce_co = controllers[CTRL_EMITTER_BOUNCE_CO][0].values[0] if CTRL_EMITTER_BOUNCE_CO in controllers else 0.0
+                node.combinetime = controllers[CTRL_EMITTER_COMBINETIME][0].values[0] if CTRL_EMITTER_COMBINETIME in controllers else 0.0
+                node.drag = controllers[CTRL_EMITTER_DRAG][0].values[0] if CTRL_EMITTER_DRAG in controllers else 0.0
+                node.fps = int(controllers[CTRL_EMITTER_FPS][0].values[0] if CTRL_EMITTER_FPS in controllers else 0.0)
+                node.frameend = int(controllers[CTRL_EMITTER_FRAMEEND][0].values[0] if CTRL_EMITTER_FRAMEEND in controllers else 0.0)
+                node.framestart = int(controllers[CTRL_EMITTER_FRAMESTART][0].values[0] if CTRL_EMITTER_FRAMESTART in controllers else 0.0)
+                node.grav = controllers[CTRL_EMITTER_GRAV][0].values[0] if CTRL_EMITTER_GRAV in controllers else 0.0
+                node.lifeexp = controllers[CTRL_EMITTER_LIFEEXP][0].values[0] if CTRL_EMITTER_LIFEEXP in controllers else 0.0
+                node.mass = controllers[CTRL_EMITTER_MASS][0].values[0] if CTRL_EMITTER_MASS in controllers else 0.0
+                node.p2p_bezier2 = controllers[CTRL_EMITTER_P2P_BEZIER2][0].values[0] if CTRL_EMITTER_P2P_BEZIER2 in controllers else 0.0
+                node.p2p_bezier3 = controllers[CTRL_EMITTER_P2P_BEZIER3][0].values[0] if CTRL_EMITTER_P2P_BEZIER3 in controllers else 0.0
+                node.particlerot = controllers[CTRL_EMITTER_PARTICLEROT][0].values[0] if CTRL_EMITTER_PARTICLEROT in controllers else 0.0
+                node.randvel = controllers[CTRL_EMITTER_RANDVEL][0].values[0] if CTRL_EMITTER_RANDVEL in controllers else 0.0
+                node.sizestart = controllers[CTRL_EMITTER_SIZESTART][0].values[0] if CTRL_EMITTER_SIZESTART in controllers else 0.0
+                node.sizemid = controllers[CTRL_EMITTER_SIZEMID][0].values[0] if CTRL_EMITTER_SIZEMID in controllers else 0.0
+                node.sizeend = controllers[CTRL_EMITTER_SIZEEND][0].values[0] if CTRL_EMITTER_SIZEEND in controllers else 0.0
+                node.sizestart_y = controllers[CTRL_EMITTER_SIZESTART_Y][0].values[0] if CTRL_EMITTER_SIZESTART_Y in controllers else 0.0
+                node.sizemid_y = controllers[CTRL_EMITTER_SIZEMID_Y][0].values[0] if CTRL_EMITTER_SIZEMID_Y in controllers else 0.0
+                node.sizeend_y = controllers[CTRL_EMITTER_SIZEEND_Y][0].values[0] if CTRL_EMITTER_SIZEEND_Y in controllers else 0.0
+                node.spread = controllers[CTRL_EMITTER_SPREAD][0].values[0] if CTRL_EMITTER_SPREAD in controllers else 0.0
+                node.threshold = controllers[CTRL_EMITTER_THRESHOLD][0].values[0] if CTRL_EMITTER_THRESHOLD in controllers else 0.0
+                node.velocity = controllers[CTRL_EMITTER_VELOCITY][0].values[0] if CTRL_EMITTER_VELOCITY in controllers else 0.0
+                node.xsize = int(controllers[CTRL_EMITTER_XSIZE][0].values[0] if CTRL_EMITTER_XSIZE in controllers else 2.0)
+                node.ysize = int(controllers[CTRL_EMITTER_YSIZE][0].values[0] if CTRL_EMITTER_YSIZE in controllers else 2.0)
+                node.blurlength = controllers[CTRL_EMITTER_BLURLENGTH][0].values[0] if CTRL_EMITTER_BLURLENGTH in controllers else 0.0
+                node.lightningdelay = controllers[CTRL_EMITTER_LIGHTNINGDELAY][0].values[0] if CTRL_EMITTER_LIGHTNINGDELAY in controllers else 0.0
+                node.lightningradius = controllers[CTRL_EMITTER_LIGHTNINGRADIUS][0].values[0] if CTRL_EMITTER_LIGHTNINGRADIUS in controllers else 0.0
+                node.lightningsubdiv = int(controllers[CTRL_EMITTER_LIGHTNINGSUBDIV][0].values[0] if CTRL_EMITTER_LIGHTNINGSUBDIV in controllers else 0.0)
+                node.lightningscale = controllers[CTRL_EMITTER_LIGHTNINGSCALE][0].values[0] if CTRL_EMITTER_LIGHTNINGSCALE in controllers else 0.0
+                node.lightningzigzag = int(controllers[CTRL_EMITTER_LIGHTNINGZIGZAG][0].values[0] if CTRL_EMITTER_LIGHTNINGZIGZAG in controllers else 0.0)
+                node.percentstart = controllers[CTRL_EMITTER_PERCENTSTART][0].values[0] if CTRL_EMITTER_PERCENTSTART in controllers else 0.0
+                node.percentmid = controllers[CTRL_EMITTER_PERCENTMID][0].values[0] if CTRL_EMITTER_PERCENTMID in controllers else 0.0
+                node.percentend = controllers[CTRL_EMITTER_PERCENTEND][0].values[0] if CTRL_EMITTER_PERCENTEND in controllers else 0.0
+                node.targetsize = int(controllers[CTRL_EMITTER_TARGETSIZE][0].values[0] if CTRL_EMITTER_TARGETSIZE in controllers else 0.0)
+                node.numcontrolpts = int(controllers[CTRL_EMITTER_NUMCONTROLPTS][0].values[0] if CTRL_EMITTER_NUMCONTROLPTS in controllers else 0.0)
+                node.controlptradius = controllers[CTRL_EMITTER_CONTROLPTRADIUS][0].values[0] if CTRL_EMITTER_CONTROLPTRADIUS in controllers else 0.0
+                node.controlptdelay = int(controllers[CTRL_EMITTER_CONTROLPTDELAY][0].values[0] if CTRL_EMITTER_CONTROLPTDELAY in controllers else 0.0)
+                node.tangentspread = int(controllers[CTRL_EMITTER_TANGENTSPREAD][0].values[0] if CTRL_EMITTER_TANGENTSPREAD in controllers else 0.0)
+                node.tangentlength = controllers[CTRL_EMITTER_TANGENTLENGTH][0].values[0] if CTRL_EMITTER_TANGENTLENGTH in controllers else 0.0
+                node.colorstart = controllers[CTRL_EMITTER_COLORSTART][0].values[0:3] if CTRL_EMITTER_COLORSTART in controllers else [1.0] * 3
+                node.colormid = controllers[CTRL_EMITTER_COLORMID][0].values[0:3] if CTRL_EMITTER_COLORMID in controllers else [1.0] * 3
+                node.colorend = controllers[CTRL_EMITTER_COLOREND][0].values[0:3] if CTRL_EMITTER_COLOREND in controllers else [1.0] * 3
 
         if type_flags & NODE_LIGHT:
             self.mdl.seek(MDL_OFFSET + flare_size_arr.offset)
