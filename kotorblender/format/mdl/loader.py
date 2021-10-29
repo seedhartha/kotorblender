@@ -346,8 +346,8 @@ class MdlLoader:
             bouding_box = [self.mdl.get_float() for _ in range(6)]
             radius = self.mdl.get_float()
             average = [self.mdl.get_float() for _ in range(3)]
-            node.diffuse = [self.mdl.get_float() for _ in range(3)]
-            node.ambient = [self.mdl.get_float() for _ in range(3)]
+            diffuse = [self.mdl.get_float() for _ in range(3)]
+            ambient = [self.mdl.get_float() for _ in range(3)]
             transparency_hint = self.mdl.get_uint32()
             bitmap = self.mdl.get_c_string_up_to(32)
             bitmap2 = self.mdl.get_c_string_up_to(32)
@@ -399,10 +399,33 @@ class MdlLoader:
             mdx_offset = self.mdl.get_uint32()
             off_vert_arr = self.mdl.get_uint32()
 
+            node.render = render
+            node.shadow = shadow
+            node.lightmapped = has_lightmap
+            node.beaming = beaming
+            node.tangentspace = 1 if mdx_data_bitmap & MDX_FLAG_TANGENT1 else 0
+            node.rotatetexture = rotate_texture
+            node.m_bIsBackgroundGeometry = background_geometry
+            node.animateuv = animate_uv
+            node.uvdirectionx = uv_dir_x
+            node.uvdirectiony = uv_dir_y
+            node.uvjitter = uv_jitter
+            node.uvjitterspeed = uv_jitter_speed
+            node.transparencyhint = transparency_hint
+            node.ambient = ambient
+            node.diffuse = diffuse
+            node.center = average
+
             if len(bitmap) > 0 and bitmap.lower() != "null":
                 node.bitmap = bitmap
             if len(bitmap2) > 0 and bitmap2.lower() != "null":
                 node.bitmap2 = bitmap2
+
+            if self.tsl:
+                node.dirt_enabled = dirt_enabled
+                node.dirt_texture = dirt_texture
+                node.dirt_worldspace = dirt_coord_space
+                node.hologram_donotdraw = hide_in_holograms
 
         if type_flags & NODE_SKIN:
             unknown_arr = self.get_array_def()
