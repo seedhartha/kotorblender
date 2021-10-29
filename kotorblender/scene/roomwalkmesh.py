@@ -16,9 +16,20 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-class FaceList:
-    def __init__(self):
-        self.faces = []  # int 3-tuple, vertex indices
-        self.shdgr = []  # int, shading group for this face
-        self.uvIdx = []  # int 3-tuple, texture/uv vertex indices
-        self.matId = []  # int, material index
+import collections
+
+from .. import defines
+
+from .walkmesh import Walkmesh
+
+
+class RoomWalkmesh(Walkmesh):
+
+    def __init__(self, name = "UNNAMED", wkmType = "wok"):
+        self.nodeDict       = collections.OrderedDict()
+        self.name           = name
+        self.walkmeshType   = "wok"
+        self.classification = defines.Classification.UNKNOWN
+
+    def import_to_collection(self, collection):
+        pass
