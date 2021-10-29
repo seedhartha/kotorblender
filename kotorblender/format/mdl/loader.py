@@ -411,6 +411,10 @@ class MdlLoader:
             period = self.mdl.get_float()
             off_vert_data = self.mdl.get_uint32()
 
+            node.displacement = displacement
+            node.period = period
+            node.tightness = tightness
+
         if type_flags & NODE_AABB:
             off_root_aabb = self.mdl.get_uint32()
             self.load_aabb(off_root_aabb)
@@ -486,7 +490,7 @@ class MdlLoader:
 
             if type_flags & NODE_DANGLY:
                 self.mdl.seek(MDL_OFFSET + constraint_arr.offset)
-                constraints = [self.mdl.get_float() for _ in range(constraint_arr.count)]
+                node.constraints = [self.mdl.get_float() for _ in range(constraint_arr.count)]
 
             node.verts = []
             node.tverts = []
