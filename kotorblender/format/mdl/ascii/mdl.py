@@ -51,8 +51,6 @@ class Mdl():
 
         self.animations = []
 
-        self.mdlnodes = []
-
     def load_ascii_node(self, asciiBlock):
         if asciiBlock is None:
             raise MalformedMdl("Empty Node")
@@ -102,7 +100,6 @@ class Mdl():
                 print("KotorBlender: WARNING - node name conflict " + key + ".")
             else:
                 self.nodeDict[key] = newNode
-                self.mdlnodes.append(newNode)
 
     def add_animation(self, anim):
         if anim:
@@ -247,8 +244,7 @@ class Mdl():
 
         self.read_ascii_header(ascii_block[:geom_start-1])
         # Import Geometry
-        self.read_ascii_geom(ascii_block[geom_start:geom_end],
-                            self.mdlnodes)
+        self.read_ascii_geom(ascii_block[geom_start:geom_end])
         # Import Animations
         if glob.importAnim and (anim_start > 0):
             self.read_ascii_anims(ascii_block[anim_start:])
@@ -264,13 +260,12 @@ class Mdl():
         for anim in self.animations:
             self.add_animation(anim)
 
-    def read_ascii_geom(self, ascii_block, nodelist):
+    def read_ascii_geom(self, ascii_block):
         """Load all geometry nodes from an ascii mdl block."""
         delim = "node "
         ascii_nodes = [delim + b for b in ascii_block.split(delim) if b]
         for _, ascii_node in enumerate(ascii_nodes):
             ascii_lines = [l.strip().split() for l in ascii_node.splitlines()]
-            node = None
             try:  # Read node type
                 ascii_lines[0][1].lower()
             except (IndexError, AttributeError):
@@ -280,7 +275,6 @@ class Mdl():
             except (IndexError, AttributeError):
                 raise MalformedMdl("Unable to read node name")
             self.load_ascii_node(ascii_lines)
-            nodelist.append(node)
 
     def read_ascii_header(self, ascii_block):
         ascii_lines = [l.strip().split() for l in ascii_block.splitlines()]
