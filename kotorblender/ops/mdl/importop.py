@@ -16,15 +16,10 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-import os
-
 import bpy
 import bpy_extras
 
-from ...format.bwm.loader import BwmLoader
-from ...format.mdl.loader import MdlLoader
-
-from ... import glob
+from ... import io
 
 
 class KB_OT_import_mdl(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
@@ -41,43 +36,4 @@ class KB_OT_import_mdl(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
             options = {'HIDDEN'})
 
     def execute(self, context):
-        glob.importGeometry = True
-        glob.importWalkmesh = False
-        glob.importSmoothGroups = False
-        glob.importMaterials = True
-        glob.importAnim = False
-        glob.texturePath = os.path.dirname(self.filepath)
-        glob.textureSearch = True
-        glob.createArmature = True
-
-        mdl = MdlLoader(self.filepath)
-        model = mdl.load()
-
-        wok_path = self.filepath[:-4] + ".wok"
-        if os.path.exists(wok_path):
-            bwm = BwmLoader(wok_path)
-            bwm.load()
-
-        pwk_path = self.filepath[:-4] + ".pwk"
-        if os.path.exists(pwk_path):
-            bwm = BwmLoader(pwk_path)
-            bwm.load()
-
-        dwk0_path = self.filepath[:-4] + "0.dwk"
-        if os.path.exists(dwk0_path):
-            bwm = BwmLoader(dwk0_path)
-            bwm.load()
-
-        dwk1_path = self.filepath[:-4] + "1.dwk"
-        if os.path.exists(dwk1_path):
-            bwm = BwmLoader(dwk1_path)
-            bwm.load()
-
-        dwk2_path = self.filepath[:-4] + "2.dwk"
-        if os.path.exists(dwk2_path):
-            bwm = BwmLoader(dwk2_path)
-            bwm.load()
-
-        model.import_to_collection(bpy.context.collection, None)
-
-        return {'FINISHED'}
+        return io.load_mdl(self, context, **self.as_keywords(ignore=("filter_glob",)))

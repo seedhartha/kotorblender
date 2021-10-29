@@ -32,7 +32,7 @@ class KB_OT_import_ascii_mdl(bpy.types.Operator, bpy_extras.io_utils.ImportHelpe
     filename_ext = ".mdl.ascii"
 
     filter_glob : bpy.props.StringProperty(
-            default = "*.mdl;*.mdl.ascii",
+            default = "*.mdl.ascii",
             options = {'HIDDEN'})
 
     importGeometry : bpy.props.BoolProperty(
@@ -72,4 +72,4 @@ class KB_OT_import_ascii_mdl(bpy.types.Operator, bpy_extras.io_utils.ImportHelpe
             default = False)
 
     def execute(self, context):
-        return io.load_mdl(self, context, **self.as_keywords(ignore=("filter_glob",)))
+        return io.load_ascii_mdl(self, context, **self.as_keywords(ignore=("filter_glob",)))
