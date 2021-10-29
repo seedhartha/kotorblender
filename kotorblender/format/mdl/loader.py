@@ -27,7 +27,7 @@ from ...scene.modelnode.aabb import AabbNode
 from ...scene.modelnode.danglymesh import DanglymeshNode
 from ...scene.modelnode.dummy import DummyNode
 from ...scene.modelnode.emitter import EmitterNode
-from ...scene.modelnode.light import LightNode
+from ...scene.modelnode.light import FlareList, LightNode
 from ...scene.modelnode.lightsaber import LightsaberNode
 from ...scene.modelnode.reference import ReferenceNode
 from ...scene.modelnode.skinmesh import SkinmeshNode
@@ -300,6 +300,16 @@ class MdlLoader:
             flare = self.mdl.get_uint32()
             fading_light = self.mdl.get_uint32()
 
+            node.shadow        = shadow
+            node.lightpriority = light_priority
+            node.ambientonly   = ambient_only
+            node.ndynamictype  = dynamic_type
+            node.affectdynamic = affect_dynamic
+            node.fadinglight   = fading_light
+            node.lensflares    = flare
+            node.flareradius   = flare_radius
+            node.flareList     = FlareList()
+
         if type_flags & NODE_EMITTER:
             dead_space = self.mdl.get_float()
             blast_radius = self.mdl.get_float()
@@ -325,6 +335,9 @@ class MdlLoader:
         if type_flags & NODE_REFERENCE:
             ref_model = self.mdl.get_c_string_up_to(32)
             reattachable = self.mdl.get_uint32()
+
+            node.refmodel = ref_model
+            node.reattachable = reattachable
 
         if type_flags & NODE_MESH:
             fn_ptr1 = self.mdl.get_uint32()
@@ -438,23 +451,21 @@ class MdlLoader:
 
         if type_flags & NODE_LIGHT:
             self.mdl.seek(MDL_OFFSET + flare_size_arr.offset)
-            flare_sizes = [self.mdl.get_float() for _ in range(flare_size_arr.count)]
+            node.flareList.sizes = [self.mdl.get_float() for _ in range(flare_size_arr.count)]
 
             self.mdl.seek(MDL_OFFSET + flare_position_arr.offset)
-            flare_positions = [self.mdl.get_float() for _ in range(flare_position_arr.count)]
+            node.flareList.positions = [self.mdl.get_float() for _ in range(flare_position_arr.count)]
 
             self.mdl.seek(MDL_OFFSET + flare_color_shift_arr.offset)
-            flare_color_shifts = []
             for _ in range(flare_color_shift_arr.count):
                 color_shift = [self.mdl.get_float() for _ in range(3)]
-                flare_color_shifts.append(color_shift)
+                node.flareList.colorshifts.append(color_shift)
 
             self.mdl.seek(MDL_OFFSET + flare_tex_name_arr.offset)
             tex_name_offsets = [self.mdl.get_uint32() for _ in range(flare_tex_name_arr.count)]
-            tex_names = []
             for tex_name_offset in tex_name_offsets:
                 self.mdl.seek(MDL_OFFSET + tex_name_offset)
-                tex_names.append(self.mdl.get_c_string())
+                node.flareList.textures.append(self.mdl.get_c_string())
 
         if type_flags & NODE_SKIN:
             if num_bonemap > 0:
