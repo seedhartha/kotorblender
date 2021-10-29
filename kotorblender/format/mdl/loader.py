@@ -490,6 +490,7 @@ class MdlLoader:
                     adjacent_faces = [self.mdl.get_uint16() for _ in range(3)]
                     vert_indices = [self.mdl.get_uint16() for _ in range(3)]
                     node.facelist.faces.append(tuple(vert_indices))
+                    node.facelist.shdgr.append(1) # TODO
                     node.facelist.uvIdx.append(tuple(vert_indices))
                     node.facelist.matId.append(material_id)
                 if index_count_arr.count > 0:
@@ -668,7 +669,7 @@ class MdlLoader:
 
     def new_node(self, name, node_type):
         switch = {
-            Nodetype.DUMMY:  DummyNode,
+            Nodetype.DUMMY: DummyNode,
             Nodetype.REFERENCE: ReferenceNode,
             Nodetype.TRIMESH: TrimeshNode,
             Nodetype.DANGLYMESH: DanglymeshNode,
