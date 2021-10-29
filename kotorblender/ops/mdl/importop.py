@@ -41,8 +41,14 @@ class KB_OT_import_mdl(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
             options = {'HIDDEN'})
 
     def execute(self, context):
+        glob.importGeometry = True
+        glob.importWalkmesh = False
+        glob.importSmoothGroups = False
+        glob.importMaterials = True
+        glob.importAnim = False
         glob.texturePath = os.path.dirname(self.filepath)
         glob.textureSearch = True
+        glob.createArmature = True
 
         mdl = MdlLoader(self.filepath)
         model = mdl.load()
@@ -72,6 +78,6 @@ class KB_OT_import_mdl(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
             bwm = BwmLoader(dwk2_path)
             bwm.load()
 
-        model.add_to_collection()
+        model.import_to_collection(bpy.context.collection, None)
 
         return {'FINISHED'}

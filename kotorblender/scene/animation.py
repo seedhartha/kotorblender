@@ -16,38 +16,66 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+import collections
+
 from .. import defines, utils
+
+from .animnode import AnimationNode
 
 
 class Animation:
 
-    def __init__(self, name, length, transtime, animroot, root_node, events):
-        self.name = name
-        self.length = length
-        self.transtime = transtime
-        self.animroot = animroot
-        self.root_node = root_node
-        self.events = events
+    def __init__(self, name = "UNNAMED"):
+        self.name      = name
+        self.length    = 1.0
+        self.transtime = 1.0
+        self.root      = defines.null
+        self.eventList = []
+        self.nodeList  = collections.OrderedDict()
 
-    def add_to_object(self, obj):
-        list_item = self.add_to_anim_list(obj)
-        self.add_events_to_list_item(list_item)
+        self.nodes = []
+        self.events = []
 
-    def add_to_anim_list(self, obj):
-        item = utils.create_anim_list_item(obj)
-        item.name = self.name
-        item.transtime = defines.fps * self.transtime
-        item.root = item.root_obj = self.get_anim_target(obj).name
-        item.frameEnd = utils.nwtime2frame(self.length) + item.frameStart
-        return item
+    def add_to_objects(self, mdl_root):
+        list_anim = self._create_list_anim(mdl_root)
+        self._add_events_to_list_anim(list_anim)
+        obj_by_node = self._associate_node_to_object(mdl_root)
 
-    def add_events_to_list_item(self, item):
+        # Add object keyframes
+        for node in self.nodes:
+            if node.name.lower() in obj_by_node:
+                obj = obj_by_node[node.name.lower()]
+                node.add_object_keyframes(obj, list_anim, {"mdlname":mdl_root.name})
+                self._create_rest_pose(obj, list_anim.frameStart-5)
+
+    def _create_list_anim(self, mdl_root):
+        result = utils.create_anim_list_item(mdl_root)
+        result.name = self.name
+        result.transtime = defines.fps * self.transtime
+        result.root = result.root_obj = self._get_anim_target(mdl_root).name
+        result.frameEnd = utils.nwtime2frame(self.length) + result.frameStart
+        return result
+
+    def _add_events_to_list_anim(self, list_anim):
         for time, name in self.events:
-            event = item.eventList.add()
+            event = list_anim.eventList.add()
             event.name = name
-            event.frame = utils.nwtime2frame(time) + item.frameStart
+            event.frame = utils.nwtime2frame(time) + list_anim.frameStart
 
-    def get_anim_target(self, obj):
-        return utils.search_node(
-            obj,
-            lambda o, name=self.animroot: o.name.lower() == name.lower())
+    def _associate_node_to_object(self, mdl_root):
+        result = dict()
+        for node in self.nodes:
+            obj = utils.search_node(mdl_root, lambda o, name=node.name: o.name.lower() == name.lower())
+            if obj:
+                result[node.name.lower()] = obj
+        return result
+
+    def _create_rest_pose(self, obj, frame=1):
+        AnimationNode.create_restpose(obj, frame)
+
+    def _get_anim_target(self, mdl_root):
+        result = utils.search_node(mdl_root, lambda o, name=self.animroot: o.name.lower() == name.lower())
+        if not result:
+            result = mdl_root
+            print("KotorBlender: animation retargeted from {} to {}".format(self.animroot, mdl_root.name))
+        return result

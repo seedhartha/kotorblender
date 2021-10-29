@@ -18,13 +18,20 @@
 
 import os
 
-from ...defines import Nodetype
+from ...defines import Classification, Nodetype
 from ...exception.malformedmdl import MalformedMdl
 from ...exception.mdxnotfound import MdxNotFound
 from ...scene.animation import Animation
 from ...scene.model import Model
-from ...scene.modelnode import ModelNode
-from ...scene.types import FaceList
+from ...scene.modelnode.aabb import AabbNode
+from ...scene.modelnode.danglymesh import DanglymeshNode
+from ...scene.modelnode.dummy import DummyNode
+from ...scene.modelnode.emitter import EmitterNode
+from ...scene.modelnode.light import LightNode
+from ...scene.modelnode.lightsaber import LightsaberNode
+from ...scene.modelnode.reference import ReferenceNode
+from ...scene.modelnode.skinmesh import SkinmeshNode
+from ...scene.modelnode.trimesh import FaceList, TrimeshNode
 
 from ..binreader import BinaryReader
 
@@ -32,6 +39,15 @@ MDL_OFFSET = 12
 
 FN_PTR_1_K1_PC = 4273776
 FN_PTR_1_K2_PC = 4285200
+
+CLASS_OTHER = 0x00
+CLASS_EFFECT = 0x01
+CLASS_TILE = 0x02
+CLASS_CHARACTER = 0x04
+CLASS_DOOR = 0x08
+CLASS_LIGHTSABER = 0x10
+CLASS_PLACEABLE = 0x20
+CLASS_FLYER = 0x40
 
 NODE_BASE = 0x0001
 NODE_LIGHT = 0x0002
@@ -114,6 +130,17 @@ MDX_FLAG_TANGENT2 = 0x0100
 MDX_FLAG_TANGENT3 = 0x0200
 MDX_FLAG_TANGENT4 = 0x0400
 
+CLASS_BY_VALUE = {
+    CLASS_OTHER: Classification.UNKNOWN,
+    CLASS_EFFECT: Classification.EFFECT,
+    CLASS_TILE: Classification.TILE,
+    CLASS_CHARACTER: Classification.CHARACTER,
+    CLASS_DOOR: Classification.DOOR,
+    CLASS_LIGHTSABER: Classification.SABER,
+    CLASS_PLACEABLE: Classification.DOOR,
+    CLASS_FLYER: Classification.FLYER
+}
+
 
 class ControllerKey:
     def __init__(self, ctrl_type, num_rows, timekeys_start, values_start, num_columns):
@@ -156,19 +183,15 @@ class MdlLoader:
     def load(self):
         print("Loading MDL '{}'".format(self.path))
 
+        self.model = Model()
+
         self.load_file_header()
         self.load_geometry_header()
         self.load_model_header()
         self.load_names()
+        self.load_nodes(self.off_root_node)
 
-        root_node = self.load_nodes(self.off_root_node)
-
-        return Model(
-            self.model_name,
-            self.supermodel_name,
-            root_node,
-            self.load_animations()
-            )
+        return self.model
 
     def load_file_header(self):
         if self.mdl.get_uint32() != 0:
@@ -180,16 +203,20 @@ class MdlLoader:
         fn_ptr1 = self.mdl.get_uint32()
         self.tsl = fn_ptr1 == FN_PTR_1_K2_PC
         fn_ptr2 = self.mdl.get_uint32()
-        self.model_name = self.mdl.get_c_string_up_to(32)
+        model_name = self.mdl.get_c_string_up_to(32)
         self.off_root_node = self.mdl.get_uint32()
         total_num_nodes = self.mdl.get_uint32()
         runtime_arr1 = self.get_array_def()
         runtime_arr2 = self.get_array_def()
         ref_count = self.mdl.get_uint32()
+
         self.model_type = self.mdl.get_uint8()
         if self.model_type != 2:
             raise MalformedMdl("Invalid model type: expected=2, actual={}".format(self.model_type))
+
         self.mdl.skip(3) # padding
+
+        self.model.name = model_name
 
     def load_model_header(self):
         classification = self.mdl.get_uint8()
@@ -202,7 +229,7 @@ class MdlLoader:
         bounding_box = [self.mdl.get_float() for _ in range(6)]
         radius = self.mdl.get_float()
         scale = self.mdl.get_float()
-        self.supermodel_name = self.mdl.get_c_string_up_to(32)
+        supermodel_name = self.mdl.get_c_string_up_to(32)
         off_head_root_node = self.mdl.get_uint32()
         self.mdl.skip(4) # padding
 
@@ -212,6 +239,15 @@ class MdlLoader:
 
         mdx_offset = self.mdl.get_uint32()
         self.name_arr = self.get_array_def()
+
+        try:
+            self.model.classification = CLASS_BY_VALUE[classification]
+        except KeyError:
+            raise MalformedMdl("Invalid classification: " + str(classification))
+        self.model.unknownC1 = subclassification
+        self.model.supermodel = supermodel_name
+        self.model.animscale = scale
+        self.model.ignorefog = affected_by_fog == 0
 
     def load_names(self):
         self.names = []
@@ -239,21 +275,23 @@ class MdlLoader:
         name = self.names[name_index]
         self.node_names_df.append(name)
 
-        node = ModelNode(
-            name,
-            self.get_node_type(type_flags),
-            parent,
-            position,
-            orientation
-            )
+        node_type = self.get_node_type(type_flags)
+        node = self.new_node(name, node_type)
+        self.model.add_node(node)
+
+        if parent:
+            node.parentName = parent.name
+
+        node.position = position
+        node.orientation = orientation
 
         if type_flags & NODE_LIGHT:
             flare_radius = self.mdl.get_float()
             unknown_arr = self.get_array_def()
-            self.flare_size_arr = self.get_array_def()
-            self.flare_position_arr = self.get_array_def()
-            self.flare_color_shift_arr = self.get_array_def()
-            self.flare_tex_name_arr = self.get_array_def()
+            flare_size_arr = self.get_array_def()
+            flare_position_arr = self.get_array_def()
+            flare_color_shift_arr = self.get_array_def()
+            flare_tex_name_arr = self.get_array_def()
             light_priority = self.mdl.get_uint32()
             ambient_only = self.mdl.get_uint32()
             dynamic_type = self.mdl.get_uint32()
@@ -298,8 +336,8 @@ class MdlLoader:
             node.diffuse = [self.mdl.get_float() for _ in range(3)]
             node.ambient = [self.mdl.get_float() for _ in range(3)]
             transparency_hint = self.mdl.get_uint32()
-            node.bitmap = self.mdl.get_c_string_up_to(32)
-            node.bitmap2 = self.mdl.get_c_string_up_to(32)
+            bitmap = self.mdl.get_c_string_up_to(32)
+            bitmap2 = self.mdl.get_c_string_up_to(32)
             bitmap3 = self.mdl.get_c_string_up_to(12)
             bitmap4 = self.mdl.get_c_string_up_to(12)
             index_count_arr = self.get_array_def()
@@ -348,6 +386,11 @@ class MdlLoader:
             mdx_offset = self.mdl.get_uint32()
             off_vert_arr = self.mdl.get_uint32()
 
+            if len(bitmap) > 0 and bitmap.lower() != "null":
+                node.bitmap = bitmap
+            if len(bitmap2) > 0 and bitmap2.lower() != "null":
+                node.bitmap2 = bitmap2
+
         if type_flags & NODE_SKIN:
             unknown_arr = self.get_array_def()
             off_mdx_bone_weights = self.mdl.get_uint32()
@@ -362,7 +405,7 @@ class MdlLoader:
             self.mdl.skip(4) # padding
 
         if type_flags & NODE_DANGLY:
-            self.constraint_arr = self.get_array_def()
+            constraint_arr = self.get_array_def()
             displacement = self.mdl.get_float()
             tightness = self.mdl.get_float()
             period = self.mdl.get_float()
@@ -390,20 +433,20 @@ class MdlLoader:
                 node.multiplier = controllers[CTRL_LIGHT_MULTIPLIER][0].values[0] if CTRL_LIGHT_MULTIPLIER in controllers else 1.0
 
         if type_flags & NODE_LIGHT:
-            self.mdl.seek(MDL_OFFSET + self.flare_size_arr.offset)
-            flare_sizes = [self.mdl.get_float() for _ in range(self.flare_size_arr.count)]
+            self.mdl.seek(MDL_OFFSET + flare_size_arr.offset)
+            flare_sizes = [self.mdl.get_float() for _ in range(flare_size_arr.count)]
 
-            self.mdl.seek(MDL_OFFSET + self.flare_position_arr.offset)
-            flare_positions = [self.mdl.get_float() for _ in range(self.flare_position_arr.count)]
+            self.mdl.seek(MDL_OFFSET + flare_position_arr.offset)
+            flare_positions = [self.mdl.get_float() for _ in range(flare_position_arr.count)]
 
-            self.mdl.seek(MDL_OFFSET + self.flare_color_shift_arr.offset)
+            self.mdl.seek(MDL_OFFSET + flare_color_shift_arr.offset)
             flare_color_shifts = []
-            for _ in range(self.flare_color_shift_arr.count):
+            for _ in range(flare_color_shift_arr.count):
                 color_shift = [self.mdl.get_float() for _ in range(3)]
                 flare_color_shifts.append(color_shift)
 
-            self.mdl.seek(MDL_OFFSET + self.flare_tex_name_arr.offset)
-            tex_name_offsets = [self.mdl.get_uint32() for _ in range(self.flare_tex_name_arr.count)]
+            self.mdl.seek(MDL_OFFSET + flare_tex_name_arr.offset)
+            tex_name_offsets = [self.mdl.get_uint32() for _ in range(flare_tex_name_arr.count)]
             tex_names = []
             for tex_name_offset in tex_name_offsets:
                 self.mdl.seek(MDL_OFFSET + tex_name_offset)
@@ -433,6 +476,7 @@ class MdlLoader:
                     vert_indices = [self.mdl.get_uint16() for _ in range(3)]
                     node.facelist.faces.append(tuple(vert_indices))
                     node.facelist.uvIdx.append(tuple(vert_indices))
+                    node.facelist.matId.append(material_id)
                 if index_count_arr.count > 0:
                     self.mdl.seek(MDL_OFFSET + index_count_arr.offset)
                     num_indices = self.mdl.get_uint32()
@@ -441,8 +485,8 @@ class MdlLoader:
                     off_indices = self.mdl.get_uint32()
 
             if type_flags & NODE_DANGLY:
-                self.mdl.seek(MDL_OFFSET + self.constraint_arr.offset)
-                constraints = [self.mdl.get_float() for _ in range(self.constraint_arr.count)]
+                self.mdl.seek(MDL_OFFSET + constraint_arr.offset)
+                constraints = [self.mdl.get_float() for _ in range(constraint_arr.count)]
 
             node.verts = []
             node.tverts = []
@@ -471,12 +515,11 @@ class MdlLoader:
                         node_name = self.node_names_df[node_idx]
                         vert_weights.append([node_name, bone_weights[i]])
                     node.weights.append(vert_weights)
-    
+
         self.mdl.seek(MDL_OFFSET + children_arr.offset)
         child_offsets = [self.mdl.get_uint32() for _ in range(children_arr.count)]
         for off_child in child_offsets:
-            child = self.load_nodes(off_child, node)
-            node.children.append(child)
+            self.load_nodes(off_child, node)
 
         return node
 
@@ -528,14 +571,7 @@ class MdlLoader:
 
         root_node = self.load_anim_nodes(off_root_node)
 
-        return Animation(
-            name,
-            length,
-            transition,
-            anim_root,
-            root_node,
-            events
-            )
+        return Animation(name)
 
     def load_anim_nodes(self, offset, parent=None):
         self.mdl.seek(MDL_OFFSET + offset)
@@ -553,13 +589,10 @@ class MdlLoader:
         controller_data_arr = self.get_array_def()
 
         name = self.names[name_index]
-        node = ModelNode(
-            name,
-            self.get_node_type(type_flags),
-            parent,
-            position,
-            orientation
-            )
+        node_type = self.get_node_type(type_flags)
+        node = self.new_node(name, node_type)
+        node.position = position
+        node.orientation = orientation
 
         if controller_arr.count > 0:
             controllers = self.load_controllers(controller_arr, controller_data_arr)
@@ -567,8 +600,7 @@ class MdlLoader:
         self.mdl.seek(MDL_OFFSET + children_arr.offset)
         child_offsets = [self.mdl.get_uint32() for _ in range(children_arr.count)]
         for off_child in child_offsets:
-            child = self.load_anim_nodes(off_child, node)
-            node.children.append(child)
+            self.load_anim_nodes(off_child, node)
 
         return node
 
@@ -618,6 +650,23 @@ class MdlLoader:
         if flags & NODE_LIGHT:
             return Nodetype.LIGHT
         return Nodetype.DUMMY
+
+    def new_node(self, name, node_type):
+        switch = {
+            Nodetype.DUMMY:  DummyNode,
+            Nodetype.REFERENCE: ReferenceNode,
+            Nodetype.TRIMESH: TrimeshNode,
+            Nodetype.DANGLYMESH: DanglymeshNode,
+            Nodetype.LIGHTSABER: LightsaberNode,
+            Nodetype.SKIN: SkinmeshNode,
+            Nodetype.EMITTER: EmitterNode,
+            Nodetype.LIGHT: LightNode,
+            Nodetype.AABB: AabbNode
+            }
+        try:
+            return switch[node_type](name)
+        except KeyError:
+            raise MalformedMdl("Invalid node type")
 
     def get_array_def(self):
         offset = self.mdl.get_uint32()
