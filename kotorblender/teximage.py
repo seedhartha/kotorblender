@@ -31,7 +31,7 @@ def _create_image(name, path):
     image = image_utils.load_image(
         name + ".tga",
         path,
-        recursive=glob.textureSearch,
+        recursive=glob.textureSearchRecursive,
         place_holder=False,
         ncase_cmp=True)
 

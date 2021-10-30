@@ -34,15 +34,21 @@ from . import glob, utils
 def load_mdl(
     operator,
     context,
-    filepath = ""
+    filepath = "",
+    importGeometry = True,
+    importAnimations = True,
+    importWalkmeshes = True,
+    importMaterials = True,
+    importArmatures = True,
+    textureSearchRecursive = False
     ):
-    glob.importGeometry = True
-    glob.importWalkmesh = False
-    glob.importMaterials = True
-    glob.importAnim = True
+    glob.importGeometry = importGeometry
+    glob.importAnimations = importAnimations
+    glob.importWalkmeshes = importWalkmeshes
+    glob.importMaterials = importMaterials
+    glob.importArmatures = importArmatures
     glob.texturePath = os.path.dirname(filepath)
-    glob.textureSearch = True
-    glob.createArmature = True
+    glob.textureSearchRecursive = textureSearchRecursive
 
     do_load_mdl(filepath)
 
@@ -53,21 +59,21 @@ def load_lyt(
     operator,
     context,
     filepath = "",
-    importGeometry = True,
-    importWalkmesh = True,
+    importAnimations = True,
+    importWalkmeshes = True,
     importMaterials = True,
-    importAnim = True,
-    textureSearch = False
+    textureSearchRecursive = False
     ):
     """
     Called from blender ui
     """
-    glob.importGeometry = importGeometry
-    glob.importWalkmesh = importWalkmesh
+    glob.importGeometry = True
+    glob.importAnimations = importAnimations
+    glob.importWalkmeshes = importWalkmeshes
     glob.importMaterials = importMaterials
-    glob.importAnim = importAnim
+    glob.importArmatures = False
     glob.texturePath = os.path.dirname(filepath)
-    glob.textureSearch = textureSearch
+    glob.textureSearchRecursive = textureSearchRecursive
 
     do_load_lyt(filepath)
 
