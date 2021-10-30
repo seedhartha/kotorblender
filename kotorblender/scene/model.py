@@ -43,7 +43,6 @@ class Model:
         self.ignorefog = False
         self.compress_quats = False
         self.headlink = False
-        self.lytposition = None
 
         self.animations = []
 
@@ -96,11 +95,6 @@ class Model:
                 obj = node.add_to_collection(collection)
                 obj.kb.imporder = objIdx
                 objIdx += 1
-
-                # If LYT position is specified, set it for the AABB node
-                if self.lytposition and node.nodetype == "aabb":
-                    node.lytposition = self.lytposition
-                    obj.kb.lytposition = self.lytposition
 
                 if (utils.is_null(node.parent_name)):
                     # Node without parent and not the mdl root.

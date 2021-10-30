@@ -186,7 +186,7 @@ class ObjectPropertyGroup(bpy.types.PropertyGroup):
                                            min=0.0, max=1.0,
                                            soft_min=0.0, soft_max=1.0)
     lytposition: bpy.props.FloatVectorProperty(name="LYT Position",
-                                               description="Room position in LYT file.",
+                                               description="Room position in LYT file",
                                                subtype='XYZ',
                                                default=(0.0, 0.0, 0.0))
 

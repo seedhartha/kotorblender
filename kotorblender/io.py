@@ -71,25 +71,28 @@ def do_load_mdl(filepath, position=(0.0, 0.0, 0.0)):
 
     mdl = MdlLoader(filepath)
     model = mdl.load()
-    model.import_to_collection(collection, position)
+
+    wok_walkmesh = None
+    pwk_walkmesh = None
+    dwk_walkmesh1 = None
+    dwk_walkmesh2 = None
+    dwk_walkmesh3 = None
 
     if glob.import_walkmeshes:
         wok_path = filepath[:-4] + ".wok"
         if os.path.exists(wok_path):
             wok = BwmLoader(wok_path, model.name)
-            walkmesh = wok.load()
+            wok_walkmesh = wok.load()
             aabb = next((node for node in model.node_dict.values() if isinstance(node, AabbNode)), None)
-            wok_geom = next((node for node in walkmesh.node_dict.values() if node.name.lower().endswith("_geom")), None)
+            wok_geom = next((node for node in wok_walkmesh.node_dict.values() if node.name.lower().endswith("_geom")), None)
             if aabb and wok_geom:
                 aabb.compute_lyt_position(wok_geom)
-                aabb.compute_room_links(wok_geom, walkmesh.outer_edges)
-                aabb.set_room_links(collection.objects[aabb.name].data)
+                aabb.compute_room_links(wok_geom, wok_walkmesh.outer_edges)
 
         pwk_path = filepath[:-4] + ".pwk"
         if os.path.exists(pwk_path):
             pwk = BwmLoader(pwk_path, model.name)
-            walkmesh = pwk.load()
-            walkmesh.import_to_collection(collection)
+            pwk_walkmesh = pwk.load()
 
         dwk0_path = filepath[:-4] + "0.dwk"
         dwk1_path = filepath[:-4] + "1.dwk"
@@ -98,12 +101,23 @@ def do_load_mdl(filepath, position=(0.0, 0.0, 0.0)):
             dwk1 = BwmLoader(dwk0_path, model.name)
             dwk2 = BwmLoader(dwk1_path, model.name)
             dwk3 = BwmLoader(dwk2_path, model.name)
-            walkmesh1 = dwk1.load()
-            walkmesh2 = dwk2.load()
-            walkmesh3 = dwk3.load()
-            walkmesh1.import_to_collection(collection)
-            walkmesh2.import_to_collection(collection)
-            walkmesh3.import_to_collection(collection)
+            dwk_walkmesh1 = dwk1.load()
+            dwk_walkmesh2 = dwk2.load()
+            dwk_walkmesh3 = dwk3.load()
+
+    model.import_to_collection(collection, position)
+
+    if wok_walkmesh:
+        aabb = next((node for node in model.node_dict.values() if isinstance(node, AabbNode)), None)
+        wok_geom = next((node for node in wok_walkmesh.node_dict.values() if node.name.lower().endswith("_geom")), None)
+        if aabb and wok_geom:
+            aabb.set_room_links(collection.objects[aabb.name].data)
+    if pwk_walkmesh:
+        pwk_walkmesh.import_to_collection(collection)
+    if dwk_walkmesh1 and dwk_walkmesh2 and dwk_walkmesh3:
+        dwk_walkmesh1.import_to_collection(collection)
+        dwk_walkmesh2.import_to_collection(collection)
+        dwk_walkmesh3.import_to_collection(collection)
 
     return {'FINISHED'}
 
