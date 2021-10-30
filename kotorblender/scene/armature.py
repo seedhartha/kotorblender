@@ -52,7 +52,7 @@ def recreate_armature(mdl_root):
     bpy.ops.object.mode_set(mode='EDIT')
 
     # Recursively create armature bones from bone nodes
-    _create_bones_recursive(armature, mdl_root)
+    create_bones_recursive(armature, mdl_root)
 
     # Enter Object Mode
     bpy.ops.object.mode_set(mode='OBJECT')
@@ -65,7 +65,7 @@ def recreate_armature(mdl_root):
     return armature_object
 
 
-def _create_bones_recursive(armature, obj, parent_bone=None):
+def create_bones_recursive(armature, obj, parent_bone=None):
     """
     Recursively create armature bones from bone nodes.
     """
@@ -82,7 +82,7 @@ def _create_bones_recursive(armature, obj, parent_bone=None):
     bone.matrix = mat_bone
 
     for child in obj.children:
-        _create_bones_recursive(armature, child, bone)
+        create_bones_recursive(armature, child, bone)
 
 
 def create_armature_animations(mdl_root, armature_object):
