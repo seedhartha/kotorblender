@@ -40,11 +40,6 @@ class KB_OT_import_lyt(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
         description = "Disable if only animations are needed",
         default = True)
 
-    importSmoothGroups : bpy.props.BoolProperty(
-        name = "Import Smooth Groups",
-        description = "Import smooth groups as sharp edges",
-        default = True)
-
     importMaterials : bpy.props.BoolProperty(
         name = "Import Materials",
         description = "Import materials",

@@ -38,7 +38,6 @@ def load_mdl(
     ):
     glob.importGeometry = True
     glob.importWalkmesh = False
-    glob.importSmoothGroups = False
     glob.importMaterials = True
     glob.importAnim = True
     glob.texturePath = os.path.dirname(filepath)
@@ -56,7 +55,6 @@ def load_lyt(
     filepath = "",
     importGeometry = True,
     importWalkmesh = True,
-    importSmoothGroups = True,
     importMaterials = True,
     importAnim = True,
     textureSearch = False
@@ -66,7 +64,6 @@ def load_lyt(
     """
     glob.importGeometry = importGeometry
     glob.importWalkmesh = importWalkmesh
-    glob.importSmoothGroups = importSmoothGroups
     glob.importMaterials = importMaterials
     glob.importAnim = importAnim
     glob.texturePath = os.path.dirname(filepath)
