@@ -37,7 +37,7 @@ def load_mdl(
     glob.importWalkmesh = False
     glob.importSmoothGroups = False
     glob.importMaterials = True
-    glob.importAnim = False
+    glob.importAnim = True
     glob.texturePath = os.path.dirname(filepath)
     glob.textureSearch = True
     glob.createArmature = True

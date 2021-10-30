@@ -29,7 +29,7 @@ class Animation:
         self.name      = name
         self.length    = 1.0
         self.transtime = 1.0
-        self.root      = defines.null
+        self.animroot  = defines.null
         self.eventList = []
         self.nodeList  = collections.OrderedDict()
 

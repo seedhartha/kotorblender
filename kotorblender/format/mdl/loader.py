@@ -18,10 +18,13 @@
 
 import os
 
+from math import sqrt
+
 from ...defines import Classification, Nodetype
 from ...exception.malformedmdl import MalformedMdl
 from ...exception.mdxnotfound import MdxNotFound
 from ...scene.animation import Animation
+from ...scene.animnode import AnimationNode
 from ...scene.model import Model
 from ...scene.modelnode.aabb import AabbNode
 from ...scene.modelnode.danglymesh import DanglymeshNode
@@ -157,6 +160,56 @@ CLASS_BY_VALUE = {
     CLASS_FLYER: Classification.FLYER
 }
 
+EMITTER_CONTROLLER_KEYS = [
+    (CTRL_EMITTER_ALPHASTART, "alphaStart", 1),
+    (CTRL_EMITTER_ALPHAMID, "alphaMid", 1),
+    (CTRL_EMITTER_ALPHAEND, "alphaEnd", 1),
+    (CTRL_EMITTER_BIRTHRATE, "birthrate", 1),
+    (CTRL_EMITTER_RANDOMBIRTHRATE, "m_fRandomBirthRate", 1),
+    (CTRL_EMITTER_BOUNCE_CO, "bounce_co", 1),
+    (CTRL_EMITTER_COMBINETIME, "combinetime", 1),
+    (CTRL_EMITTER_DRAG, "drag", 1),
+    (CTRL_EMITTER_FPS, "fps", 1),
+    (CTRL_EMITTER_FRAMEEND, "frameEnd", 1),
+    (CTRL_EMITTER_FRAMESTART, "frameStart", 1),
+    (CTRL_EMITTER_GRAV, "grav", 1),
+    (CTRL_EMITTER_LIFEEXP, "lifeExp", 1),
+    (CTRL_EMITTER_MASS, "mass", 1),
+    (CTRL_EMITTER_P2P_BEZIER2, "p2p_bezier2", 1),
+    (CTRL_EMITTER_P2P_BEZIER3, "p2p_bezier3", 1),
+    (CTRL_EMITTER_PARTICLEROT, "particleRot", 1),
+    (CTRL_EMITTER_RANDVEL, "randvel", 1),
+    (CTRL_EMITTER_SIZESTART, "sizeStart", 1),
+    (CTRL_EMITTER_SIZEMID, "sizeMid", 1),
+    (CTRL_EMITTER_SIZEEND, "sizeEnd", 1),
+    (CTRL_EMITTER_SIZESTART_Y, "sizeStart_y", 1),
+    (CTRL_EMITTER_SIZEMID_Y, "sizeMid_y", 1),
+    (CTRL_EMITTER_SIZEEND_Y, "sizeEnd_y", 1),
+    (CTRL_EMITTER_SPREAD, "spread", 1),
+    (CTRL_EMITTER_THRESHOLD, "threshold", 1),
+    (CTRL_EMITTER_VELOCITY, "velocity", 1),
+    (CTRL_EMITTER_XSIZE, "xsize", 1),
+    (CTRL_EMITTER_YSIZE, "ysize", 1),
+    (CTRL_EMITTER_BLURLENGTH, "blurlength", 1),
+    (CTRL_EMITTER_LIGHTNINGDELAY, "lightningDelay", 1),
+    (CTRL_EMITTER_LIGHTNINGRADIUS, "lightningRadius", 1),
+    (CTRL_EMITTER_LIGHTNINGSUBDIV, "lightningSubDiv", 1),
+    (CTRL_EMITTER_LIGHTNINGSCALE, "lightningScale", 1),
+    (CTRL_EMITTER_LIGHTNINGZIGZAG, "lightningzigzag", 1),
+    (CTRL_EMITTER_PERCENTSTART, "percentStart", 1),
+    (CTRL_EMITTER_PERCENTMID, "percentMid", 1),
+    (CTRL_EMITTER_PERCENTEND, "percentEnd", 1),
+    (CTRL_EMITTER_TARGETSIZE, "targetsize", 1),
+    (CTRL_EMITTER_NUMCONTROLPTS, "numcontrolpts", 1),
+    (CTRL_EMITTER_CONTROLPTRADIUS, "controlptradius", 1),
+    (CTRL_EMITTER_CONTROLPTDELAY, "controlptdelay", 1),
+    (CTRL_EMITTER_TANGENTSPREAD, "tangentspread", 1),
+    (CTRL_EMITTER_TANGENTLENGTH, "tangentlength", 1),
+    (CTRL_EMITTER_COLORSTART, "colorStart", 3),
+    (CTRL_EMITTER_COLORMID, "colorMid", 3),
+    (CTRL_EMITTER_COLOREND, "colorEnd", 3)
+]
+
 
 class ControllerKey:
     def __init__(self, ctrl_type, num_rows, timekeys_start, values_start, num_columns):
@@ -206,6 +259,7 @@ class MdlLoader:
         self.load_model_header()
         self.load_names()
         self.load_nodes(self.off_root_node)
+        self.load_animations()
 
         return self.model
 
@@ -298,6 +352,7 @@ class MdlLoader:
         if parent:
             node.parentName = parent.name
 
+        node.supernodeNumber = supernode_number
         node.position = position
         node.orientation = orientation
 
@@ -657,8 +712,6 @@ class MdlLoader:
         for off_child in child_offsets:
             self.load_nodes(off_child, node)
 
-        return node
-
     def load_aabb(self, offset):
         self.mdl.seek(MDL_OFFSET + offset)
         bounding_box = [self.mdl.get_float() for _ in range(6)]
@@ -674,10 +727,11 @@ class MdlLoader:
 
     def load_animations(self):
         if self.animation_arr.count == 0:
-            return []
+            return
         self.mdl.seek(MDL_OFFSET + self.animation_arr.offset)
         offsets = [self.mdl.get_uint32() for _ in range(self.animation_arr.count)]
-        return [self.load_animation(offset) for offset in offsets]
+        for offset in offsets:
+            self.load_animation(offset)
 
     def load_animation(self, offset):
         self.mdl.seek(MDL_OFFSET + offset)
@@ -697,19 +751,22 @@ class MdlLoader:
         event_arr = self.get_array_def()
         self.mdl.skip(4) # padding
 
-        events = []
+        anim = Animation(name)
+        anim.length = length
+        anim.transtime = transition
+        anim.animroot = anim_root
+
         if event_arr.count > 0:
             self.mdl.seek(MDL_OFFSET + event_arr.offset)
             for _ in range(event_arr.count):
                 time = self.mdl.get_float()
                 event_name = self.mdl.get_c_string_up_to(32)
-                events.append((time, event_name))
+                anim.events.append((time, event_name))
 
-        root_node = self.load_anim_nodes(off_root_node)
+        self.model.animations.append(anim)
+        self.load_anim_nodes(off_root_node, anim)
 
-        return Animation(name)
-
-    def load_anim_nodes(self, offset, parent=None):
+    def load_anim_nodes(self, offset, anim, parent=None):
         self.mdl.seek(MDL_OFFSET + offset)
 
         type_flags = self.mdl.get_uint16()
@@ -725,20 +782,76 @@ class MdlLoader:
         controller_data_arr = self.get_array_def()
 
         name = self.names[name_index]
-        node_type = self.get_node_type(type_flags)
-        node = self.new_node(name, node_type)
-        node.position = position
-        node.orientation = orientation
+        node = AnimationNode(name)
+        node.nodetype = self.get_node_type(type_flags)
+        node.parent = parent.name if parent else defines.null
+        anim.nodes.append(node)
 
         if controller_arr.count > 0:
+            supernode = next(node for node in self.model.nodeDict.values() if node.supernodeNumber == supernode_number)
+            if not supernode:
+                raise MalformedMdl("Model node not found for animation node: " + str(name))
+            base_position = supernode.position
             controllers = self.load_controllers(controller_arr, controller_data_arr)
+            if CTRL_BASE_POSITION in controllers:
+                node.object_data["position"] = (
+                    [[row.timekey] + self.position_controller_to_vector(row.values, base_position) for row in controllers[CTRL_BASE_POSITION]],
+                    "location",
+                    3
+                    )
+            if CTRL_BASE_ORIENTATION in controllers:
+                node.object_data["orientation"] = (
+                    [[row.timekey] + self.orientation_controller_to_quaternion(row.values) for row in controllers[CTRL_BASE_ORIENTATION]],
+                    "rotation_quaternion",
+                    4
+                    )
+            if CTRL_BASE_SCALE in controllers:
+                node.object_data["scale"] = (
+                    [[row.timekey] + [row.values[0]] * 3 for row in controllers[CTRL_BASE_SCALE]],
+                    "scale",
+                    3
+                    )
+            if isinstance(supernode, TrimeshNode):
+                if CTRL_MESH_ALPHA in controllers:
+                    node.object_data["alpha"] = (
+                        [[row.timekey] + [row.values[0]] for row in controllers[CTRL_MESH_ALPHA]],
+                        "kb.alpha",
+                        1
+                        )
+                if CTRL_MESH_SELFILLUMCOLOR in controllers:
+                    node.object_data["selfillumcolor"] = (
+                        [[row.timekey] + row.values[:3] for row in controllers[CTRL_MESH_SELFILLUMCOLOR]],
+                        "kb.selfillumcolor",
+                        3
+                        )
+            if isinstance(supernode, LightNode):
+                if CTRL_LIGHT_COLOR in controllers:
+                    node.object_data["color"] = (
+                        [[row.timekey] + row.values[:3] for row in controllers[CTRL_LIGHT_COLOR]],
+                        "color",
+                        3
+                        )
+                if CTRL_LIGHT_RADIUS in controllers:
+                    node.object_data["radius"] = (
+                        [[row.timekey] + [row.values[0]] for row in controllers[CTRL_LIGHT_RADIUS]],
+                        "distance",
+                        1
+                        )
+            if isinstance(supernode, EmitterNode):
+                for key in EMITTER_CONTROLLER_KEYS:
+                    if not key[0] in controllers:
+                        continue
+                    num_columns = key[2]
+                    node.emitter_data[key[1]] = (
+                        [[row.timekey] + row.values[:num_columns] for row in controllers[key[0]]],
+                        "",
+                        num_columns
+                    )
 
         self.mdl.seek(MDL_OFFSET + children_arr.offset)
         child_offsets = [self.mdl.get_uint32() for _ in range(children_arr.count)]
         for off_child in child_offsets:
-            self.load_anim_nodes(off_child, node)
-
-        return node
+            self.load_anim_nodes(off_child, anim, node)
 
     def load_controllers(self, controller_arr, controller_data_arr):
         self.mdl.seek(MDL_OFFSET + controller_arr.offset)
@@ -758,14 +871,16 @@ class MdlLoader:
             timekeys = [self.mdl.get_float() for _ in range(key.num_rows)]
             self.mdl.seek(MDL_OFFSET + controller_data_arr.offset + 4 * key.values_start)
             if key.ctrl_type == CTRL_BASE_ORIENTATION and key.num_columns == 2:
+                integral = True
                 num_columns = 1
             else:
+                integral = False
                 num_columns = key.num_columns & 0xf
                 bezier = key.num_columns & 0x10
                 if bezier:
                     num_columns *= 3
-            values = [self.mdl.get_float() for _ in range(num_columns * key.num_rows)]
-            controllers[key.ctrl_type] = [ControllerRow(timekeys[i], values[i*key.num_columns:i*key.num_columns+num_columns]) for i in range(key.num_rows)]
+            values = [self.mdl.get_uint32() if integral else self.mdl.get_float() for _ in range(num_columns * key.num_rows)]
+            controllers[key.ctrl_type] = [ControllerRow(timekeys[i], values[i*num_columns:i*num_columns+num_columns]) for i in range(key.num_rows)]
         return controllers
 
     def get_node_type(self, flags):
@@ -803,6 +918,31 @@ class MdlLoader:
             return switch[node_type](name)
         except KeyError:
             raise MalformedMdl("Invalid node type")
+
+    def position_controller_to_vector(self, values, base_position):
+        return [
+            values[0] + base_position[0],
+            values[1] + base_position[1],
+            values[2] + base_position[2]
+            ]
+
+    def orientation_controller_to_quaternion(self, values):
+        num_columns = len(values)
+        if num_columns == 4:
+            return [values[3], *values[0:3]]
+        elif num_columns == 1:
+            comp = values[0]
+            x = ((comp & 0x7ff) / 1023.0) - 1.0
+            y = (((comp >> 11) & 0x7ff) / 1023.0) - 1.0
+            z = ((comp >> 22) / 511.0) - 1.0
+            mag2 = x * x + y * y + z * z
+            if mag2 < 1.0:
+                w = sqrt(1.0 - mag2)
+            else:
+                w = 0.0
+            return [w, x, y, z]
+        else:
+            raise MalformedMdl("Unsupported number of orientation columns: " + str(num_columns))
 
     def get_array_def(self):
         offset = self.mdl.get_uint32()

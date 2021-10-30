@@ -48,18 +48,21 @@ class Model:
         self.animations = []
 
     def add_node(self, newNode):
-        # Blender requires unique object names. Names in mdls are only
-        # unique for a parent, i.e. another object with the same name but
-        # with a different parent may exist.
-        # We'd need to save all names starting from root to resolve
-        # this, but that's too much effort.
-        # ParentName + Name should be enough.
-        if newNode:
-            key = newNode.parentName + newNode.name
-            if key in self.nodeDict:
-                print("KotorBlender: WARNING - node name conflict " + key + ".")
-            else:
-                self.nodeDict[key] = newNode
+        if not newNode:
+            return
+        key = newNode.parentName + newNode.name
+        if key in self.nodeDict:
+            print("KotorBlender: WARNING - node name conflict " + key + ".")
+        else:
+            self.nodeDict[key] = newNode
+
+    def add_animation(self, anim):
+        if not anim:
+            return
+        if anim.name in self.animDict:
+            print("KotorBlender: WARNING - animation name conflict.")
+        else:
+            self.animDict[anim.name] = anim
 
     def import_to_collection(self, collection, wkm, position = (0.0, 0.0, 0.0)):
         mdl_root = None
