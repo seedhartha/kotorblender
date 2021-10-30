@@ -50,7 +50,7 @@ wok_materials = [ ["wok_NotDefined"    , (0.400, 0.400, 0.400), 0.0], \
                   ["wok_StoneBridge"   , (0.081, 0.108, 0.139), 0.0] ]
 
 
-class WkmMaterial():
+class WkmMaterial:
     DIRT                = 1
     OBSCURING           = 2
     GRASS               = 3
@@ -75,7 +75,7 @@ class WkmMaterial():
     NONWALKABLE = [ NONWALK, OBSCURING, SNOW, TRANSPARENT, DEEPWATER, LAVA ]
 
 
-class DummySubtype():
+class DummySubtype:
     NONE      = "NONE"
     HAND      = "HAND"
     HEAD      = "HEAD"
@@ -133,7 +133,7 @@ class DummySubtype():
                     CLOSED_01 : "closed_02" }
 
 
-class Meshtype():
+class Meshtype:
     TRIMESH    = "TRI"
     DANGLYMESH = "DAN"
     LIGHTSABER = "SAB"
@@ -144,7 +144,7 @@ class Meshtype():
     ALL = {TRIMESH, DANGLYMESH, LIGHTSABER, SKIN, AABB, EMITTER}
 
 
-class Dummytype():
+class Dummytype:
     NONE      = "NON"
     DWKROOT   = "DWK"
     MDLROOT   = "MDL"
@@ -155,7 +155,7 @@ class Dummytype():
     ALL = {NONE, DWKROOT, MDLROOT, PWKROOT, REFERENCE, PATHPOINT}
 
 
-class Classification():
+class Classification:
     UNKNOWN   = "Other"
     TILE      = "Tile"
     CHARACTER = "Character"
@@ -169,7 +169,7 @@ class Classification():
     ALL = {UNKNOWN, TILE, CHARACTER, DOOR, EFFECT, GUI, SABER, ITEM, FLYER}
 
 
-class Nodetype():
+class Nodetype:
     DUMMY       = "dummy"
     REFERENCE   = "reference"
     TRIMESH     = "trimesh"
