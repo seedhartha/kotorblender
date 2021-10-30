@@ -36,27 +36,27 @@ class KB_OT_anim_move(bpy.types.Operator):
         """Prevent execution if animation list has less than 2 elements."""
         mdl_base = utils.get_mdl_root_from_object(context.object)
         if mdl_base is not None:
-            return (len(mdl_base.kb.animList) > 1)
+            return (len(mdl_base.kb.anim_list) > 1)
         return False
 
     def execute(self, context):
         """Move an item in the animation list."""
         mdl_base = utils.get_mdl_root_from_object(context.object)
-        anim_list = mdl_base.kb.animList
+        anim_list = mdl_base.kb.anim_list
 
-        currentIdx = mdl_base.kb.animListIdx
+        current_idx = mdl_base.kb.anim_list_idx
         new_idx = 0
         max_idx = len(anim_list) - 1
         if self.direction == "DOWN":
-            new_idx = currentIdx + 1
+            new_idx = current_idx + 1
         elif self.direction == "UP":
-            new_idx = currentIdx - 1
+            new_idx = current_idx - 1
         else:
             return {'CANCELLED'}
 
         new_idx = max(0, min(new_idx, max_idx))
-        if new_idx == currentIdx:
+        if new_idx == current_idx:
             return {'CANCELLED'}
-        anim_list.move(currentIdx, new_idx)
-        mdl_base.kb.animListIdx = new_idx
+        anim_list.move(current_idx, new_idx)
+        mdl_base.kb.anim_list_idx = new_idx
         return {'FINISHED'}

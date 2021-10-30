@@ -36,31 +36,31 @@ class KB_OT_anim_event_move(bpy.types.Operator):
         """Enable only if the list isn't empty."""
         mdl_base = utils.get_mdl_root_from_object(context.object)
         if mdl_base is not None:
-            anim_list = mdl_base.kb.animList
-            anim_list_idx = mdl_base.kb.animListIdx
+            anim_list = mdl_base.kb.anim_list
+            anim_list_idx = mdl_base.kb.anim_list_idx
             if (anim_list_idx >= 0) and len(anim_list) > anim_list_idx:
                 anim = anim_list[anim_list_idx]
-                ev_list = anim.eventList
-                ev_list_idx = anim.eventListIdx
+                ev_list = anim.event_list
+                ev_list_idx = anim.event_list_idx
                 return ev_list_idx >= 0 and len(ev_list) > ev_list_idx
         return False
 
     def execute(self, context):
         mdl_base = utils.get_mdl_root_from_object(context.object)
-        anim = mdl_base.kb.animList[mdl_base.kb.animListIdx]
-        eventList = anim.eventList
+        anim = mdl_base.kb.anim_list[mdl_base.kb.anim_list_idx]
+        event_list = anim.event_list
 
-        currentIdx = anim.eventListIdx
-        newIdx = 0
-        maxIdx = len(eventList) - 1
+        current_idx = anim.event_list_idx
+        new_idx = 0
+        max_idx = len(event_list) - 1
         if self.direction == "DOWN":
-            newIdx = currentIdx + 1
+            new_idx = current_idx + 1
         elif self.direction == "UP":
-            newIdx = currentIdx - 1
+            new_idx = current_idx - 1
         else:
             return {'CANCELLED'}
 
-        newIdx = max(0, min(newIdx, maxIdx))
-        eventList.move(currentIdx, newIdx)
-        anim.eventListIdx = newIdx
+        new_idx = max(0, min(new_idx, max_idx))
+        event_list.move(current_idx, new_idx)
+        anim.event_list_idx = new_idx
         return {'FINISHED'}

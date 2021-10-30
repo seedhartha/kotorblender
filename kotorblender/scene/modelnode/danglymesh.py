@@ -48,7 +48,7 @@ class DanglymeshNode(TrimeshNode):
         in NWN. Range is [0.0, 255.0] as opposed to [0.0, 1.0] in Blender
         """
         vgroup = obj.vertex_groups.new(name="constraints")
-        for vertexIdx, constraint in enumerate(self.constraints):
+        for vert_idx, constraint in enumerate(self.constraints):
             weight = constraint/255
-            vgroup.add([vertexIdx], weight, 'REPLACE')
+            vgroup.add([vert_idx], weight, 'REPLACE')
         obj.kb.constraints = vgroup.name

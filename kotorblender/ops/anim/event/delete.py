@@ -33,23 +33,21 @@ class KB_OT_anim_event_delete(bpy.types.Operator):
         """Enable only if the list isn't empty."""
         mdl_base = utils.get_mdl_root_from_object(context.object)
         if mdl_base is not None:
-            anim_list = mdl_base.kb.animList
-            anim_list_idx = mdl_base.kb.animListIdx
+            anim_list = mdl_base.kb.anim_list
+            anim_list_idx = mdl_base.kb.anim_list_idx
             if (anim_list_idx >= 0) and len(anim_list) > anim_list_idx:
                 anim = anim_list[anim_list_idx]
-                ev_list = anim.eventList
-                ev_list_idx = anim.eventListIdx
+                ev_list = anim.event_list
+                ev_list_idx = anim.event_list_idx
                 return ev_list_idx >= 0 and len(ev_list) > ev_list_idx
         return False
 
     def execute(self, context):
         mdl_base = utils.get_mdl_root_from_object(context.object)
-        anim = mdl_base.kb.animList[mdl_base.kb.animListIdx]
-        eventList = anim.eventList
-        eventIdx = anim.eventListIdx
+        anim = mdl_base.kb.anim_list[mdl_base.kb.anim_list_idx]
 
-        eventList.remove(eventIdx)
-        if eventIdx > 0:
-            eventIdx = eventIdx - 1
+        anim.event_list.remove(anim.event_list_idx)
+        if anim.event_list_idx > 0:
+            anim.event_list_idx = anim.event_list_idx - 1
 
         return {'FINISHED'}

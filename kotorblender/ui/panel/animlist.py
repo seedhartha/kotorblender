@@ -47,8 +47,8 @@ class KB_PT_animlist(bpy.types.Panel):
             # Display and add/remove animations
             row = layout.row()
             row.template_list("KB_UL_anims", "TheAnimList",
-                              mdl_base.kb, "animList",
-                              mdl_base.kb, "animListIdx",
+                              mdl_base.kb, "anim_list",
+                              mdl_base.kb, "anim_list_idx",
                               rows=7)
             col = row.column(align=True)
             col.operator("kb.anim_new", icon='ADD', text="")
@@ -58,8 +58,8 @@ class KB_PT_animlist(bpy.types.Panel):
                          icon='TRIA_UP', text="").direction = "UP"
             col.operator("kb.anim_move",
                          icon='TRIA_DOWN', text="").direction = "DOWN"
-            anim_list = mdl_base.kb.animList
-            anim_list_idx = mdl_base.kb.animListIdx
+            anim_list = mdl_base.kb.anim_list
+            anim_list_idx = mdl_base.kb.anim_list_idx
             if anim_list_idx >= 0 and len(anim_list) > anim_list_idx:
                 anim = anim_list[anim_list_idx]
                 row = layout.row()
@@ -71,8 +71,8 @@ class KB_PT_animlist(bpy.types.Panel):
                 row = layout.row()
                 split = row.split()
                 col = split.column(align=True)
-                col.prop(anim, "frameStart")
-                col.prop(anim, "frameEnd")
+                col.prop(anim, "frame_start")
+                col.prop(anim, "frame_end")
 
                 # Event Helper. Display and add/remove events.
                 box = layout.box()
@@ -80,8 +80,8 @@ class KB_PT_animlist(bpy.types.Panel):
 
                 row = box.row()
                 row.template_list("KB_UL_anim_events", "TheEventList",
-                                  anim, "eventList",
-                                  anim, "eventListIdx")
+                                  anim, "event_list",
+                                  anim, "event_list_idx")
                 col = row.column(align=True)
                 col.operator("kb.anim_event_new", text="", icon='ADD')
                 col.operator("kb.anim_event_delete", text="", icon='REMOVE')

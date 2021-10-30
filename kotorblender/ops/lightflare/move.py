@@ -29,33 +29,33 @@ class KB_OT_move_lightflare(bpy.types.Operator):
 
     @classmethod
     def poll(self, context):
-        return len(context.object.kb.flareList) > 0
+        return len(context.object.kb.flare_list) > 0
 
     def move_index(self, context):
-        flareList = context.object.kb.flareList
-        flareIdx  = context.object.kb.flareListIdx
+        flare_list = context.object.kb.flare_list
+        flare_idx  = context.object.kb.flare_listIdx
 
-        listLength = len(flareList) - 1 # (index starts at 0)
-        newIdx = 0
+        listLength = len(flare_list) - 1 # (index starts at 0)
+        new_idx = 0
         if self.direction == "UP":
-            newIdx = flareIdx - 1
+            new_idx = flare_idx - 1
         elif self.direction == "DOWN":
-            newIdx = flareIdx + 1
+            new_idx = flare_idx + 1
 
-        newIdx   = max(0, min(newIdx, listLength))
-        context.object.kb.flareListIdx = newIdx
+        new_idx = max(0, min(new_idx, listLength))
+        context.object.kb.flare_listIdx = new_idx
 
     def execute(self, context):
-        flareList = context.object.kb.flareList
-        flareIdx  = context.object.kb.flareListIdx
+        flare_list = context.object.kb.flare_list
+        flare_idx  = context.object.kb.flare_listIdx
 
         if self.direction == "DOWN":
-            neighbour = flareIdx + 1
-            flareList.move(flareIdx, neighbour)
+            neighbour = flare_idx + 1
+            flare_list.move(flare_idx, neighbour)
             self.move_index(context)
         elif self.direction == "UP":
-            neighbour = flareIdx - 1
-            flareList.move(neighbour, flareIdx)
+            neighbour = flare_idx - 1
+            flare_list.move(neighbour, flare_idx)
             self.move_index(context)
         else:
             return{'CANCELLED'}

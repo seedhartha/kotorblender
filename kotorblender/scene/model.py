@@ -32,14 +32,14 @@ from . import armature
 class Model:
 
     def __init__(self):
-        self.nodeDict      = collections.OrderedDict()
-        self.animDict      = dict() # No need to retain order
+        self.node_dict      = collections.OrderedDict()
+        self.anim_dict      = dict() # No need to retain order
 
         self.name           = "UNNAMED"
         self.supermodel     = defines.null
         self.animscale      = 1.0
         self.classification = defines.Classification.UNKNOWN
-        self.unknownC1      = 0
+        self.subclassification      = 0
         self.ignorefog      = False
         self.compress_quats = False
         self.headlink       = False
@@ -47,40 +47,40 @@ class Model:
 
         self.animations = []
 
-    def add_node(self, newNode):
-        if not newNode:
+    def add_node(self, new_node):
+        if not new_node:
             return
-        key = newNode.parentName + newNode.name
-        if key in self.nodeDict:
+        key = new_node.parent_name + new_node.name
+        if key in self.node_dict:
             print("KotorBlender: WARNING - node name conflict " + key + ".")
         else:
-            self.nodeDict[key] = newNode
+            self.node_dict[key] = new_node
 
     def add_animation(self, anim):
         if not anim:
             return
-        if anim.name in self.animDict:
+        if anim.name in self.anim_dict:
             print("KotorBlender: WARNING - animation name conflict.")
         else:
-            self.animDict[anim.name] = anim
+            self.anim_dict[anim.name] = anim
 
     def import_to_collection(self, collection, position = (0.0, 0.0, 0.0)):
         mdl_root = None
         objIdx = 0
-        if (glob.importGeometry) and self.nodeDict:
-            it = iter(self.nodeDict.items())
+        if self.node_dict:
+            it = iter(self.node_dict.items())
 
             # The first node should be the rootdummy.
             # If the first node has a parent or isn't a dummy we don't
             # even try to import the mdl
             (_, node) = next(it)
-            if (type(node) == DummyNode) and (utils.is_null(node.parentName)):
+            if (type(node) == DummyNode) and (utils.is_null(node.parent_name)):
                 obj                   = node.add_to_collection(collection)
                 obj.location          = position
                 obj.kb.dummytype      = defines.Dummytype.MDLROOT
                 obj.kb.supermodel     = self.supermodel
                 obj.kb.classification = self.classification
-                obj.kb.unknownC1      = self.unknownC1
+                obj.kb.subclassification      = self.subclassification
                 obj.kb.ignorefog      = (self.ignorefog >= 1)
                 obj.kb.compress_quats = (self.compress_quats >= 1)
                 obj.kb.headlink       = (self.headlink >= 1)
@@ -102,7 +102,7 @@ class Model:
                     node.lytposition = self.lytposition
                     obj.kb.lytposition = self.lytposition
 
-                if (utils.is_null(node.parentName)):
+                if (utils.is_null(node.parent_name)):
                     # Node without parent and not the mdl root.
                     raise MalformedFile(node.name + " has no parent.")
                 else:
@@ -110,14 +110,14 @@ class Model:
                     if obj.parent is not None:
                         print("WARNING: Node already parented: {}".format(obj.name))
                         pass
-                    elif mdl_root and node.parentName in bpy.data.objects and \
+                    elif mdl_root and node.parent_name in bpy.data.objects and \
                          utils.ancestor_node(
-                             bpy.data.objects[node.parentName],
+                             bpy.data.objects[node.parent_name],
                              utils.is_root_dummy
                          ).name == mdl_root.name:
                         # parent named node exists and is in our model
-                        obj.parent = bpy.data.objects[node.parentName]
-                        if node.parentName != self.name:
+                        obj.parent = bpy.data.objects[node.parent_name]
+                        if node.parent_name != self.name:
                             # child of non-root, preserve orientation
                             obj.matrix_parent_inverse = obj.parent.matrix_world.inverted()
                     else:
@@ -128,7 +128,7 @@ class Model:
                         # taking into account blender .001 suffix naming scheme,
                         # note: only searching 001-030
                         found = False
-                        for altname in [node.parentName + ".{:03d}".format(i) for i in range(1,30)]:
+                        for altname in [node.parent_name + ".{:03d}".format(i) for i in range(1,30)]:
                             if altname in bpy.data.objects and \
                                utils.ancestor_node(
                                    bpy.data.objects[altname],
@@ -141,7 +141,7 @@ class Model:
                                 break
                         # Node with invalid parent.
                         if not found:
-                            raise MalformedFile(node.name + " has no parent " + node.parentName)
+                            raise MalformedFile(node.name + " has no parent " + node.parent_name)
 
         # Attempt to import animations
         # Search for the MDL root if not already present
@@ -155,7 +155,7 @@ class Model:
                 return
 
         armature_object = None
-        if glob.importArmatures:
+        if glob.import_armatures:
             armature_object = armature.recreate_armature(mdl_root)
         else:
             # When armature creation is disabled, see if the MDL root already has an armature and use that
@@ -168,7 +168,7 @@ class Model:
                 if armature_object:
                     break
 
-        if glob.importAnimations:
+        if glob.import_animations:
             self.create_animations(mdl_root, armature_object)
 
     def create_animations(self, mdl_root, armature_object):

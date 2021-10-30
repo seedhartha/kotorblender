@@ -79,15 +79,15 @@ class KB_PT_light(bpy.types.Panel):
         sub.prop(obj.kb, "flareradius", text="Radius")
         row = box.row()
         row.active = obj.kb.lensflares
-        row.template_list("KB_UL_lightflares", "The_List", obj.kb, "flareList", obj.kb, "flareListIdx")
+        row.template_list("KB_UL_lightflares", "The_List", obj.kb, "flare_list", obj.kb, "flare_listIdx")
         col = row.column(align = True)
         col.operator("kb.lightflare_new", icon='ADD', text = "")
         col.operator("kb.lightflare_delete", icon='REMOVE', text = "")
         col.separator()
         col.operator("kb.lightflare_move", icon='TRIA_UP', text = "").direction = "UP"
         col.operator("kb.lightflare_move", icon='TRIA_DOWN', text = "").direction = "DOWN"
-        if obj.kb.flareListIdx >= 0 and len(obj.kb.flareList) > 0:
-            item = obj.kb.flareList[obj.kb.flareListIdx]
+        if obj.kb.flare_listIdx >= 0 and len(obj.kb.flare_list) > 0:
+            item = obj.kb.flare_list[obj.kb.flare_listIdx]
             row = box.row()
             row.active = obj.kb.lensflares
             row.prop(item, "texture")

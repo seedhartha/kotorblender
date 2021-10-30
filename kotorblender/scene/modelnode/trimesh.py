@@ -49,7 +49,7 @@ class TrimeshNode(GeometryNode):
         self.shadow                  = 1
         self.beaming                 = 0
         self.inheritcolor            = 0  # Unused ?
-        self.m_bIsBackgroundGeometry = 0
+        self.background_geometry = 0
         self.dirt_enabled            = 0
         self.dirt_texture            = 1
         self.dirt_worldspace         = 1
@@ -81,7 +81,7 @@ class TrimeshNode(GeometryNode):
         obj  = bpy.data.objects.new(self.name, mesh)
         self.set_object_data(obj)
 
-        if glob.importMaterials and self.roottype == "mdl":
+        if glob.import_materials and self.roottype == "mdl":
             material.rebuild_material(obj)
 
         collection.objects.link(obj)
@@ -102,17 +102,17 @@ class TrimeshNode(GeometryNode):
         # Special handling for mesh in walkmesh files
         if self.roottype in ["pwk", "dwk", "wok"]:
             # Create walkmesh materials
-            for wokMat in defines.wok_materials:
-                matName = wokMat[0]
+            for wok_mat in defines.wok_materials:
+                mat_name = wok_mat[0]
                 # Walkmesh materials will be shared across multiple walkmesh
                 # objects
-                if matName in bpy.data.materials:
-                    material = bpy.data.materials[matName]
+                if mat_name in bpy.data.materials:
+                    material = bpy.data.materials[mat_name]
                 else:
-                    material = bpy.data.materials.new(matName)
-                    material.diffuse_color      = [*wokMat[1], 1.0]
+                    material = bpy.data.materials.new(mat_name)
+                    material.diffuse_color      = [*wok_mat[1], 1.0]
                     material.specular_color     = (0.0,0.0,0.0)
-                    material.specular_intensity = wokMat[2]
+                    material.specular_intensity = wok_mat[2]
                 mesh.materials.append(material)
 
             # Apply the walkmesh materials to each face
@@ -151,7 +151,7 @@ class TrimeshNode(GeometryNode):
         obj.kb.tangentspace            = (self.tangentspace == 1)
         obj.kb.inheritcolor            = (self.inheritcolor == 1)
         obj.kb.rotatetexture           = (self.rotatetexture == 1)
-        obj.kb.m_bIsBackgroundGeometry = (self.m_bIsBackgroundGeometry == 1)
+        obj.kb.background_geometry = (self.background_geometry == 1)
         obj.kb.dirt_enabled            = (self.dirt_enabled == 1)
         obj.kb.dirt_texture            = self.dirt_texture
         obj.kb.dirt_worldspace         = self.dirt_worldspace

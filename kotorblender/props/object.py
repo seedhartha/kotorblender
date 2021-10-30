@@ -50,7 +50,7 @@ def update_emitter_prop(self, context):
         obj.kb.render_emitter = "Linked"
     if obj.kb.update != "Explosion":
         obj.kb.loop = False
-    if not utils.is_null(obj.kb.chunkName):
+    if not utils.is_null(obj.kb.chunk_name):
         obj.kb.render_emitter = "Normal"
         obj.kb.blend = "Normal"
     if obj.kb.p2p_type == "Bezier":
@@ -109,7 +109,7 @@ class ObjectPropertyGroup(bpy.types.PropertyGroup):
                                                       (defines.Classification.ITEM,      "Placeable", "Items or placeables",                 32), \
                                                       (defines.Classification.FLYER,     "Flyer",     "Non-interactive scene elements",      64) ],
                                             default = defines.Classification.UNKNOWN)
-    unknownC1      : bpy.props.IntProperty(name = "Unknown", description = "Unknown byte-2 in the classification bytes section of the model header", default = 0)
+    subclassification      : bpy.props.IntProperty(name = "Unknown", description = "Unknown byte-2 in the classification bytes section of the model header", default = 0)
     ignorefog      : bpy.props.BoolProperty(name = "Ignore Fog", description = "If true, model will not be occluded by area fog in-game", default = False)
     compress_quats : bpy.props.BoolProperty(name = "Use Compressed Quaternions", description = "If true, model will use compressed quaternions in animations", default = False)
     headlink       : bpy.props.BoolProperty(name = "Head Model", description = "If true, this model is a Head", default = False)
@@ -131,8 +131,8 @@ class ObjectPropertyGroup(bpy.types.PropertyGroup):
                                             default = "NONE")
     animscale   : bpy.props.FloatProperty(name = "Animationscale", description = "Animation scale for all animations", default = 1.00, min = 0.0)
     # Animation Data (for separation)
-    animList : bpy.props.CollectionProperty(type=AnimPropertyGroup)
-    animListIdx : bpy.props.IntProperty(name="Index for anim List",
+    anim_list : bpy.props.CollectionProperty(type=AnimPropertyGroup)
+    anim_list_idx : bpy.props.IntProperty(name="Index for anim List",
                                         default=0, options=set())
     # For reference emptys
     refmodel     : bpy.props.StringProperty(name = "Reference Model", description = "Name of another mdl file", default = "fx_ref")
@@ -158,7 +158,7 @@ class ObjectPropertyGroup(bpy.types.PropertyGroup):
     tangentspace     : bpy.props.BoolProperty(name = "tangentspace", description = "Allow Normal Mapping", default = False)
     inheritcolor     : bpy.props.BoolProperty(name = "Inheritcolor", description = "Unused (?)", default = False)
     rotatetexture    : bpy.props.BoolProperty(name = "Rotatetexture", description = "Automatically rotates texture to prevent seams", default = False)
-    m_bIsBackgroundGeometry : bpy.props.BoolProperty(name="Background Geometry", description="Lower detail or fewer mipmaps (?)", default=False, options=set())
+    background_geometry : bpy.props.BoolProperty(name="Background Geometry", description="Lower detail or fewer mipmaps (?)", default=False, options=set())
     dirt_enabled     : bpy.props.BoolProperty(name="Dirt", description="Dirt enabled (KotOR 2:TSL ONLY)", default=False, options=set())
     dirt_texture     : bpy.props.IntProperty(name="Dirt Texture", description="Dirt texture, values from walkmesh materials?", default=1, options=set())
     dirt_worldspace  : bpy.props.IntProperty(name="Dirt Worldspace", description="Dirt world space, some kind of mapping?", default=1, options=set())
@@ -209,8 +209,8 @@ class ObjectPropertyGroup(bpy.types.PropertyGroup):
     negativelight : bpy.props.BoolProperty(name = "Negative Light", default = False)
     lensflares    : bpy.props.BoolProperty(name = "Lensflares", default = False)
     flareradius   : bpy.props.FloatProperty(name = "Flare Radius", default = 0.0, min = 0.0, max = 1000000.0)
-    flareList     : bpy.props.CollectionProperty(type = FlarePropertyGroup)
-    flareListIdx  : bpy.props.IntProperty(name = "Index for flare list", default = 0)
+    flare_list     : bpy.props.CollectionProperty(type = FlarePropertyGroup)
+    flare_listIdx  : bpy.props.IntProperty(name = "Index for flare list", default = 0)
 
     # Point lights in Eevee do not have equivalent for Aurora light multiplier and radius
     radius : bpy.props.FloatProperty(name = "Radius", default = 0.0, min = 0.0, max = 10000.0, update = update_light_power)
@@ -262,7 +262,7 @@ class ObjectPropertyGroup(bpy.types.PropertyGroup):
     percentend : bpy.props.FloatProperty(name="Percent end", description="Percent end", default=1.0, min=0.0, max=1.0)
     sizemid : bpy.props.FloatProperty(name="sizeMid", description = "x size mid", default=1.0, min=0.0)
     sizemid_y : bpy.props.FloatProperty(name="sizeMid_y", description = "y size mid", default=0.0, min=0.0)
-    m_frandombirthrate : bpy.props.FloatProperty(name = "Random Birthrate", description = "Random Birthrate", default=10.0, min=0.0)
+    random_birth_rate : bpy.props.FloatProperty(name = "Random Birthrate", description = "Random Birthrate", default=10.0, min=0.0)
     targetsize : bpy.props.IntProperty(name="Target Size", description="Target Size", default=1, min=0)
     numcontrolpts : bpy.props.IntProperty(name="# of Control Points", description="Number of Control Points", default=0, min=0)
     controlptradius : bpy.props.FloatProperty(name="Control Point Radius", description="Control Point Radius", default=0.0, min=0.0)
@@ -292,7 +292,7 @@ class ObjectPropertyGroup(bpy.types.PropertyGroup):
     deadspace : bpy.props.FloatProperty(name="Dead space", description="Dead space", default = 0.0, min = 0.0, options=set())
     blastradius : bpy.props.FloatProperty(name="Radius", description="Blast Radius (meters)", default = 0.0, min = 0.0, unit='LENGTH', options=set())
     blastlength : bpy.props.FloatProperty(name="Length", description="Blast Length (seconds)", default = 0.0, min = 0.0, unit='TIME', options=set())
-    numBranches : bpy.props.IntProperty(name="# of Branches", description="Number of Branches", default=0, options=set())
+    num_branches : bpy.props.IntProperty(name="# of Branches", description="Number of Branches", default=0, options=set())
     controlptsmoothing : bpy.props.IntProperty(name="Control Point Smoothing", description="Control Point Smoothing", default=0, options=set())
     xgrid : bpy.props.IntProperty(name="X Grid", description="X Grid", default=0, options=set())
     ygrid : bpy.props.IntProperty(name="Y Grid", description="Y Grid", default=0, options=set())
@@ -329,12 +329,12 @@ class ObjectPropertyGroup(bpy.types.PropertyGroup):
                  ("Lighten", "Lighten", "Lighten", 3)],
         default="NONE", options=set())
     texture : bpy.props.StringProperty(name="Texture", description="Texture", maxlen=32, options=set())
-    chunkName : bpy.props.StringProperty(name="Chunk Name", description="Chunk Name", maxlen=16, default="", options=set(), update=update_emitter_prop)
+    chunk_name : bpy.props.StringProperty(name="Chunk Name", description="Chunk Name", maxlen=16, default="", options=set(), update=update_emitter_prop)
     twosidedtex : bpy.props.BoolProperty(name="Two-Sided Texture", description="Textures visible from front and back", default=False, options=set())
     loop : bpy.props.BoolProperty(name="Loop", description="Loop", default = False, options=set())
     renderorder : bpy.props.IntProperty(name="Render order", description="Render Order", default = 0, min = 0, options=set())
-    m_bFrameBlending : bpy.props.BoolProperty(name="Frame Blending", default=False, options=set())
-    m_sDepthTextureName : bpy.props.StringProperty(name="Depth Texture Name", description="Depth Texture Name", default=defines.null, maxlen=32, options=set())
+    frame_blending : bpy.props.BoolProperty(name="Frame Blending", default=False, options=set())
+    depth_texture_name : bpy.props.StringProperty(name="Depth Texture Name", description="Depth Texture Name", default=defines.null, maxlen=32, options=set())
 
     # Emitter flags
     p2p         : bpy.props.BoolProperty(name="p2p", description="Use Point to Point settings", default = False, options=set())
@@ -345,8 +345,8 @@ class ObjectPropertyGroup(bpy.types.PropertyGroup):
                  ("Bezier", "Bezier", "Bezier", 1),
                  ("Gravity", "Gravity", "Gravity", 2)],
         default="NONE", options=set(), update=update_emitter_prop)
-    affectedByWind : bpy.props.BoolProperty(name="Affected By Wind", description="Particles are affected by area wind", default = False, options=set())
-    m_isTinted : bpy.props.BoolProperty(name="Tinted", description="Tint texture with start, mid, and end color", default = False, options=set())
+    affected_by_wind : bpy.props.BoolProperty(name="Affected By Wind", description="Particles are affected by area wind", default = False, options=set())
+    tinted : bpy.props.BoolProperty(name="Tinted", description="Tint texture with start, mid, and end color", default = False, options=set())
     bounce : bpy.props.BoolProperty(name="Bounce", description="Bounce On/Off", default = False, options=set())
     random : bpy.props.BoolProperty(name="Random", description="Random", default = False, options=set())
     inherit : bpy.props.BoolProperty(name="Inherit", description="Inherit", default = False, options=set())

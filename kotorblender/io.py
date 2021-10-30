@@ -19,34 +19,28 @@
 import os
 
 import bpy
-from kotorblender.exception.malformedfile import MalformedFile
-
-from mathutils import Vector
 
 from .format.bwm.loader import BwmLoader
 from .format.mdl.loader import MdlLoader
-from .scene.areawalkmesh import AreaWalkmesh
 from .scene.modelnode.aabb import AabbNode
 
-from . import glob, utils
+from . import glob
 
 
 def load_mdl(
     filepath = "",
-    importGeometry = True,
-    importAnimations = True,
-    importWalkmeshes = True,
-    importMaterials = True,
-    importArmatures = True,
-    textureSearchRecursive = False
+    import_animations = True,
+    import_walkmeshes = True,
+    import_materials = True,
+    import_armatures = True,
+    texture_search_recursive = False
     ):
-    glob.importGeometry = importGeometry
-    glob.importAnimations = importAnimations
-    glob.importWalkmeshes = importWalkmeshes
-    glob.importMaterials = importMaterials
-    glob.importArmatures = importArmatures
-    glob.texturePath = os.path.dirname(filepath)
-    glob.textureSearchRecursive = textureSearchRecursive
+    glob.import_animations = import_animations
+    glob.import_walkmeshes = import_walkmeshes
+    glob.import_materials = import_materials
+    glob.import_armatures = import_armatures
+    glob.texture_path = os.path.dirname(filepath)
+    glob.texture_search_recursive = texture_search_recursive
 
     do_load_mdl(filepath)
 
@@ -55,18 +49,17 @@ def load_mdl(
 
 def load_lyt(
     filepath = "",
-    importAnimations = True,
-    importWalkmeshes = True,
-    importMaterials = True,
-    textureSearchRecursive = False
+    import_animations = True,
+    import_walkmeshes = True,
+    import_materials = True,
+    texture_search_recursive = False
     ):
-    glob.importGeometry = True
-    glob.importAnimations = importAnimations
-    glob.importWalkmeshes = importWalkmeshes
-    glob.importMaterials = importMaterials
-    glob.importArmatures = False
-    glob.texturePath = os.path.dirname(filepath)
-    glob.textureSearchRecursive = textureSearchRecursive
+    glob.import_animations = import_animations
+    glob.import_walkmeshes = import_walkmeshes
+    glob.import_materials = import_materials
+    glob.import_armatures = False
+    glob.texture_path = os.path.dirname(filepath)
+    glob.texture_search_recursive = texture_search_recursive
 
     do_load_lyt(filepath)
 
@@ -80,13 +73,13 @@ def do_load_mdl(filepath, position = (0.0, 0.0, 0.0)):
     model = mdl.load()
     model.import_to_collection(collection, position)
 
-    if glob.importWalkmeshes:
+    if glob.import_walkmeshes:
         wok_path = filepath[:-4] + ".wok"
         if os.path.exists(wok_path):
             wok = BwmLoader(wok_path, model.name)
             walkmesh = wok.load()
-            aabb = next((node for node in model.nodeDict.values() if isinstance(node, AabbNode)), None)
-            wok_geom = next((node for node in walkmesh.nodeDict.values() if node.name.lower().endswith("_geom")), None)
+            aabb = next((node for node in model.node_dict.values() if isinstance(node, AabbNode)), None)
+            wok_geom = next((node for node in walkmesh.node_dict.values() if node.name.lower().endswith("_geom")), None)
             if aabb and wok_geom:
                 aabb.compute_lyt_position(wok_geom)
                 aabb.compute_room_links(wok_geom, walkmesh.outer_edges)

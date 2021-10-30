@@ -30,8 +30,7 @@ class Animation:
         self.length    = 1.0
         self.transtime = 1.0
         self.animroot  = defines.null
-        self.eventList = []
-        self.nodeList  = collections.OrderedDict()
+        self.event_list = []
 
         self.nodes = []
         self.events = []
@@ -46,21 +45,21 @@ class Animation:
             if node.name.lower() in obj_by_node:
                 obj = obj_by_node[node.name.lower()]
                 node.add_object_keyframes(obj, list_anim, {"mdlname":mdl_root.name})
-                self.create_rest_pose(obj, list_anim.frameStart-5)
+                self.create_rest_pose(obj, list_anim.frame_start-5)
 
     def create_list_anim(self, mdl_root):
         result = utils.create_anim_list_item(mdl_root)
         result.name = self.name
         result.transtime = defines.fps * self.transtime
         result.root = result.root_obj = self.get_anim_target(mdl_root).name
-        result.frameEnd = utils.nwtime2frame(self.length) + result.frameStart
+        result.frame_end = utils.nwtime2frame(self.length) + result.frame_start
         return result
 
     def add_events_to_list_anim(self, list_anim):
         for time, name in self.events:
-            event = list_anim.eventList.add()
+            event = list_anim.event_list.add()
             event.name = name
-            event.frame = utils.nwtime2frame(time) + list_anim.frameStart
+            event.frame = utils.nwtime2frame(time) + list_anim.frame_start
 
     def associate_node_to_object(self, mdl_root):
         result = dict()

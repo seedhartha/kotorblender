@@ -57,16 +57,16 @@ class KB_PT_emitter(bpy.types.Panel):
         row = box.row()
         row.prop(obj.kb, "render_emitter")
         if obj.kb.update == "Lightning" or \
-           not utils.is_null(obj.kb.chunkName):
+           not utils.is_null(obj.kb.chunk_name):
             row.enabled = False
         row = box.row()
         row.prop(obj.kb, "blend")
-        if not utils.is_null(obj.kb.chunkName):
+        if not utils.is_null(obj.kb.chunk_name):
             row.enabled = False
         row = box.row()
         row.prop(obj.kb, "spawntype")
         if obj.kb.update != "Fountain" or \
-           not utils.is_null(obj.kb.chunkName):
+           not utils.is_null(obj.kb.chunk_name):
             row.enabled = False
 
         box.separator()
@@ -96,7 +96,7 @@ class KB_PT_emitter(bpy.types.Panel):
         row = box.row()
         row.label(text="Miscellaneous")
         row = box.row()
-        row.prop(obj.kb, "numBranches")
+        row.prop(obj.kb, "num_branches")
         row = box.row()
         row.prop(obj.kb, "renderorder")
         row = box.row()
@@ -153,7 +153,7 @@ class KB_PT_emitter(bpy.types.Panel):
         if obj.kb.update == "Lightning":
             col.enabled = False
         col = row.column()
-        col.prop(obj.kb, "m_frandombirthrate", text="Random")
+        col.prop(obj.kb, "random_birth_rate", text="Random")
         if obj.kb.update == "Lightning":
             col.enabled = False
         row = box.row()
@@ -211,22 +211,22 @@ class KB_PT_emitter(bpy.types.Panel):
         col = row.column()
         col.prop(obj.kb, "splat")
         row = box.row()
-        row.prop(obj.kb, "affectedByWind")
+        row.prop(obj.kb, "affected_by_wind")
         if obj.kb.update == "Lightning":
             row.enabled = False
         row = box.row()
-        row.prop(obj.kb, "m_isTinted")
+        row.prop(obj.kb, "tinted")
 
         box = layout.row().box()
         row = box.row()
         row.label(text="Texture / Chunk", icon='TEXTURE')
         row = box.row()
         row.prop(obj.kb, "texture")
-        if not utils.is_null(obj.kb.chunkName):
+        if not utils.is_null(obj.kb.chunk_name):
             row.enabled = False
         row = box.row()
         row.prop(obj.kb, "twosidedtex")
-        if not utils.is_null(obj.kb.chunkName):
+        if not utils.is_null(obj.kb.chunk_name):
             row.enabled = False
 
         box.separator()
@@ -237,7 +237,7 @@ class KB_PT_emitter(bpy.types.Panel):
         row.label(text="Grid")
         row.prop(obj.kb, "xgrid", text="X")
         row.prop(obj.kb, "ygrid", text="Y")
-        if not utils.is_null(obj.kb.chunkName):
+        if not utils.is_null(obj.kb.chunk_name):
             row.enabled = False
         row = box.row()
         row.prop(obj.kb, "fps")
@@ -245,7 +245,7 @@ class KB_PT_emitter(bpy.types.Panel):
         row.prop(obj.kb, "framestart")
         row.prop(obj.kb, "frameend")
         row = box.row()
-        row.prop(obj.kb, "m_bFrameBlending")
+        row.prop(obj.kb, "frame_blending")
         row = box.row()
         row.prop(obj.kb, "random")
 
@@ -256,14 +256,14 @@ class KB_PT_emitter(bpy.types.Panel):
         row = box.row()
         row.prop(obj.kb, "depth_texture")
         row = box.row()
-        row.prop(obj.kb, "m_sDepthTextureName", text="")
+        row.prop(obj.kb, "depth_texture_name", text="")
 
         box.separator()
 
         row = box.row()
         row.label(text="Chunk Model")
         row = box.row()
-        row.prop(obj.kb, "chunkName", text="")
+        row.prop(obj.kb, "chunk_name", text="")
 
         box = layout.row().box()
         row = box.row()

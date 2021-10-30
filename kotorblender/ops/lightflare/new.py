@@ -27,6 +27,6 @@ class KB_OT_new_lightflare(bpy.types.Operator):
 
     def execute(self, context):
         if (context.object.type == 'LIGHT'):
-            context.object.kb.flareList.add()
+            context.object.kb.flare_list.add()
 
         return{'FINISHED'}

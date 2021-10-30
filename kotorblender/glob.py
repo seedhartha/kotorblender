@@ -16,11 +16,10 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-importGeometry = True
-importAnimations = True
-importWalkmeshes = True
-importMaterials = True
-importArmatures = False
+import_animations = True
+import_walkmeshes = True
+import_materials = True
+import_armatures = False
 
-texturePath = ""
-textureSearchRecursive = False
+texture_path = ""
+texture_search_recursive = False

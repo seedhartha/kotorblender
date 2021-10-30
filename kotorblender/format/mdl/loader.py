@@ -172,8 +172,8 @@ EMITTER_CONTROLLER_KEYS = [
     (CTRL_EMITTER_COMBINETIME, "combinetime", 1),
     (CTRL_EMITTER_DRAG, "drag", 1),
     (CTRL_EMITTER_FPS, "fps", 1),
-    (CTRL_EMITTER_FRAMEEND, "frameEnd", 1),
-    (CTRL_EMITTER_FRAMESTART, "frameStart", 1),
+    (CTRL_EMITTER_FRAMEEND, "frame_end", 1),
+    (CTRL_EMITTER_FRAMESTART, "frame_start", 1),
     (CTRL_EMITTER_GRAV, "grav", 1),
     (CTRL_EMITTER_LIFEEXP, "lifeExp", 1),
     (CTRL_EMITTER_MASS, "mass", 1),
@@ -316,7 +316,7 @@ class MdlLoader:
             self.model.classification = CLASS_BY_VALUE[classification]
         except KeyError:
             raise MalformedFile("Invalid classification: " + str(classification))
-        self.model.unknownC1 = subclassification
+        self.model.subclassification = subclassification
         self.model.supermodel = supermodel_name
         self.model.animscale = scale
         self.model.ignorefog = affected_by_fog == 0
@@ -351,13 +351,13 @@ class MdlLoader:
         node = self.new_node(name, node_type)
 
         if parent:
-            node.parentName = parent.name
-            node.fromRoot = parent.fromRoot
+            node.parent_name = parent.name
+            node.from_root = parent.from_root
 
-        node.supernodeNumber = supernode_number
+        node.supernode_number = supernode_number
         node.position = position
         node.orientation = orientation
-        node.fromRoot = node.fromRoot @ Matrix.Translation(Vector(position)) @ Quaternion(orientation).to_matrix().to_4x4()
+        node.from_root = node.from_root @ Matrix.Translation(Vector(position)) @ Quaternion(orientation).to_matrix().to_4x4()
 
         self.model.add_node(node)
 
@@ -384,7 +384,7 @@ class MdlLoader:
             node.fadinglight   = fading_light
             node.lensflares    = flare
             node.flareradius   = flare_radius
-            node.flareList     = FlareList()
+            node.flare_list     = FlareList()
 
         if type_flags & NODE_EMITTER:
             dead_space = self.mdl.get_float()
@@ -412,7 +412,7 @@ class MdlLoader:
             node.deadspace = dead_space
             node.blastradius = blast_radius
             node.blastlength = blast_length
-            node.numBranches = num_branches
+            node.num_branches = num_branches
             node.controlptsmoothing = ctrl_point_smoothing
             node.xgrid = x_grid
             node.ygrid = y_grid
@@ -421,17 +421,17 @@ class MdlLoader:
             node.render = render
             node.blend = blend
             node.texture = texture
-            node.chunkName = chunk_name
+            node.chunk_name = chunk_name
             node.twosidedtex = twosided_tex != 0
             node.loop = loop != 0
             node.renderorder = render_order
-            node.m_bFrameBlending = frame_blending != 0
-            node.m_sDepthTextureName = depth_texture_name if len(depth_texture_name) > 0 and depth_texture_name.lower() != "null" else defines.null
+            node.frame_blending = frame_blending != 0
+            node.depth_texture_name = depth_texture_name if len(depth_texture_name) > 0 and depth_texture_name.lower() != "null" else defines.null
             # flags
             node.p2p = flags & EMITTER_FLAG_P2P != 0
             node.p2p_sel = flags & EMITTER_FLAG_P2P_SEL != 0
-            node.affectedByWind = flags & EMITTER_FLAG_AFFECTED_WIND != 0
-            node.m_isTinted = flags & EMITTER_FLAG_TINTED != 0
+            node.affected_by_wind = flags & EMITTER_FLAG_AFFECTED_WIND != 0
+            node.tinted = flags & EMITTER_FLAG_TINTED != 0
             node.bounce = flags & EMITTER_FLAG_BOUNCE != 0
             node.random = flags & EMITTER_FLAG_RANDOM != 0
             node.inherit = flags & EMITTER_FLAG_INHERIT != 0
@@ -514,7 +514,7 @@ class MdlLoader:
             node.beaming = beaming
             node.tangentspace = 1 if mdx_data_bitmap & MDX_FLAG_TANGENT1 else 0
             node.rotatetexture = rotate_texture
-            node.m_bIsBackgroundGeometry = background_geometry
+            node.background_geometry = background_geometry
             node.animateuv = animate_uv
             node.uvdirectionx = uv_dir_x
             node.uvdirectiony = uv_dir_y
@@ -585,7 +585,7 @@ class MdlLoader:
                 node.alphamid = controllers[CTRL_EMITTER_ALPHAMID][0].values[0] if CTRL_EMITTER_ALPHAMID in controllers else 0.0
                 node.alphaend = controllers[CTRL_EMITTER_ALPHAEND][0].values[0] if CTRL_EMITTER_ALPHAEND in controllers else 0.0
                 node.birthrate = controllers[CTRL_EMITTER_BIRTHRATE][0].values[0] if CTRL_EMITTER_BIRTHRATE in controllers else 0.0
-                node.m_frandombirthrate = controllers[CTRL_EMITTER_RANDOMBIRTHRATE][0].values[0] if CTRL_EMITTER_RANDOMBIRTHRATE in controllers else 0.0
+                node.random_birth_rate = controllers[CTRL_EMITTER_RANDOMBIRTHRATE][0].values[0] if CTRL_EMITTER_RANDOMBIRTHRATE in controllers else 0.0
                 node.bounce_co = controllers[CTRL_EMITTER_BOUNCE_CO][0].values[0] if CTRL_EMITTER_BOUNCE_CO in controllers else 0.0
                 node.combinetime = controllers[CTRL_EMITTER_COMBINETIME][0].values[0] if CTRL_EMITTER_COMBINETIME in controllers else 0.0
                 node.drag = controllers[CTRL_EMITTER_DRAG][0].values[0] if CTRL_EMITTER_DRAG in controllers else 0.0
@@ -631,21 +631,21 @@ class MdlLoader:
 
         if type_flags & NODE_LIGHT:
             self.mdl.seek(MDL_OFFSET + flare_size_arr.offset)
-            node.flareList.sizes = [self.mdl.get_float() for _ in range(flare_size_arr.count)]
+            node.flare_list.sizes = [self.mdl.get_float() for _ in range(flare_size_arr.count)]
 
             self.mdl.seek(MDL_OFFSET + flare_position_arr.offset)
-            node.flareList.positions = [self.mdl.get_float() for _ in range(flare_position_arr.count)]
+            node.flare_list.positions = [self.mdl.get_float() for _ in range(flare_position_arr.count)]
 
             self.mdl.seek(MDL_OFFSET + flare_color_shift_arr.offset)
             for _ in range(flare_color_shift_arr.count):
                 color_shift = [self.mdl.get_float() for _ in range(3)]
-                node.flareList.colorshifts.append(color_shift)
+                node.flare_list.colorshifts.append(color_shift)
 
             self.mdl.seek(MDL_OFFSET + flare_tex_name_arr.offset)
             tex_name_offsets = [self.mdl.get_uint32() for _ in range(flare_tex_name_arr.count)]
             for tex_name_offset in tex_name_offsets:
                 self.mdl.seek(MDL_OFFSET + tex_name_offset)
-                node.flareList.textures.append(self.mdl.get_c_string())
+                node.flare_list.textures.append(self.mdl.get_c_string())
 
         if type_flags & NODE_SKIN:
             if num_bonemap > 0:
@@ -793,7 +793,7 @@ class MdlLoader:
         anim.nodes.append(node)
 
         if controller_arr.count > 0:
-            supernode = next((node for node in self.model.nodeDict.values() if node.supernodeNumber == supernode_number), None)
+            supernode = next((node for node in self.model.node_dict.values() if node.supernode_number == supernode_number), None)
             if not supernode:
                 raise MalformedFile("Model node not found for animation node: " + str(name))
             base_position = supernode.position
