@@ -4,7 +4,7 @@ This add-on is a fork of KotorBlender, upgraded to support Blender 2.8+. KotorBl
 
 ## Features
 
-- Import & export ASCII MDL models: geometry, materials, animations, walkmeshes and TXI files
+- Import & export MDL models, including walkmeshes
 - Import & export LYT files
 - Import & export PTH files
 
@@ -20,12 +20,10 @@ This add-on is a fork of KotorBlender, upgraded to support Blender 2.8+. KotorBl
 
 1. Extract MDL, MDX, WOK, and, optionally, TPC and LYT files to a single directory (Kotor Tool, reone-tools, etc.)
 1. Convert TPC files to TGA/TXI (reone-tools)
-1. Convert binary MDL to ASCII MDL using MDLops or MDLedit
-1. Import ASCII MDL into Blender via File → Import → KotOR Model (.mdl)
+1. Import MDL into Blender via File → Import → KotOR Model (.mdl)
 1. Create/modify models
 1. Select an MDL root object to be exported 
-1. Export ASCII MDL via File → Export → KotOR Model (.mdl)
-1. Convert ASCII MDL to binary MDL using MDLops or MDLedit
+1. Export MDL via File → Export → KotOR Model (.mdl)
 
 ### Baking Lightmaps
 
@@ -71,13 +69,6 @@ Fine-tuning:
 ## Compatibility
 
 - Blender 2.8+
-- MDLops 1.0.2
-- MDLedit 1.0.3
-
-### Known Issues
-
-- You cannot have neverblender and kotorblender *enabled* at the same time
-- MDLedit has problems reading `color` and `selfillumcolor` controllers from ASCII MDL
 
 ## License
 
