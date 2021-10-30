@@ -50,7 +50,7 @@ class LightNode(GeometryNode):
         self.fadinglight   = 1
         self.lensflares    = 0
         self.flareradius   = 1.0
-        self.flareList     = FlareList()
+        self.flare_list     = FlareList()
 
     def add_to_collection(self, collection):
         light = self.create_light(self.name)
@@ -87,13 +87,13 @@ class LightNode(GeometryNode):
 
         if (self.flareradius > 0) or (self.lensflares >= 1):
             obj.kb.lensflares = True
-            numFlares = len(self.flareList.textures)
-            for i in range(numFlares):
-                newItem = obj.kb.flareList.add()
-                newItem.texture    = self.flareList.textures[i]
-                newItem.colorshift = self.flareList.colorshifts[i]
-                newItem.size       = self.flareList.sizes[i]
-                newItem.position   = self.flareList.positions[i]
+            num_flares = len(self.flare_list.textures)
+            for i in range(num_flares):
+                newItem = obj.kb.flare_list.add()
+                newItem.texture    = self.flare_list.textures[i]
+                newItem.colorshift = self.flare_list.colorshifts[i]
+                newItem.size       = self.flare_list.sizes[i]
+                newItem.position   = self.flare_list.positions[i]
 
         obj.kb.flareradius = self.flareradius
         light.calc_light_power(obj)

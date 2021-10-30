@@ -44,14 +44,14 @@ class KB_OT_load_wok_materials(bpy.types.Operator):
 
             # Create materials
             for matDef in defines.wok_materials:
-                matName = matDef[0]
+                mat_name = matDef[0]
 
                 # Walkmesh materials should be shared across multiple
                 # walkmeshes, as they always identical
-                if matName in bpy.data.materials.keys():
-                    mat = bpy.data.materials[matName]
+                if mat_name in bpy.data.materials.keys():
+                    mat = bpy.data.materials[mat_name]
                 else:
-                    mat = bpy.data.materials.new(matName)
+                    mat = bpy.data.materials.new(mat_name)
 
                     mat.diffuse_color      = [*matDef[1], 1.0]
                     mat.specular_color     = (0.0,0.0,0.0)

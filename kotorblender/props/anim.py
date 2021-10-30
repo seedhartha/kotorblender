@@ -42,11 +42,11 @@ class AnimPropertyGroup(bpy.types.PropertyGroup):
         default="unnamed", options=set())
     mute : bpy.props.BoolProperty(name="Export", default=False, options=set(),
                                   description="Export animation to MDL")
-    frameStart : bpy.props.IntProperty(name="Start", default=0, options=set(),
+    frame_start : bpy.props.IntProperty(name="Start", default=0, options=set(),
                                        description="Animation Start", min=0)
-    frameEnd : bpy.props.IntProperty(name="End", default=0, options=set(),
+    frame_end : bpy.props.IntProperty(name="End", default=0, options=set(),
                                      description="Animation End", min=0)
 
-    eventList : bpy.props.CollectionProperty(type=AnimEventPropertyGroup)
-    eventListIdx : bpy.props.IntProperty(name="Index for event List",
+    event_list : bpy.props.CollectionProperty(type=AnimEventPropertyGroup)
+    event_list_idx : bpy.props.IntProperty(name="Index for event List",
                                          default=0, options=set())

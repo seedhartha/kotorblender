@@ -35,20 +35,20 @@ class KB_OT_import_lyt(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
         default="*.lyt",
         options={'HIDDEN'})
 
-    importAnimations : bpy.props.BoolProperty(
+    import_animations : bpy.props.BoolProperty(
         name = "Import Animations",
         default = True)
 
-    importWalkmeshes : bpy.props.BoolProperty(
+    import_walkmeshes : bpy.props.BoolProperty(
         name = "Import Walkmeshes",
         description = "Import area, placeable and door walkmeshes",
         default = True)
 
-    importMaterials : bpy.props.BoolProperty(
+    import_materials : bpy.props.BoolProperty(
         name = "Import Materials",
         default = True)
 
-    textureSearchRecursive : bpy.props.BoolProperty(
+    texture_search_recursive : bpy.props.BoolProperty(
         name="Image search",
         description="Search for textures in subdirectories",
         default=False)

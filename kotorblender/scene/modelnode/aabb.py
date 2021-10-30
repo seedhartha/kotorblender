@@ -21,8 +21,6 @@ import bpy
 from bpy_extras.io_utils import unpack_list
 from mathutils import Vector
 
-from ...exception.malformedfile import MalformedFile
-
 from ... import defines, utils
 
 from .trimesh import TrimeshNode
@@ -56,17 +54,17 @@ class AabbNode(TrimeshNode):
         mesh.polygons.foreach_set("loop_total", (3,) * num_faces)
 
         # Create materials
-        for wokMat in defines.wok_materials:
-            matName = wokMat[0]
+        for wok_mat in defines.wok_materials:
+            mat_name = wok_mat[0]
             # Walkmesh materials will be shared across multiple walkmesh
             # objects
-            if matName in bpy.data.materials:
-                material = bpy.data.materials[matName]
+            if mat_name in bpy.data.materials:
+                material = bpy.data.materials[mat_name]
             else:
-                material = bpy.data.materials.new(matName)
-                material.diffuse_color      = [*wokMat[1], 1.0]
+                material = bpy.data.materials.new(mat_name)
+                material.diffuse_color      = [*wok_mat[1], 1.0]
                 material.specular_color     = (0.0,0.0,0.0)
-                material.specular_intensity = wokMat[2]
+                material.specular_intensity = wok_mat[2]
             mesh.materials.append(material)
 
         # Apply the walkmesh materials to each face
@@ -100,7 +98,7 @@ class AabbNode(TrimeshNode):
             mdl_mat_id = self.facelist.matId[i]
             if mdl_mat_id == wok_mat_id:
                 mdl_vert = self.verts[self.facelist.faces[i][0]]
-                mdl_vert_from_root = self.fromRoot @ Vector(mdl_vert)
+                mdl_vert_from_root = self.from_root @ Vector(mdl_vert)
                 self.lytposition = wok_vert - mdl_vert_from_root
                 break
 
@@ -113,7 +111,7 @@ class AabbNode(TrimeshNode):
             wok_verts = [wok_geom.verts[idx] for idx in wok_face]
             for face_idx, mdl_vert_indices in enumerate(self.facelist.faces):
                 mdl_verts = [self.verts[idx] for idx in mdl_vert_indices]
-                mdl_verts_from_root = [self.fromRoot @ Vector(vert) for vert in mdl_verts]
+                mdl_verts_from_root = [self.from_root @ Vector(vert) for vert in mdl_verts]
                 mdl_verts_lyt_space = [vert + self.lytposition for vert in mdl_verts_from_root]
                 if all([utils.isclose_3f(wok_verts[i], mdl_verts_lyt_space[i]) for i in range(3)]):
                     self.roomlinks.append((3 * face_idx + (edge[0] % 3), edge[1]))

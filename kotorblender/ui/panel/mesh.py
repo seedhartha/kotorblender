@@ -84,7 +84,7 @@ class KB_PT_mesh(bpy.types.Panel):
             col.prop(obj.kb, "shadow", text="Shadow")
             col.prop(obj.kb, "lightmapped", text="Lightmapped")
             col.prop(obj.kb, "tangentspace", text="Tangentspace")
-            col.prop(obj.kb, "m_bIsBackgroundGeometry", text="Background Geometry")
+            col.prop(obj.kb, "background_geometry", text="Background Geometry")
             col = split.column()
             col.prop(obj.kb, "beaming", text="Beaming")
             col.prop(obj.kb, "inheritcolor", text="Inherit Color")

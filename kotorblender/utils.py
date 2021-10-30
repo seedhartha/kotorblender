@@ -19,7 +19,6 @@
 import math
 
 import bpy
-from mathutils import Quaternion
 
 from . import defines
 
@@ -158,14 +157,14 @@ def get_last_keyframe(root_obj):
 def create_anim_list_item(mdl_base, check_keyframes=False):
     """Append a new animation at the and of the animation list."""
     last_frame = max([defines.anim_globstart] +
-                     [a.frameEnd for a in mdl_base.kb.animList])
+                     [a.frame_end for a in mdl_base.kb.anim_list])
     if check_keyframes:
         last_frame = max(last_frame, get_last_keyframe(mdl_base))
-    anim = mdl_base.kb.animList.add()
+    anim = mdl_base.kb.anim_list.add()
     anim.name = mdl_base.name
     start = int(math.ceil((last_frame + defines.anim_offset) / 10.0)) * 10
-    anim.frameStart = start
-    anim.frameEnd = start
+    anim.frame_start = start
+    anim.frame_end = start
     return anim
 
 

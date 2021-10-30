@@ -40,7 +40,7 @@ class AnimationNode:
     def create_data_object(self, obj, anim, options={}):
         """Creates animations in object actions."""
         fps = defines.fps
-        frame_start = anim.frameStart
+        frame_start = anim.frame_start
 
         # Insert keyframes of each type
         for label, (data, data_path, data_dim) in self.object_data.items():
@@ -70,7 +70,7 @@ class AnimationNode:
     def create_data_emitter(self, obj, anim, options={}):
         """Creates animations in emitter actions."""
         fps = defines.fps
-        frame_start = anim.frameStart
+        frame_start = anim.frame_start
         action = utils.get_action(obj, options["mdlname"] + "." + obj.name)
         for label, (data, _, data_dim) in self.emitter_data.items():
             frames = [fps * d[0] + frame_start for d in data]

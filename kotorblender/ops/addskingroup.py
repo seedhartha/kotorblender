@@ -25,15 +25,15 @@ class KB_OT_add_skingroup(bpy.types.Operator):
 
     def execute(self, context):
         obj        = context.object
-        skingrName = obj.kb.skingroup_obj
+        skingr_name = obj.kb.skingroup_obj
         # Check if there is already a vertex group with this name
-        if skingrName:
-            if (skingrName not in obj.vertex_groups.keys()):
+        if skingr_name:
+            if (skingr_name not in obj.vertex_groups.keys()):
                 # Create the vertex group
-                obj.vertex_groups.new(name=skingrName)
+                obj.vertex_groups.new(name=skingr_name)
                 obj.kb.skingroup_obj = ""
 
-                self.report({'INFO'}, "Created vertex group " + skingrName)
+                self.report({'INFO'}, "Created vertex group " + skingr_name)
                 return{'FINISHED'}
             else:
                 self.report({'INFO'}, "Duplicate Name")

@@ -30,13 +30,13 @@ class GeometryNode:
         self.roottype = "mdl"
 
         self.name        = name
-        self.parentName  = defines.null
+        self.parent_name  = defines.null
         self.position    = (0.0, 0.0, 0.0)
         self.orientation = (1.0, 0.0, 0.0, 0.0)
         self.scale       = 1.0
         self.wirecolor   = (0.0, 0.0, 0.0)
 
-        self.fromRoot = Matrix()
+        self.from_root = Matrix()
 
         self.objref = ""
 

@@ -30,7 +30,7 @@ class EmitterNode(GeometryNode):
         "deadspace",
         "blastradius",
         "blastlength",
-        "numBranches",
+        "num_branches",
         "controlptsmoothing",
         "xgrid",
         "ygrid",
@@ -39,16 +39,16 @@ class EmitterNode(GeometryNode):
         "render",
         "blend",
         "texture",
-        "chunkName",
+        "chunk_name",
         "twosidedtex",
         "loop",
         "renderorder",
-        "m_bFrameBlending",
-        "m_sDepthTextureName",
+        "frame_blending",
+        "depth_texture_name",
         "p2p",
         "p2p_sel",
-        "affectedByWind",
-        "m_isTinted",
+        "affected_by_wind",
+        "tinted",
         "bounce",
         "random",
         "inherit",
@@ -61,7 +61,7 @@ class EmitterNode(GeometryNode):
         "alphamid",
         "alphaend",
         "birthrate",
-        "m_frandombirthrate",
+        "random_birth_rate",
         "bounce_co",
         "combinetime",
         "drag",
@@ -114,7 +114,7 @@ class EmitterNode(GeometryNode):
         self.deadspace = 0.0
         self.blastradius = 0.0
         self.blastlength = 0.0
-        self.numBranches = 0
+        self.num_branches = 0
         self.controlptsmoothing = 0
         self.xgrid = 0
         self.ygrid = 0
@@ -123,17 +123,17 @@ class EmitterNode(GeometryNode):
         self.render = ""
         self.blend = ""
         self.texture = ""
-        self.chunkName = ""
+        self.chunk_name = ""
         self.twosidedtex = False
         self.loop = False
         self.renderorder = 0
-        self.m_bFrameBlending = False
-        self.m_sDepthTextureName = defines.null
+        self.frame_blending = False
+        self.depth_texture_name = defines.null
         # flags
         self.p2p = False
         self.p2p_sel = False
-        self.affectedByWind = False
-        self.m_isTinted = False
+        self.affected_by_wind = False
+        self.tinted = False
         self.bounce = False
         self.random = False
         self.inherit = False
@@ -147,7 +147,7 @@ class EmitterNode(GeometryNode):
         self.alphamid = 0.0
         self.alphaend = 0.0
         self.birthrate = 0.0
-        self.m_frandombirthrate = 0.0
+        self.random_birth_rate = 0.0
         self.bounce_co = 0.0
         self.combinetime = 0.0
         self.drag = 0.0

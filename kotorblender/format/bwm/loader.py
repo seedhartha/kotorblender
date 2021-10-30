@@ -94,7 +94,7 @@ class BwmLoader:
 
             self.geom_node = TrimeshNode("{}_wok_geom".format(self.model_name))
             self.geom_node.roottype = "wok"
-            self.geom_node.parentName = root_node.name
+            self.geom_node.parent_name = root_node.name
             self.geom_node.position = position
             self.walkmesh.add_node(self.geom_node)
         else:
@@ -119,17 +119,17 @@ class BwmLoader:
 
             self.geom_node = TrimeshNode(geom_node_name)
             self.geom_node.roottype = walkmesh_type
-            self.geom_node.parentName = root_node.name
+            self.geom_node.parent_name = root_node.name
             self.geom_node.position = position
             self.walkmesh.add_node(self.geom_node)
 
             use1_node = DummyNode("{}_01".format(geom_node_name))
-            use1_node.parentName = geom_node_name
+            use1_node.parent_name = geom_node_name
             use1_node.position = rel_use_vec1
             self.walkmesh.add_node(use1_node)
 
             use2_node = DummyNode("{}_02".format(geom_node_name))
-            use2_node.parentName = geom_node_name
+            use2_node.parent_name = geom_node_name
             use2_node.position = rel_use_vec2
             self.walkmesh.add_node(use2_node)
 
