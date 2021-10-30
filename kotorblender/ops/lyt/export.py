@@ -34,7 +34,7 @@ class KB_OT_export_lyt(bpy.types.Operator, bpy_extras.io_utils.ExportHelper):
             default = "*.lyt",
             options = {'HIDDEN'})
 
-    def _describe_object(self, obj):
+    def describe_object(self, obj):
         parent = utils.get_mdl_root(obj)
         orientation = obj.rotation_euler.to_quaternion()
         return "{} {} {:.7g} {:.7g} {:.7g} {:.7g} {:.7g} {:.7g} {:.7g}".format(parent.name if parent else "NULL", obj.name, *obj.matrix_world.translation, *orientation)
@@ -63,10 +63,10 @@ class KB_OT_export_lyt(bpy.types.Operator, bpy_extras.io_utils.ExportHelper):
             f.write("  obstaclecount 0\n")
             f.write("  doorhookcount {}\n".format(len(doors)))
             for door in doors:
-                f.write("    {}\n".format(self._describe_object(door)))
+                f.write("    {}\n".format(self.describe_object(door)))
             f.write("  othercount {}\n".format(len(others)))
             for other in others:
-                f.write("    {}\n".format(self._describe_object(other)))
+                f.write("    {}\n".format(self.describe_object(other)))
             f.write("donelayout\n")
 
         return {'FINISHED'}

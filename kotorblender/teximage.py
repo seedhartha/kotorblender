@@ -27,7 +27,7 @@ from bpy_extras import image_utils
 from . import glob
 
 
-def _create_image(name, path):
+def create_image(name, path):
     image = image_utils.load_image(
         name + ".tga",
         path,
@@ -56,7 +56,7 @@ def load_texture_image(name):
         if name in bpy.data.images:
             image = bpy.data.images[name]
         else:
-            image = _create_image(name, glob.texturePath)
+            image = create_image(name, glob.texturePath)
 
         texture = bpy.data.textures.new(name, type='IMAGE')
         texture.image = image

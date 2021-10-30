@@ -37,32 +37,32 @@ class Animation:
         self.events = []
 
     def add_to_objects(self, mdl_root):
-        list_anim = self._create_list_anim(mdl_root)
-        self._add_events_to_list_anim(list_anim)
-        obj_by_node = self._associate_node_to_object(mdl_root)
+        list_anim = self.create_list_anim(mdl_root)
+        self.add_events_to_list_anim(list_anim)
+        obj_by_node = self.associate_node_to_object(mdl_root)
 
         # Add object keyframes
         for node in self.nodes:
             if node.name.lower() in obj_by_node:
                 obj = obj_by_node[node.name.lower()]
                 node.add_object_keyframes(obj, list_anim, {"mdlname":mdl_root.name})
-                self._create_rest_pose(obj, list_anim.frameStart-5)
+                self.create_rest_pose(obj, list_anim.frameStart-5)
 
-    def _create_list_anim(self, mdl_root):
+    def create_list_anim(self, mdl_root):
         result = utils.create_anim_list_item(mdl_root)
         result.name = self.name
         result.transtime = defines.fps * self.transtime
-        result.root = result.root_obj = self._get_anim_target(mdl_root).name
+        result.root = result.root_obj = self.get_anim_target(mdl_root).name
         result.frameEnd = utils.nwtime2frame(self.length) + result.frameStart
         return result
 
-    def _add_events_to_list_anim(self, list_anim):
+    def add_events_to_list_anim(self, list_anim):
         for time, name in self.events:
             event = list_anim.eventList.add()
             event.name = name
             event.frame = utils.nwtime2frame(time) + list_anim.frameStart
 
-    def _associate_node_to_object(self, mdl_root):
+    def associate_node_to_object(self, mdl_root):
         result = dict()
         for node in self.nodes:
             obj = utils.search_node(mdl_root, lambda o, name=node.name: o.name.lower() == name.lower())
@@ -70,10 +70,10 @@ class Animation:
                 result[node.name.lower()] = obj
         return result
 
-    def _create_rest_pose(self, obj, frame=1):
+    def create_rest_pose(self, obj, frame=1):
         AnimationNode.create_restpose(obj, frame)
 
-    def _get_anim_target(self, mdl_root):
+    def get_anim_target(self, mdl_root):
         result = utils.search_node(mdl_root, lambda o, name=self.animroot: o.name.lower() == name.lower())
         if not result:
             result = mdl_root

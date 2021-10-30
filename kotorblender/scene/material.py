@@ -25,7 +25,7 @@ import bpy
 from .. import teximage, utils
 
 
-def _get_material_name(obj):
+def get_material_name(obj):
     if utils.is_null(obj.kb.bitmap) and utils.is_null(obj.kb.bitmap2):
         diffuse = utils.color_to_hex(obj.kb.diffuse)
         alpha = utils.int_to_hex(utils.float_to_byte(obj.kb.alpha))
@@ -35,8 +35,8 @@ def _get_material_name(obj):
     return name
 
 
-def _get_or_create_material(obj):
-    name = _get_material_name(obj)
+def get_or_create_material(obj):
+    name = get_material_name(obj)
     if name in bpy.data.materials:
         material = bpy.data.materials[name]
     else:
@@ -44,12 +44,12 @@ def _get_or_create_material(obj):
     return material
 
 
-def _rebuild_material_simple(material, obj):
+def rebuild_material_simple(material, obj):
     material.use_nodes = False
     material.diffuse_color = [*obj.kb.diffuse, 1.0]
 
 
-def _rebuild_material_nodes(material, obj):
+def rebuild_material_nodes(material, obj):
     material.use_nodes = True
     links = material.node_tree.links
     links.clear()
@@ -117,7 +117,7 @@ def rebuild_material(obj):
     """
     :param obj: object for which to rebuild the material
     """
-    material = _get_or_create_material(obj)
+    material = get_or_create_material(obj)
 
     mesh = obj.data
     mesh.materials.clear()
@@ -125,6 +125,6 @@ def rebuild_material(obj):
 
     # Only use nodes when object has at least one texture
     if (not utils.is_null(obj.kb.bitmap)) or (not utils.is_null(obj.kb.bitmap2)):
-        _rebuild_material_nodes(material, obj)
+        rebuild_material_nodes(material, obj)
     else:
-        _rebuild_material_simple(material, obj)
+        rebuild_material_simple(material, obj)
