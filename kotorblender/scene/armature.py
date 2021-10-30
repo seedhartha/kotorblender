@@ -32,7 +32,6 @@ def recreate_armature(mdl_root):
 
     skinmeshes = utils.search_node_all(mdl_root, lambda o: o.kb.meshtype == defines.Meshtype.SKIN)
     if not skinmeshes:
-        print("KotorBlender: WARNING - skinmeshes not found under the MDL root - armature creation aborted")
         return None
 
     # Create an armature and make it active

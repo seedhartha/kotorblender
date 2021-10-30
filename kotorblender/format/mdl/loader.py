@@ -349,7 +349,6 @@ class MdlLoader:
 
         node_type = self.get_node_type(type_flags)
         node = self.new_node(name, node_type)
-        self.model.add_node(node)
 
         if parent:
             node.parentName = parent.name
@@ -359,6 +358,8 @@ class MdlLoader:
         node.position = position
         node.orientation = orientation
         node.fromRoot = node.fromRoot @ Matrix.Translation(Vector(position)) @ Quaternion(orientation).to_matrix().to_4x4()
+
+        self.model.add_node(node)
 
         if type_flags & NODE_LIGHT:
             flare_radius = self.mdl.get_float()
