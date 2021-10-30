@@ -18,8 +18,6 @@
 
 import collections
 
-import bpy
-
 from ....exception.malformedmdl import MalformedMdl
 
 from .... import defines, utils
@@ -32,7 +30,7 @@ class Animation():
         self.name      = name
         self.length    = 1.0
         self.transtime = 1.0
-        self.root      = defines.null
+        self.animroot  = defines.null
         self.eventList = []
         self.nodeList  = collections.OrderedDict()
 
@@ -115,9 +113,9 @@ class Animation():
                 self.transtime = float(line[1])
             elif (label == "animroot"):
                 try:
-                    self.root = line[1]
+                    self.animroot = line[1]
                 except:
-                    self.root = "undefined"
+                    self.animroot = "undefined"
             elif (label == "event"):
                 self.add_event((float(line[1]), line[2]))
             elif (label == "eventlist"):
@@ -230,7 +228,7 @@ class Animation():
         self.name      = animRootDummy.kb.animname
         self.length    = utils.frame2nwtime(animScene.frame_end, animScene.render.fps)
         self.transtime = animRootDummy.kb.transtime
-        self.root      = animRootDummy.kb.animroot
+        self.animroot  = animRootDummy.kb.animroot
 
         asciiLines.append("newanim " + self.name + " " + mdlName)
         asciiLines.append("  length " + str(round(self.length, 5)))
