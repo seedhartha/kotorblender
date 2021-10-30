@@ -23,7 +23,7 @@ from math import sqrt
 from mathutils import Matrix, Quaternion, Vector
 
 from ...defines import Classification, Nodetype
-from ...exception.malformedmdl import MalformedMdl
+from ...exception.malformedfile import MalformedFile
 from ...exception.mdxnotfound import MdxNotFound
 from ...scene.animation import Animation
 from ...scene.animnode import AnimationNode
@@ -267,7 +267,7 @@ class MdlLoader:
 
     def load_file_header(self):
         if self.mdl.get_uint32() != 0:
-            raise MalformedMdl("Invalid MDL signature")
+            raise MalformedFile("Invalid MDL signature")
         self.mdl_size = self.mdl.get_uint32()
         self.mdx_size = self.mdl.get_uint32()
 
@@ -284,7 +284,7 @@ class MdlLoader:
 
         self.model_type = self.mdl.get_uint8()
         if self.model_type != 2:
-            raise MalformedMdl("Invalid model type: expected=2, actual={}".format(self.model_type))
+            raise MalformedFile("Invalid model type: expected=2, actual={}".format(self.model_type))
 
         self.mdl.skip(3) # padding
 
@@ -307,7 +307,7 @@ class MdlLoader:
 
         mdx_size = self.mdl.get_uint32()
         if mdx_size != self.mdx_size:
-            raise MalformedMdl("MDX size mismatch: expected={}, actual={}".format(self.mdx_size, mdx_size))
+            raise MalformedFile("MDX size mismatch: expected={}, actual={}".format(self.mdx_size, mdx_size))
 
         mdx_offset = self.mdl.get_uint32()
         self.name_arr = self.get_array_def()
@@ -315,7 +315,7 @@ class MdlLoader:
         try:
             self.model.classification = CLASS_BY_VALUE[classification]
         except KeyError:
-            raise MalformedMdl("Invalid classification: " + str(classification))
+            raise MalformedFile("Invalid classification: " + str(classification))
         self.model.unknownC1 = subclassification
         self.model.supermodel = supermodel_name
         self.model.animscale = scale
@@ -794,7 +794,7 @@ class MdlLoader:
         if controller_arr.count > 0:
             supernode = next((node for node in self.model.nodeDict.values() if node.supernodeNumber == supernode_number), None)
             if not supernode:
-                raise MalformedMdl("Model node not found for animation node: " + str(name))
+                raise MalformedFile("Model node not found for animation node: " + str(name))
             base_position = supernode.position
             controllers = self.load_controllers(controller_arr, controller_data_arr)
             if CTRL_BASE_POSITION in controllers:
@@ -921,7 +921,7 @@ class MdlLoader:
         try:
             return switch[node_type](name)
         except KeyError:
-            raise MalformedMdl("Invalid node type")
+            raise MalformedFile("Invalid node type")
 
     def position_controller_to_vector(self, values, base_position):
         return [
@@ -946,13 +946,13 @@ class MdlLoader:
                 w = 0.0
             return [w, x, y, z]
         else:
-            raise MalformedMdl("Unsupported number of orientation columns: " + str(num_columns))
+            raise MalformedFile("Unsupported number of orientation columns: " + str(num_columns))
 
     def get_array_def(self):
         offset = self.mdl.get_uint32()
         count1 = self.mdl.get_uint32()
         count2 = self.mdl.get_uint32()
         if count1 != count2:
-            raise MalformedMdl("Array count mismatch: count1={}, count2={}".format(count1, count2))
+            raise MalformedFile("Array count mismatch: count1={}, count2={}".format(count1, count2))
 
         return ArrayDefinition(offset, count1)

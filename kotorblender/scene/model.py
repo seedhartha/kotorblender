@@ -20,7 +20,7 @@ import collections
 
 import bpy
 
-from ..exception.malformedmdl import MalformedMdl
+from ..exception.malformedfile import MalformedFile
 
 from .. import defines, glob, utils
 
@@ -90,7 +90,7 @@ class Model:
                 obj.kb.imporder = objIdx
                 objIdx += 1
             else:
-                raise MalformedMdl("First node has to be a dummy without a parent.")
+                raise MalformedFile("First node has to be a dummy without a parent.")
 
             for (_, node) in it:
                 obj = node.add_to_collection(collection)
@@ -104,7 +104,7 @@ class Model:
 
                 if (utils.is_null(node.parentName)):
                     # Node without parent and not the mdl root.
-                    raise MalformedMdl(node.name + " has no parent.")
+                    raise MalformedFile(node.name + " has no parent.")
                 else:
                     # Check if such an object exists
                     if obj.parent is not None:
@@ -141,7 +141,7 @@ class Model:
                                 break
                         # Node with invalid parent.
                         if not found:
-                            raise MalformedMdl(node.name + " has no parent " + node.parentName)
+                            raise MalformedFile(node.name + " has no parent " + node.parentName)
 
         # Import the walkmesh, it will use any placeholder dummies just imported,
         # and the walkmesh nodes will be copied during animation import
