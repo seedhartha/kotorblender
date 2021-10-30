@@ -62,7 +62,7 @@ bl_info = {
     "version": (2, 1, 0),
     "blender": (2, 80, 0),
     "location": "File > Import-Export, Object Properties",
-    "description": "Import, export and edit Odyssey (KotOR) ASCII MDL format",
+    "description": "Import, export and edit Odyssey Engine models (KotOR)",
     "warning": "cannot be used with NeverBlender enabled",
     "wiki_url": ""
                 "",
