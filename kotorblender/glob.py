@@ -27,7 +27,6 @@ texturePath   = ""
 textureSearch = False
 
 createArmature = False
-preferBinary = False
 
 # Export
 exportSmoothGroups = True

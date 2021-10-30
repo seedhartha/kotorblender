@@ -190,8 +190,6 @@ class EmitterNode(GeometryNode):
         self.colorstart = (1.0, 1.0, 1.0)
         self.colormid = (1.0, 1.0, 1.0)
         self.colorend = (1.0, 1.0, 1.0)
-        # unidentified stuff
-        self.rawascii = ""
 
     def add_to_collection(self, collection):
         mesh = self.create_mesh(self.name)
