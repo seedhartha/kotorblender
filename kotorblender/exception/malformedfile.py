@@ -16,7 +16,7 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-class MalformedMdl(Exception):
+class MalformedFile(Exception):
     def __init__(self, message):
         self.message = message
 

@@ -16,7 +16,7 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-from ...exception.malformedbwm import MalformedBwm
+from ...exception.malformedfile import MalformedFile
 from ...scene.roomwalkmesh import RoomWalkmesh
 from ...scene.walkmesh import Walkmesh
 
@@ -67,7 +67,7 @@ class BwmLoader:
     def load_header(self):
         file_type = self.bwm.get_string(4)
         if file_type != "BWM ":
-            raise MalformedBwm("BWM file type is invalid: expected='BWM ', actual='{}'".format(file_type))
+            raise MalformedFile("BWM file type is invalid: expected='BWM ', actual='{}'".format(file_type))
 
         version = self.bwm.get_string(4)
         type = self.bwm.get_uint32()

@@ -18,7 +18,7 @@
 
 import bpy
 
-from ..exception.malformedmdl import MalformedMdl
+from ..exception.malformedfile import MalformedFile
 
 from .. import defines, utils
 
@@ -136,4 +136,4 @@ class Walkmesh(Model):
                     obj.matrix_parent_inverse = obj.parent.matrix_world.inverted()
                 else:
                     # Node with invalid parent.
-                    raise MalformedMdl(node.name + " has no parent " + node.parentName)
+                    raise MalformedFile(node.name + " has no parent " + node.parentName)
