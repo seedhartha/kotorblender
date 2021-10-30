@@ -31,8 +31,34 @@ class AabbNode(TrimeshNode):
     def __init__(self, name="UNNAMED"):
         TrimeshNode.__init__(self, name)
         self.nodetype = "aabb"
-
         self.meshtype = defines.Meshtype.AABB
+        self.roomlinks = []
+        self.lytposition = (0.0, 0.0, 0.0)
+
+    def compute_lyt_position(self, wok_geom):
+        wok_vert = Vector(wok_geom.verts[wok_geom.facelist.faces[0][0]])
+        wok_mat_id = wok_geom.facelist.matId[0]
+        for i in range(len(self.facelist.faces)):
+            mdl_mat_id = self.facelist.matId[i]
+            if mdl_mat_id == wok_mat_id:
+                mdl_vert = self.verts[self.facelist.faces[i][0]]
+                mdl_vert_from_root = self.from_root @ Vector(mdl_vert)
+                self.lytposition = wok_vert - mdl_vert_from_root
+                break
+
+    def compute_room_links(self, wok_geom, outer_edges):
+        for edge in outer_edges:
+            if edge[1] == 0xffffffff:
+                continue
+            wok_face = wok_geom.facelist.faces[edge[0] // 3]
+            wok_verts = [wok_geom.verts[idx] for idx in wok_face]
+            for face_idx, mdl_vert_indices in enumerate(self.facelist.faces):
+                mdl_verts = [self.verts[idx] for idx in mdl_vert_indices]
+                mdl_verts_from_root = [self.from_root @ Vector(vert) for vert in mdl_verts]
+                mdl_verts_lyt_space = [vert + self.lytposition for vert in mdl_verts_from_root]
+                if all([utils.isclose_3f(wok_verts[i], mdl_verts_lyt_space[i]) for i in range(3)]):
+                    self.roomlinks.append((3 * face_idx + (edge[0] % 3), edge[1]))
+                    break
 
     def add_to_collection(self, collection):
         mesh = self.create_mesh(self.name)
@@ -90,29 +116,29 @@ class AabbNode(TrimeshNode):
         mesh.update()
         return mesh
 
-    def compute_lyt_position(self, wok_geom):
-        self.lytposition = [0.0] * 3
-        wok_vert = Vector(wok_geom.verts[wok_geom.facelist.faces[0][0]])
-        wok_mat_id = wok_geom.facelist.matId[0]
-        for i in range(len(self.facelist.faces)):
-            mdl_mat_id = self.facelist.matId[i]
-            if mdl_mat_id == wok_mat_id:
-                mdl_vert = self.verts[self.facelist.faces[i][0]]
-                mdl_vert_from_root = self.from_root @ Vector(mdl_vert)
-                self.lytposition = wok_vert - mdl_vert_from_root
-                break
+    def set_object_data(self, obj):
+        TrimeshNode.set_object_data(self, obj)
 
-    def compute_room_links(self, wok_geom, outer_edges):
-        self.roomlinks = []
-        for edge in outer_edges:
-            if edge[1] == 0xffffffff:
-                continue
-            wok_face = wok_geom.facelist.faces[edge[0] // 3]
-            wok_verts = [wok_geom.verts[idx] for idx in wok_face]
-            for face_idx, mdl_vert_indices in enumerate(self.facelist.faces):
-                mdl_verts = [self.verts[idx] for idx in mdl_vert_indices]
-                mdl_verts_from_root = [self.from_root @ Vector(vert) for vert in mdl_verts]
-                mdl_verts_lyt_space = [vert + self.lytposition for vert in mdl_verts_from_root]
-                if all([utils.isclose_3f(wok_verts[i], mdl_verts_lyt_space[i]) for i in range(3)]):
-                    self.roomlinks.append((3 * face_idx + (edge[0] % 3), edge[1]))
-                    break
+        obj.kb.lytposition = self.lytposition
+
+    def set_room_links(self, mesh):
+        if not "RoomLinks" in mesh.vertex_colors:
+            room_vert_colors = mesh.vertex_colors.new(name="RoomLinks")
+        else:
+            room_vert_colors = mesh.vertex_colors["RoomLinks"]
+        for link in self.roomlinks:
+            face_idx = int(link[0] / 3)
+            edge_idx = link[0] % 3
+            room_color = [0.0 / 255, (200 + link[1]) / 255.0, 0.0 / 255]
+            real_idx = 0
+            for polyglon_idx, polygon in enumerate(mesh.polygons):
+                if polygon.material_index not in defines.WkmMaterial.NONWALKABLE:
+                    if real_idx == face_idx:
+                        face_idx = polyglon_idx
+                        break
+                    else:
+                        real_idx += 1
+            face = mesh.polygons[face_idx]
+            for vert_idx, loop_idx in zip(face.vertices, face.loop_indices):
+                if vert_idx in face.edge_keys[edge_idx]:
+                    room_vert_colors.data[loop_idx].color = [*room_color, 1.0]

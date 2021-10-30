@@ -72,8 +72,6 @@ class TrimeshNode(GeometryNode):
         self.tverts = []  # list of texture vertices
         self.tverts1 = []  # list of texture vertices
         self.texindices1 = []  # list of texture vertex indices
-        self.roomlinks = []  # walkmesh only
-        self.lytposition = (0.0, 0.0, 0.0)
 
     def add_to_collection(self, collection):
         mesh = self.create_mesh(self.name)
@@ -164,27 +162,3 @@ class TrimeshNode(GeometryNode):
         obj.kb.selfillumcolor = self.selfillumcolor
         obj.kb.diffuse = self.diffuse
         obj.kb.ambient = self.ambient
-        obj.kb.lytposition = self.lytposition
-
-    def set_room_links(self, mesh, skipNonWalkable=True):
-        if not "RoomLinks" in mesh.vertex_colors:
-            room_vert_colors = mesh.vertex_colors.new(name="RoomLinks")
-        else:
-            room_vert_colors = mesh.vertex_colors["RoomLinks"]
-        for link in self.roomlinks:
-            # edge indices don't really match up, but face order does
-            faceIdx = int(link[0] / 3)
-            edgeIdx = link[0] % 3
-            room_color = [0.0 / 255, (200 + link[1]) / 255.0, 0.0 / 255]
-            realIdx = 0
-            for face_idx, face in enumerate(mesh.polygons):
-                if skipNonWalkable and (face.material_index not in defines.WkmMaterial.NONWALKABLE):
-                    if realIdx == faceIdx:
-                        faceIdx = face_idx
-                        break
-                    else:
-                        realIdx += 1
-            face = mesh.polygons[faceIdx]
-            for vert_idx, loop_idx in zip(face.vertices, face.loop_indices):
-                if vert_idx in face.edge_keys[edgeIdx]:
-                    room_vert_colors.data[loop_idx].color = [*room_color, 1.0]
