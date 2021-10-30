@@ -73,42 +73,41 @@ def load_lyt(
 
 
 def do_load_mdl(filepath, position = (0.0, 0.0, 0.0)):
+    collection = bpy.context.collection
+
     mdl = MdlLoader(filepath)
     model = mdl.load()
     walkmesh = None
 
-    wok_path = filepath[:-4] + ".wok"
-    if os.path.exists(wok_path):
-        bwm = BwmLoader(wok_path)
-        walkmesh = bwm.load()
+    if glob.importWalkmeshes:
+        wok_path = filepath[:-4] + ".wok"
+        if os.path.exists(wok_path):
+            wok = BwmLoader(wok_path)
+            walkmesh = wok.load()
 
-    pwk_path = filepath[:-4] + ".pwk"
-    if os.path.exists(pwk_path):
-        bwm = BwmLoader(pwk_path)
-        bwm.load()
+        pwk_path = filepath[:-4] + ".pwk"
+        if os.path.exists(pwk_path):
+            pwk = BwmLoader(pwk_path)
+            walkmesh = pwk.load()
 
-    dwk0_path = filepath[:-4] + "0.dwk"
-    if os.path.exists(dwk0_path):
-        bwm = BwmLoader(dwk0_path)
-        bwm.load()
+        dwk0_path = filepath[:-4] + "0.dwk"
+        dwk1_path = filepath[:-4] + "1.dwk"
+        dwk2_path = filepath[:-4] + "2.dwk"
+        if os.path.exists(dwk0_path) and os.path.exists(dwk1_path) and os.path.exists(dwk2_path):
+            dwk1 = BwmLoader(dwk0_path)
+            dwk2 = BwmLoader(dwk1_path)
+            dwk3 = BwmLoader(dwk2_path)
+            walkmesh1 = dwk1.load()
+            walkmesh2 = dwk2.load()
+            walkmesh3 = dwk3.load()
 
-    dwk1_path = filepath[:-4] + "1.dwk"
-    if os.path.exists(dwk1_path):
-        bwm = BwmLoader(dwk1_path)
-        bwm.load()
-
-    dwk2_path = filepath[:-4] + "2.dwk"
-    if os.path.exists(dwk2_path):
-        bwm = BwmLoader(dwk2_path)
-        bwm.load()
-
-    model.import_to_collection(bpy.context.collection, None, position)
+    model.import_to_collection(collection, position)
 
     if isinstance(walkmesh, RoomWalkmesh):
         aabb = next((node for node in model.nodeDict.values() if isinstance(node, AabbNode)), None)
         if aabb:
             aabb.roomlinks = compute_room_links(aabb, walkmesh)
-            aabb.set_room_links(bpy.context.collection.objects[aabb.name].data)
+            aabb.set_room_links(collection.objects[aabb.name].data)
 
     return {'FINISHED'}
 
