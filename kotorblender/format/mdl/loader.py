@@ -20,6 +20,8 @@ import os
 
 from math import sqrt
 
+from mathutils import Matrix, Quaternion, Vector
+
 from ...defines import Classification, Nodetype
 from ...exception.malformedmdl import MalformedMdl
 from ...exception.mdxnotfound import MdxNotFound
@@ -351,10 +353,12 @@ class MdlLoader:
 
         if parent:
             node.parentName = parent.name
+            node.fromRoot = parent.fromRoot
 
         node.supernodeNumber = supernode_number
         node.position = position
         node.orientation = orientation
+        node.fromRoot = node.fromRoot @ Matrix.Translation(Vector(position)) @ Quaternion(orientation).to_matrix().to_4x4()
 
         if type_flags & NODE_LIGHT:
             flare_radius = self.mdl.get_float()

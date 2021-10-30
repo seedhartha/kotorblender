@@ -33,6 +33,10 @@ class Walkmesh(Model):
 
         self.walkmeshType = wkmType
 
+        self.verts = []
+        self.faces = []
+        self.outerEdges = []
+
     def import_to_collection(self, collection):
         if self.nodeDict:
             # Walkmeshes have no rootdummys. We need to create one ourselves
