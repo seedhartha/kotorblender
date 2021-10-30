@@ -65,7 +65,7 @@ class Model:
 
     def import_to_collection(self, collection, position=(0.0, 0.0, 0.0)):
         mdl_root = None
-        objIdx = 0
+        obj_idx = 0
         if self.node_dict:
             it = iter(self.node_dict.items())
 
@@ -86,15 +86,15 @@ class Model:
                 obj.kb.animscale = self.animscale
                 mdl_root = obj
 
-                obj.kb.imporder = objIdx
-                objIdx += 1
+                obj.kb.imporder = obj_idx
+                obj_idx += 1
             else:
                 raise MalformedFile("First node has to be a dummy without a parent.")
 
             for (_, node) in it:
                 obj = node.add_to_collection(collection)
-                obj.kb.imporder = objIdx
-                objIdx += 1
+                obj.kb.imporder = obj_idx
+                obj_idx += 1
 
                 if (utils.is_null(node.parent_name)):
                     # Node without parent and not the mdl root.

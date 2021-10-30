@@ -23,6 +23,3 @@ class AreaWalkmesh(Walkmesh):
 
     def __init__(self):
         Walkmesh.__init__(self, "wok")
-
-    def import_to_collection(self, model_name, collection):
-        pass

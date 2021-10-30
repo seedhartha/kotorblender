@@ -33,10 +33,9 @@ class DummyNode(GeometryNode):
         GeometryNode.set_object_data(self, obj)
 
         obj.kb.dummytype = self.dummytype
-
         obj.kb.dummysubtype = defines.DummySubtype.NONE
-        subtypes = defines.DummySubtype.SUFFIX_LIST
-        for element in subtypes:
+
+        for element in defines.DummySubtype.SUFFIX_LIST:
             if self.name.endswith(element[0]):
                 obj.kb.dummysubtype = element[1]
                 break
