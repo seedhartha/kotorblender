@@ -17,8 +17,13 @@
 # ##### END GPL LICENSE BLOCK #####
 
 from ...exception.malformedbwm import MalformedBwm
+from ...scene.roomwalkmesh import RoomWalkmesh
+from ...scene.walkmesh import Walkmesh
 
 from ..binreader import BinaryReader
+
+WALKMESH_TYPE_PLACEABLE = 0
+WALKMESH_TYPE_ROOM = 1
 
 
 class Face:
@@ -57,6 +62,8 @@ class BwmLoader:
         self.load_outer_edges()
         self.load_perimeters()
 
+        return self.walkmesh
+
     def load_header(self):
         file_type = self.bwm.get_string(4)
         if file_type != "BWM ":
@@ -67,7 +74,7 @@ class BwmLoader:
         rel_use_vec1 = [self.bwm.get_float() for _ in range(3)]
         rel_use_vec2 = [self.bwm.get_float() for _ in range(3)]
         abs_use_vec1 = [self.bwm.get_float() for _ in range(3)]
-        abs_use_vec1 = [self.bwm.get_float() for _ in range(3)]
+        abs_use_vec2 = [self.bwm.get_float() for _ in range(3)]
         position = [self.bwm.get_float() for _ in range(3)]
         self.num_verts = self.bwm.get_uint32()
         self.off_verts = self.bwm.get_uint32()
@@ -86,12 +93,16 @@ class BwmLoader:
         self.num_perimeters = self.bwm.get_uint32()
         self.off_perimeters = self.bwm.get_uint32()
 
+        if type == WALKMESH_TYPE_PLACEABLE:
+            self.walkmesh = Walkmesh()
+        else:
+            self.walkmesh = RoomWalkmesh()
+
     def load_vertices(self):
-        self.verts = []
         self.bwm.seek(self.off_verts)
         for _ in range(self.num_verts):
             vert = [self.bwm.get_float() for _ in range(3)]
-            self.verts.append(vert)
+            self.walkmesh.verts.append(vert)
 
     def load_faces(self):
         vert_indices = []
@@ -111,7 +122,7 @@ class BwmLoader:
         self.bwm.seek(self.off_distances)
         distances = [self.bwm.get_float() for _ in range(self.num_faces)]
 
-        self.faces = [Face(vert_indices[i], material_ids[i], normals[i], distances[i]) for i in range(self.num_faces)]
+        self.walkmesh.faces = [Face(vert_indices[i], material_ids[i], normals[i], distances[i]) for i in range(self.num_faces)]
 
     def load_aabbs(self):
         self.aabbs = []
@@ -128,15 +139,14 @@ class BwmLoader:
     def load_adjacent_edges(self):
         self.bwm.seek(self.off_adj_edges)
         for i in range(self.num_adj_edges):
-            self.faces[i].adj_edges = [self.bwm.get_int32() for _ in range(3)]
+            self.walkmesh.faces[i].adj_edges = [self.bwm.get_int32() for _ in range(3)]
 
     def load_outer_edges(self):
-        self.outer_edges = []
         self.bwm.seek(self.off_outer_edges)
         for _ in range(self.num_outer_edges):
             index = self.bwm.get_uint32()
             transition = self.bwm.get_uint32()
-            self.outer_edges.append((index, transition))
+            self.walkmesh.outerEdges.append((index, transition))
 
     def load_perimeters(self):
         self.bwm.seek(self.off_perimeters)

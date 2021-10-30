@@ -21,9 +21,13 @@ import re
 
 import bpy
 
+from mathutils import Vector
+
 from .format.bwm.loader import BwmLoader
-from .format.mdl.loader import MdlLoader
 from .format.mdl.ascii import (mdl as mdlformat)
+from .format.mdl.loader import MdlLoader
+from .scene.modelnode.aabb import AabbNode
+from .scene.roomwalkmesh import RoomWalkmesh
 
 from . import defines, glob, utils
 
@@ -194,7 +198,7 @@ def do_load_mdl(filepath, position = (0.0, 0.0, 0.0)):
     wok_path = filepath[:-4] + ".wok"
     if os.path.exists(wok_path):
         bwm = BwmLoader(wok_path)
-        bwm.load()
+        walkmesh = bwm.load()
 
     pwk_path = filepath[:-4] + ".pwk"
     if os.path.exists(pwk_path):
@@ -217,6 +221,11 @@ def do_load_mdl(filepath, position = (0.0, 0.0, 0.0)):
         bwm.load()
 
     model.import_to_collection(bpy.context.collection, None, position)
+
+    if isinstance(walkmesh, RoomWalkmesh):
+        aabb = next(node for node in model.nodeDict.values() if isinstance(node, AabbNode))
+        aabb.roomlinks = compute_room_links(aabb, walkmesh)
+        aabb.set_room_links(bpy.context.collection.objects[aabb.name].data)
 
     return {'FINISHED'}
 
@@ -331,3 +340,32 @@ def do_load_lyt(filepath):
                 do_load_mdl(mdl_path, room[1:])
         else:
             print("KotorBlender: WARNING - room model not found: " + mdl_path)
+
+def compute_room_links(aabb, walkmesh):
+    lyt_position = Vector()
+    first_wok_face = walkmesh.faces[0]
+    for i in range(len(aabb.facelist.faces)):
+        mdl_mat_id = aabb.facelist.matId[i]
+        if mdl_mat_id == first_wok_face.material_id:
+            first_mdl_vert = aabb.verts[aabb.facelist.faces[i][0]]
+            first_mdl_vert_from_root = aabb.fromRoot @ Vector(first_mdl_vert)
+            first_wok_vert = Vector(walkmesh.verts[first_wok_face.vert_indices[0]])
+            lyt_position = first_wok_vert - first_mdl_vert_from_root
+            break
+
+    room_links = []
+
+    for edge in walkmesh.outerEdges:
+        if edge[1] == 0xffffffff:
+            continue
+        wok_face = walkmesh.faces[edge[0] // 3]
+        wok_verts = [walkmesh.verts[idx] for idx in wok_face.vert_indices]
+        for face_idx, mdl_vert_indices in enumerate(aabb.facelist.faces):
+            mdl_verts = [aabb.verts[idx] for idx in mdl_vert_indices]
+            mdl_verts_from_root = [aabb.fromRoot @ Vector(vert) for vert in mdl_verts]
+            mdl_verts_lyt_space = [vert + lyt_position for vert in mdl_verts_from_root]
+            if all([utils.isclose_3f(wok_verts[i], mdl_verts_lyt_space[i]) for i in range(3)]):
+                room_links.append((3 * face_idx + (edge[0] % 3), edge[1]))
+                break
+
+    return room_links

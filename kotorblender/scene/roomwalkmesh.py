@@ -31,5 +31,9 @@ class RoomWalkmesh(Walkmesh):
         self.walkmeshType   = "wok"
         self.classification = defines.Classification.UNKNOWN
 
+        self.verts = []
+        self.faces = []
+        self.outerEdges = []
+
     def import_to_collection(self, collection):
         pass

@@ -18,7 +18,7 @@
 
 import bpy
 
-from mathutils import Quaternion
+from mathutils import Matrix, Quaternion
 
 from ... import defines
 
@@ -37,6 +37,8 @@ class GeometryNode:
         self.orientation = (1.0, 0.0, 0.0, 0.0)
         self.scale       = 1.0
         self.wirecolor   = (0.0, 0.0, 0.0)
+
+        self.fromRoot = Matrix()
 
         self.objref = ""
         self.rawascii = "" # unprocessed directives
