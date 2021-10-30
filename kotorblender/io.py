@@ -110,9 +110,10 @@ def do_load_mdl(filepath, position = (0.0, 0.0, 0.0)):
     model.import_to_collection(bpy.context.collection, None, position)
 
     if isinstance(walkmesh, RoomWalkmesh):
-        aabb = next(node for node in model.nodeDict.values() if isinstance(node, AabbNode))
-        aabb.roomlinks = compute_room_links(aabb, walkmesh)
-        aabb.set_room_links(bpy.context.collection.objects[aabb.name].data)
+        aabb = next((node for node in model.nodeDict.values() if isinstance(node, AabbNode)), None)
+        if aabb:
+            aabb.roomlinks = compute_room_links(aabb, walkmesh)
+            aabb.set_room_links(bpy.context.collection.objects[aabb.name].data)
 
     return {'FINISHED'}
 
