@@ -25,8 +25,6 @@ anim_globstart = 1
 # Offset between two imported animations (minimum)
 anim_offset = 60
 fps = 30
-shagrPrefix    = "shadegr."
-animdataPrefix = "anim."
 wok_materials = [ ["wok_NotDefined"    , (0.400, 0.400, 0.400), 0.0], \
                   ["wok_Dirt"          , (0.610, 0.235, 0.050), 0.0], \
                   ["wok_Obscuring"     , (0.100, 0.100, 0.100), 0.5], \

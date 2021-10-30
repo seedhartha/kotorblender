@@ -38,23 +38,6 @@ def isclose_3f(a, b, rel_tol=0.1):
             isclose(a[2], b[2], rel_tol))
 
 
-def is_number(s):
-    try:
-        float(s)
-    except ValueError:
-        return False
-    else:
-        return True
-
-
-def get_name(s):
-    """
-    To be able to switch to case sensitive and back
-    Still not certain mdl node names are case sensitive
-    """
-    return s
-
-
 def get_real_name(s):
     """
     Do a case insensitive search through existing objects,
@@ -103,41 +86,8 @@ def search_node_all(obj, test):
     return nodes
 
 
-def search_node_in_model(obj, test):
-    """
-    Helper to search through entire model from any starting point in hierarchy;
-    walks up to model root and performs find-one search.
-    """
-    return search_node(ancestor_node(obj, is_root_dummy), test)
-
-
 def is_root_dummy(obj, dummytype = defines.Dummytype.MDLROOT):
     return obj and (obj.type == 'EMPTY') and (obj.kb.dummytype == dummytype)
-
-
-def get_node_type(obj):
-    """
-    Get the node type (dummy, trimesh, skin, ...) of the blender object
-    """
-    objType  = obj.type
-    if objType == 'EMPTY':
-        if obj.kb.dummytype == defines.Dummytype.REFERENCE:
-            return "reference"
-    elif objType == 'MESH':
-        if   obj.kb.meshtype == defines.Meshtype.TRIMESH:
-            return "trimesh"
-        elif obj.kb.meshtype == defines.Meshtype.DANGLYMESH:
-            return "danglymesh"
-        elif obj.kb.meshtype == defines.Meshtype.SKIN:
-            return "skin"
-        elif obj.kb.meshtype == defines.Meshtype.EMITTER:
-            return "emitter"
-        elif obj.kb.meshtype == defines.Meshtype.AABB:
-            return "aabb"
-    elif objType == 'LIGHT':
-        return "light"
-
-    return "dummy"
 
 
 def get_children_recursive(obj, obj_list):
@@ -150,30 +100,6 @@ def get_children_recursive(obj, obj_list):
 
 def get_mdl_root_from_object(obj):
     return ancestor_node(obj, is_root_dummy)
-
-
-def get_mdl_root_from_context():
-    """
-    Method to find the best MDL root dummy based on user intent
-    """
-    # 1. Search first selected object, if any
-    if bpy.context.selected_objects:
-        obj = bpy.context.selected_objects[0]
-        match = get_mdl_root_from_object(obj)
-        if match:
-            return match
-
-    # 2. Search Empty objects in the current collection
-    matches = [o for o in bpy.context.collection.objects if is_root_dummy(o)]
-    if matches:
-        return matches[0]
-
-    # 3. Search all Empty objects
-    matches = [m for m in bpy.data.objects if is_root_dummy(m)]
-    if matches:
-        return matches[0]
-
-    return None
 
 
 def get_fcurve(action, data_path, index=0, group_name=None):
@@ -243,92 +169,11 @@ def create_anim_list_item(mdl_base, check_keyframes=False):
     return anim
 
 
-def str2identifier(s):
-    """Convert to lower case. Convert 'null' to empty string."""
-    if (not s or s.lower() == defines.null):
-        return ""
-    return s.lower()
-
-
-def toggle_anim_focus(scene, mdl_base):
-    """Set the Start and end frames of the timeline."""
-    animList = mdl_base.kb.animList
-    animIdx = mdl_base.kb.animListIdx
-
-    anim = animList[animIdx]
-    if (scene.frame_start == anim.frameStart) and \
-       (scene.frame_end == anim.frameEnd):
-        # Set timeline to include all current
-        scene.frame_start = 1
-        lastFrame = 1
-        for anim in animList:
-            if lastFrame < anim.frameEnd:
-                lastFrame = anim.frameEnd
-        scene.frame_end = lastFrame
-    else:
-        # Set timeline to the current animation
-        scene.frame_start = anim.frameStart
-        scene.frame_end = anim.frameEnd
-    scene.frame_current = scene.frame_start
-
-
-def check_anim_bounds(mdl_base):
-    """
-    Check for animations of this mdl base.
-
-    Returns true, if are non-overlapping and only use by one object.
-    """
-    if len(mdl_base.kb.animList) < 2:
-        return True
-    # TODO: use an interval tree
-    animBounds = [(a.frameStart, a.frameEnd, idx) for idx, a in
-                  enumerate(mdl_base.kb.animList)]
-    for a1 in animBounds:
-        for a2 in animBounds:
-            if (a1[0] <= a2[1]) and (a2[0] <= a1[1]) and (a1[2] != a2[2]):
-                return False
-    return True
-
-
-def chunker(seq, size):
-    return (seq[pos:pos + size] for pos in range(0, len(seq), size))
-
-
-def get_aurora_rot_from_object(obj):
-    q = obj.rotation_quaternion
-    return [q.axis[0], q.axis[1], q.axis[2], q.angle]
-
-
-def get_aurora_scale(obj):
-    """
-    If the scale is uniform, i.e, x=y=z, we will return
-    the value. Else we'll return 1.
-    """
-    scale = obj.scale
-    if (scale[0] == scale[1] == scale[2]):
-        return scale[0]
-
-    return 1.0
-
-
 def nwtime2frame(time, fps = defines.fps):
     """
     For animations: Convert key time to frame number
     """
     return round(fps*time)
-
-
-def frame2nwtime(frame, fps = defines.fps):
-    return round(frame / fps, 7)
-
-
-def quat2nwangle(quatValues):
-    quat = Quaternion(quatValues)
-    return [quat.axis[0], quat.axis[1], quat.axis[2], quat.angle]
-
-
-def nwangle2quat(values):
-    return Quaternion(values[0:3], values[3])
 
 
 def float_to_byte(val):
