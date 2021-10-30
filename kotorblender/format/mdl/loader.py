@@ -792,7 +792,7 @@ class MdlLoader:
         anim.nodes.append(node)
 
         if controller_arr.count > 0:
-            supernode = next(node for node in self.model.nodeDict.values() if node.supernodeNumber == supernode_number)
+            supernode = next((node for node in self.model.nodeDict.values() if node.supernodeNumber == supernode_number), None)
             if not supernode:
                 raise MalformedMdl("Model node not found for animation node: " + str(name))
             base_position = supernode.position

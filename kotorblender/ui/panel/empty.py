@@ -66,22 +66,6 @@ class KB_PT_empty(bpy.types.Panel):
             box.operator("kb.recreate_armature")
             layout.separator()
 
-            # All Children Settings Helper
-            row = layout.row()
-            box = row.box()
-            box.label(text="Child Node Settings")
-            row = box.row()
-            row.label(text="Smoothgroups")
-            row = box.row()
-            op = row.operator("kb.children_smoothgroup", text="Direct")
-            op.action = "DRCT"
-            op = row.operator("kb.children_smoothgroup", text="Auto")
-            op.action = "AUTO"
-            op = row.operator("kb.children_smoothgroup", text="Single")
-            op.action = "SING"
-            op = row.operator("kb.children_smoothgroup", text="Separate")
-            op.action = "SEPR"
-
         elif (obj.kb.dummytype == defines.Dummytype.PWKROOT):
             pass
 

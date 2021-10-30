@@ -45,20 +45,12 @@ from .ops.pth.importop import KB_OT_import_path
 from .ops.pth.removeconnection import KB_OT_remove_connection
 from .ops.rebuildmaterialnodes import KB_OT_rebuild_material_nodes
 from .ops.recreatearmature import KB_OT_recreate_armature
-from .ops.smoothgroup.children import KB_OT_children_smoothgroup
-from .ops.smoothgroup.generate import KB_OT_generate_smoothgroup
-from .ops.smoothgroup.select import KB_OT_select_smoothgroup
-from .ops.smoothgroup.toggle import KB_OT_toggle_smoothgroup
-from .ops.txi.textureboxops import KB_OT_texture_box_ops
-from .ops.txi.textureio import KB_OT_texture_io
-from .ops.txi.textureops import KB_OT_texture_ops
 from .props.anim import AnimPropertyGroup
 from .props.animevent import AnimEventPropertyGroup
 from .props.flare import FlarePropertyGroup
 from .props.listitem import ListItemPropertyGroup
 from .props.object import ObjectPropertyGroup
 from .props.pathconnection import PathConnectionPropertyGroup
-from .props.texture import TexturePropertyGroup
 from .ui.list.animevents import KB_UL_anim_events
 from .ui.list.anims import KB_UL_anims
 from .ui.list.lightflares import KB_UL_lightflares
@@ -70,8 +62,6 @@ from .ui.panel.empty import KB_PT_empty
 from .ui.panel.light import KB_PT_light
 from .ui.panel.mesh import KB_PT_mesh
 from .ui.panel.pathpoint import KB_PT_path_point
-from .ui.panel.smoothgroups import KB_PT_smoothgroups
-from .ui.panel.texture import KB_PT_texture
 
 bl_info = {
     "name": "KotorBlender",
@@ -120,12 +110,10 @@ classes = (
     AnimPropertyGroup,
     FlarePropertyGroup,
     ObjectPropertyGroup,
-    TexturePropertyGroup,
 
     # Operators
 
     KB_OT_add_connection,
-    KB_OT_children_smoothgroup,
     KB_OT_anim_clone,
     KB_OT_anim_crop,
     KB_OT_anim_event_delete,
@@ -135,7 +123,6 @@ classes = (
     KB_OT_export_mdl,
     KB_OT_export_path,
     KB_OT_anim_focus,
-    KB_OT_generate_smoothgroup,
     KB_OT_import_lyt,
     KB_OT_import_mdl,
     KB_OT_import_path,
@@ -153,11 +140,6 @@ classes = (
     KB_OT_anim_pad,
     KB_OT_remove_connection,
     KB_OT_anim_scale,
-    KB_OT_select_smoothgroup,
-    KB_OT_texture_box_ops,
-    KB_OT_texture_io,
-    KB_OT_texture_ops,
-    KB_OT_toggle_smoothgroup,
 
     # Panels
 
@@ -167,8 +149,6 @@ classes = (
     KB_PT_light,
     KB_PT_mesh,
     KB_PT_path_point,
-    KB_PT_smoothgroups,
-    KB_PT_texture,
 
     # Menus
 
@@ -188,7 +168,6 @@ def register():
         bpy.utils.register_class(cls)
 
     bpy.types.Object.kb = bpy.props.PointerProperty(type=ObjectPropertyGroup)
-    bpy.types.ImageTexture.kb = bpy.props.PointerProperty(type=TexturePropertyGroup)
 
     bpy.types.TOPBAR_MT_file_import.append(menu_func_import_mdl)
     bpy.types.TOPBAR_MT_file_import.append(menu_func_import_lyt)

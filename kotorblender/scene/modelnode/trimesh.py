@@ -135,26 +135,6 @@ class TrimeshNode(GeometryNode):
             uv_layer = mesh.uv_layers.new(name="UVMap_lm", do_init=False)
             uv_layer.data.foreach_set("uv", uv)
 
-        # Import smooth groups as sharp edges
-        if glob.importSmoothGroups:
-            bm = bmesh.new()
-            mesh.update()
-            bm.from_mesh(mesh)
-            if hasattr(bm.edges, "ensure_lookup_table"):
-                bm.edges.ensure_lookup_table()
-            # Mark edge as sharp if its faces belong to different smooth groups
-            for e in bm.edges:
-                f = e.link_faces
-                if (len(f) > 1) and not (self.facelist.shdgr[f[0].index] & self.facelist.shdgr[f[1].index]):
-                    edgeIdx = e.index
-                    mesh.edges[edgeIdx].use_edge_sharp = True
-            bm.free()
-            del bm
-            mesh.update()
-            # load all smoothgroup numbers into a mesh data layer per-poly
-            mesh_sg_list = mesh.polygon_layers_int.new(name=defines.sg_layer_name)
-            mesh_sg_list.data.foreach_set("value", self.facelist.shdgr)
-
         if self.roottype == "wok" and len(self.roomlinks):
             self.set_room_links(mesh)
 

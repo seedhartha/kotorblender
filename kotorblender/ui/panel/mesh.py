@@ -110,9 +110,6 @@ class KB_PT_mesh(bpy.types.Panel):
                 row.prop(obj.kb, "dirt_texture")
                 row = box.row()
                 row.prop(obj.kb, "dirt_worldspace")
-            row = box.row()
-            row.label(text = "Smoothgroups")
-            row.prop(obj.kb, "smoothgroup", text="Smooth Group", expand = True)
 
             # Additional props for danglymeshes
             if (obj.kb.meshtype == defines.Meshtype.DANGLYMESH):

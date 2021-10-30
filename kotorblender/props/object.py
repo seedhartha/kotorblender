@@ -147,13 +147,6 @@ class ObjectPropertyGroup(bpy.types.PropertyGroup):
                                                   (defines.Meshtype.EMITTER, "Emitter", "Particle emitter", 4), \
                                                   (defines.Meshtype.LIGHTSABER, "Lightsaber", "Saber mesh (blade plane)", 5)],
                                         default = defines.Meshtype.TRIMESH)
-    smoothgroup    : bpy.props.EnumProperty(name = "Smoothgroup",
-                                            items = [   ("SEPR", "Separate", "All faces have their own smoothgroup",   0),
-                                                        ("SING", "Single", "All Faces belong to the same smoothgroup", 1),
-                                                        ("AUTO", "Auto",   "Generate smoothgroups either from edges marked as sharp or edge angles when no sharp edges are present",  2),
-                                                        ("DRCT", "Direct", "Use imported and directly defined smoothgroups, select smoothgroups for geometry with unset smoothgroups by using Auto algorithm", 3)
-                                                         ],
-                                            default = "AUTO")
 
     bitmap           : bpy.props.StringProperty(name = "Diffuse map")
     bitmap2          : bpy.props.StringProperty(name = "Lightmap")

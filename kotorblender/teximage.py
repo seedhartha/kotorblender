@@ -24,8 +24,6 @@ import bpy
 
 from bpy_extras import image_utils
 
-from .format import txi as txiformat
-
 from . import glob
 
 
@@ -63,6 +61,5 @@ def load_texture_image(name):
         texture = bpy.data.textures.new(name, type='IMAGE')
         texture.image = image
         texture.use_fake_user = True
-        txiformat.load_txi(texture)
 
     return texture.image
