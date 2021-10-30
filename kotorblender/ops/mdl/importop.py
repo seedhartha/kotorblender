@@ -59,4 +59,4 @@ class KB_OT_import_mdl(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
         default=False)
 
     def execute(self, context):
-        return io.load_mdl(self, context, **self.as_keywords(ignore=("filter_glob",)))
+        return io.load_mdl(**self.as_keywords(ignore=("filter_glob",)))

@@ -54,4 +54,4 @@ class KB_OT_import_lyt(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
         default=False)
 
     def execute(self, context):
-        return io.load_lyt(self, context, **self.as_keywords(ignore=("filter_glob",)))
+        return io.load_lyt(**self.as_keywords(ignore=("filter_glob",)))

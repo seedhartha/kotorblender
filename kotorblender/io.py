@@ -17,7 +17,6 @@
 # ##### END GPL LICENSE BLOCK #####
 
 import os
-import re
 
 import bpy
 
@@ -32,8 +31,6 @@ from . import glob, utils
 
 
 def load_mdl(
-    operator,
-    context,
     filepath = "",
     importGeometry = True,
     importAnimations = True,
@@ -56,17 +53,12 @@ def load_mdl(
 
 
 def load_lyt(
-    operator,
-    context,
     filepath = "",
     importAnimations = True,
     importWalkmeshes = True,
     importMaterials = True,
     textureSearchRecursive = False
     ):
-    """
-    Called from blender ui
-    """
     glob.importGeometry = True
     glob.importAnimations = importAnimations
     glob.importWalkmeshes = importWalkmeshes
