@@ -64,7 +64,7 @@ class Model:
         else:
             self.animDict[anim.name] = anim
 
-    def import_to_collection(self, collection, wkm, position = (0.0, 0.0, 0.0)):
+    def import_to_collection(self, collection, position = (0.0, 0.0, 0.0)):
         mdl_root = None
         objIdx = 0
         if (glob.importGeometry) and self.nodeDict:
@@ -142,11 +142,6 @@ class Model:
                         # Node with invalid parent.
                         if not found:
                             raise MalformedFile(node.name + " has no parent " + node.parentName)
-
-        # Import the walkmesh, it will use any placeholder dummies just imported,
-        # and the walkmesh nodes will be copied during animation import
-        if (glob.importWalkmeshes) and not wkm is None and wkm.walkmeshType != "wok":
-            wkm.import_to_collection(collection)
 
         # Attempt to import animations
         # Search for the MDL root if not already present
