@@ -19,7 +19,7 @@
 from ...exception.malformedfile import MalformedFile
 from ...scene.areawalkmesh import AreaWalkmesh
 from ...scene.modelnode.dummy import DummyNode
-from ...scene.modelnode.trimesh import FaceList, TrimeshNode
+from ...scene.modelnode.trimesh import TrimeshNode
 from ...scene.walkmesh import Walkmesh
 
 from ..binreader import BinaryReader
@@ -38,7 +38,6 @@ class AABB:
 
 
 class BwmLoader:
-
     def __init__(self, path, model_name):
         self.path = path
         self.model_name = model_name
@@ -78,7 +77,7 @@ class BwmLoader:
         self.off_distances = self.bwm.get_uint32()
         self.num_aabbs = self.bwm.get_uint32()
         self.off_aabbs = self.bwm.get_uint32()
-        self.bwm.skip(4) # unknown
+        self.bwm.skip(4)  # unknown
         self.num_adj_edges = self.bwm.get_uint32()
         self.off_adj_edges = self.bwm.get_uint32()
         self.num_outer_edges = self.bwm.get_uint32()
@@ -159,7 +158,7 @@ class BwmLoader:
 
         for i in range(self.num_faces):
             self.geom_node.facelist.faces.append(vert_indices[i])
-            self.geom_node.facelist.shdgr.append(1) # TODO
+            self.geom_node.facelist.shdgr.append(1)  # TODO
             self.geom_node.facelist.uvIdx.append([0] * 3)
             self.geom_node.facelist.matId.append(material_ids[i])
 
@@ -169,7 +168,7 @@ class BwmLoader:
         for _ in range(self.num_aabbs):
             bounding_box = [self.bwm.get_float() for _ in range(6)]
             face_idx = self.bwm.get_int32()
-            self.bwm.skip(4) # unknown
+            self.bwm.skip(4)  # unknown
             most_significant_plane = self.bwm.get_uint32()
             child_idx1 = self.bwm.get_uint32()
             child_idx2 = self.bwm.get_uint32()

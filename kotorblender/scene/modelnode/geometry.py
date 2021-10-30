@@ -25,16 +25,16 @@ from ... import defines
 
 class GeometryNode:
 
-    def __init__(self, name = "UNNAMED"):
+    def __init__(self, name="UNNAMED"):
         self.nodetype = "undefined"
         self.roottype = "mdl"
 
-        self.name        = name
-        self.parent_name  = defines.null
-        self.position    = (0.0, 0.0, 0.0)
+        self.name = name
+        self.parent_name = defines.null
+        self.position = (0.0, 0.0, 0.0)
         self.orientation = (1.0, 0.0, 0.0, 0.0)
-        self.scale       = 1.0
-        self.wirecolor   = (0.0, 0.0, 0.0)
+        self.scale = 1.0
+        self.wirecolor = (0.0, 0.0, 0.0)
 
         self.from_root = Matrix()
 
@@ -48,10 +48,10 @@ class GeometryNode:
 
     def set_object_data(self, obj):
         self.objref = obj.name  # used to resolve naming conflicts
-        obj.rotation_mode       = 'QUATERNION'
+        obj.rotation_mode = 'QUATERNION'
         obj.rotation_quaternion = Quaternion(self.orientation)
-        obj.kb.restrot          = self.orientation
-        obj.scale               = (self.scale, self.scale, self.scale)
-        obj.location            = self.position
-        obj.kb.restloc          = obj.location
-        obj.kb.wirecolor        = self.wirecolor
+        obj.kb.restrot = self.orientation
+        obj.scale = (self.scale, self.scale, self.scale)
+        obj.location = self.position
+        obj.kb.restloc = obj.location
+        obj.kb.wirecolor = self.wirecolor

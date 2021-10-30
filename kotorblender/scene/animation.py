@@ -25,11 +25,11 @@ from .animnode import AnimationNode
 
 class Animation:
 
-    def __init__(self, name = "UNNAMED"):
-        self.name      = name
-        self.length    = 1.0
+    def __init__(self, name="UNNAMED"):
+        self.name = name
+        self.length = 1.0
         self.transtime = 1.0
-        self.animroot  = defines.null
+        self.animroot = defines.null
         self.event_list = []
 
         self.nodes = []
@@ -44,7 +44,7 @@ class Animation:
         for node in self.nodes:
             if node.name.lower() in obj_by_node:
                 obj = obj_by_node[node.name.lower()]
-                node.add_object_keyframes(obj, list_anim, {"mdlname":mdl_root.name})
+                node.add_object_keyframes(obj, list_anim, {"mdlname": mdl_root.name})
                 self.create_rest_pose(obj, list_anim.frame_start-5)
 
     def create_list_anim(self, mdl_root):

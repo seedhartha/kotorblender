@@ -22,8 +22,7 @@ import bpy
 class KB_UL_anim_events(bpy.types.UIList):
     """UI List for displaying animation events."""
 
-    def draw_item(self, context, layout, data, item, icon,
-                  active_data, active_propname, index):
+    def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
         """Draw a single animation event."""
 
         if self.layout_type in {'DEFAULT', 'COMPACT'}:

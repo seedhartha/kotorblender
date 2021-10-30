@@ -23,7 +23,7 @@ from .trimesh import TrimeshNode
 
 class LightsaberNode(TrimeshNode):
 
-    def __init__(self, name = "UNNAMED"):
+    def __init__(self, name="UNNAMED"):
         TrimeshNode.__init__(self, name)
 
         self.nodetype = "lightsaber"

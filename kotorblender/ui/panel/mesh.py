@@ -36,13 +36,13 @@ class KB_PT_mesh(bpy.types.Panel):
 
     @classmethod
     def poll(cls, context):
-        return (context.object and \
-                context.object.type == 'MESH' and \
+        return (context.object and
+                context.object.type == 'MESH' and
                 context.object.kb.meshtype != defines.Meshtype.EMITTER)
 
     def draw(self, context):
-        obj      = context.object
-        layout   = self.layout
+        obj = context.object
+        layout = self.layout
 
         row = layout.row()
         row.prop(obj.kb, "meshtype", text="Type")
@@ -56,7 +56,7 @@ class KB_PT_mesh(bpy.types.Panel):
             row = box.row()
             row.prop(obj.kb, "wirecolor", text="Wirecolor")
 
-        else: # Trimesh, danglymesh, skin
+        else:  # Trimesh, danglymesh, skin
             row = layout.row()
             box = row.box()
             row = box.row()
@@ -118,7 +118,7 @@ class KB_PT_mesh(bpy.types.Panel):
                 row = layout.row()
                 box = row.box()
                 row = box.row()
-                row.label(text = "Danglymesh Properties")
+                row.label(text="Danglymesh Properties")
                 row = box.row()
                 row.prop_search(obj.kb, "constraints", obj, "vertex_groups", text="Constraints")
                 row = box.row()
@@ -135,10 +135,10 @@ class KB_PT_mesh(bpy.types.Panel):
                 row = layout.row()
                 box = row.box()
                 row = box.row()
-                row.label(text = "Create vertex group: ")
-                row = box.row(align = True)
+                row.label(text="Create vertex group: ")
+                row = box.row(align=True)
                 row.prop_search(obj.kb, "skingroup_obj", context.scene, "objects")
-                row.operator("kb.skingroup_add", text = "", icon='ADD')
+                row.operator("kb.skingroup_add", text="", icon='ADD')
 
             # Additional props for aabb walkmeshes
             elif (obj.kb.meshtype == defines.Meshtype.AABB):
@@ -149,4 +149,4 @@ class KB_PT_mesh(bpy.types.Panel):
                 row = box.row()
                 row.prop(obj.kb, "lytposition", text="LYT Position")
                 row = box.row()
-                row.operator("kb.load_wok_mats", text = "Load walkmesh materials", icon='NONE')
+                row.operator("kb.load_wok_mats", text="Load walkmesh materials", icon='NONE')

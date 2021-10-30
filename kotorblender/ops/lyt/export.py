@@ -26,13 +26,13 @@ class KB_OT_export_lyt(bpy.types.Operator, bpy_extras.io_utils.ExportHelper):
     """Export Odyssey Engine layout (.lyt)"""
 
     bl_idname = "kb.lytexport"
-    bl_label  = "Export Odyssey LYT"
+    bl_label = "Export Odyssey LYT"
 
     filename_ext = ".lyt"
 
-    filter_glob : bpy.props.StringProperty(
-            default = "*.lyt",
-            options = {'HIDDEN'})
+    filter_glob: bpy.props.StringProperty(
+        default="*.lyt",
+        options={'HIDDEN'})
 
     def describe_object(self, obj):
         parent = utils.get_mdl_root(obj)

@@ -28,13 +28,13 @@ class KB_OT_export_path(bpy.types.Operator, bpy_extras.io_utils.ExportHelper):
     """Export Odyssey Engine path (.pth)"""
 
     bl_idname = "kb.pthexport"
-    bl_label  = "Export Odyssey PTH"
+    bl_label = "Export Odyssey PTH"
 
     filename_ext = ".pth"
 
-    filter_glob : bpy.props.StringProperty(
-            default = "*.pth",
-            options = {'HIDDEN'})
+    filter_glob: bpy.props.StringProperty(
+        default="*.pth",
+        options={'HIDDEN'})
 
     def execute(self, context):
         point_objects = [obj for obj in bpy.data.objects if is_path_point(obj)]
@@ -52,7 +52,7 @@ class KB_OT_export_path(bpy.types.Operator, bpy_extras.io_utils.ExportHelper):
                 conection["_type"] = 3
                 conection["_fields"] = {
                     "Destination": 4
-                    }
+                }
                 conection["Destination"] = point_idx_by_name[object_connection.point]
                 conections.append(conection)
 
@@ -63,7 +63,7 @@ class KB_OT_export_path(bpy.types.Operator, bpy_extras.io_utils.ExportHelper):
                 "First_Conection": 4,
                 "X": 8,
                 "Y": 8
-                }
+            }
             point["Conections"] = len(obj.kb.path_connections)
             point["First_Conection"] = first_conection
             point["X"] = obj.location[0]
@@ -75,7 +75,7 @@ class KB_OT_export_path(bpy.types.Operator, bpy_extras.io_utils.ExportHelper):
         tree["_fields"] = {
             "Path_Points": 15,
             "Path_Conections": 15
-            }
+        }
         tree["Path_Points"] = points
         tree["Path_Conections"] = conections
 

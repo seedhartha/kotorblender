@@ -85,7 +85,7 @@ def search_node_all(obj, test):
     return nodes
 
 
-def is_root_dummy(obj, dummytype = defines.Dummytype.MDLROOT):
+def is_root_dummy(obj, dummytype=defines.Dummytype.MDLROOT):
     return obj and (obj.type == 'EMPTY') and (obj.kb.dummytype == dummytype)
 
 
@@ -168,7 +168,7 @@ def create_anim_list_item(mdl_base, check_keyframes=False):
     return anim
 
 
-def nwtime2frame(time, fps = defines.fps):
+def nwtime2frame(time, fps=defines.fps):
     """
     For animations: Convert key time to frame number
     """

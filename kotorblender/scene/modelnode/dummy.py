@@ -23,7 +23,7 @@ from .geometry import GeometryNode
 
 class DummyNode(GeometryNode):
 
-    def __init__(self, name = "UNNAMED"):
+    def __init__(self, name="UNNAMED"):
         GeometryNode.__init__(self, name)
 
         self.nodetype = "dummy"

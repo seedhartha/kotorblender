@@ -23,9 +23,9 @@ class KB_OT_move_lightflare(bpy.types.Operator):
     """ Move an item in the flare list """
 
     bl_idname = "kb.lightflare_move"
-    bl_label  = "Move an item in the flare list"
+    bl_label = "Move an item in the flare list"
 
-    direction : bpy.props.EnumProperty(items=(("UP", "Up", ""), ("DOWN", "Down", "")))
+    direction: bpy.props.EnumProperty(items=(("UP", "Up", ""), ("DOWN", "Down", "")))
 
     @classmethod
     def poll(self, context):
@@ -33,9 +33,9 @@ class KB_OT_move_lightflare(bpy.types.Operator):
 
     def move_index(self, context):
         flare_list = context.object.kb.flare_list
-        flare_idx  = context.object.kb.flare_listIdx
+        flare_idx = context.object.kb.flare_listIdx
 
-        listLength = len(flare_list) - 1 # (index starts at 0)
+        listLength = len(flare_list) - 1  # (index starts at 0)
         new_idx = 0
         if self.direction == "UP":
             new_idx = flare_idx - 1
@@ -47,7 +47,7 @@ class KB_OT_move_lightflare(bpy.types.Operator):
 
     def execute(self, context):
         flare_list = context.object.kb.flare_list
-        flare_idx  = context.object.kb.flare_listIdx
+        flare_idx = context.object.kb.flare_listIdx
 
         if self.direction == "DOWN":
             neighbour = flare_idx + 1

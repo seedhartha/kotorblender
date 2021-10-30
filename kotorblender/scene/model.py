@@ -32,18 +32,18 @@ from . import armature
 class Model:
 
     def __init__(self):
-        self.node_dict      = collections.OrderedDict()
-        self.anim_dict      = dict() # No need to retain order
+        self.node_dict = collections.OrderedDict()
+        self.anim_dict = dict()  # No need to retain order
 
-        self.name           = "UNNAMED"
-        self.supermodel     = defines.null
-        self.animscale      = 1.0
+        self.name = "UNNAMED"
+        self.supermodel = defines.null
+        self.animscale = 1.0
         self.classification = defines.Classification.UNKNOWN
-        self.subclassification      = 0
-        self.ignorefog      = False
+        self.subclassification = 0
+        self.ignorefog = False
         self.compress_quats = False
-        self.headlink       = False
-        self.lytposition    = None
+        self.headlink = False
+        self.lytposition = None
 
         self.animations = []
 
@@ -64,7 +64,7 @@ class Model:
         else:
             self.anim_dict[anim.name] = anim
 
-    def import_to_collection(self, collection, position = (0.0, 0.0, 0.0)):
+    def import_to_collection(self, collection, position=(0.0, 0.0, 0.0)):
         mdl_root = None
         objIdx = 0
         if self.node_dict:
@@ -75,16 +75,16 @@ class Model:
             # even try to import the mdl
             (_, node) = next(it)
             if (type(node) == DummyNode) and (utils.is_null(node.parent_name)):
-                obj                   = node.add_to_collection(collection)
-                obj.location          = position
-                obj.kb.dummytype      = defines.Dummytype.MDLROOT
-                obj.kb.supermodel     = self.supermodel
+                obj = node.add_to_collection(collection)
+                obj.location = position
+                obj.kb.dummytype = defines.Dummytype.MDLROOT
+                obj.kb.supermodel = self.supermodel
                 obj.kb.classification = self.classification
-                obj.kb.subclassification      = self.subclassification
-                obj.kb.ignorefog      = (self.ignorefog >= 1)
+                obj.kb.subclassification = self.subclassification
+                obj.kb.ignorefog = (self.ignorefog >= 1)
                 obj.kb.compress_quats = (self.compress_quats >= 1)
-                obj.kb.headlink       = (self.headlink >= 1)
-                obj.kb.animscale      = self.animscale
+                obj.kb.headlink = (self.headlink >= 1)
+                obj.kb.animscale = self.animscale
                 mdl_root = obj
 
                 obj.kb.imporder = objIdx
@@ -111,10 +111,10 @@ class Model:
                         print("WARNING: Node already parented: {}".format(obj.name))
                         pass
                     elif mdl_root and node.parent_name in bpy.data.objects and \
-                         utils.ancestor_node(
-                             bpy.data.objects[node.parent_name],
-                             utils.is_root_dummy
-                         ).name == mdl_root.name:
+                            utils.ancestor_node(
+                                bpy.data.objects[node.parent_name],
+                                utils.is_root_dummy
+                            ).name == mdl_root.name:
                         # parent named node exists and is in our model
                         obj.parent = bpy.data.objects[node.parent_name]
                         if node.parent_name != self.name:
@@ -128,7 +128,7 @@ class Model:
                         # taking into account blender .001 suffix naming scheme,
                         # note: only searching 001-030
                         found = False
-                        for altname in [node.parent_name + ".{:03d}".format(i) for i in range(1,30)]:
+                        for altname in [node.parent_name + ".{:03d}".format(i) for i in range(1, 30)]:
                             if altname in bpy.data.objects and \
                                utils.ancestor_node(
                                    bpy.data.objects[altname],

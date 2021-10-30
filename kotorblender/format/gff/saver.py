@@ -24,7 +24,6 @@ from .types import *
 
 
 class GffSaver:
-
     def __init__(self, tree, path, file_type):
         self.tree = tree
         self.writer = BinaryWriter(path, 'little')
@@ -124,7 +123,7 @@ class GffSaver:
                     field_type,
                     label_idx,
                     data_or_data_offset
-                    )
+                )
                 self.fields.append(field)
 
             if len(field_indices) == 1:
@@ -138,7 +137,7 @@ class GffSaver:
                 tree["_type"],
                 data_or_data_offset,
                 len(field_indices)
-                )
+            )
             self.structs.append(struct)
 
     def repack_float_to_int(self, val):

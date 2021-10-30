@@ -30,13 +30,13 @@ class KB_OT_import_path(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
     """Import Odyssey Engine path (.pth)"""
 
     bl_idname = "kb.pthimport"
-    bl_label  = "Import Odyssey PTH"
+    bl_label = "Import Odyssey PTH"
 
     filename_ext = ".pth"
 
-    filter_glob : bpy.props.StringProperty(
-            default = "*.pth",
-            options = {'HIDDEN'})
+    filter_glob: bpy.props.StringProperty(
+        default="*.pth",
+        options={'HIDDEN'})
 
     def execute(self, context):
         basename = os.path.basename(self.filepath)

@@ -238,7 +238,6 @@ class ArrayDefinition:
 
 
 class MdlLoader:
-
     def __init__(self, path):
         self.path = path
         self.mdl = BinaryReader(path, 'little')
@@ -249,7 +248,7 @@ class MdlLoader:
             raise MdxNotFound("MDX file '{}' not found".format(mdx_path))
 
         self.mdx = BinaryReader(mdx_path, 'little')
-        self.node_names_df = [] # depth first array of node names
+        self.node_names_df = []  # depth first array of node names
 
     def load(self):
         print("Loading MDL '{}'".format(self.path))
@@ -286,14 +285,14 @@ class MdlLoader:
         if self.model_type != 2:
             raise MalformedFile("Invalid model type: expected=2, actual={}".format(self.model_type))
 
-        self.mdl.skip(3) # padding
+        self.mdl.skip(3)  # padding
 
         self.model.name = model_name
 
     def load_model_header(self):
         classification = self.mdl.get_uint8()
         subclassification = self.mdl.get_uint8()
-        self.mdl.skip(1) # unknown
+        self.mdl.skip(1)  # unknown
         affected_by_fog = self.mdl.get_uint8()
         num_child_models = self.mdl.get_uint32()
         self.animation_arr = self.get_array_def()
@@ -303,7 +302,7 @@ class MdlLoader:
         scale = self.mdl.get_float()
         supermodel_name = self.mdl.get_c_string_up_to(32)
         off_head_root_node = self.mdl.get_uint32()
-        self.mdl.skip(4) # padding
+        self.mdl.skip(4)  # padding
 
         mdx_size = self.mdl.get_uint32()
         if mdx_size != self.mdx_size:
@@ -335,7 +334,7 @@ class MdlLoader:
         type_flags = self.mdl.get_uint16()
         supernode_number = self.mdl.get_uint16()
         name_index = self.mdl.get_uint16()
-        self.mdl.skip(2) # padding
+        self.mdl.skip(2)  # padding
         off_root = self.mdl.get_uint32()
         off_parent = self.mdl.get_uint32()
         position = [self.mdl.get_float() for _ in range(3)]
@@ -376,15 +375,15 @@ class MdlLoader:
             flare = self.mdl.get_uint32()
             fading_light = self.mdl.get_uint32()
 
-            node.shadow        = shadow
+            node.shadow = shadow
             node.lightpriority = light_priority
-            node.ambientonly   = ambient_only
-            node.ndynamictype  = dynamic_type
+            node.ambientonly = ambient_only
+            node.ndynamictype = dynamic_type
             node.affectdynamic = affect_dynamic
-            node.fadinglight   = fading_light
-            node.lensflares    = flare
-            node.flareradius   = flare_radius
-            node.flare_list     = FlareList()
+            node.fadinglight = fading_light
+            node.lensflares = flare
+            node.flareradius = flare_radius
+            node.flare_list = FlareList()
 
         if type_flags & NODE_EMITTER:
             dead_space = self.mdl.get_float()
@@ -405,7 +404,7 @@ class MdlLoader:
             render_order = self.mdl.get_uint16()
             frame_blending = self.mdl.get_uint8()
             depth_texture_name = self.mdl.get_c_string_up_to(32)
-            self.mdl.skip(1) # padding
+            self.mdl.skip(1)  # padding
             flags = self.mdl.get_uint32()
 
             # object data
@@ -465,8 +464,8 @@ class MdlLoader:
             index_count_arr = self.get_array_def()
             index_offset_arr = self.get_array_def()
             inv_counter_arr = self.get_array_def()
-            self.mdl.skip(3 * 4) # unknown
-            self.mdl.skip(8) # saber unknown
+            self.mdl.skip(3 * 4)  # unknown
+            self.mdl.skip(8)  # saber unknown
             animate_uv = self.mdl.get_uint32()
             uv_dir_x = self.mdl.get_float()
             uv_dir_y = self.mdl.get_float()
@@ -496,15 +495,15 @@ class MdlLoader:
 
             if self.tsl:
                 dirt_enabled = self.mdl.get_uint8()
-                self.mdl.skip(1) # padding
+                self.mdl.skip(1)  # padding
                 dirt_texture = self.mdl.get_uint16()
                 dirt_coord_space = self.mdl.get_uint16()
                 hide_in_holograms = self.mdl.get_uint8()
-                self.mdl.skip(1) # padding
+                self.mdl.skip(1)  # padding
 
-            self.mdl.skip(2) # padding
+            self.mdl.skip(2)  # padding
             total_area = self.mdl.get_float()
-            self.mdl.skip(4) # padding
+            self.mdl.skip(4)  # padding
             mdx_offset = self.mdl.get_uint32()
             off_vert_arr = self.mdl.get_uint32()
 
@@ -547,7 +546,7 @@ class MdlLoader:
             garbage_arr = self.get_array_def()
             for _ in range(16):
                 bone_indices = self.mdl.get_uint16()
-            self.mdl.skip(4) # padding
+            self.mdl.skip(4)  # padding
 
         if type_flags & NODE_DANGLY:
             constraint_arr = self.get_array_def()
@@ -670,7 +669,7 @@ class MdlLoader:
                     adjacent_faces = [self.mdl.get_uint16() for _ in range(3)]
                     vert_indices = [self.mdl.get_uint16() for _ in range(3)]
                     node.facelist.faces.append(tuple(vert_indices))
-                    node.facelist.shdgr.append(1) # TODO
+                    node.facelist.shdgr.append(1)  # TODO
                     node.facelist.uvIdx.append(tuple(vert_indices))
                     node.facelist.matId.append(material_id)
                 if index_count_arr.count > 0:
@@ -749,12 +748,12 @@ class MdlLoader:
         runtime_arr2 = self.get_array_def()
         ref_count = self.mdl.get_uint32()
         model_type = self.mdl.get_uint8()
-        self.mdl.skip(3) # padding
+        self.mdl.skip(3)  # padding
         length = self.mdl.get_float()
         transition = self.mdl.get_float()
         anim_root = self.mdl.get_c_string_up_to(32)
         event_arr = self.get_array_def()
-        self.mdl.skip(4) # padding
+        self.mdl.skip(4)  # padding
 
         anim = Animation(name)
         anim.length = length
@@ -777,7 +776,7 @@ class MdlLoader:
         type_flags = self.mdl.get_uint16()
         supernode_number = self.mdl.get_uint16()
         name_index = self.mdl.get_uint16()
-        self.mdl.skip(2) # padding
+        self.mdl.skip(2)  # padding
         off_root = self.mdl.get_uint32()
         off_parent = self.mdl.get_uint32()
         position = [self.mdl.get_float() for _ in range(3)]
@@ -803,45 +802,45 @@ class MdlLoader:
                     [[row.timekey] + self.position_controller_to_vector(row.values, base_position) for row in controllers[CTRL_BASE_POSITION]],
                     "location",
                     3
-                    )
+                )
             if CTRL_BASE_ORIENTATION in controllers:
                 node.object_data["orientation"] = (
                     [[row.timekey] + self.orientation_controller_to_quaternion(row.values) for row in controllers[CTRL_BASE_ORIENTATION]],
                     "rotation_quaternion",
                     4
-                    )
+                )
             if CTRL_BASE_SCALE in controllers:
                 node.object_data["scale"] = (
                     [[row.timekey] + [row.values[0]] * 3 for row in controllers[CTRL_BASE_SCALE]],
                     "scale",
                     3
-                    )
+                )
             if isinstance(supernode, TrimeshNode):
                 if CTRL_MESH_ALPHA in controllers:
                     node.object_data["alpha"] = (
                         [[row.timekey] + [row.values[0]] for row in controllers[CTRL_MESH_ALPHA]],
                         "kb.alpha",
                         1
-                        )
+                    )
                 if CTRL_MESH_SELFILLUMCOLOR in controllers:
                     node.object_data["selfillumcolor"] = (
                         [[row.timekey] + row.values[:3] for row in controllers[CTRL_MESH_SELFILLUMCOLOR]],
                         "kb.selfillumcolor",
                         3
-                        )
+                    )
             if isinstance(supernode, LightNode):
                 if CTRL_LIGHT_COLOR in controllers:
                     node.object_data["color"] = (
                         [[row.timekey] + row.values[:3] for row in controllers[CTRL_LIGHT_COLOR]],
                         "color",
                         3
-                        )
+                    )
                 if CTRL_LIGHT_RADIUS in controllers:
                     node.object_data["radius"] = (
                         [[row.timekey] + [row.values[0]] for row in controllers[CTRL_LIGHT_RADIUS]],
                         "distance",
                         1
-                        )
+                    )
             if isinstance(supernode, EmitterNode):
                 for key in EMITTER_CONTROLLER_KEYS:
                     if not key[0] in controllers:
@@ -863,12 +862,12 @@ class MdlLoader:
         keys = []
         for _ in range(controller_arr.count):
             ctrl_type = self.mdl.get_uint32()
-            self.mdl.skip(2) # unknown
+            self.mdl.skip(2)  # unknown
             num_rows = self.mdl.get_uint16()
             timekeys_start = self.mdl.get_uint16()
             values_start = self.mdl.get_uint16()
             num_columns = self.mdl.get_uint8()
-            self.mdl.skip(3) # padding
+            self.mdl.skip(3)  # padding
             keys.append(ControllerKey(ctrl_type, num_rows, timekeys_start, values_start, num_columns))
         controllers = dict()
         for key in keys:
@@ -918,7 +917,7 @@ class MdlLoader:
             Nodetype.EMITTER: EmitterNode,
             Nodetype.LIGHT: LightNode,
             Nodetype.AABB: AabbNode
-            }
+        }
         try:
             return switch[node_type](name)
         except KeyError:
@@ -929,7 +928,7 @@ class MdlLoader:
             values[0] + base_position[0],
             values[1] + base_position[1],
             values[2] + base_position[2]
-            ]
+        ]
 
     def orientation_controller_to_quaternion(self, values):
         num_columns = len(values)

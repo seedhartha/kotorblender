@@ -18,8 +18,8 @@
 
 import struct
 
-class BinaryWriter:
 
+class BinaryWriter:
     def __init__(self, path, byteorder):
         self.file = open(path, "wb")
         self.byteorder = byteorder

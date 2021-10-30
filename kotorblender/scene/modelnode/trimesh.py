@@ -38,47 +38,47 @@ class FaceList:
 
 class TrimeshNode(GeometryNode):
 
-    def __init__(self, name = "UNNAMED"):
+    def __init__(self, name="UNNAMED"):
         GeometryNode.__init__(self, name)
         self.nodetype = "trimesh"
 
-        self.meshtype                = defines.Meshtype.TRIMESH
-        self.center                  = (0.0, 0.0, 0.0) # Unused ?
-        self.lightmapped             = 0
-        self.render                  = 1
-        self.shadow                  = 1
-        self.beaming                 = 0
-        self.inheritcolor            = 0  # Unused ?
+        self.meshtype = defines.Meshtype.TRIMESH
+        self.center = (0.0, 0.0, 0.0)  # Unused ?
+        self.lightmapped = 0
+        self.render = 1
+        self.shadow = 1
+        self.beaming = 0
+        self.inheritcolor = 0  # Unused ?
         self.background_geometry = 0
-        self.dirt_enabled            = 0
-        self.dirt_texture            = 1
-        self.dirt_worldspace         = 1
-        self.hologram_donotdraw      = 0
-        self.animateuv               = 0
-        self.uvdirectionx            = 1.0
-        self.uvdirectiony            = 1.0
-        self.uvjitter                = 0.0
-        self.uvjitterspeed           = 0.0
-        self.alpha                   = 1.0
-        self.transparencyhint        = 0
-        self.selfillumcolor          = (0.0, 0.0, 0.0)
-        self.ambient                 = (0.0, 0.0, 0.0)
-        self.diffuse                 = (0.0, 0.0, 0.0)
-        self.bitmap                  = defines.null
-        self.bitmap2                 = defines.null
-        self.tangentspace            = 0
-        self.rotatetexture           = 0
-        self.verts                   = [] # list of vertices
-        self.facelist                = FaceList()
-        self.tverts                  = [] # list of texture vertices
-        self.tverts1                 = [] # list of texture vertices
-        self.texindices1             = [] # list of texture vertex indices
-        self.roomlinks               = [] # walkmesh only
-        self.lytposition             = (0.0, 0.0, 0.0)
+        self.dirt_enabled = 0
+        self.dirt_texture = 1
+        self.dirt_worldspace = 1
+        self.hologram_donotdraw = 0
+        self.animateuv = 0
+        self.uvdirectionx = 1.0
+        self.uvdirectiony = 1.0
+        self.uvjitter = 0.0
+        self.uvjitterspeed = 0.0
+        self.alpha = 1.0
+        self.transparencyhint = 0
+        self.selfillumcolor = (0.0, 0.0, 0.0)
+        self.ambient = (0.0, 0.0, 0.0)
+        self.diffuse = (0.0, 0.0, 0.0)
+        self.bitmap = defines.null
+        self.bitmap2 = defines.null
+        self.tangentspace = 0
+        self.rotatetexture = 0
+        self.verts = []  # list of vertices
+        self.facelist = FaceList()
+        self.tverts = []  # list of texture vertices
+        self.tverts1 = []  # list of texture vertices
+        self.texindices1 = []  # list of texture vertex indices
+        self.roomlinks = []  # walkmesh only
+        self.lytposition = (0.0, 0.0, 0.0)
 
     def add_to_collection(self, collection):
         mesh = self.create_mesh(self.name)
-        obj  = bpy.data.objects.new(self.name, mesh)
+        obj = bpy.data.objects.new(self.name, mesh)
         self.set_object_data(obj)
 
         if glob.import_materials and self.roottype == "mdl":
@@ -110,8 +110,8 @@ class TrimeshNode(GeometryNode):
                     material = bpy.data.materials[mat_name]
                 else:
                     material = bpy.data.materials.new(mat_name)
-                    material.diffuse_color      = [*wok_mat[1], 1.0]
-                    material.specular_color     = (0.0,0.0,0.0)
+                    material.diffuse_color = [*wok_mat[1], 1.0]
+                    material.specular_color = (0.0, 0.0, 0.0)
                     material.specular_intensity = wok_mat[2]
                 mesh.materials.append(material)
 
@@ -140,32 +140,32 @@ class TrimeshNode(GeometryNode):
     def set_object_data(self, obj):
         GeometryNode.set_object_data(self, obj)
 
-        obj.kb.meshtype                = self.meshtype
-        obj.kb.bitmap                  = self.bitmap if not utils.is_null(self.bitmap) else ""
-        obj.kb.bitmap2                 = self.bitmap2 if not utils.is_null(self.bitmap2) else ""
-        obj.kb.alpha                   = self.alpha
-        obj.kb.lightmapped             = (self.lightmapped == 1)
-        obj.kb.render                  = (self.render == 1)
-        obj.kb.shadow                  = (self.shadow == 1)
-        obj.kb.beaming                 = (self.beaming == 1)
-        obj.kb.tangentspace            = (self.tangentspace == 1)
-        obj.kb.inheritcolor            = (self.inheritcolor == 1)
-        obj.kb.rotatetexture           = (self.rotatetexture == 1)
+        obj.kb.meshtype = self.meshtype
+        obj.kb.bitmap = self.bitmap if not utils.is_null(self.bitmap) else ""
+        obj.kb.bitmap2 = self.bitmap2 if not utils.is_null(self.bitmap2) else ""
+        obj.kb.alpha = self.alpha
+        obj.kb.lightmapped = (self.lightmapped == 1)
+        obj.kb.render = (self.render == 1)
+        obj.kb.shadow = (self.shadow == 1)
+        obj.kb.beaming = (self.beaming == 1)
+        obj.kb.tangentspace = (self.tangentspace == 1)
+        obj.kb.inheritcolor = (self.inheritcolor == 1)
+        obj.kb.rotatetexture = (self.rotatetexture == 1)
         obj.kb.background_geometry = (self.background_geometry == 1)
-        obj.kb.dirt_enabled            = (self.dirt_enabled == 1)
-        obj.kb.dirt_texture            = self.dirt_texture
-        obj.kb.dirt_worldspace         = self.dirt_worldspace
-        obj.kb.hologram_donotdraw      = (self.hologram_donotdraw == 1)
-        obj.kb.animateuv               = (self.animateuv == 1)
-        obj.kb.uvdirectionx            = self.uvdirectionx
-        obj.kb.uvdirectiony            = self.uvdirectiony
-        obj.kb.uvjitter                = self.uvjitter
-        obj.kb.uvjitterspeed           = self.uvjitterspeed
-        obj.kb.transparencyhint        = self.transparencyhint
-        obj.kb.selfillumcolor          = self.selfillumcolor
-        obj.kb.diffuse                 = self.diffuse
-        obj.kb.ambient                 = self.ambient
-        obj.kb.lytposition             = self.lytposition
+        obj.kb.dirt_enabled = (self.dirt_enabled == 1)
+        obj.kb.dirt_texture = self.dirt_texture
+        obj.kb.dirt_worldspace = self.dirt_worldspace
+        obj.kb.hologram_donotdraw = (self.hologram_donotdraw == 1)
+        obj.kb.animateuv = (self.animateuv == 1)
+        obj.kb.uvdirectionx = self.uvdirectionx
+        obj.kb.uvdirectiony = self.uvdirectiony
+        obj.kb.uvjitter = self.uvjitter
+        obj.kb.uvjitterspeed = self.uvjitterspeed
+        obj.kb.transparencyhint = self.transparencyhint
+        obj.kb.selfillumcolor = self.selfillumcolor
+        obj.kb.diffuse = self.diffuse
+        obj.kb.ambient = self.ambient
+        obj.kb.lytposition = self.lytposition
 
     def set_room_links(self, mesh, skipNonWalkable=True):
         if not "RoomLinks" in mesh.vertex_colors:
@@ -176,7 +176,7 @@ class TrimeshNode(GeometryNode):
             # edge indices don't really match up, but face order does
             faceIdx = int(link[0] / 3)
             edgeIdx = link[0] % 3
-            room_color = [ 0.0 / 255, (200 + link[1]) / 255.0, 0.0 / 255 ]
+            room_color = [0.0 / 255, (200 + link[1]) / 255.0, 0.0 / 255]
             realIdx = 0
             for face_idx, face in enumerate(mesh.polygons):
                 if skipNonWalkable and (face.material_index not in defines.WkmMaterial.NONWALKABLE):

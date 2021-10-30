@@ -28,13 +28,13 @@ from . import glob
 
 
 def load_mdl(
-    filepath = "",
-    import_animations = True,
-    import_walkmeshes = True,
-    import_materials = True,
-    import_armatures = True,
-    texture_search_recursive = False
-    ):
+    filepath="",
+    import_animations=True,
+    import_walkmeshes=True,
+    import_materials=True,
+    import_armatures=True,
+    texture_search_recursive=False
+):
     glob.import_animations = import_animations
     glob.import_walkmeshes = import_walkmeshes
     glob.import_materials = import_materials
@@ -48,12 +48,12 @@ def load_mdl(
 
 
 def load_lyt(
-    filepath = "",
-    import_animations = True,
-    import_walkmeshes = True,
-    import_materials = True,
-    texture_search_recursive = False
-    ):
+    filepath="",
+    import_animations=True,
+    import_walkmeshes=True,
+    import_materials=True,
+    texture_search_recursive=False
+):
     glob.import_animations = import_animations
     glob.import_walkmeshes = import_walkmeshes
     glob.import_materials = import_materials
@@ -66,7 +66,7 @@ def load_lyt(
     return {'FINISHED'}
 
 
-def do_load_mdl(filepath, position = (0.0, 0.0, 0.0)):
+def do_load_mdl(filepath, position=(0.0, 0.0, 0.0)):
     collection = bpy.context.collection
 
     mdl = MdlLoader(filepath)
