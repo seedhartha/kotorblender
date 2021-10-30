@@ -32,8 +32,31 @@ class KB_OT_import_mdl(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
     filename_ext = ".mdl"
 
     filter_glob : bpy.props.StringProperty(
-            default = "*.mdl",
-            options = {'HIDDEN'})
+        default = "*.mdl",
+        options = {'HIDDEN'})
+
+    importAnimations : bpy.props.BoolProperty(
+        name = "Import Animations",
+        default = True)
+
+    importWalkmeshes : bpy.props.BoolProperty(
+        name = "Import Walkmeshes",
+        description = "Import area, placeable and door walkmeshes",
+        default = True)
+
+    importMaterials : bpy.props.BoolProperty(
+        name = "Import Materials",
+        default = True)
+
+    importArmatures : bpy.props.BoolProperty(
+        name = "Import Armatures",
+        description = "Create an animated armature from model nodes",
+        default = True)
+
+    textureSearchRecursive : bpy.props.BoolProperty(
+        name="Image search",
+        description="Search for textures in subdirectories",
+        default=False)
 
     def execute(self, context):
         return io.load_mdl(self, context, **self.as_keywords(ignore=("filter_glob",)))

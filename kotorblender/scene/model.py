@@ -145,7 +145,7 @@ class Model:
 
         # Import the walkmesh, it will use any placeholder dummies just imported,
         # and the walkmesh nodes will be copied during animation import
-        if (glob.importWalkmesh) and not wkm is None and wkm.walkmeshType != "wok":
+        if (glob.importWalkmeshes) and not wkm is None and wkm.walkmeshType != "wok":
             wkm.import_to_collection(collection)
 
         # Attempt to import animations
@@ -160,7 +160,7 @@ class Model:
                 return
 
         armature_object = None
-        if glob.createArmature:
+        if glob.importArmatures:
             armature_object = armature.recreate_armature(mdl_root)
         else:
             # When armature creation is disabled, see if the MDL root already has an armature and use that
@@ -173,7 +173,8 @@ class Model:
                 if armature_object:
                     break
 
-        self.create_animations(mdl_root, armature_object)
+        if glob.importAnimations:
+            self.create_animations(mdl_root, armature_object)
 
     def create_animations(self, mdl_root, armature_object):
         # Load the 'default' animation first, so it is at the front

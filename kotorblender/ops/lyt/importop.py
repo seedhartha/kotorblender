@@ -35,30 +35,22 @@ class KB_OT_import_lyt(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
         default="*.lyt",
         options={'HIDDEN'})
 
-    importGeometry : bpy.props.BoolProperty(
-        name = "Import Geometry",
-        description = "Disable if only animations are needed",
+    importAnimations : bpy.props.BoolProperty(
+        name = "Import Animations",
+        default = True)
+
+    importWalkmeshes : bpy.props.BoolProperty(
+        name = "Import Walkmeshes",
+        description = "Import area, placeable and door walkmeshes",
         default = True)
 
     importMaterials : bpy.props.BoolProperty(
         name = "Import Materials",
-        description = "Import materials",
         default = True)
 
-    importAnim : bpy.props.BoolProperty(
-        name = "Import Animations",
-        description = "Import animations",
-        default = True)
-
-    importWalkmesh : bpy.props.BoolProperty(
-        name = "Import Walkmesh",
-        description = "Attempt to load placeable and door walkmeshes",
-        default = True)
-
-    textureSearch : bpy.props.BoolProperty(
+    textureSearchRecursive : bpy.props.BoolProperty(
         name="Image search",
-        description="Search for images in subdirectories" \
-                " (Warning, may be slow)",
+        description="Search for textures in subdirectories",
         default=False)
 
     def execute(self, context):
