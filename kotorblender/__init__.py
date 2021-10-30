@@ -39,10 +39,10 @@ from .ops.lyt.export import KB_OT_export_lyt
 from .ops.lyt.importop import KB_OT_import_lyt
 from .ops.mdl.export import KB_OT_export_mdl
 from .ops.mdl.importop import KB_OT_import_mdl
-from .ops.path.addconnection import KB_OT_add_connection
-from .ops.path.export import KB_OT_export_path
-from .ops.path.importop import KB_OT_import_path
-from .ops.path.removeconnection import KB_OT_remove_connection
+from .ops.pth.addconnection import KB_OT_add_connection
+from .ops.pth.export import KB_OT_export_path
+from .ops.pth.importop import KB_OT_import_path
+from .ops.pth.removeconnection import KB_OT_remove_connection
 from .ops.rebuildmaterialnodes import KB_OT_rebuild_material_nodes
 from .ops.recreatearmature import KB_OT_recreate_armature
 from .ops.smoothgroup.children import KB_OT_children_smoothgroup
