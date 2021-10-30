@@ -37,7 +37,7 @@ class KB_PT_light(bpy.types.Panel):
         return (context.object and context.object.type == 'LIGHT')
 
     def draw(self, context):
-        obj    = context.object
+        obj = context.object
         layout = self.layout
 
         row = layout.row()
@@ -80,12 +80,12 @@ class KB_PT_light(bpy.types.Panel):
         row = box.row()
         row.active = obj.kb.lensflares
         row.template_list("KB_UL_lightflares", "The_List", obj.kb, "flare_list", obj.kb, "flare_listIdx")
-        col = row.column(align = True)
-        col.operator("kb.lightflare_new", icon='ADD', text = "")
-        col.operator("kb.lightflare_delete", icon='REMOVE', text = "")
+        col = row.column(align=True)
+        col.operator("kb.lightflare_new", icon='ADD', text="")
+        col.operator("kb.lightflare_delete", icon='REMOVE', text="")
         col.separator()
-        col.operator("kb.lightflare_move", icon='TRIA_UP', text = "").direction = "UP"
-        col.operator("kb.lightflare_move", icon='TRIA_DOWN', text = "").direction = "DOWN"
+        col.operator("kb.lightflare_move", icon='TRIA_UP', text="").direction = "UP"
+        col.operator("kb.lightflare_move", icon='TRIA_DOWN', text="").direction = "DOWN"
         if obj.kb.flare_listIdx >= 0 and len(obj.kb.flare_list) > 0:
             item = obj.kb.flare_list[obj.kb.flare_listIdx]
             row = box.row()

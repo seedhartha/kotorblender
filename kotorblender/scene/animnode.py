@@ -55,7 +55,7 @@ class AnimationNode:
 
             if label == "position":
                 values = [d[1:4] for d in data]
-                data_dim = 3 # TODO: add support for Bezier keys
+                data_dim = 3  # TODO: add support for Bezier keys
             elif label == "orientation":
                 values = [d[1:5] for d in data]
                 data_dim = 4

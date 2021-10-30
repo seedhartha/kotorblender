@@ -26,7 +26,6 @@ from .types import *
 
 
 class GffLoader:
-
     def __init__(self, path, file_type):
         self.reader = BinaryReader(path, 'little')
         self.file_type = file_type.ljust(4)
@@ -69,7 +68,7 @@ class GffLoader:
                 self.reader.get_uint32(),
                 self.reader.get_uint32(),
                 self.reader.get_uint32()
-                )
+            )
             self.structs.append(struct)
 
     def load_fields(self):
@@ -80,7 +79,7 @@ class GffLoader:
                 self.reader.get_uint32(),
                 self.reader.get_uint32(),
                 self.reader.get_uint32()
-                )
+            )
             self.fields.append(field)
 
     def load_labels(self):

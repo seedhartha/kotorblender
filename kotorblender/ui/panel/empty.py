@@ -37,7 +37,7 @@ class KB_PT_empty(bpy.types.Panel):
         return (context.object and context.object.type == 'EMPTY')
 
     def draw(self, context):
-        obj    = context.object
+        obj = context.object
         layout = self.layout
 
         row = layout.row()
@@ -50,19 +50,19 @@ class KB_PT_empty(bpy.types.Panel):
             box = row.box()
             split = box.split()
             col = split.column()
-            col.label(text = "Classification:")
-            col.label(text = "Supermodel:")
-            col.label(text = "Ignore Fog:")
-            col.label(text = "Animation Scale:")
+            col.label(text="Classification:")
+            col.label(text="Supermodel:")
+            col.label(text="Ignore Fog:")
+            col.label(text="Animation Scale:")
             if obj.kb.classification == defines.Classification.CHARACTER:
-                col.label(text = "Head Model:")
+                col.label(text="Head Model:")
             col = split.column()
-            col.prop(obj.kb, "classification", text = "")
-            col.prop(obj.kb, "supermodel", text = "")
-            col.prop(obj.kb, "ignorefog", text = "")
-            col.prop(obj.kb, "animscale", text = "")
+            col.prop(obj.kb, "classification", text="")
+            col.prop(obj.kb, "supermodel", text="")
+            col.prop(obj.kb, "ignorefog", text="")
+            col.prop(obj.kb, "animscale", text="")
             if obj.kb.classification == defines.Classification.CHARACTER:
-                col.prop(obj.kb, "headlink", text = "")
+                col.prop(obj.kb, "headlink", text="")
             box.operator("kb.recreate_armature")
             layout.separator()
 

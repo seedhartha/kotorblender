@@ -31,24 +31,24 @@ class KB_OT_import_lyt(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
 
     filename_ext = ".lyt"
 
-    filter_glob : bpy.props.StringProperty(
+    filter_glob: bpy.props.StringProperty(
         default="*.lyt",
         options={'HIDDEN'})
 
-    import_animations : bpy.props.BoolProperty(
-        name = "Import Animations",
-        default = True)
+    import_animations: bpy.props.BoolProperty(
+        name="Import Animations",
+        default=True)
 
-    import_walkmeshes : bpy.props.BoolProperty(
-        name = "Import Walkmeshes",
-        description = "Import area, placeable and door walkmeshes",
-        default = True)
+    import_walkmeshes: bpy.props.BoolProperty(
+        name="Import Walkmeshes",
+        description="Import area, placeable and door walkmeshes",
+        default=True)
 
-    import_materials : bpy.props.BoolProperty(
-        name = "Import Materials",
-        default = True)
+    import_materials: bpy.props.BoolProperty(
+        name="Import Materials",
+        default=True)
 
-    texture_search_recursive : bpy.props.BoolProperty(
+    texture_search_recursive: bpy.props.BoolProperty(
         name="Image search",
         description="Search for textures in subdirectories",
         default=False)

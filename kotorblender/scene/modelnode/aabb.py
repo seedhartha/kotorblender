@@ -28,7 +28,7 @@ from .trimesh import TrimeshNode
 
 class AabbNode(TrimeshNode):
 
-    def __init__(self, name = "UNNAMED"):
+    def __init__(self, name="UNNAMED"):
         TrimeshNode.__init__(self, name)
         self.nodetype = "aabb"
 
@@ -62,8 +62,8 @@ class AabbNode(TrimeshNode):
                 material = bpy.data.materials[mat_name]
             else:
                 material = bpy.data.materials.new(mat_name)
-                material.diffuse_color      = [*wok_mat[1], 1.0]
-                material.specular_color     = (0.0,0.0,0.0)
+                material.diffuse_color = [*wok_mat[1], 1.0]
+                material.specular_color = (0.0, 0.0, 0.0)
                 material.specular_intensity = wok_mat[2]
             mesh.materials.append(material)
 
@@ -116,4 +116,3 @@ class AabbNode(TrimeshNode):
                 if all([utils.isclose_3f(wok_verts[i], mdl_verts_lyt_space[i]) for i in range(3)]):
                     self.roomlinks.append((3 * face_idx + (edge[0] % 3), edge[1]))
                     break
-

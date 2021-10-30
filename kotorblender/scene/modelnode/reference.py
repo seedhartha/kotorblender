@@ -23,17 +23,17 @@ from .geometry import GeometryNode
 
 class ReferenceNode(GeometryNode):
 
-    def __init__(self, name = "UNNAMED"):
+    def __init__(self, name="UNNAMED"):
         GeometryNode.__init__(self, name)
         self.nodetype = "reference"
 
-        self.dummytype    = defines.Dummytype.REFERENCE
-        self.refmodel     = defines.null
+        self.dummytype = defines.Dummytype.REFERENCE
+        self.refmodel = defines.null
         self.reattachable = 0
 
     def set_object_data(self, obj):
         GeometryNode.set_object_data(self, obj)
 
-        obj.kb.dummytype    = self.dummytype
-        obj.kb.refmodel     = self.refmodel
+        obj.kb.dummytype = self.dummytype
+        obj.kb.refmodel = self.refmodel
         obj.kb.reattachable = (self.reattachable == 1)

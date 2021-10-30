@@ -28,8 +28,8 @@ class KB_OT_anim_move(bpy.types.Operator):
     bl_label = "Move an animation in the list, without affecting keyframes"
     bl_options = {'UNDO'}
 
-    direction : bpy.props.EnumProperty(items=(("UP", "Up", ""),
-                                              ("DOWN", "Down", "")))
+    direction: bpy.props.EnumProperty(items=(("UP", "Up", ""),
+                                             ("DOWN", "Down", "")))
 
     @classmethod
     def poll(self, context):

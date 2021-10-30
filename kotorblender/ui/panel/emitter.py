@@ -27,8 +27,8 @@ class KB_PT_emitter(bpy.types.Panel):
     format. This is only available for particle systems.
     It is located under the particle panel in the properties window
     """
-    bl_label       = "Odyssey Emitter Properties"
-    bl_space_type  = 'PROPERTIES'
+    bl_label = "Odyssey Emitter Properties"
+    bl_space_type = 'PROPERTIES'
     bl_region_type = 'WINDOW'
     bl_context = "object"
 
@@ -36,8 +36,8 @@ class KB_PT_emitter(bpy.types.Panel):
     def poll(cls, context):
         try:
             return context.object and \
-                   context.object.type == 'MESH' and \
-                   context.object.kb.meshtype == defines.Meshtype.EMITTER
+                context.object.type == 'MESH' and \
+                context.object.kb.meshtype == defines.Meshtype.EMITTER
         except:
             return False
 
@@ -293,11 +293,11 @@ class KB_PT_emitter(bpy.types.Panel):
         # Blast props
         parent_box = box
         box = box.row().box()
-        row =  box.row()
+        row = box.row()
         row.label(text="Blast")
-        row =  box.row()
+        row = box.row()
         row.prop(obj.kb, "blastradius")
-        row =  box.row()
+        row = box.row()
         row.prop(obj.kb, "blastlength")
         box = parent_box
 

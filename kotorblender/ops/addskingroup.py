@@ -21,10 +21,10 @@ import bpy
 
 class KB_OT_add_skingroup(bpy.types.Operator):
     bl_idname = "kb.skingroup_add"
-    bl_label  = "Add new Skingroup"
+    bl_label = "Add new Skingroup"
 
     def execute(self, context):
-        obj        = context.object
+        obj = context.object
         skingr_name = obj.kb.skingroup_obj
         # Check if there is already a vertex group with this name
         if skingr_name:

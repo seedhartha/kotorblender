@@ -27,7 +27,7 @@ class KB_OT_load_wok_materials(bpy.types.Operator):
     material slots will be deleted.
     """
     bl_idname = "kb.load_wok_mats"
-    bl_label  = "Load walkmesh materials"
+    bl_label = "Load walkmesh materials"
 
     def execute(self, context):
         """
@@ -53,8 +53,8 @@ class KB_OT_load_wok_materials(bpy.types.Operator):
                 else:
                     mat = bpy.data.materials.new(mat_name)
 
-                    mat.diffuse_color      = [*matDef[1], 1.0]
-                    mat.specular_color     = (0.0,0.0,0.0)
+                    mat.diffuse_color = [*matDef[1], 1.0]
+                    mat.specular_color = (0.0, 0.0, 0.0)
                     mat.specular_intensity = matDef[2]
 
                 object_mesh.materials.append(mat)

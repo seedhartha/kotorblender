@@ -18,8 +18,8 @@
 
 import struct
 
-class BinaryReader:
 
+class BinaryReader:
     def __init__(self, path, byteorder):
         self.file = open(path, "rb")
         self.byteorder = byteorder

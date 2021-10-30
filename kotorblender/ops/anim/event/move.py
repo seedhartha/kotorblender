@@ -28,8 +28,8 @@ class KB_OT_anim_event_move(bpy.types.Operator):
     bl_label = "Move an item in the event  list"
     bl_options = {'UNDO'}
 
-    direction : bpy.props.EnumProperty(items=(("UP", "Up", ""),
-                                              ("DOWN", "Down", "")))
+    direction: bpy.props.EnumProperty(items=(("UP", "Up", ""),
+                                             ("DOWN", "Down", "")))
 
     @classmethod
     def poll(self, context):

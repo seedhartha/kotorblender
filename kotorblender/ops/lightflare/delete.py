@@ -32,10 +32,10 @@ class KB_OT_delete_lightflare(bpy.types.Operator):
 
     def execute(self, context):
         flare_list = context.object.kb.flare_list
-        flare_idx  = context.object.kb.flare_listIdx
+        flare_idx = context.object.kb.flare_listIdx
 
         flare_list.remove(flare_idx)
         if flare_idx > 0:
-            flare_idx =flare_idx - 1
+            flare_idx = flare_idx - 1
 
         return{"FINISHED"}

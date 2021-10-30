@@ -20,6 +20,7 @@
 Light utility functions.
 """
 
+
 def calc_light_power(light):
     """
     Calculate Eevee light power from Aurora light radius and multiplier

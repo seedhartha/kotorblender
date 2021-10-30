@@ -20,7 +20,6 @@ from ..binwriter import BinaryWriter
 
 
 class BwmSaver:
-
     def __init__(self, path):
         self.bwm = BinaryWriter(path, 'little')
 

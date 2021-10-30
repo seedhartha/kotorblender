@@ -105,7 +105,7 @@ class EmitterNode(GeometryNode):
         "colormid",
         "colorend"]
 
-    def __init__(self, name = "UNNAMED"):
+    def __init__(self, name="UNNAMED"):
         GeometryNode.__init__(self, name)
         self.nodetype = "emitter"
 
@@ -193,7 +193,7 @@ class EmitterNode(GeometryNode):
 
     def add_to_collection(self, collection):
         mesh = self.create_mesh(self.name)
-        obj  = bpy.data.objects.new(self.name, mesh)
+        obj = bpy.data.objects.new(self.name, mesh)
 
         self.set_object_data(obj)
         collection.objects.link(obj)
@@ -203,8 +203,8 @@ class EmitterNode(GeometryNode):
         # Create the mesh itself
         mesh = bpy.data.meshes.new(objName)
         a_bmesh = bmesh.new(use_operators=False)
-        a_bmesh.verts.new(( (self.xsize/2) / 100.0,  (self.ysize/2) / 100.0, 0.0))
-        a_bmesh.verts.new(( (self.xsize/2) / 100.0, (-self.ysize/2) / 100.0, 0.0))
+        a_bmesh.verts.new(((self.xsize/2) / 100.0,  (self.ysize/2) / 100.0, 0.0))
+        a_bmesh.verts.new(((self.xsize/2) / 100.0, (-self.ysize/2) / 100.0, 0.0))
         a_bmesh.verts.new(((-self.xsize/2) / 100.0, (-self.ysize/2) / 100.0, 0.0))
         a_bmesh.verts.new(((-self.xsize/2) / 100.0,  (self.ysize/2) / 100.0, 0.0))
         a_bmesh.verts.ensure_lookup_table()

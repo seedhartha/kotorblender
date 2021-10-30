@@ -23,21 +23,21 @@ from .trimesh import TrimeshNode
 
 class DanglymeshNode(TrimeshNode):
 
-    def __init__(self, name = "UNNAMED"):
+    def __init__(self, name="UNNAMED"):
         TrimeshNode.__init__(self, name)
         self.nodetype = "danglymesh"
 
-        self.meshtype     = defines.Meshtype.DANGLYMESH
-        self.period       = 1.0
-        self.tightness    = 1.0
+        self.meshtype = defines.Meshtype.DANGLYMESH
+        self.period = 1.0
+        self.tightness = 1.0
         self.displacement = 1.0
-        self.constraints  = []
+        self.constraints = []
 
     def set_object_data(self, obj):
         TrimeshNode.set_object_data(self, obj)
 
-        obj.kb.period       = self.period
-        obj.kb.tightness    = self.tightness
+        obj.kb.period = self.period
+        obj.kb.tightness = self.tightness
         obj.kb.displacement = self.displacement
         self.add_constraints_to_object(obj)
 

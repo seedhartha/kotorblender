@@ -20,7 +20,6 @@ from ..binwriter import BinaryWriter
 
 
 class MdlSaver:
-
     def __init__(self, path):
         self.mdl = BinaryWriter(path, 'little')
 
