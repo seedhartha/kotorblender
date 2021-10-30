@@ -19,18 +19,12 @@
 import bpy
 
 from .ops.addskingroup import KB_OT_add_skingroup
-from .ops.anim.clone import KB_OT_anim_clone
-from .ops.anim.crop import KB_OT_anim_crop
 from .ops.anim.delete import KB_OT_anim_delete
 from .ops.anim.event.delete import KB_OT_anim_event_delete
 from .ops.anim.event.move import KB_OT_anim_event_move
 from .ops.anim.event.new import KB_OT_anim_event_new
-from .ops.anim.focus import KB_OT_anim_focus
 from .ops.anim.move import KB_OT_anim_move
-from .ops.anim.moveback import KB_OT_anim_moveback
 from .ops.anim.new import KB_OT_anim_new
-from .ops.anim.pad import KB_OT_anim_pad
-from .ops.anim.scale import KB_OT_anim_scale
 from .ops.lightflare.delete import KB_OT_delete_lightflare
 from .ops.lightflare.move import KB_OT_move_lightflare
 from .ops.lightflare.new import KB_OT_new_lightflare
@@ -55,7 +49,6 @@ from .ui.list.animevents import KB_UL_anim_events
 from .ui.list.anims import KB_UL_anims
 from .ui.list.lightflares import KB_UL_lightflares
 from .ui.list.pathpoints import KB_UL_path_points
-from .ui.menu.animlistspecials import KB_MT_animlist_specials
 from .ui.panel.animlist import KB_PT_animlist
 from .ui.panel.emitter import KB_PT_emitter
 from .ui.panel.empty import KB_PT_empty
@@ -114,15 +107,12 @@ classes = (
     # Operators
 
     KB_OT_add_connection,
-    KB_OT_anim_clone,
-    KB_OT_anim_crop,
     KB_OT_anim_event_delete,
     KB_OT_anim_delete,
     KB_OT_delete_lightflare,
     KB_OT_export_lyt,
     KB_OT_export_mdl,
     KB_OT_export_path,
-    KB_OT_anim_focus,
     KB_OT_import_lyt,
     KB_OT_import_mdl,
     KB_OT_import_path,
@@ -132,14 +122,11 @@ classes = (
     KB_OT_recreate_armature,
     KB_OT_anim_event_move,
     KB_OT_anim_move,
-    KB_OT_anim_moveback,
     KB_OT_move_lightflare,
     KB_OT_anim_event_new,
     KB_OT_anim_new,
     KB_OT_new_lightflare,
-    KB_OT_anim_pad,
     KB_OT_remove_connection,
-    KB_OT_anim_scale,
 
     # Panels
 
@@ -149,10 +136,6 @@ classes = (
     KB_PT_light,
     KB_PT_mesh,
     KB_PT_path_point,
-
-    # Menus
-
-    KB_MT_animlist_specials,
 
     # UI Lists
 
