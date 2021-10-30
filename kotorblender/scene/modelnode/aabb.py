@@ -19,8 +19,11 @@
 import bpy
 
 from bpy_extras.io_utils import unpack_list
+from mathutils import Vector
 
-from ... import defines
+from ...exception.malformedfile import MalformedFile
+
+from ... import defines, utils
 
 from .trimesh import TrimeshNode
 
@@ -86,23 +89,33 @@ class AabbNode(TrimeshNode):
             uv_layer = mesh.uv_layers.new(name="UVMap_lm", do_init=False)
             uv_layer.data.foreach_set("uv", uv)
 
-        # If there are room links in MDL, then this model is from MDLedit, and we must NOT skip non-walkable faces
-        if self.roottype == "mdl" and len(self.roomlinks):
-            self.set_room_links(mesh, False)
-
         mesh.update()
         return mesh
 
-    def compute_layout_position(self, wkm):
-        wkmv1 = wkm.verts[wkm.facelist.faces[0][0]]
-        wkmv1 = (wkmv1[0] - wkm.position[0],
-                 wkmv1[1] - wkm.position[1],
-                 wkmv1[2] - wkm.position[2])
-        for faceIdx, face in enumerate(self.facelist.faces):
-            if self.facelist.matId[faceIdx] != 7:
-                v1 = self.verts[face[0]]
-                self.lytposition = (round(wkmv1[0] - v1[0], 6),
-                                    round(wkmv1[1] - v1[1], 6),
-                                    round(wkmv1[2] - v1[2], 6))
+    def compute_lyt_position(self, wok_geom):
+        self.lytposition = [0.0] * 3
+        wok_vert = Vector(wok_geom.verts[wok_geom.facelist.faces[0][0]])
+        wok_mat_id = wok_geom.facelist.matId[0]
+        for i in range(len(self.facelist.faces)):
+            mdl_mat_id = self.facelist.matId[i]
+            if mdl_mat_id == wok_mat_id:
+                mdl_vert = self.verts[self.facelist.faces[i][0]]
+                mdl_vert_from_root = self.fromRoot @ Vector(mdl_vert)
+                self.lytposition = wok_vert - mdl_vert_from_root
                 break
-        bpy.data.objects[self.objref].kb.lytposition = self.lytposition
+
+    def compute_room_links(self, wok_geom, outer_edges):
+        self.roomlinks = []
+        for edge in outer_edges:
+            if edge[1] == 0xffffffff:
+                continue
+            wok_face = wok_geom.facelist.faces[edge[0] // 3]
+            wok_verts = [wok_geom.verts[idx] for idx in wok_face]
+            for face_idx, mdl_vert_indices in enumerate(self.facelist.faces):
+                mdl_verts = [self.verts[idx] for idx in mdl_vert_indices]
+                mdl_verts_from_root = [self.fromRoot @ Vector(vert) for vert in mdl_verts]
+                mdl_verts_lyt_space = [vert + self.lytposition for vert in mdl_verts_from_root]
+                if all([utils.isclose_3f(wok_verts[i], mdl_verts_lyt_space[i]) for i in range(3)]):
+                    self.roomlinks.append((3 * face_idx + (edge[0] % 3), edge[1]))
+                    break
+

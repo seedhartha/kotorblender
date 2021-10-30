@@ -131,12 +131,8 @@ class TrimeshNode(GeometryNode):
                 uv = unpack_list([self.tverts1[i] for indices in self.texindices1 for i in indices])
             else:
                 uv = unpack_list([self.tverts1[i] for indices in self.facelist.uvIdx for i in indices])
-
             uv_layer = mesh.uv_layers.new(name="UVMap_lm", do_init=False)
             uv_layer.data.foreach_set("uv", uv)
-
-        if self.roottype == "wok" and len(self.roomlinks):
-            self.set_room_links(mesh)
 
         mesh.update()
         return mesh
