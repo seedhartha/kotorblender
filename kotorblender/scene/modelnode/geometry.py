@@ -27,9 +27,7 @@ class GeometryNode:
 
     def __init__(self, name = "UNNAMED"):
         self.nodetype = "undefined"
-
         self.roottype = "mdl"
-        self.rootname = "undefined"
 
         self.name        = name
         self.parentName  = defines.null

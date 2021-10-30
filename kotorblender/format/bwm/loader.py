@@ -17,23 +17,15 @@
 # ##### END GPL LICENSE BLOCK #####
 
 from ...exception.malformedfile import MalformedFile
-from ...scene.roomwalkmesh import RoomWalkmesh
+from ...scene.areawalkmesh import AreaWalkmesh
+from ...scene.modelnode.dummy import DummyNode
+from ...scene.modelnode.trimesh import FaceList, TrimeshNode
 from ...scene.walkmesh import Walkmesh
 
 from ..binreader import BinaryReader
 
-WALKMESH_TYPE_PLACEABLE = 0
-WALKMESH_TYPE_ROOM = 1
-
-
-class Face:
-    def __init__(self, vert_indices, material_id, normal, distance):
-        self.vert_indices = vert_indices
-        self.material_id = material_id
-        self.normal = normal
-        self.distance = distance
-
-        self.adj_edges = []
+WALKMESH_TYPE_SITUATED = 0
+WALKMESH_TYPE_AREA = 1
 
 
 class AABB:
@@ -47,8 +39,9 @@ class AABB:
 
 class BwmLoader:
 
-    def __init__(self, path):
+    def __init__(self, path, model_name):
         self.path = path
+        self.model_name = model_name
         self.bwm = BinaryReader(path, 'little')
 
     def load(self):
@@ -93,16 +86,58 @@ class BwmLoader:
         self.num_perimeters = self.bwm.get_uint32()
         self.off_perimeters = self.bwm.get_uint32()
 
-        if type == WALKMESH_TYPE_PLACEABLE:
-            self.walkmesh = Walkmesh()
+        if type == WALKMESH_TYPE_AREA:
+            self.walkmesh = AreaWalkmesh()
+
+            root_node = DummyNode("{}_wok".format(self.model_name))
+            self.walkmesh.add_node(root_node)
+
+            self.geom_node = TrimeshNode("{}_wok_geom".format(self.model_name))
+            self.geom_node.roottype = "wok"
+            self.geom_node.parentName = root_node.name
+            self.geom_node.position = position
+            self.walkmesh.add_node(self.geom_node)
         else:
-            self.walkmesh = RoomWalkmesh()
+            walkmesh_type = "dwk" if self.path.endswith("dwk") else "pwk"
+            self.walkmesh = Walkmesh(walkmesh_type)
+
+            if walkmesh_type == "dwk":
+                if self.path.endswith("0.dwk"):
+                    dwk_state = "open1"
+                elif self.path.endswith("1.dwk"):
+                    dwk_state = "open2"
+                else:
+                    dwk_state = "closed"
+                root_node_name = "{}_{}_{}".format(self.model_name, walkmesh_type, dwk_state)
+                geom_node_name = "{}_{}_{}_geom".format(self.model_name, walkmesh_type, dwk_state)
+            else:
+                root_node_name = "{}_{}".format(self.model_name, walkmesh_type)
+                geom_node_name = "{}_{}_geom".format(self.model_name, walkmesh_type)
+
+            root_node = DummyNode(root_node_name)
+            self.walkmesh.add_node(root_node)
+
+            self.geom_node = TrimeshNode(geom_node_name)
+            self.geom_node.roottype = walkmesh_type
+            self.geom_node.parentName = root_node.name
+            self.geom_node.position = position
+            self.walkmesh.add_node(self.geom_node)
+
+            use1_node = DummyNode("{}_01".format(geom_node_name))
+            use1_node.parentName = geom_node_name
+            use1_node.position = rel_use_vec1
+            self.walkmesh.add_node(use1_node)
+
+            use2_node = DummyNode("{}_02".format(geom_node_name))
+            use2_node.parentName = geom_node_name
+            use2_node.position = rel_use_vec2
+            self.walkmesh.add_node(use2_node)
 
     def load_vertices(self):
         self.bwm.seek(self.off_verts)
         for _ in range(self.num_verts):
             vert = [self.bwm.get_float() for _ in range(3)]
-            self.walkmesh.verts.append(vert)
+            self.geom_node.verts.append(vert)
 
     def load_faces(self):
         vert_indices = []
@@ -122,10 +157,14 @@ class BwmLoader:
         self.bwm.seek(self.off_distances)
         distances = [self.bwm.get_float() for _ in range(self.num_faces)]
 
-        self.walkmesh.faces = [Face(vert_indices[i], material_ids[i], normals[i], distances[i]) for i in range(self.num_faces)]
+        for i in range(self.num_faces):
+            self.geom_node.facelist.faces.append(vert_indices[i])
+            self.geom_node.facelist.shdgr.append(1) # TODO
+            self.geom_node.facelist.uvIdx.append([0] * 3)
+            self.geom_node.facelist.matId.append(material_ids[i])
 
     def load_aabbs(self):
-        self.aabbs = []
+        aabbs = []
         self.bwm.seek(self.off_aabbs)
         for _ in range(self.num_aabbs):
             bounding_box = [self.bwm.get_float() for _ in range(6)]
@@ -134,19 +173,20 @@ class BwmLoader:
             most_significant_plane = self.bwm.get_uint32()
             child_idx1 = self.bwm.get_uint32()
             child_idx2 = self.bwm.get_uint32()
-            self.aabbs.append(AABB(bounding_box, face_idx, most_significant_plane, child_idx1, child_idx2))
+            aabbs.append(AABB(bounding_box, face_idx, most_significant_plane, child_idx1, child_idx2))
 
     def load_adjacent_edges(self):
+        adj_edges = []
         self.bwm.seek(self.off_adj_edges)
         for i in range(self.num_adj_edges):
-            self.walkmesh.faces[i].adj_edges = [self.bwm.get_int32() for _ in range(3)]
+            adj_edges.append([self.bwm.get_int32() for _ in range(3)])
 
     def load_outer_edges(self):
         self.bwm.seek(self.off_outer_edges)
         for _ in range(self.num_outer_edges):
             index = self.bwm.get_uint32()
             transition = self.bwm.get_uint32()
-            self.walkmesh.outerEdges.append((index, transition))
+            self.walkmesh.outer_edges.append((index, transition))
 
     def load_perimeters(self):
         self.bwm.seek(self.off_perimeters)

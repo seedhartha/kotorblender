@@ -16,24 +16,13 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-import collections
-
-from .. import defines
-
 from .walkmesh import Walkmesh
 
 
-class RoomWalkmesh(Walkmesh):
+class AreaWalkmesh(Walkmesh):
 
-    def __init__(self, name = "UNNAMED", wkmType = "wok"):
-        self.nodeDict       = collections.OrderedDict()
-        self.name           = name
-        self.walkmeshType   = "wok"
-        self.classification = defines.Classification.UNKNOWN
+    def __init__(self):
+        Walkmesh.__init__(self, "wok")
 
-        self.verts = []
-        self.faces = []
-        self.outerEdges = []
-
-    def import_to_collection(self, collection):
+    def import_to_collection(self, model_name, collection):
         pass
