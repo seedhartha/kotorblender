@@ -158,7 +158,6 @@ class BwmLoader:
 
         for i in range(self.num_faces):
             self.geom_node.facelist.faces.append(vert_indices[i])
-            self.geom_node.facelist.shdgr.append(1)  # TODO
             self.geom_node.facelist.uvIdx.append([0] * 3)
             self.geom_node.facelist.matId.append(material_ids[i])
 
