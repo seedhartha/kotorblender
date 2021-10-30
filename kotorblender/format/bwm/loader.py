@@ -16,6 +16,7 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+from ...defines import Dummytype
 from ...exception.malformedfile import MalformedFile
 from ...scene.areawalkmesh import AreaWalkmesh
 from ...scene.modelnode.dummy import DummyNode
@@ -86,20 +87,13 @@ class BwmLoader:
         self.off_perimeters = self.bwm.get_uint32()
 
         if type == WALKMESH_TYPE_AREA:
-            self.walkmesh = AreaWalkmesh()
-
-            root_node = DummyNode("{}_wok".format(self.model_name))
-            self.walkmesh.add_node(root_node)
-
-            self.geom_node = TrimeshNode("{}_wok_geom".format(self.model_name))
+            self.geom_node = TrimeshNode("{}_wok_wg".format(self.model_name))
             self.geom_node.roottype = "wok"
-            self.geom_node.parent_name = root_node.name
             self.geom_node.position = position
+            self.walkmesh = AreaWalkmesh()
             self.walkmesh.add_node(self.geom_node)
         else:
             walkmesh_type = "dwk" if self.path.endswith("dwk") else "pwk"
-            self.walkmesh = Walkmesh(walkmesh_type)
-
             if walkmesh_type == "dwk":
                 if self.path.endswith("0.dwk"):
                     dwk_state = "open1"
@@ -107,29 +101,36 @@ class BwmLoader:
                     dwk_state = "open2"
                 else:
                     dwk_state = "closed"
-                root_node_name = "{}_{}_{}".format(self.model_name, walkmesh_type, dwk_state)
-                geom_node_name = "{}_{}_{}_geom".format(self.model_name, walkmesh_type, dwk_state)
+                root_name = "{}_dwk_{}".format(self.model_name, dwk_state)
+                geom_name = "{}_dwk_wg_{}".format(self.model_name, dwk_state)
+                use_name1 = "{}_dwk_dp_{}_01".format(self.model_name, dwk_state)
+                use_name2 = "{}_dwk_dp_{}_02".format(self.model_name, dwk_state)
             else:
-                root_node_name = "{}_{}".format(self.model_name, walkmesh_type)
-                geom_node_name = "{}_{}_geom".format(self.model_name, walkmesh_type)
+                root_name = "{}_pwk".format(self.model_name)
+                geom_name = "{}_pwk_wg".format(self.model_name)
+                use_name1 = "{}_pwk_use01".format(geom_name)
+                use_name2 = "{}_pwk_use02".format(geom_name)
 
-            root_node = DummyNode(root_node_name)
-            self.walkmesh.add_node(root_node)
+            root_node = DummyNode(root_name)
+            root_node.dummytype = Dummytype.DWKROOT if walkmesh_type == "dwk" else Dummytype.PWKROOT
 
-            self.geom_node = TrimeshNode(geom_node_name)
+            self.geom_node = TrimeshNode(geom_name)
             self.geom_node.roottype = walkmesh_type
-            self.geom_node.parent_name = root_node.name
+            self.geom_node.parent_name = root_name
             self.geom_node.position = position
-            self.walkmesh.add_node(self.geom_node)
 
-            use1_node = DummyNode("{}_01".format(geom_node_name))
-            use1_node.parent_name = geom_node_name
+            use1_node = DummyNode(use_name1)
+            use1_node.parent_name = geom_name
             use1_node.position = rel_use_vec1
-            self.walkmesh.add_node(use1_node)
 
-            use2_node = DummyNode("{}_02".format(geom_node_name))
-            use2_node.parent_name = geom_node_name
+            use2_node = DummyNode(use_name2)
+            use2_node.parent_name = geom_name
             use2_node.position = rel_use_vec2
+
+            self.walkmesh = Walkmesh(walkmesh_type)
+            self.walkmesh.add_node(root_node)
+            self.walkmesh.add_node(self.geom_node)
+            self.walkmesh.add_node(use1_node)
             self.walkmesh.add_node(use2_node)
 
     def load_vertices(self):

@@ -106,6 +106,7 @@ def do_load_mdl(filepath, position=(0.0, 0.0, 0.0)):
             dwk_walkmesh3 = dwk3.load()
 
     model.import_to_collection(collection, position)
+    model_root = next(iter(model.node_dict.values()))
 
     if wok_walkmesh:
         aabb = next((node for node in model.node_dict.values() if isinstance(node, AabbNode)), None)
@@ -113,11 +114,11 @@ def do_load_mdl(filepath, position=(0.0, 0.0, 0.0)):
         if aabb and wok_geom:
             aabb.set_room_links(collection.objects[aabb.name].data)
     if pwk_walkmesh:
-        pwk_walkmesh.import_to_collection(collection)
+        pwk_walkmesh.import_to_collection(model_root.name, collection)
     if dwk_walkmesh1 and dwk_walkmesh2 and dwk_walkmesh3:
-        dwk_walkmesh1.import_to_collection(collection)
-        dwk_walkmesh2.import_to_collection(collection)
-        dwk_walkmesh3.import_to_collection(collection)
+        dwk_walkmesh1.import_to_collection(model_root.name, collection)
+        dwk_walkmesh2.import_to_collection(model_root.name, collection)
+        dwk_walkmesh3.import_to_collection(model_root.name, collection)
 
     return {'FINISHED'}
 
