@@ -41,7 +41,6 @@ class GeometryNode:
         self.fromRoot = Matrix()
 
         self.objref = ""
-        self.rawascii = "" # unprocessed directives
 
     def add_to_collection(self, collection):
         obj = bpy.data.objects.new(self.name, None)
@@ -58,8 +57,3 @@ class GeometryNode:
         obj.location            = self.position
         obj.kb.restloc          = obj.location
         obj.kb.wirecolor        = self.wirecolor
-        # add unprocessed data as text objects
-        if (len(self.rawascii)):
-            txt = bpy.data.texts.new(obj.name)
-            txt.write(self.rawascii)
-            obj.kb.rawascii = txt.name

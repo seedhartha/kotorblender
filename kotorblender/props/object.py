@@ -223,8 +223,6 @@ class ObjectPropertyGroup(bpy.types.PropertyGroup):
     radius : bpy.props.FloatProperty(name = "Radius", default = 0.0, min = 0.0, max = 10000.0, update = update_light_power)
     multiplier : bpy.props.FloatProperty(name = "Multiplier", default = 1.0, min = 0.0, max = 10.0, update = update_light_power)
 
-    rawascii : bpy.props.StringProperty(name = "Text node", description = "Name of the raw text node", default = "")
-
     # For emitters
 
     # update rules:

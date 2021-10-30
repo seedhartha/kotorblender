@@ -16,7 +16,6 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-import addon_utils
 import bpy
 
 from .ops.addskingroup import KB_OT_add_skingroup
@@ -38,8 +37,6 @@ from .ops.lightflare.new import KB_OT_new_lightflare
 from .ops.loadwokmaterials import KB_OT_load_wok_materials
 from .ops.lyt.export import KB_OT_export_lyt
 from .ops.lyt.importop import KB_OT_import_lyt
-from .ops.mdl.ascii.export import KB_OT_export_ascii_mdl
-from .ops.mdl.ascii.importop import KB_OT_import_ascii_mdl
 from .ops.mdl.export import KB_OT_export_mdl
 from .ops.mdl.importop import KB_OT_import_mdl
 from .ops.path.addconnection import KB_OT_add_connection
@@ -94,10 +91,6 @@ def menu_func_import_mdl(self, context):
     self.layout.operator(KB_OT_import_mdl.bl_idname, text="KotOR Model (.mdl)")
 
 
-def menu_func_import_ascii_mdl(self, context):
-    self.layout.operator(KB_OT_import_ascii_mdl.bl_idname, text="KotOR Model (.mdl.ascii)")
-
-
 def menu_func_import_lyt(self, context):
     self.layout.operator(KB_OT_import_lyt.bl_idname, text="KotOR Layout (.lyt)")
 
@@ -108,10 +101,6 @@ def menu_func_import_pth(self, context):
 
 def menu_func_export_mdl(self, context):
     self.layout.operator(KB_OT_export_mdl.bl_idname, text="KotOR Model (.mdl)")
-
-
-def menu_func_export_ascii_mdl(self, context):
-    self.layout.operator(KB_OT_export_ascii_mdl.bl_idname, text="KotOR Model (.mdl.ascii)")
 
 
 def menu_func_export_lyt(self, context):
@@ -142,13 +131,11 @@ classes = (
     KB_OT_anim_event_delete,
     KB_OT_anim_delete,
     KB_OT_delete_lightflare,
-    KB_OT_export_ascii_mdl,
     KB_OT_export_lyt,
     KB_OT_export_mdl,
     KB_OT_export_path,
     KB_OT_anim_focus,
     KB_OT_generate_smoothgroup,
-    KB_OT_import_ascii_mdl,
     KB_OT_import_lyt,
     KB_OT_import_mdl,
     KB_OT_import_path,
@@ -204,11 +191,9 @@ def register():
     bpy.types.ImageTexture.kb = bpy.props.PointerProperty(type=TexturePropertyGroup)
 
     bpy.types.TOPBAR_MT_file_import.append(menu_func_import_mdl)
-    bpy.types.TOPBAR_MT_file_import.append(menu_func_import_ascii_mdl)
     bpy.types.TOPBAR_MT_file_import.append(menu_func_import_lyt)
     bpy.types.TOPBAR_MT_file_import.append(menu_func_import_pth)
     bpy.types.TOPBAR_MT_file_export.append(menu_func_export_mdl)
-    bpy.types.TOPBAR_MT_file_export.append(menu_func_export_ascii_mdl)
     bpy.types.TOPBAR_MT_file_export.append(menu_func_export_lyt)
     bpy.types.TOPBAR_MT_file_export.append(menu_func_export_pth)
 
@@ -216,7 +201,6 @@ def register():
 def unregister():
     bpy.types.TOPBAR_MT_file_export.remove(menu_func_export_pth)
     bpy.types.TOPBAR_MT_file_export.remove(menu_func_export_lyt)
-    bpy.types.TOPBAR_MT_file_export.remove(menu_func_export_ascii_mdl)
     bpy.types.TOPBAR_MT_file_export.remove(menu_func_export_mdl)
     bpy.types.TOPBAR_MT_file_import.remove(menu_func_import_pth)
     bpy.types.TOPBAR_MT_file_import.remove(menu_func_import_lyt)

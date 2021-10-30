@@ -55,8 +55,6 @@ class KB_PT_mesh(bpy.types.Panel):
 
             row = box.row()
             row.prop(obj.kb, "wirecolor", text="Wirecolor")
-            row = box.row()
-            row.prop_search(obj.kb, "rawascii", bpy.data, "texts", text="Data")
 
         else: # Trimesh, danglymesh, skin
             row = layout.row()
