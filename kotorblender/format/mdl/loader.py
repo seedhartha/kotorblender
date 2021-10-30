@@ -212,6 +212,21 @@ EMITTER_CONTROLLER_KEYS = [
     (CTRL_EMITTER_COLOREND, "colorEnd", 3)
 ]
 
+SABER_FACES = [
+    [5, 4, 0],
+    [0, 1, 5],
+    [13, 8, 12],
+    [8, 13, 9],
+    [6, 5, 1],
+    [1, 2, 6],
+    [10, 9, 13],
+    [13, 14, 10],
+    [3, 6, 2],
+    [6, 3, 7],
+    [15, 11, 14],
+    [10, 14, 11]
+]
+
 
 class ControllerKey:
     def __init__(self, ctrl_type, num_rows, timekeys_start, values_start, num_columns):
@@ -564,9 +579,9 @@ class MdlLoader:
             self.load_aabb(off_root_aabb)
 
         if type_flags & NODE_SABER:
-            off_verts = self.mdl.get_uint32()
-            off_uv = self.mdl.get_uint32()
-            off_normals = self.mdl.get_uint32()
+            off_saber_verts = self.mdl.get_uint32()
+            off_saber_uv = self.mdl.get_uint32()
+            off_saber_normals = self.mdl.get_uint32()
             inv_count1 = self.mdl.get_uint32()
             inv_count2 = self.mdl.get_uint32()
 
@@ -660,7 +675,12 @@ class MdlLoader:
 
         if type_flags & NODE_MESH:
             node.facelist = FaceList()
-            if face_arr.count > 0:
+            if type_flags & NODE_SABER:
+                for face in SABER_FACES:
+                    node.facelist.faces.append(face)
+                    node.facelist.uvIdx.append(face)
+                    node.facelist.matId.append(0)
+            elif face_arr.count > 0:
                 self.mdl.seek(MDL_OFFSET + face_arr.offset)
                 for _ in range(face_arr.count):
                     normal = [self.mdl.get_float() for _ in range(3)]
@@ -669,7 +689,6 @@ class MdlLoader:
                     adjacent_faces = [self.mdl.get_uint16() for _ in range(3)]
                     vert_indices = [self.mdl.get_uint16() for _ in range(3)]
                     node.facelist.faces.append(tuple(vert_indices))
-                    node.facelist.shdgr.append(1)  # TODO
                     node.facelist.uvIdx.append(tuple(vert_indices))
                     node.facelist.matId.append(material_id)
                 if index_count_arr.count > 0:
@@ -687,29 +706,52 @@ class MdlLoader:
             node.tverts = []
             node.tverts1 = []
             node.weights = []
-            for i in range(num_verts):
-                self.mdx.seek(mdx_offset + i * mdx_data_size + off_mdx_verts)
-                node.verts.append(tuple([self.mdx.get_float() for _ in range(3)]))
-                if mdx_data_bitmap & MDX_FLAG_UV1:
-                    self.mdx.seek(mdx_offset + i * mdx_data_size + off_mdx_uv1)
-                    node.tverts.append(tuple([self.mdx.get_float() for _ in range(2)]))
-                if mdx_data_bitmap & MDX_FLAG_UV2:
-                    self.mdx.seek(mdx_offset + i * mdx_data_size + off_mdx_uv2)
-                    node.tverts1.append(tuple([self.mdx.get_float() for _ in range(2)]))
-                if type_flags & NODE_SKIN:
-                    self.mdx.seek(mdx_offset + i * mdx_data_size + off_mdx_bone_weights)
-                    bone_weights = [self.mdx.get_float() for _ in range(4)]
-                    self.mdx.seek(mdx_offset + i * mdx_data_size + off_mdx_bone_indices)
-                    bone_indices = [self.mdx.get_float() for _ in range(4)]
-                    vert_weights = []
-                    for i in range(4):
-                        bone_idx = int(bone_indices[i])
-                        if bone_idx == -1:
-                            continue
-                        node_idx = node_by_bone[bone_idx]
-                        node_name = self.node_names_df[node_idx]
-                        vert_weights.append([node_name, bone_weights[i]])
-                    node.weights.append(vert_weights)
+
+            if type_flags & NODE_SABER:
+                saber_verts = []
+                self.mdl.seek(MDL_OFFSET + off_saber_verts)
+                for i in range(176):
+                    saber_verts.append([self.mdl.get_float() for _ in range(3)])
+                saber_tverts = []
+                self.mdl.seek(MDL_OFFSET + off_saber_uv)
+                for i in range(176):
+                    saber_tverts.append([self.mdl.get_float() for _ in range(2)])
+                for i in range(4):
+                    node.verts.append(saber_verts[i])
+                    node.tverts.append(saber_tverts[i])
+                for i in range(4):
+                    node.verts.append(saber_verts[i])
+                    node.tverts.append(saber_tverts[4+i])
+                for i in range(88, 92):
+                    node.verts.append(saber_verts[i])
+                    node.tverts.append(saber_tverts[i])
+                for i in range(88, 92):
+                    node.verts.append(saber_verts[i])
+                    node.tverts.append(saber_tverts[4+i])
+            elif mdx_data_size > 0:
+                for i in range(num_verts):
+                    self.mdx.seek(mdx_offset + i * mdx_data_size + off_mdx_verts)
+                    node.verts.append(tuple([self.mdx.get_float() for _ in range(3)]))
+                    if mdx_data_bitmap & MDX_FLAG_UV1:
+                        self.mdx.seek(mdx_offset + i * mdx_data_size + off_mdx_uv1)
+                        node.tverts.append(tuple([self.mdx.get_float() for _ in range(2)]))
+                    if mdx_data_bitmap & MDX_FLAG_UV2:
+                        self.mdx.seek(mdx_offset + i * mdx_data_size + off_mdx_uv2)
+                        node.tverts1.append(tuple([self.mdx.get_float() for _ in range(2)]))
+                    if type_flags & NODE_SKIN:
+                        self.mdx.seek(mdx_offset + i * mdx_data_size + off_mdx_bone_weights)
+                        bone_weights = [self.mdx.get_float() for _ in range(4)]
+                        self.mdx.seek(mdx_offset + i * mdx_data_size + off_mdx_bone_indices)
+                        bone_indices = [self.mdx.get_float() for _ in range(4)]
+                        vert_weights = []
+                        for i in range(4):
+                            bone_idx = int(bone_indices[i])
+                            if bone_idx == -1:
+                                continue
+                            node_idx = node_by_bone[bone_idx]
+                            node_name = self.node_names_df[node_idx]
+                            vert_weights.append([node_name, bone_weights[i]])
+                        node.weights.append(vert_weights)
 
         self.mdl.seek(MDL_OFFSET + children_arr.offset)
         child_offsets = [self.mdl.get_uint32() for _ in range(children_arr.count)]

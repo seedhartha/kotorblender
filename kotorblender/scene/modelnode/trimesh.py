@@ -31,7 +31,6 @@ from .geometry import GeometryNode
 class FaceList:
     def __init__(self):
         self.faces = []  # int 3-tuple, vertex indices
-        self.shdgr = []  # int, shading group for this face
         self.uvIdx = []  # int 3-tuple, texture/uv vertex indices
         self.matId = []  # int, material index
 
