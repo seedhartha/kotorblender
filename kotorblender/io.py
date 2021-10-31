@@ -108,7 +108,7 @@ def load_pth(
                 connection.point = name
 
 
-def save_mdl(filepath):
+def save_mdl(filepath, export_for_tsl=False):
     # reset pose
     bpy.context.scene.frame_set(1)
 
@@ -120,7 +120,7 @@ def save_mdl(filepath):
     print("Exporting MDL root {}".format(mdl_root.name))
     model = Model.from_mdl_root(mdl_root)
 
-    mdl = MdlSaver(filepath, model)
+    mdl = MdlSaver(filepath, model, export_for_tsl)
     mdl.save()
 
 

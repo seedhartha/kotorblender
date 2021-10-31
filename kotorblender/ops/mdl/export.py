@@ -34,6 +34,11 @@ class KB_OT_export_mdl(bpy.types.Operator, bpy_extras.io_utils.ExportHelper):
         default="*.mdl",
         options={'HIDDEN'})
 
+    export_for_tsl: bpy.props.BoolProperty(
+        name="Export for TSL",
+        description="Use The Sith Lords MDL format",
+        default=False)
+
     def execute(self, context):
         io.save_mdl(**self.as_keywords(ignore=("filter_glob", "check_existing")))
         return {'FINISHED'}

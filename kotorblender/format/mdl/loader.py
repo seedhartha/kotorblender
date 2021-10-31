@@ -42,29 +42,9 @@ from ... import defines
 
 from ..binreader import BinaryReader
 
+from .types import *
+
 MDL_OFFSET = 12
-
-FN_PTR_1_K1_PC = 4273776
-FN_PTR_1_K2_PC = 4285200
-
-CLASS_OTHER = 0x00
-CLASS_EFFECT = 0x01
-CLASS_TILE = 0x02
-CLASS_CHARACTER = 0x04
-CLASS_DOOR = 0x08
-CLASS_LIGHTSABER = 0x10
-CLASS_PLACEABLE = 0x20
-CLASS_FLYER = 0x40
-
-NODE_BASE = 0x0001
-NODE_LIGHT = 0x0002
-NODE_EMITTER = 0x0004
-NODE_REFERENCE = 0x0010
-NODE_MESH = 0x0020
-NODE_SKIN = 0x0040
-NODE_DANGLY = 0x0100
-NODE_AABB = 0x0200
-NODE_SABER = 0x0800
 
 CTRL_BASE_POSITION = 8
 CTRL_BASE_ORIENTATION = 20
@@ -150,17 +130,6 @@ EMITTER_FLAG_SPLAT = 0x0200
 EMITTER_FLAG_INHERIT_PART = 0x0400
 EMITTER_FLAG_DEPTH_TEXTURE = 0x0800
 EMITTER_FLAG_13 = 0x1000
-
-CLASS_BY_VALUE = {
-    CLASS_OTHER: Classification.UNKNOWN,
-    CLASS_EFFECT: Classification.EFFECT,
-    CLASS_TILE: Classification.TILE,
-    CLASS_CHARACTER: Classification.CHARACTER,
-    CLASS_DOOR: Classification.DOOR,
-    CLASS_LIGHTSABER: Classification.SABER,
-    CLASS_PLACEABLE: Classification.DOOR,
-    CLASS_FLYER: Classification.FLYER
-}
 
 EMITTER_CONTROLLER_KEYS = [
     (CTRL_EMITTER_ALPHASTART, "alphastart", 1),
@@ -292,7 +261,8 @@ class MdlLoader:
 
     def load_geometry_header(self):
         fn_ptr1 = self.mdl.get_uint32()
-        self.tsl = fn_ptr1 == FN_PTR_1_K2_PC
+        self.tsl = fn_ptr1 == MODEL_FN_PTR_1_K2_PC
+
         fn_ptr2 = self.mdl.get_uint32()
         model_name = self.mdl.get_c_string_up_to(32)
         self.off_root_node = self.mdl.get_uint32()
