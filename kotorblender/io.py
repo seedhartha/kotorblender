@@ -19,6 +19,7 @@
 import os
 
 import bpy
+from kotorblender.scene.modelnode.trimesh import TrimeshNode
 
 from .format.bwm.loader import BwmLoader
 from .format.mdl.loader import MdlLoader
@@ -83,8 +84,8 @@ def do_load_mdl(filepath, position=(0.0, 0.0, 0.0)):
         if os.path.exists(wok_path):
             wok = BwmLoader(wok_path, model.name)
             wok_walkmesh = wok.load()
-            aabb = next((node for node in model.node_dict.values() if isinstance(node, AabbNode)), None)
-            wok_geom = next((node for node in wok_walkmesh.node_dict.values() if node.name.lower().endswith("_geom")), None)
+            aabb = model.find_node(lambda n: isinstance(n, AabbNode))
+            wok_geom = wok_walkmesh.find_node(lambda n: isinstance(n, TrimeshNode))
             if aabb and wok_geom:
                 aabb.compute_lyt_position(wok_geom)
                 aabb.compute_room_links(wok_geom, wok_walkmesh.outer_edges)
@@ -105,20 +106,19 @@ def do_load_mdl(filepath, position=(0.0, 0.0, 0.0)):
             dwk_walkmesh2 = dwk2.load()
             dwk_walkmesh3 = dwk3.load()
 
-    model.import_to_collection(collection, position)
-    model_root = next(iter(model.node_dict.values()))
+    model_root = model.import_to_collection(collection, position)
 
     if wok_walkmesh:
-        aabb = next((node for node in model.node_dict.values() if isinstance(node, AabbNode)), None)
-        wok_geom = next((node for node in wok_walkmesh.node_dict.values() if node.name.lower().endswith("_geom")), None)
+        aabb = model.find_node(lambda n: isinstance(n, AabbNode))
+        wok_geom = wok_walkmesh.find_node(lambda n: isinstance(n, TrimeshNode))
         if aabb and wok_geom:
             aabb.set_room_links(collection.objects[aabb.name].data)
     if pwk_walkmesh:
-        pwk_walkmesh.import_to_collection(model_root.name, collection)
+        pwk_walkmesh.import_to_collection(model_root, collection)
     if dwk_walkmesh1 and dwk_walkmesh2 and dwk_walkmesh3:
-        dwk_walkmesh1.import_to_collection(model_root.name, collection)
-        dwk_walkmesh2.import_to_collection(model_root.name, collection)
-        dwk_walkmesh3.import_to_collection(model_root.name, collection)
+        dwk_walkmesh1.import_to_collection(model_root, collection)
+        dwk_walkmesh2.import_to_collection(model_root, collection)
+        dwk_walkmesh3.import_to_collection(model_root, collection)
 
     return {'FINISHED'}
 

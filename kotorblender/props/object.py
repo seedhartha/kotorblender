@@ -86,8 +86,6 @@ class ObjectPropertyGroup(bpy.types.PropertyGroup):
                                      default=0.0,
                                      options=set())
 
-    imporder: bpy.props.IntProperty(name="Order of Import", default=0)
-
     # For all emptys
     dummytype: bpy.props.EnumProperty(name="Type",
                                       items=[(defines.Dummytype.NONE,      "None",                "Simple dummy object",                                        0),

@@ -263,7 +263,9 @@ class MdlLoader:
             raise MdxNotFound("MDX file '{}' not found".format(mdx_path))
 
         self.mdx = BinaryReader(mdx_path, 'little')
+
         self.node_names_df = []  # depth first array of node names
+        self.node_by_number = dict()
 
     def load(self):
         print("Loading MDL '{}'".format(self.path))
@@ -274,7 +276,9 @@ class MdlLoader:
         self.load_geometry_header()
         self.load_model_header()
         self.load_names()
-        self.load_nodes(self.off_root_node)
+
+        self.model.root_node = self.load_nodes(self.off_root_node)
+
         self.load_animations()
 
         return self.model
@@ -359,21 +363,20 @@ class MdlLoader:
         controller_data_arr = self.get_array_def()
 
         name = self.names[name_index]
-        self.node_names_df.append(name)
-
         node_type = self.get_node_type(type_flags)
         node = self.new_node(name, node_type)
 
+        self.node_names_df.append(name)
+        self.node_by_number[supernode_number] = node
+
         if parent:
-            node.parent_name = parent.name
+            node.parent = parent
             node.from_root = parent.from_root
 
         node.supernode_number = supernode_number
         node.position = position
         node.orientation = orientation
         node.from_root = node.from_root @ Matrix.Translation(Vector(position)) @ Quaternion(orientation).to_matrix().to_4x4()
-
-        self.model.add_node(node)
 
         if type_flags & NODE_LIGHT:
             flare_radius = self.mdl.get_float()
@@ -756,7 +759,10 @@ class MdlLoader:
         self.mdl.seek(MDL_OFFSET + children_arr.offset)
         child_offsets = [self.mdl.get_uint32() for _ in range(children_arr.count)]
         for off_child in child_offsets:
-            self.load_nodes(off_child, node)
+            child = self.load_nodes(off_child, node)
+            node.children.append(child)
+
+        return node
 
     def load_aabb(self, offset):
         self.mdl.seek(MDL_OFFSET + offset)
@@ -834,14 +840,13 @@ class MdlLoader:
         anim.nodes.append(node)
 
         if controller_arr.count > 0:
-            supernode = next((node for node in self.model.node_dict.values() if node.supernode_number == supernode_number), None)
-            if not supernode:
+            if not supernode_number in self.node_by_number:
                 raise MalformedFile("Model node not found for animation node: " + str(name))
-            base_position = supernode.position
+            supernode = self.node_by_number[supernode_number]
             controllers = self.load_controllers(controller_arr, controller_data_arr)
             if CTRL_BASE_POSITION in controllers:
                 node.object_data["position"] = (
-                    [[row.timekey] + self.position_controller_to_vector(row.values, base_position) for row in controllers[CTRL_BASE_POSITION]],
+                    [[row.timekey] + self.position_controller_to_vector(row.values, supernode.position) for row in controllers[CTRL_BASE_POSITION]],
                     "location",
                     3
                 )
