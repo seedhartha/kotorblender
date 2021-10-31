@@ -119,7 +119,7 @@ class Model:
         return model
 
     @classmethod
-    def model_node_from_object(cls, obj, parent=None):
+    def model_node_from_object(cls, obj):
         if obj.type == 'EMPTY':
             if obj.kb.dummytype == Dummytype.REFERENCE:
                 node_type = Nodetype.REFERENCE
@@ -156,7 +156,9 @@ class Model:
         node.load_object_data(obj)
 
         for child_obj in obj.children:
-            child = Model.model_node_from_object(child_obj, node)
+            child = Model.model_node_from_object(child_obj)
+            if child_obj.type == 'EMPTY' and child_obj.kb.dummytype in [Dummytype.PWKROOT, Dummytype.DWKROOT]:
+                continue
             node.children.append(child)
 
         return node
