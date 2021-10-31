@@ -20,7 +20,7 @@ from ...defines import Dummytype
 from ...exception.malformedfile import MalformedFile
 from ...scene.areawalkmesh import AreaWalkmesh
 from ...scene.modelnode.dummy import DummyNode
-from ...scene.modelnode.trimesh import TrimeshNode
+from ...scene.modelnode.trimesh import FaceList, TrimeshNode
 from ...scene.walkmesh import Walkmesh
 
 from ..binreader import BinaryReader
@@ -44,6 +44,10 @@ class BwmLoader:
         self.model_name = model_name
         self.bwm = BinaryReader(path, 'little')
 
+        self.verts = []
+        self.facelist = FaceList()
+        self.outer_edges = []
+
     def load(self):
         print("Loading BWM '{}'".format(self.path))
 
@@ -55,7 +59,7 @@ class BwmLoader:
         self.load_outer_edges()
         self.load_perimeters()
 
-        return self.walkmesh
+        return self.new_walkmesh()
 
     def load_header(self):
         file_type = self.bwm.get_string(4)
@@ -63,12 +67,12 @@ class BwmLoader:
             raise MalformedFile("BWM file type is invalid: expected='BWM ', actual='{}'".format(file_type))
 
         version = self.bwm.get_string(4)
-        type = self.bwm.get_uint32()
-        rel_use_vec1 = [self.bwm.get_float() for _ in range(3)]
-        rel_use_vec2 = [self.bwm.get_float() for _ in range(3)]
+        self.walkmesh_type = self.bwm.get_uint32()
+        self.rel_use_vec1 = [self.bwm.get_float() for _ in range(3)]
+        self.rel_use_vec2 = [self.bwm.get_float() for _ in range(3)]
         abs_use_vec1 = [self.bwm.get_float() for _ in range(3)]
         abs_use_vec2 = [self.bwm.get_float() for _ in range(3)]
-        position = [self.bwm.get_float() for _ in range(3)]
+        self.position = [self.bwm.get_float() for _ in range(3)]
         self.num_verts = self.bwm.get_uint32()
         self.off_verts = self.bwm.get_uint32()
         self.num_faces = self.bwm.get_uint32()
@@ -86,58 +90,11 @@ class BwmLoader:
         self.num_perimeters = self.bwm.get_uint32()
         self.off_perimeters = self.bwm.get_uint32()
 
-        if type == WALKMESH_TYPE_AREA:
-            self.geom_node = TrimeshNode("{}_wok_wg".format(self.model_name))
-            self.geom_node.roottype = "wok"
-            self.geom_node.position = position
-            self.walkmesh = AreaWalkmesh()
-            self.walkmesh.add_node(self.geom_node)
-        else:
-            walkmesh_type = "dwk" if self.path.endswith("dwk") else "pwk"
-            if walkmesh_type == "dwk":
-                if self.path.endswith("0.dwk"):
-                    dwk_state = "open1"
-                elif self.path.endswith("1.dwk"):
-                    dwk_state = "open2"
-                else:
-                    dwk_state = "closed"
-                root_name = "{}_dwk_{}".format(self.model_name, dwk_state)
-                geom_name = "{}_dwk_wg_{}".format(self.model_name, dwk_state)
-                use_name1 = "{}_dwk_dp_{}_01".format(self.model_name, dwk_state)
-                use_name2 = "{}_dwk_dp_{}_02".format(self.model_name, dwk_state)
-            else:
-                root_name = "{}_pwk".format(self.model_name)
-                geom_name = "{}_pwk_wg".format(self.model_name)
-                use_name1 = "{}_pwk_use01".format(geom_name)
-                use_name2 = "{}_pwk_use02".format(geom_name)
-
-            root_node = DummyNode(root_name)
-            root_node.dummytype = Dummytype.DWKROOT if walkmesh_type == "dwk" else Dummytype.PWKROOT
-
-            self.geom_node = TrimeshNode(geom_name)
-            self.geom_node.roottype = walkmesh_type
-            self.geom_node.parent_name = root_name
-            self.geom_node.position = position
-
-            use1_node = DummyNode(use_name1)
-            use1_node.parent_name = geom_name
-            use1_node.position = rel_use_vec1
-
-            use2_node = DummyNode(use_name2)
-            use2_node.parent_name = geom_name
-            use2_node.position = rel_use_vec2
-
-            self.walkmesh = Walkmesh(walkmesh_type)
-            self.walkmesh.add_node(root_node)
-            self.walkmesh.add_node(self.geom_node)
-            self.walkmesh.add_node(use1_node)
-            self.walkmesh.add_node(use2_node)
-
     def load_vertices(self):
         self.bwm.seek(self.off_verts)
         for _ in range(self.num_verts):
             vert = [self.bwm.get_float() for _ in range(3)]
-            self.geom_node.verts.append(vert)
+            self.verts.append(vert)
 
     def load_faces(self):
         vert_indices = []
@@ -158,9 +115,9 @@ class BwmLoader:
         distances = [self.bwm.get_float() for _ in range(self.num_faces)]
 
         for i in range(self.num_faces):
-            self.geom_node.facelist.faces.append(vert_indices[i])
-            self.geom_node.facelist.uvIdx.append([0] * 3)
-            self.geom_node.facelist.matId.append(material_ids[i])
+            self.facelist.faces.append(vert_indices[i])
+            self.facelist.uvIdx.append([0] * 3)
+            self.facelist.matId.append(material_ids[i])
 
     def load_aabbs(self):
         aabbs = []
@@ -185,8 +142,76 @@ class BwmLoader:
         for _ in range(self.num_outer_edges):
             index = self.bwm.get_uint32()
             transition = self.bwm.get_uint32()
-            self.walkmesh.outer_edges.append((index, transition))
+            self.outer_edges.append((index, transition))
 
     def load_perimeters(self):
         self.bwm.seek(self.off_perimeters)
         self.perimeters = [self.bwm.get_uint32() for _ in range(self.num_perimeters)]
+
+    def new_walkmesh(self):
+        if self.walkmesh_type == WALKMESH_TYPE_AREA:
+            return self.new_area_walkmesh()
+        elif self.walkmesh_type == WALKMESH_TYPE_SITUATED:
+            return self.new_situated_walkmesh()
+        else:
+            raise MalformedFile("Unsupported walkmesh type: " + str(self.walkmesh_type))
+
+    def new_area_walkmesh(self):
+        geom_node = TrimeshNode("{}_wok_wg".format(self.model_name))
+        geom_node.roottype = "wok"
+        geom_node.position = self.position
+        geom_node.verts = self.verts
+        geom_node.facelist = self.facelist
+
+        walkmesh = AreaWalkmesh()
+        walkmesh.root_node = geom_node
+        walkmesh.outer_edges = self.outer_edges
+
+        return walkmesh
+
+    def new_situated_walkmesh(self):
+        type_name = "dwk" if self.path.endswith("dwk") else "pwk"
+        if type_name == "dwk":
+            if self.path.endswith("0.dwk"):
+                dwk_state = "open1"
+            elif self.path.endswith("1.dwk"):
+                dwk_state = "open2"
+            else:
+                dwk_state = "closed"
+            root_name = "{}_dwk_{}".format(self.model_name, dwk_state)
+            geom_name = "{}_dwk_wg_{}".format(self.model_name, dwk_state)
+            use_name1 = "{}_dwk_dp_{}_01".format(self.model_name, dwk_state)
+            use_name2 = "{}_dwk_dp_{}_02".format(self.model_name, dwk_state)
+        else:
+            root_name = "{}_pwk".format(self.model_name)
+            geom_name = "{}_pwk_wg".format(self.model_name)
+            use_name1 = "{}_pwk_use01".format(geom_name)
+            use_name2 = "{}_pwk_use02".format(geom_name)
+
+        root_node = DummyNode(root_name)
+        root_node.dummytype = Dummytype.DWKROOT if type_name == "dwk" else Dummytype.PWKROOT
+
+        geom_node = TrimeshNode(geom_name)
+        geom_node.roottype = type_name
+        geom_node.position = self.position
+        geom_node.parent = root_node
+        geom_node.verts = self.verts
+        geom_node.facelist = self.facelist
+
+        use1_node = DummyNode(use_name1)
+        use1_node.position = self.rel_use_vec1
+        use1_node.parent = geom_node
+
+        use2_node = DummyNode(use_name2)
+        use2_node.position = self.rel_use_vec2
+        use2_node.parent = geom_node
+
+        root_node.children.append(geom_node)
+        geom_node.children.append(use1_node)
+        geom_node.children.append(use2_node)
+
+        walkmesh = Walkmesh(type_name)
+        walkmesh.root_node = root_node
+        walkmesh.outer_edges = self.outer_edges
+
+        return walkmesh

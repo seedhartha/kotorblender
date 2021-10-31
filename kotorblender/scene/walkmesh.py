@@ -16,11 +16,10 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-import bpy
-
-from .. import utils
+from ..exception.malformedfile import MalformedFile
 
 from .model import Model
+from .modelnode.dummy import DummyNode
 
 
 class Walkmesh(Model):
@@ -31,13 +30,8 @@ class Walkmesh(Model):
 
         self.outer_edges = []
 
-    def import_to_collection(self, parent_name, collection):
-        if not self.node_dict:
-            return
-        for node in self.node_dict.values():
-            if utils.is_null(node.parent_name):
-                node.parent_name = parent_name
-            obj = node.add_to_collection(collection)
-            if node.parent_name in bpy.data.objects:
-                obj.parent = bpy.data.objects[node.parent_name]
-                obj.matrix_parent_inverse = obj.parent.matrix_world.inverted()
+    def import_to_collection(self, parent_obj, collection):
+        if type(self.root_node) != DummyNode or self.root_node.parent:
+            raise MalformedFile("Root node has to be a dummy without a parent")
+
+        self.import_nodes_to_collection(self.root_node, parent_obj, collection)

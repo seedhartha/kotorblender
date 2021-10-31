@@ -20,8 +20,6 @@ import bpy
 
 from mathutils import Matrix, Quaternion
 
-from ... import defines
-
 
 class GeometryNode:
 
@@ -30,15 +28,14 @@ class GeometryNode:
         self.roottype = "mdl"
 
         self.name = name
-        self.parent_name = defines.null
         self.position = (0.0, 0.0, 0.0)
         self.orientation = (1.0, 0.0, 0.0, 0.0)
         self.scale = 1.0
         self.wirecolor = (0.0, 0.0, 0.0)
 
+        self.parent = None
+        self.children = []
         self.from_root = Matrix()
-
-        self.objref = ""
 
     def add_to_collection(self, collection):
         obj = bpy.data.objects.new(self.name, None)
@@ -47,7 +44,6 @@ class GeometryNode:
         return obj
 
     def set_object_data(self, obj):
-        self.objref = obj.name  # used to resolve naming conflicts
         obj.rotation_mode = 'QUATERNION'
         obj.rotation_quaternion = Quaternion(self.orientation)
         obj.kb.restrot = self.orientation
@@ -55,3 +51,6 @@ class GeometryNode:
         obj.location = self.position
         obj.kb.restloc = obj.location
         obj.kb.wirecolor = self.wirecolor
+
+    def find_child(self, test):
+        return next(iter(child for child in self.children if test(child)), None)
