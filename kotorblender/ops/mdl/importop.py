@@ -54,7 +54,7 @@ class KB_OT_import_mdl(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
         default=True)
 
     texture_search_recursive: bpy.props.BoolProperty(
-        name="Image search",
+        name="Recursive Texture Search",
         description="Search for textures in subdirectories",
         default=False)
 
