@@ -86,6 +86,4 @@ class KB_PT_empty(bpy.types.Panel):
             box = row.box()
 
             row = box.row()
-            row.prop(obj.kb, "wirecolor")
-            row = box.row()
             row.prop(obj.kb, "dummysubtype")

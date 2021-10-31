@@ -49,8 +49,6 @@ class KB_PT_light(bpy.types.Panel):
         box = row.box()
 
         row = box.row()
-        row.prop(obj.kb, "wirecolor", text="Wirecolor")
-        row = box.row()
         row.prop(obj.kb, "lightpriority", text="Priority")
         row = box.row()
         row.prop(obj.kb, "radius", text="Radius")

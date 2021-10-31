@@ -31,7 +31,6 @@ class GeometryNode:
         self.position = (0.0, 0.0, 0.0)
         self.orientation = (1.0, 0.0, 0.0, 0.0)
         self.scale = 1.0
-        self.wirecolor = (0.0, 0.0, 0.0)
 
         self.parent = None
         self.children = []
@@ -50,7 +49,6 @@ class GeometryNode:
         obj.scale = (self.scale, self.scale, self.scale)
         obj.location = self.position
         obj.kb.restloc = obj.location
-        obj.kb.wirecolor = self.wirecolor
 
     def find_child(self, test):
         return next(iter(child for child in self.children if test(child)), None)

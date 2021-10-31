@@ -65,14 +65,6 @@ class ObjectPropertyGroup(bpy.types.PropertyGroup):
     format. It hold the properties for meshes, lights and empties.
     """
 
-    # For all objects
-    wirecolor: bpy.props.FloatVectorProperty(name="Wirecolor",
-                                             description="Color of the wireframe",
-                                             subtype='COLOR_GAMMA',
-                                             default=(1.0, 1.0, 1.0),
-                                             min=0.0, max=1.0,
-                                             soft_min=0.0, soft_max=1.0)
-
     # Helper properties to store additional values. Cannot be edited.
     restrot: bpy.props.FloatVectorProperty(name="Rest Pose Rotation",
                                            size=4,
