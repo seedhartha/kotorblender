@@ -16,8 +16,6 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-import collections
-
 from .. import defines, utils
 
 from .animnode import AnimationNode
