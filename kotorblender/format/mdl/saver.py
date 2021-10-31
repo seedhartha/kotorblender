@@ -27,7 +27,7 @@ class MdlSaver:
 
         basepath, _ = os.path.splitext(path)
         mdx_path = basepath + ".mdx"
-        self.mdx = BinaryWriter(path, 'little')
+        self.mdx = BinaryWriter(mdx_path, 'little')
 
         self.model = model
 
