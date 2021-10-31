@@ -65,19 +65,6 @@ class ObjectPropertyGroup(bpy.types.PropertyGroup):
     format. It hold the properties for meshes, lights and empties.
     """
 
-    # Helper properties to store additional values. Cannot be edited.
-    restrot: bpy.props.FloatVectorProperty(name="Rest Pose Rotation",
-                                           size=4,
-                                           default=(0.0, 0.0, 0.0, 0.0),
-                                           options=set())
-    restloc: bpy.props.FloatVectorProperty(name="Rest Pose Location",
-                                           size=3,
-                                           default=(0.0, 0.0, 0.0),
-                                           options=set())
-    restscl: bpy.props.FloatProperty(name="Rest Pose Scale",
-                                     default=0.0,
-                                     options=set())
-
     # For all emptys
     dummytype: bpy.props.EnumProperty(name="Type",
                                       items=[(defines.Dummytype.NONE,      "None",                "Simple dummy object",                                        0),

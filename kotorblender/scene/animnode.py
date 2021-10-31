@@ -96,14 +96,14 @@ class AnimationNode:
             return  # No action = no animation = no need for rest pose
         fcu = [action.fcurves.find("rotation_quaternion", index=i) for i in range(4)]
         if fcu.count(None) < 1:
-            q = Quaternion(obj.kb.restrot)
+            q = obj.rotation_quaternion
             insert_kfp(fcu, frame, [q.w, q.x, q.y, q.z], 4)
         fcu = [action.fcurves.find("location", index=i) for i in range(3)]
         if fcu.count(None) < 1:
-            insert_kfp(fcu, frame, obj.kb.restloc, 3)
+            insert_kfp(fcu, frame, obj.location, 3)
         fcu = [action.fcurves.find("scale", index=i) for i in range(3)]
         if fcu.count(None) < 1:
-            insert_kfp(fcu, frame, [obj.kb.restscl] * 3, 3)
+            insert_kfp(fcu, frame, obj.scale, 3)
 
     @staticmethod
     def insert_kfp(frames, values, action, dp, dp_dim, action_group=None):
