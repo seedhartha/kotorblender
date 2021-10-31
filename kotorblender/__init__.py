@@ -34,8 +34,8 @@ from .ops.lyt.importop import KB_OT_import_lyt
 from .ops.mdl.export import KB_OT_export_mdl
 from .ops.mdl.importop import KB_OT_import_mdl
 from .ops.pth.addconnection import KB_OT_add_connection
-from .ops.pth.export import KB_OT_export_path
-from .ops.pth.importop import KB_OT_import_path
+from .ops.pth.export import KB_OT_export_pth
+from .ops.pth.importop import KB_OT_import_pth
 from .ops.pth.removeconnection import KB_OT_remove_connection
 from .ops.rebuildmaterialnodes import KB_OT_rebuild_material_nodes
 from .ops.recreatearmature import KB_OT_recreate_armature
@@ -75,7 +75,7 @@ def menu_func_import_lyt(self, context):
 
 
 def menu_func_import_pth(self, context):
-    self.layout.operator(KB_OT_import_path.bl_idname, text="KotOR Path (.pth)")
+    self.layout.operator(KB_OT_import_pth.bl_idname, text="KotOR Path (.pth)")
 
 
 def menu_func_export_mdl(self, context):
@@ -87,7 +87,7 @@ def menu_func_export_lyt(self, context):
 
 
 def menu_func_export_pth(self, context):
-    self.layout.operator(KB_OT_export_path.bl_idname, text="KotOR Path (.pth)")
+    self.layout.operator(KB_OT_export_pth.bl_idname, text="KotOR Path (.pth)")
 
 
 classes = (
@@ -108,10 +108,10 @@ classes = (
     KB_OT_delete_lightflare,
     KB_OT_export_lyt,
     KB_OT_export_mdl,
-    KB_OT_export_path,
+    KB_OT_export_pth,
     KB_OT_import_lyt,
     KB_OT_import_mdl,
-    KB_OT_import_path,
+    KB_OT_import_pth,
     KB_OT_add_skingroup,
     KB_OT_load_wok_materials,
     KB_OT_rebuild_material_nodes,

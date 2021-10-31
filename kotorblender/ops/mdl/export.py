@@ -19,6 +19,8 @@
 import bpy
 import bpy_extras
 
+from ... import io
+
 
 class KB_OT_export_mdl(bpy.types.Operator, bpy_extras.io_utils.ExportHelper):
     """Export Odyssey Engine model (.mdl)"""
@@ -33,4 +35,5 @@ class KB_OT_export_mdl(bpy.types.Operator, bpy_extras.io_utils.ExportHelper):
         options={'HIDDEN'})
 
     def execute(self, context):
+        io.save_mdl(**self.as_keywords(ignore=("filter_glob", "check_existing")))
         return {'FINISHED'}
