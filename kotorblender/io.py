@@ -79,6 +79,7 @@ def load_pth(
         path_object = bpy.data.objects[pathname]
     else:
         path_object = bpy.data.objects.new(pathname, None)
+        path_object.kb.dummytype = Dummytype.PTHROOT
         bpy.context.collection.objects.link(path_object)
 
     loader = GffLoader(filepath, "PTH")
@@ -127,7 +128,7 @@ def save_lyt(filepath):
                     rooms.append(obj)
                 elif obj.name.lower().startswith("door"):
                     doors.append(obj)
-                else:
+                elif obj.kb.dummytype not in [Dummytype.PTHROOT, Dummytype.PATHPOINT]:
                     others.append(obj)
 
         f.write("beginlayout\n")
