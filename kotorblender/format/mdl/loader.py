@@ -276,6 +276,7 @@ class MdlLoader:
         self.load_geometry_header()
         self.load_model_header()
         self.load_names()
+        self.peek_nodes(self.off_root_node)
 
         self.model.root_node = self.load_nodes(self.off_root_node)
 
@@ -347,6 +348,21 @@ class MdlLoader:
             self.mdl.seek(MDL_OFFSET + off)
             self.names.append(self.mdl.get_c_string())
 
+    def peek_nodes(self, offset):
+        self.mdl.seek(MDL_OFFSET + offset)
+        self.mdl.skip(4)
+        name_index = self.mdl.get_uint16()
+        self.mdl.skip(38)
+        children_arr = self.get_array_def()
+
+        name = self.names[name_index]
+        self.node_names_df.append(name)
+
+        self.mdl.seek(MDL_OFFSET + children_arr.offset)
+        child_offsets = [self.mdl.get_uint32() for _ in range(children_arr.count)]
+        for off_child in child_offsets:
+            self.peek_nodes(off_child)
+
     def load_nodes(self, offset, parent=None):
         self.mdl.seek(MDL_OFFSET + offset)
 
@@ -366,7 +382,6 @@ class MdlLoader:
         node_type = self.get_node_type(type_flags)
         node = self.new_node(name, node_type)
 
-        self.node_names_df.append(name)
         self.node_by_number[supernode_number] = node
 
         if parent:
