@@ -48,5 +48,10 @@ class GeometryNode:
         obj.rotation_quaternion = Quaternion(self.orientation)
         obj.scale = (self.scale, self.scale, self.scale)
 
+    def load_object_data(self, obj):
+        self.position = obj.location
+        self.orientation = obj.rotation_quaternion
+        self.scale = obj.scale[0]
+
     def find_child(self, test):
         return next(iter(child for child in self.children if test(child)), None)

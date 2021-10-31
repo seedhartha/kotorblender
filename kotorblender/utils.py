@@ -205,3 +205,7 @@ def get_mdl_root(obj):
         return None
 
     return get_mdl_root(obj.parent)
+
+
+def get_node_class_from_object(obj):
+    pass

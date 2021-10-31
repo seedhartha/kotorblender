@@ -16,13 +16,20 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-import bpy
-
+from ..defines import Dummytype, Meshtype, Nodetype
 from ..exception.malformedfile import MalformedFile
 
 from .. import defines, glob
 
+from .modelnode.aabb import AabbNode
+from .modelnode.danglymesh import DanglymeshNode
 from .modelnode.dummy import DummyNode
+from .modelnode.emitter import EmitterNode
+from .modelnode.light import LightNode
+from .modelnode.lightsaber import LightsaberNode
+from .modelnode.reference import ReferenceNode
+from .modelnode.skinmesh import SkinmeshNode
+from .modelnode.trimesh import TrimeshNode
 
 from . import armature
 
@@ -102,9 +109,54 @@ class Model:
         model.supermodel = root_obj.kb.supermodel
         model.classification = root_obj.kb.classification
         model.subclassification = root_obj.kb.subclassification
-        model.ignorefog = not root_obj.kb.ignorefog
+        model.ignorefog = root_obj.kb.ignorefog
         model.compress_quats = root_obj.kb.compress_quats
         model.headlink = root_obj.kb.headlink
         model.animscale = root_obj.kb.animscale
 
+        model.root_node = Model.model_node_from_object(root_obj)
+
         return model
+
+    @classmethod
+    def model_node_from_object(cls, obj, parent=None):
+        if obj.type == 'EMPTY':
+            if obj.kb.dummytype == Dummytype.REFERENCE:
+                node_type = Nodetype.REFERENCE
+            else:
+                node_type = Nodetype.DUMMY
+        elif obj.type == 'MESH':
+            if obj.kb.meshtype == Meshtype.EMITTER:
+                node_type = Nodetype.EMITTER
+            elif obj.kb.meshtype == Meshtype.AABB:
+                node_type = Nodetype.AABB
+            elif obj.kb.meshtype == Meshtype.SKIN:
+                node_type = Nodetype.SKIN
+            elif obj.kb.meshtype == Meshtype.LIGHTSABER:
+                node_type = Nodetype.LIGHT
+            elif obj.kb.meshtype == Meshtype.DANGLYMESH:
+                node_type = Nodetype.DANGLYMESH
+            else:
+                node_type = Nodetype.TRIMESH
+        elif obj.type == 'LIGHT':
+            node_type = Nodetype.LIGHT
+
+        switch = {
+            Nodetype.DUMMY: DummyNode,
+            Nodetype.REFERENCE: ReferenceNode,
+            Nodetype.TRIMESH: TrimeshNode,
+            Nodetype.DANGLYMESH: DanglymeshNode,
+            Nodetype.SKIN: SkinmeshNode,
+            Nodetype.EMITTER: EmitterNode,
+            Nodetype.LIGHT: LightNode,
+            Nodetype.AABB: AabbNode,
+            Nodetype.LIGHTSABER: LightsaberNode
+        }
+        node = switch[node_type](obj.name)
+        node.load_object_data(obj)
+
+        for child_obj in obj.children:
+            child = Model.model_node_from_object(child_obj, node)
+            node.children.append(child)
+
+        return node
