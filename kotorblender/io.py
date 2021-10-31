@@ -19,13 +19,17 @@
 import os
 
 import bpy
-from kotorblender.scene.modelnode.trimesh import TrimeshNode
 
 from .format.bwm.loader import BwmLoader
+from .format.gff.loader import GffLoader
+from .format.gff.saver import GffSaver
 from .format.mdl.loader import MdlLoader
 from .scene.modelnode.aabb import AabbNode
+from .scene.modelnode.trimesh import TrimeshNode
 
-from . import glob
+from .defines import Dummytype
+
+from . import glob, utils
 
 
 def load_mdl(
@@ -45,8 +49,6 @@ def load_mdl(
 
     do_load_mdl(filepath)
 
-    return {'FINISHED'}
-
 
 def load_lyt(
     filepath="",
@@ -64,7 +66,130 @@ def load_lyt(
 
     do_load_lyt(filepath)
 
-    return {'FINISHED'}
+
+def load_pth(
+    filepath=""
+):
+    def get_point_name(idx):
+        return "PathPoint{0:0>3}".format(idx)
+
+    basename = os.path.basename(filepath)
+    pathname = "Path_" + os.path.splitext(basename)[0]
+    if pathname in bpy.data.objects:
+        path_object = bpy.data.objects[pathname]
+    else:
+        path_object = bpy.data.objects.new(pathname, None)
+        bpy.context.collection.objects.link(path_object)
+
+    loader = GffLoader(filepath, "PTH")
+    tree = loader.load()
+    points = []
+
+    for i, point in enumerate(tree["Path_Points"]):
+        name = get_point_name(i)
+        object = bpy.data.objects.new(name, None)
+        object.parent = path_object
+        object.location = [point["X"], point["Y"], 0.0]
+        object.kb.dummytype = Dummytype.PATHPOINT
+        bpy.context.collection.objects.link(object)
+        points.append((point, object))
+
+    for point, object in points:
+        start = point["First_Conection"]
+        stop = start + point["Conections"]
+        conections = tree["Path_Conections"][start:stop]
+        for conection in conections:
+            name = get_point_name(conection["Destination"])
+            if name in bpy.data.objects:
+                connection = object.kb.path_connections.add()
+                connection.point = name
+
+
+def save_mdl(filepath):
+    pass
+
+
+def save_lyt(filepath):
+    def describe_object(obj):
+        parent = utils.get_mdl_root(obj)
+        orientation = obj.rotation_euler.to_quaternion()
+        return "{} {} {:.7g} {:.7g} {:.7g} {:.7g} {:.7g} {:.7g} {:.7g}".format(parent.name if parent else "NULL", obj.name, *obj.matrix_world.translation, *orientation)
+
+    with open(filepath, "w") as f:
+        rooms = []
+        doors = []
+        others = []
+
+        objects = bpy.context.selected_objects if len(bpy.context.selected_objects) > 0 else bpy.context.collection.objects
+        for obj in objects:
+            if obj.type == 'EMPTY':
+                if obj.kb.dummytype == Dummytype.MDLROOT:
+                    rooms.append(obj)
+                elif obj.name.lower().startswith("door"):
+                    doors.append(obj)
+                else:
+                    others.append(obj)
+
+        f.write("beginlayout\n")
+        f.write("  roomcount {}\n".format(len(rooms)))
+        for room in rooms:
+            f.write("    {} {:.7g} {:.7g} {:.7g}\n".format(room.name, *room.location))
+        f.write("  trackcount 0\n")
+        f.write("  obstaclecount 0\n")
+        f.write("  doorhookcount {}\n".format(len(doors)))
+        for door in doors:
+            f.write("    {}\n".format(describe_object(door)))
+        f.write("  othercount {}\n".format(len(others)))
+        for other in others:
+            f.write("    {}\n".format(describe_object(other)))
+        f.write("donelayout\n")
+
+
+def save_pth(filepath):
+    point_objects = [obj for obj in bpy.data.objects if utils.is_path_point(obj)]
+
+    point_idx_by_name = dict()
+    for idx, obj in enumerate(point_objects):
+        point_idx_by_name[obj.name] = idx
+
+    points = []
+    conections = []
+    for obj in point_objects:
+        first_conection = len(conections)
+        for object_connection in obj.kb.path_connections:
+            conection = dict()
+            conection["_type"] = 3
+            conection["_fields"] = {
+                "Destination": 4
+            }
+            conection["Destination"] = point_idx_by_name[object_connection.point]
+            conections.append(conection)
+
+        point = dict()
+        point["_type"] = 2
+        point["_fields"] = {
+            "Conections": 4,
+            "First_Conection": 4,
+            "X": 8,
+            "Y": 8
+        }
+        point["Conections"] = len(obj.kb.path_connections)
+        point["First_Conection"] = first_conection
+        point["X"] = obj.location[0]
+        point["Y"] = obj.location[1]
+        points.append(point)
+
+    tree = dict()
+    tree["_type"] = 0xFFFFFFFF
+    tree["_fields"] = {
+        "Path_Points": 15,
+        "Path_Conections": 15
+    }
+    tree["Path_Points"] = points
+    tree["Path_Conections"] = conections
+
+    saver = GffSaver(tree, filepath, "PTH")
+    saver.save()
 
 
 def do_load_mdl(filepath, position=(0.0, 0.0, 0.0)):
@@ -119,8 +244,6 @@ def do_load_mdl(filepath, position=(0.0, 0.0, 0.0)):
         dwk_walkmesh1.import_to_collection(model_root, collection)
         dwk_walkmesh2.import_to_collection(model_root, collection)
         dwk_walkmesh3.import_to_collection(model_root, collection)
-
-    return {'FINISHED'}
 
 
 def do_load_lyt(filepath):
