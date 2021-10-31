@@ -109,6 +109,9 @@ def load_pth(
 
 
 def save_mdl(filepath):
+    # reset pose
+    bpy.context.scene.frame_set(1)
+
     mdl_root = next(iter(obj for obj in bpy.context.selected_objects if utils.is_root_dummy(obj)), None)
     if not mdl_root:
         mdl_root = next(iter(obj for obj in bpy.context.collection.objects if utils.is_root_dummy(obj)), None)
@@ -256,6 +259,9 @@ def do_load_mdl(filepath, position=(0.0, 0.0, 0.0)):
         dwk_walkmesh1.import_to_collection(model_root, collection)
         dwk_walkmesh2.import_to_collection(model_root, collection)
         dwk_walkmesh3.import_to_collection(model_root, collection)
+
+    # reset pose
+    bpy.context.scene.frame_set(1)
 
 
 def do_load_lyt(filepath):
