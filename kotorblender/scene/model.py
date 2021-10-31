@@ -94,3 +94,17 @@ class Model:
         if test(self.root_node):
             return self.root_node
         return self.root_node.find_child(test)
+
+    @classmethod
+    def from_mdl_root(cls, root_obj):
+        model = Model()
+        model.name = root_obj.name
+        model.supermodel = root_obj.kb.supermodel
+        model.classification = root_obj.kb.classification
+        model.subclassification = root_obj.kb.subclassification
+        model.ignorefog = not root_obj.kb.ignorefog
+        model.compress_quats = root_obj.kb.compress_quats
+        model.headlink = root_obj.kb.headlink
+        model.animscale = root_obj.kb.animscale
+
+        return model

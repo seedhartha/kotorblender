@@ -24,6 +24,8 @@ from .format.bwm.loader import BwmLoader
 from .format.gff.loader import GffLoader
 from .format.gff.saver import GffSaver
 from .format.mdl.loader import MdlLoader
+from .format.mdl.saver import MdlSaver
+from .scene.model import Model
 from .scene.modelnode.aabb import AabbNode
 from .scene.modelnode.trimesh import TrimeshNode
 
@@ -107,7 +109,16 @@ def load_pth(
 
 
 def save_mdl(filepath):
-    pass
+    mdl_root = next(iter(obj for obj in bpy.context.selected_objects if utils.is_root_dummy(obj)), None)
+    if not mdl_root:
+        mdl_root = next(iter(obj for obj in bpy.context.collection.objects if utils.is_root_dummy(obj)), None)
+    if not mdl_root:
+        return
+    print("Exporting MDL root {}".format(mdl_root.name))
+    model = Model.from_mdl_root(mdl_root)
+
+    mdl = MdlSaver(filepath, model)
+    mdl.save()
 
 
 def save_lyt(filepath):

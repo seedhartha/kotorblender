@@ -16,12 +16,25 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+import os
+
 from ..binwriter import BinaryWriter
 
 
 class MdlSaver:
-    def __init__(self, path):
+    def __init__(self, path, model):
         self.mdl = BinaryWriter(path, 'little')
 
+        basepath, _ = os.path.splitext(path)
+        mdx_path = basepath + ".mdx"
+        self.mdx = BinaryWriter(path, 'little')
+
+        self.model = model
+
     def save(self):
-        raise NotImplementedError()
+        mdl_size = 0
+        mdx_size = 0
+
+        self.mdl.put_uint32(0)
+        self.mdl.put_uint32(mdl_size)
+        self.mdl.put_uint32(mdx_size)
