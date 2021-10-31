@@ -18,11 +18,11 @@ This add-on is a fork of KotorBlender, upgraded to support Blender 2.8+. KotorBl
 
 ### Modelling
 
-1. Extract MDL, MDX, WOK, and, optionally, TPC and LYT files to a single directory (Kotor Tool, reone-tools, etc.)
+1. Extract MDL, MDX and, optionally, TPC, WOK, PWK, DWK, and LYT files (Kotor Tool, reone-tools, etc.)
 1. Convert TPC files to TGA/TXI (reone-tools)
 1. Import MDL into Blender via File → Import → KotOR Model (.mdl)
-1. Create/modify models
-1. Select an MDL root object to be exported 
+1. Edit model
+1. Select a MDL root object to be exported
 1. Export MDL via File → Export → KotOR Model (.mdl)
 
 ### Baking Lightmaps
@@ -64,7 +64,7 @@ Fine-tuning:
 
 ## Trivia
 
-- Check "Image search" when importing to recursively search for textures in subdirectories
+- Check "Recursive Texture Search" when importing to recursively search for textures in subdirectories
 
 ## Compatibility
 
