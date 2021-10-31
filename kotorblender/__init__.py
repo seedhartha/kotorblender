@@ -59,14 +59,10 @@ from .ui.panel.pathpoint import KB_PT_path_point
 bl_info = {
     "name": "KotorBlender",
     "author": "Attila Gyoerkoes & J.W. Brandon & Vsevolod Kremianskii",
-    "version": (2, 1, 0),
+    "version": (3, 0, 0),
     "blender": (2, 80, 0),
     "location": "File > Import-Export, Object Properties",
     "description": "Import, export and edit Odyssey Engine models (KotOR)",
-    "warning": "cannot be used with NeverBlender enabled",
-    "wiki_url": ""
-                "",
-    "tracker_url": "",
     "category": "Import-Export"}
 
 
@@ -143,7 +139,7 @@ classes = (
     KB_UL_anims,
     KB_UL_lightflares,
     KB_UL_path_points
-    )
+)
 
 
 def register():
