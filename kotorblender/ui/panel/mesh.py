@@ -53,9 +53,6 @@ class KB_PT_mesh(bpy.types.Panel):
             row = layout.row()
             box = row.box()
 
-            row = box.row()
-            row.prop(obj.kb, "wirecolor", text="Wirecolor")
-
         else:  # Trimesh, danglymesh, skin
             row = layout.row()
             box = row.box()
@@ -69,8 +66,6 @@ class KB_PT_mesh(bpy.types.Panel):
             row.prop(obj.kb, "ambient")
             row = box.row()
             row.prop(obj.kb, "selfillumcolor")
-            row = box.row()
-            row.prop(obj.kb, "wirecolor")
             row = box.row()
             row.prop(obj.kb, "alpha")
             row = box.row()
