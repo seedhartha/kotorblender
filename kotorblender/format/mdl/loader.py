@@ -46,65 +46,6 @@ from .types import *
 
 MDL_OFFSET = 12
 
-CTRL_BASE_POSITION = 8
-CTRL_BASE_ORIENTATION = 20
-CTRL_BASE_SCALE = 36
-CTRL_MESH_SELFILLUMCOLOR = 100
-CTRL_MESH_ALPHA = 132
-CTRL_LIGHT_COLOR = 76
-CTRL_LIGHT_RADIUS = 88
-CTRL_LIGHT_SHADOWRADIUS = 96
-CTRL_LIGHT_VERTICALDISPLACEMENT = 100
-CTRL_LIGHT_MULTIPLIER = 140
-CTRL_EMITTER_ALPHAEND = 80
-CTRL_EMITTER_ALPHASTART = 84
-CTRL_EMITTER_BIRTHRATE = 88
-CTRL_EMITTER_BOUNCE_CO = 92
-CTRL_EMITTER_COMBINETIME = 96
-CTRL_EMITTER_DRAG = 100
-CTRL_EMITTER_FPS = 104
-CTRL_EMITTER_FRAMEEND = 108
-CTRL_EMITTER_FRAMESTART = 112
-CTRL_EMITTER_GRAV = 116
-CTRL_EMITTER_LIFEEXP = 120
-CTRL_EMITTER_MASS = 124
-CTRL_EMITTER_P2P_BEZIER2 = 128
-CTRL_EMITTER_P2P_BEZIER3 = 132
-CTRL_EMITTER_PARTICLEROT = 136
-CTRL_EMITTER_RANDVEL = 140
-CTRL_EMITTER_SIZESTART = 144
-CTRL_EMITTER_SIZEEND = 148
-CTRL_EMITTER_SIZESTART_Y = 152
-CTRL_EMITTER_SIZEEND_Y = 156
-CTRL_EMITTER_SPREAD = 160
-CTRL_EMITTER_THRESHOLD = 164
-CTRL_EMITTER_VELOCITY = 168
-CTRL_EMITTER_XSIZE = 172
-CTRL_EMITTER_YSIZE = 176
-CTRL_EMITTER_BLURLENGTH = 180
-CTRL_EMITTER_LIGHTNINGDELAY = 184
-CTRL_EMITTER_LIGHTNINGRADIUS = 188
-CTRL_EMITTER_LIGHTNINGSCALE = 192
-CTRL_EMITTER_LIGHTNINGSUBDIV = 196
-CTRL_EMITTER_LIGHTNINGZIGZAG = 200
-CTRL_EMITTER_ALPHAMID = 216
-CTRL_EMITTER_PERCENTSTART = 220
-CTRL_EMITTER_PERCENTMID = 224
-CTRL_EMITTER_PERCENTEND = 228
-CTRL_EMITTER_SIZEMID = 232
-CTRL_EMITTER_SIZEMID_Y = 236
-CTRL_EMITTER_RANDOMBIRTHRATE = 240
-CTRL_EMITTER_TARGETSIZE = 252
-CTRL_EMITTER_NUMCONTROLPTS = 256
-CTRL_EMITTER_CONTROLPTRADIUS = 260
-CTRL_EMITTER_CONTROLPTDELAY = 264
-CTRL_EMITTER_TANGENTSPREAD = 268
-CTRL_EMITTER_TANGENTLENGTH = 272
-CTRL_EMITTER_COLORMID = 284
-CTRL_EMITTER_COLOREND = 380
-CTRL_EMITTER_COLORSTART = 392
-CTRL_EMITTER_DETONATE = 502
-
 MDX_FLAG_VERTEX = 0x0001
 MDX_FLAG_UV1 = 0x0002
 MDX_FLAG_UV2 = 0x0004
@@ -197,24 +138,6 @@ SABER_FACES = [
 ]
 
 
-class ControllerKey:
-    def __init__(self, ctrl_type, num_rows, timekeys_start, values_start, num_columns):
-        self.ctrl_type = ctrl_type
-        self.num_rows = num_rows
-        self.timekeys_start = timekeys_start
-        self.values_start = values_start
-        self.num_columns = num_columns
-
-
-class ControllerRow:
-    def __init__(self, timekey, values):
-        self.timekey = timekey
-        self.values = values
-
-    def __repr__(self):
-        return "{{timekey={}, values={}}}".format(self.timekey, self.values)
-
-
 class ArrayDefinition:
     def __init__(self, offset, count):
         self.offset = offset
@@ -233,7 +156,7 @@ class MdlLoader:
 
         self.mdx = BinaryReader(mdx_path, 'little')
 
-        self.node_names_df = []  # depth first array of node names
+        self.node_names = []
         self.node_by_number = dict()
 
     def load(self):
@@ -326,7 +249,7 @@ class MdlLoader:
         children_arr = self.get_array_def()
 
         name = self.names[name_index]
-        self.node_names_df.append(name)
+        self.node_names.append(name)
 
         self.mdl.seek(MDL_OFFSET + children_arr.offset)
         child_offsets = [self.mdl.get_uint32() for _ in range(children_arr.count)]
@@ -737,7 +660,7 @@ class MdlLoader:
                             if bone_idx == -1:
                                 continue
                             node_idx = node_by_bone[bone_idx]
-                            node_name = self.node_names_df[node_idx]
+                            node_name = self.node_names[node_idx]
                             vert_weights.append([node_name, bone_weights[i]])
                         node.weights.append(vert_weights)
 
