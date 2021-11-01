@@ -42,6 +42,8 @@ class KB_PT_light(bpy.types.Panel):
 
         row = layout.row()
         row.prop(obj.kb, "lighttype", text="Type")
+        row = layout.row()
+        row.prop(obj.kb, "export_order")
 
         layout.separator()
 

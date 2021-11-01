@@ -18,7 +18,7 @@
 
 import bpy
 
-from ... import (defines, utils)
+from ... import defines, utils
 
 
 class KB_PT_emitter(bpy.types.Panel):
@@ -48,6 +48,8 @@ class KB_PT_emitter(bpy.types.Panel):
 
         row = layout.row()
         row.prop(obj.kb, "meshtype", text="Type")
+        row = layout.row()
+        row.prop(obj.kb, "export_order")
 
         layout.separator()
 

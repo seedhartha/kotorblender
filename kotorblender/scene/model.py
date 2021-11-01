@@ -155,7 +155,7 @@ class Model:
         node = switch[node_type](obj.name)
         node.load_object_data(obj)
 
-        for child_obj in obj.children:
+        for child_obj in sorted(obj.children, key=lambda o: o.kb.export_order):
             child = Model.model_node_from_object(child_obj)
             if child_obj.type == 'EMPTY' and child_obj.kb.dummytype in [Dummytype.PWKROOT, Dummytype.DWKROOT]:
                 continue
