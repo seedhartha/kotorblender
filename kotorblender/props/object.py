@@ -65,6 +65,9 @@ class ObjectPropertyGroup(bpy.types.PropertyGroup):
     format. It hold the properties for meshes, lights and empties.
     """
 
+    # For all objects
+    export_order: bpy.props.IntProperty(name="Export Order", description="Export order within parent", default=0, min=0, max=1000)
+
     # For all emptys
     dummytype: bpy.props.EnumProperty(name="Type",
                                       items=[(defines.Dummytype.NONE,      "None",                "Simple dummy object",                                        0),

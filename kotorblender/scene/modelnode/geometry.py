@@ -27,6 +27,8 @@ class GeometryNode:
         self.nodetype = "undefined"
         self.roottype = "mdl"
 
+        self.supernode_number = 0
+        self.export_order = 0
         self.name = name
         self.position = (0.0, 0.0, 0.0)
         self.orientation = (1.0, 0.0, 0.0, 0.0)
@@ -43,12 +45,14 @@ class GeometryNode:
         return obj
 
     def set_object_data(self, obj):
+        obj.kb.export_order = self.export_order
         obj.location = self.position
         obj.rotation_mode = 'QUATERNION'
         obj.rotation_quaternion = Quaternion(self.orientation)
         obj.scale = (self.scale, self.scale, self.scale)
 
     def load_object_data(self, obj):
+        self.export_order = obj.kb.export_order
         self.position = obj.location
         self.orientation = obj.rotation_quaternion
         self.scale = obj.scale[0]

@@ -158,7 +158,7 @@ class MdlLoader:
         self.load_names()
         self.peek_nodes(self.off_root_node)
 
-        self.model.root_node = self.load_nodes(self.off_root_node)
+        self.model.root_node = self.load_nodes(self.off_root_node, 0)
 
         self.load_animations()
 
@@ -244,7 +244,7 @@ class MdlLoader:
         for off_child in child_offsets:
             self.peek_nodes(off_child)
 
-    def load_nodes(self, offset, parent=None):
+    def load_nodes(self, offset, export_order, parent=None):
         self.mdl.seek(MDL_OFFSET + offset)
 
         type_flags = self.mdl.get_uint16()
@@ -270,6 +270,7 @@ class MdlLoader:
             node.from_root = parent.from_root
 
         node.supernode_number = supernode_number
+        node.export_order = export_order
         node.position = position
         node.orientation = orientation
         node.from_root = node.from_root @ Matrix.Translation(Vector(position)) @ Quaternion(orientation).to_matrix().to_4x4()
@@ -654,8 +655,8 @@ class MdlLoader:
 
         self.mdl.seek(MDL_OFFSET + children_arr.offset)
         child_offsets = [self.mdl.get_uint32() for _ in range(children_arr.count)]
-        for off_child in child_offsets:
-            child = self.load_nodes(off_child, node)
+        for child_idx, off_child in enumerate(child_offsets):
+            child = self.load_nodes(off_child, child_idx, node)
             node.children.append(child)
 
         return node
