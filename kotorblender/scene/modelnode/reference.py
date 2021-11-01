@@ -37,3 +37,10 @@ class ReferenceNode(GeometryNode):
         obj.kb.dummytype = self.dummytype
         obj.kb.refmodel = self.refmodel
         obj.kb.reattachable = (self.reattachable == 1)
+
+    def load_object_data(self, obj):
+        GeometryNode.load_object_data(self, obj)
+
+        self.dummytype = obj.kb.dummytype
+        self.refmodel = obj.kb.refmodel
+        self.reattachable = 1 if obj.kb.reattachable else 0

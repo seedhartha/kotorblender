@@ -36,7 +36,7 @@ class EmitterNode(GeometryNode):
         "ygrid",
         "spawntype",
         "update",
-        "render",
+        "render_emitter",
         "blend",
         "texture",
         "chunk_name",
@@ -118,9 +118,9 @@ class EmitterNode(GeometryNode):
         self.controlptsmoothing = 0
         self.xgrid = 0
         self.ygrid = 0
-        self.spawntype = ""
+        self.spawntype = 0
         self.update = ""
-        self.render = ""
+        self.render_emitter = ""
         self.blend = ""
         self.texture = ""
         self.chunk_name = ""
@@ -223,9 +223,9 @@ class EmitterNode(GeometryNode):
             value = getattr(self, attrname)
             # Enum translation is not pretty...
             if attrname == "spawntype":
-                if value == "0":
+                if value == 0:
                     value = "Normal"
-                elif value == "1":
+                elif value == 1:
                     value = "Trail"
                 else:
                     value = "NONE"
@@ -234,8 +234,7 @@ class EmitterNode(GeometryNode):
                     value = "NONE"
                 else:
                     value = value.title()
-            elif attrname == "render":
-                attrname = "render_emitter"
+            elif attrname == "render_emitter":
                 if value not in ["Normal", "Billboard_to_Local_Z", "Billboard_to_World_Z",
                                  "Aligned_to_World_Z", "Aligned_to_Particle_Dir", "Motion_Blur"]:
                     value = "NONE"
@@ -255,3 +254,33 @@ class EmitterNode(GeometryNode):
                 obj.kb.p2p_sel = self.p2p_sel
                 continue
             setattr(obj.kb, attrname, value)
+
+    def load_object_data(self, obj):
+        GeometryNode.load_object_data(self, obj)
+
+        for attrname in self.emitter_attrs:
+            value = getattr(obj.kb, attrname)
+
+            if attrname == "spawntype":
+                if value == "Normal":
+                    value = 0
+                elif value == "Trail":
+                    value = 1
+                else:
+                    continue
+            elif attrname == "update":
+                if value not in ["Fountain", "Single", "Explosion", "Lightning"]:
+                    continue
+            elif attrname == "render_emitter":
+                if value not in ["Normal", "Billboard_to_Local_Z", "Billboard_to_World_Z", "Aligned_to_World_Z", "Aligned_to_Particle_Dir", "Motion_Blur"]:
+                    continue
+            elif attrname == "blend":
+                if value == "Punch-Through":
+                    value = "PunchThrough"
+                elif value not in ["Lighten", "Normal"]:
+                    continue
+            elif attrname == "p2p_sel":
+                self.p2p_sel = obj.kb.p2p_type == "Bezier"
+                continue
+
+            setattr(self, attrname, value)

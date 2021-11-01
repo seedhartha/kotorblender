@@ -181,7 +181,6 @@ class ObjectPropertyGroup(bpy.types.PropertyGroup):
     skingroup_obj: bpy.props.StringProperty(name="Bone", description="Name of the bone to create the skingroup for", default="")
 
     # For lights
-    lighttype: bpy.props.EnumProperty(name="Type", items=[("NONE", "None", "Simple light", 0), ("MAINLIGHT1", "Mainlight 1", "Mainlight for Tiles (Editable in toolset)", 1), ("MAINLIGHT2", "Mainlight 2", "Mainlight for Tiles (Editable in toolset)", 2), ("SOURCELIGHT1", "Sourcelight 1", "Editable in toolset", 3), ("SOURCELIGHT2", "Sourcelight 2", "Editable in toolset", 4)], default="NONE")
     ambientonly: bpy.props.BoolProperty(name="Ambient Only", default=False)
     lightpriority: bpy.props.IntProperty(name="Lightpriority", default=3, min=1, max=5)
     fadinglight: bpy.props.BoolProperty(name="Fading light", default=False)
