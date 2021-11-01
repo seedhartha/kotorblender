@@ -22,7 +22,7 @@ from math import sqrt
 
 from mathutils import Matrix, Quaternion, Vector
 
-from ...defines import Classification, Nodetype
+from ...defines import Nodetype
 from ...exception.malformedfile import MalformedFile
 from ...exception.mdxnotfound import MdxNotFound
 from ...scene.animation import Animation
@@ -45,18 +45,6 @@ from ..binreader import BinaryReader
 from .types import *
 
 MDL_OFFSET = 12
-
-MDX_FLAG_VERTEX = 0x0001
-MDX_FLAG_UV1 = 0x0002
-MDX_FLAG_UV2 = 0x0004
-MDX_FLAG_UV3 = 0x0008
-MDX_FLAG_UV4 = 0x0010
-MDX_FLAG_NORMAL = 0x0020
-MDX_FLAG_COLOR = 0x0040
-MDX_FLAG_TANGENT1 = 0x0080
-MDX_FLAG_TANGENT2 = 0x0100
-MDX_FLAG_TANGENT3 = 0x0200
-MDX_FLAG_TANGENT4 = 0x0400
 
 EMITTER_FLAG_P2P = 0x0001
 EMITTER_FLAG_P2P_SEL = 0x0002

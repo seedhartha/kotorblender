@@ -23,7 +23,7 @@ from mathutils import Vector
 
 from ... import defines, utils
 
-from .trimesh import TrimeshNode
+from .trimesh import TrimeshNode, UV_MAP_DIFFUSE, UV_MAP_LIGHTMAP
 
 
 class AabbNode(TrimeshNode):
@@ -100,7 +100,7 @@ class AabbNode(TrimeshNode):
         # Create UV map
         if len(self.tverts) > 0:
             uv = unpack_list([self.tverts[i] for indices in self.facelist.uvIdx for i in indices])
-            uv_layer = mesh.uv_layers.new(name="UVMap", do_init=False)
+            uv_layer = mesh.uv_layers.new(name=UV_MAP_DIFFUSE, do_init=False)
             uv_layer.data.foreach_set("uv", uv)
 
         # Create lightmap UV map
@@ -110,7 +110,7 @@ class AabbNode(TrimeshNode):
             else:
                 uv = unpack_list([self.tverts1[i] for indices in self.facelist.uvIdx for i in indices])
 
-            uv_layer = mesh.uv_layers.new(name="UVMap_lm", do_init=False)
+            uv_layer = mesh.uv_layers.new(name=UV_MAP_LIGHTMAP, do_init=False)
             uv_layer.data.foreach_set("uv", uv)
 
         mesh.update()

@@ -27,12 +27,16 @@ from .. import material
 
 from .geometry import GeometryNode
 
+UV_MAP_DIFFUSE = "UVMap"
+UV_MAP_LIGHTMAP = "UVMap_lm"
+
 
 class FaceList:
     def __init__(self):
         self.faces = []  # int 3-tuple, vertex indices
         self.uvIdx = []  # int 3-tuple, texture/uv vertex indices
         self.matId = []  # int, material index
+        self.normals = []  # float 3-tuple, normal
 
 
 class TrimeshNode(GeometryNode):
@@ -68,6 +72,7 @@ class TrimeshNode(GeometryNode):
         self.tangentspace = 0
         self.rotatetexture = 0
         self.verts = []  # list of vertices
+        self.normals = []  # list of normals
         self.facelist = FaceList()
         self.tverts = []  # list of texture vertices
         self.tverts1 = []  # list of texture vertices
@@ -119,7 +124,7 @@ class TrimeshNode(GeometryNode):
         # Create UV map
         if len(self.tverts) > 0:
             uv = unpack_list([self.tverts[i] for indices in self.facelist.uvIdx for i in indices])
-            uv_layer = mesh.uv_layers.new(name="UVMap", do_init=False)
+            uv_layer = mesh.uv_layers.new(name=UV_MAP_DIFFUSE, do_init=False)
             uv_layer.data.foreach_set("uv", uv)
 
         # Create lightmap UV map
@@ -128,7 +133,7 @@ class TrimeshNode(GeometryNode):
                 uv = unpack_list([self.tverts1[i] for indices in self.texindices1 for i in indices])
             else:
                 uv = unpack_list([self.tverts1[i] for indices in self.facelist.uvIdx for i in indices])
-            uv_layer = mesh.uv_layers.new(name="UVMap_lm", do_init=False)
+            uv_layer = mesh.uv_layers.new(name=UV_MAP_LIGHTMAP, do_init=False)
             uv_layer.data.foreach_set("uv", uv)
 
         mesh.update()
@@ -162,3 +167,64 @@ class TrimeshNode(GeometryNode):
         obj.kb.selfillumcolor = self.selfillumcolor
         obj.kb.diffuse = self.diffuse
         obj.kb.ambient = self.ambient
+
+    def load_object_data(self, obj):
+        GeometryNode.load_object_data(self, obj)
+
+        self.meshtype = obj.kb.meshtype
+        self.bitmap = obj.kb.bitmap if obj.kb.bitmap else defines.null
+        self.bitmap2 = obj.kb.bitmap2 if obj.kb.bitmap2 else ""
+        self.alpha = obj.kb.alpha
+        self.lightmapped = 1 if obj.kb.lightmapped else 0
+        self.render = 1 if obj.kb.render else 0
+        self.shadow = 1 if obj.kb.shadow else 0
+        self.beaming = 1 if obj.kb.beaming else 0
+        self.tangentspace = 1 if obj.kb.tangentspace else 0
+        self.inheritcolor = 1 if obj.kb.inheritcolor else 0
+        self.rotatetexture = 1 if obj.kb.rotatetexture else 0
+        self.background_geometry = 1 if obj.kb.background_geometry else 0
+        self.dirt_enabled = 1 if obj.kb.dirt_enabled else 0
+        self.dirt_texture = obj.kb.dirt_texture
+        self.dirt_worldspace = obj.kb.dirt_worldspace
+        self.hologram_donotdraw = 1 if obj.kb.hologram_donotdraw else 0
+        self.animateuv = 1 if obj.kb.animateuv else 0
+        self.uvdirectionx = obj.kb.uvdirectionx
+        self.uvdirectiony = obj.kb.uvdirectiony
+        self.uvjitter = obj.kb.uvjitter
+        self.uvjitterspeed = obj.kb.uvjitterspeed
+        self.transparencyhint = obj.kb.transparencyhint
+        self.selfillumcolor = obj.kb.selfillumcolor
+        self.diffuse = obj.kb.diffuse
+        self.ambient = obj.kb.ambient
+
+        mesh = obj.data
+
+        # Triangulation
+        bm = bmesh.new()
+        bm.from_mesh(mesh)
+        bmesh.ops.triangulate(bm, faces=bm.faces)
+        bm.to_mesh(mesh)
+        bm.free()
+
+        for vert in mesh.vertices:
+            self.verts.append(vert.co[:3])
+            self.normals.append(vert.normal[:3])
+
+        self.tverts = self.get_tverts_from_uv_layer(mesh, UV_MAP_DIFFUSE)
+        self.tverts1 = self.get_tverts_from_uv_layer(mesh, UV_MAP_LIGHTMAP)
+
+        for polygon in mesh.polygons:
+            self.facelist.faces.append(polygon.vertices[:3])
+            self.facelist.uvIdx.append(polygon.vertices[:3])
+            self.facelist.matId.append(polygon.material_index)
+            self.facelist.normals.append(polygon.normal)
+
+    def get_tverts_from_uv_layer(self, mesh, layer_name):
+        if not layer_name in mesh.uv_layers:
+            return []
+        layer_data = mesh.uv_layers[layer_name].data
+        tverts = dict()
+        for polygon_idx, polygon in enumerate(mesh.polygons):
+            for i in range(3):
+                tverts[polygon.vertices[i]] = layer_data[3 * polygon_idx + i].uv[:2]
+        return [v for _, v in sorted(tverts.items())]
