@@ -16,6 +16,7 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+from ntpath import realpath
 import os
 
 from ...defines import Nodetype
@@ -67,6 +68,12 @@ class MdlSaver:
         self.indices_offsets = dict()
         self.mdx_offsets = dict()
 
+        self.flare_sizes_offsets = dict()
+        self.flare_positions_offsets = dict()
+        self.flare_colorshifts_offsets = dict()
+        self.flare_texture_offset_offsets = dict()
+        self.flare_textures_offsets = dict()
+
     def save(self):
         self.peek_model()
 
@@ -112,6 +119,34 @@ class MdlSaver:
             self.mdl_pos += 80  # geometry header
 
             type_flags = self.get_node_flags(node)
+
+            if type_flags & NODE_LIGHT:
+                self.mdl_pos += 92  # light header
+
+                if node.lensflares:
+                    self.flare_sizes_offsets[node_idx] = self.mdl_pos
+                    self.mdl_pos += 4 * len(node.flare_list.sizes)
+
+                    self.flare_positions_offsets[node_idx] = self.mdl_pos
+                    self.mdl_pos += 4 * len(node.flare_list.positions)
+
+                    self.flare_colorshifts_offsets[node_idx] = self.mdl_pos
+                    self.mdl_pos += 4 * 3 * len(node.flare_light.colorshifts)
+
+                    self.flare_texture_offset_offsets[node_idx] = self.mdl_pos
+                    self.mdl_pos += 4 * len(node.flare_list.textures)
+
+                    self.flare_textures_offsets[node_idx] = []
+                    for tex in node.flare_list.textures:
+                        self.flare_textures_offsets[node_idx].append(self.mdl_pos)
+                        self.mdl_pos += len(tex) + 1
+
+            if type_flags & NODE_EMITTER:
+                self.mdl_pos += 224  # emitter header
+
+            if type_flags & NODE_REFERENCE:
+                self.mdl_pos += 36  # reference header
+
             if type_flags & NODE_MESH:
                 self.mdl_pos += 332  # mesh header
                 if self.tsl:
@@ -176,21 +211,44 @@ class MdlSaver:
 
         out_keys.append(ControllerKey(CTRL_BASE_ORIENTATION, 1, data_count, data_count + 1, 4))
         out_data.append(0.0)  # timekey
-        for val in node.orientation:
+        for val in node.orientation[1:4]:
             out_data.append(val)
+        out_data.append(node.orientation[0])
         data_count += 5
 
-        if type_flags & NODE_MESH:
-            out_keys.append(ControllerKey(CTRL_MESH_ALPHA, 1, data_count, data_count + 1, 1))
-            out_data.append(0.0)  # timekey
-            out_data.append(node.alpha)
-            data_count += 2
+        out_keys.append(ControllerKey(CTRL_BASE_SCALE, 1, data_count, data_count + 1, 1))
+        out_data.append(0.0)  # timekey
+        out_data.append(node.scale)
+        data_count += 2
 
+        if type_flags & NODE_MESH:
             out_keys.append(ControllerKey(CTRL_MESH_SELFILLUMCOLOR, 1, data_count, data_count + 1, 3))
             out_data.append(0.0)  # timekey
             for val in node.selfillumcolor:
                 out_data.append(val)
             data_count += 4
+
+            out_keys.append(ControllerKey(CTRL_MESH_ALPHA, 1, data_count, data_count + 1, 1))
+            out_data.append(0.0)  # timekey
+            out_data.append(node.alpha)
+            data_count += 2
+
+        if type_flags & NODE_LIGHT:
+            out_keys.append(ControllerKey(CTRL_LIGHT_COLOR, 1, data_count, data_count + 1, 3))
+            out_data.append(0.0)  # timekey
+            for val in node.color:
+                out_data.append(val)
+            data_count += 4
+
+            out_keys.append(ControllerKey(CTRL_LIGHT_RADIUS, 1, data_count, data_count + 1, 1))
+            out_data.append(0.0)  # timekey
+            out_data.append(node.radius)
+            data_count += 2
+
+            out_keys.append(ControllerKey(CTRL_LIGHT_MULTIPLIER, 1, data_count, data_count + 1, 1))
+            out_data.append(0.0)  # timekey
+            out_data.append(node.multiplier)
+            data_count += 2
 
     def save_file_header(self):
         self.mdl.put_uint32(0)  # pseudo signature
@@ -285,6 +343,109 @@ class MdlSaver:
             self.put_array_def(self.children_offsets[node_idx], len(child_indices))
             self.put_array_def(self.controller_offsets[node_idx], self.controller_counts[node_idx])
             self.put_array_def(self.controller_data_offsets[node_idx], self.controller_data_counts[node_idx])
+
+            if type_flags & NODE_LIGHT:
+                shadow = node.shadow
+                light_priority = node.lightpriority
+                ambient_only = node.ambientonly
+                dynamic_type = node.ndynamictype
+                affect_dynamic = node.affectdynamic
+                fading_light = node.fadinglight
+                flare = node.lensflares
+                flare_radius = node.flareradius
+
+                self.mdl.put_float(flare_radius)
+                self.put_array_def(0, 0)  # unknown
+                self.put_array_def(self.flare_sizes_offsets[node_idx] if node.lensflares else 0, len(node.flare_list.sizes))
+                self.put_array_def(self.flare_positions_offsets[node_idx] if node.lensflares else 0, len(node.flare_list.positions))
+                self.put_array_def(self.flare_colorshifts_offsets[node_idx] if node.lensflares else 0, len(node.flare_list.colorshifts))
+                self.put_array_def(self.flare_texture_offset_offsets[node_idx] if node.lensflares else 0, len(node.flare_list.textures))
+                self.mdl.put_uint32(light_priority)
+                self.mdl.put_uint32(ambient_only)
+                self.mdl.put_uint32(dynamic_type)
+                self.mdl.put_uint32(affect_dynamic)
+                self.mdl.put_uint32(shadow)
+                self.mdl.put_uint32(flare)
+                self.mdl.put_uint32(fading_light)
+
+                if node.lensflares:
+                    for size in node.flare_list.sizes:
+                        self.mdl.put_float(size)
+                    for position in node.flare_list.positions:
+                        self.mdl.put_float(position)
+                    for colorshift in node.flare_list.colorshifts:
+                        for val in colorshift:
+                            self.mdl.put_float(val)
+                    for i in range(len(node.flare_list.textures)):
+                        off_tex = self.flare_textures_offsets[node_idx][i]
+                        self.mdl.put_uint32(off_tex)
+                    for tex in node.flare_list.textures:
+                        self.mdl.put_c_string(tex)
+
+            if type_flags & NODE_EMITTER:
+                update = node.update.ljust(32, '\0')
+                render = node.render_emitter.ljust(32, '\0')
+                blend = node.blend.ljust(32, '\0')
+                texture = node.texture.ljust(32, '\0')
+                chunk_name = node.chunk_name.ljust(16, '\0')
+                twosided_tex = 1 if node.twosidedtex else 0
+                loop = 1 if node.loop else 0
+                frame_blending = 1 if node.frame_blending else 0
+                depth_texture_name = node.depth_texture_name.ljust(32, '\0')
+
+                flags = 0
+                if node.p2p:
+                    flags |= EMITTER_FLAG_P2P
+                if node.p2p_sel:
+                    flags |= EMITTER_FLAG_P2P_SEL
+                if node.affected_by_wind:
+                    flags |= EMITTER_FLAG_AFFECTED_WIND
+                if node.tinted:
+                    flags |= EMITTER_FLAG_TINTED
+                if node.bounce:
+                    flags |= EMITTER_FLAG_BOUNCE
+                if node.random:
+                    flags |= EMITTER_FLAG_RANDOM
+                if node.inherit:
+                    flags |= EMITTER_FLAG_INHERIT
+                if node.inheritvel:
+                    flags |= EMITTER_FLAG_INHERIT_VEL
+                if node.inherit_local:
+                    flags |= EMITTER_FLAG_INHERIT_LOCAL
+                if node.splat:
+                    flags |= EMITTER_FLAG_SPLAT
+                if node.inherit_part:
+                    flags |= EMITTER_FLAG_INHERIT_PART
+                if node.depth_texture:
+                    flags |= EMITTER_FLAG_DEPTH_TEXTURE
+
+                self.mdl.put_float(node.deadspace)
+                self.mdl.put_float(node.blastradius)
+                self.mdl.put_float(node.blastlength)
+                self.mdl.put_uint32(node.num_branches)
+                self.mdl.put_float(node.controlptsmoothing)
+                self.mdl.put_uint32(node.xgrid)
+                self.mdl.put_uint32(node.ygrid)
+                self.mdl.put_uint32(node.spawntype)
+                self.mdl.put_string(update)
+                self.mdl.put_string(render)
+                self.mdl.put_string(blend)
+                self.mdl.put_string(texture)
+                self.mdl.put_string(chunk_name)
+                self.mdl.put_uint32(twosided_tex)
+                self.mdl.put_uint32(loop)
+                self.mdl.put_uint16(node.renderorder)
+                self.mdl.put_uint8(frame_blending)
+                self.mdl.put_string(depth_texture_name)
+                self.mdl.put_uint8(0)  # padding
+                self.mdl.put_uint32(flags)
+
+            if type_flags & NODE_REFERENCE:
+                ref_model = node.refmodel.ljust(32, '\0')
+                reattachable = node.reattachable
+
+                self.mdl.put_string(ref_model)
+                self.mdl.put_uint32(reattachable)
 
             if type_flags & NODE_MESH:
                 if self.tsl:
@@ -491,12 +652,12 @@ class MdlSaver:
     def get_node_flags(self, node):
         switch = {
             Nodetype.DUMMY: NODE_BASE,
-            Nodetype.REFERENCE: NODE_BASE,  # NODE_REFERENCE
+            Nodetype.REFERENCE: NODE_BASE | NODE_REFERENCE,
             Nodetype.TRIMESH: NODE_BASE | NODE_MESH,
             Nodetype.DANGLYMESH: NODE_BASE | NODE_MESH,  # NODE_DANGLY
             Nodetype.SKIN: NODE_BASE | NODE_MESH,  # NODE_SKIN
-            Nodetype.EMITTER: NODE_BASE,  # NODE_EMITTER
-            Nodetype.LIGHT: NODE_BASE,  # NODE_LIGHT
+            Nodetype.EMITTER: NODE_BASE | NODE_EMITTER,
+            Nodetype.LIGHT: NODE_BASE | NODE_LIGHT,
             Nodetype.AABB: NODE_BASE | NODE_MESH,  # NODE_AABB
             Nodetype.LIGHTSABER: NODE_BASE | NODE_MESH  # NODE_SABER
         }

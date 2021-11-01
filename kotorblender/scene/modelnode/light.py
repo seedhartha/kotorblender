@@ -23,7 +23,7 @@ from .. import light
 from .geometry import GeometryNode
 
 
-class FlareList():
+class FlareList:
     def __init__(self):
         self.textures = []
         self.sizes = []
@@ -44,7 +44,6 @@ class LightNode(GeometryNode):
         self.color = (0.0, 0.0, 0.0)
         self.ambientonly = 1
         self.ndynamictype = 0
-        self.isdynamic = 0
         self.affectdynamic = 1
         self.negativelight = 0
         self.fadinglight = 1
@@ -68,22 +67,15 @@ class LightNode(GeometryNode):
     def set_object_data(self, obj):
         GeometryNode.set_object_data(self, obj)
 
-        switch = {"ml1": "MAINLIGHT1",
-                  "ml2": "MAINLIGHT2",
-                  "sl1": "SOURCELIGHT1",
-                  "sl2": "SOURCELIGHT2"}
-        # TODO: Check light names when exporting tiles
         obj.kb.multiplier = self.multiplier
         obj.kb.radius = self.radius
         obj.kb.ambientonly = (self.ambientonly >= 1)
-        obj.kb.lighttype = switch.get(self.name[-3:], "NONE")
         obj.kb.shadow = (self.shadow >= 1)
         obj.kb.lightpriority = self.lightpriority
         obj.kb.fadinglight = (self.fadinglight >= 1)
         obj.kb.isdynamic = self.ndynamictype
-        if obj.kb.isdynamic == 0 and self.isdynamic >= 1:
-            obj.kb.isdynamic = 1
         obj.kb.affectdynamic = (self.affectdynamic >= 1)
+        obj.kb.flareradius = self.flareradius
 
         if (self.flareradius > 0) or (self.lensflares >= 1):
             obj.kb.lensflares = True
@@ -95,5 +87,26 @@ class LightNode(GeometryNode):
                 newItem.size = self.flare_list.sizes[i]
                 newItem.position = self.flare_list.positions[i]
 
-        obj.kb.flareradius = self.flareradius
         light.calc_light_power(obj)
+
+    def load_object_data(self, obj):
+        GeometryNode.load_object_data(self, obj)
+
+        self.color = obj.data.color
+        self.multiplier = obj.kb.multiplier
+        self.radius = obj.kb.radius
+        self.ambientonly = 1 if obj.kb.ambientonly else 0
+        self.shadow = 1 if obj.kb.shadow else 0
+        self.lightpriority = obj.kb.lightpriority
+        self.fadinglight = 1 if obj.kb.fadinglight else 0
+        self.ndynamictype = obj.kb.isdynamic
+        self.affectdynamic = 1 if obj.kb.affectdynamic else 0
+        self.flareradius = obj.kb.flareradius
+
+        if obj.kb.lensflares:
+            self.lensflares = 1
+            for item in obj.kb.flare_list:
+                self.flare_list.textures.append(item.texture)
+                self.flare_list.sizes.append(item.size)
+                self.flare_list.positions.append(item.position)
+                self.flare_list.colorshifts.append(item.colorshift)

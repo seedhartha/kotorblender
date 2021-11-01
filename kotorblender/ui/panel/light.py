@@ -41,8 +41,6 @@ class KB_PT_light(bpy.types.Panel):
         layout = self.layout
 
         row = layout.row()
-        row.prop(obj.kb, "lighttype", text="Type")
-        row = layout.row()
         row.prop(obj.kb, "export_order")
 
         layout.separator()
@@ -70,7 +68,6 @@ class KB_PT_light(bpy.types.Panel):
 
         # Lens flares
         row = layout.row()
-        row.enabled = (obj.kb.lighttype == "NONE")
         box = row.box()
         row = box.row()
         row.prop(obj.kb, "lensflares")

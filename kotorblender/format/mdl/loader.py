@@ -46,20 +46,6 @@ from .types import *
 
 MDL_OFFSET = 12
 
-EMITTER_FLAG_P2P = 0x0001
-EMITTER_FLAG_P2P_SEL = 0x0002
-EMITTER_FLAG_AFFECTED_WIND = 0x0004
-EMITTER_FLAG_TINTED = 0x0008
-EMITTER_FLAG_BOUNCE = 0x0010
-EMITTER_FLAG_RANDOM = 0x0020
-EMITTER_FLAG_INHERIT = 0x0040
-EMITTER_FLAG_INHERIT_VEL = 0x0080
-EMITTER_FLAG_INHERIT_LOCAL = 0x0100
-EMITTER_FLAG_SPLAT = 0x0200
-EMITTER_FLAG_INHERIT_PART = 0x0400
-EMITTER_FLAG_DEPTH_TEXTURE = 0x0800
-EMITTER_FLAG_13 = 0x1000
-
 EMITTER_CONTROLLER_KEYS = [
     (CTRL_EMITTER_ALPHASTART, "alphastart", 1),
     (CTRL_EMITTER_ALPHAMID, "alphamid", 1),
@@ -306,8 +292,8 @@ class MdlLoader:
             blast_length = self.mdl.get_float()
             num_branches = self.mdl.get_uint32()
             ctrl_point_smoothing = self.mdl.get_float()
-            x_grid = self.mdl.get_float()
-            y_grid = self.mdl.get_float()
+            x_grid = self.mdl.get_uint32()
+            y_grid = self.mdl.get_uint32()
             spawn_type = self.mdl.get_uint32()
             update = self.mdl.get_c_string_up_to(32)
             render = self.mdl.get_c_string_up_to(32)
@@ -332,7 +318,7 @@ class MdlLoader:
             node.ygrid = y_grid
             node.spawntype = spawn_type
             node.update = update
-            node.render = render
+            node.render_emitter = render
             node.blend = blend
             node.texture = texture
             node.chunk_name = chunk_name
