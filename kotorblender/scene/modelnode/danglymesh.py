@@ -20,6 +20,8 @@ from ... import defines
 
 from .trimesh import TrimeshNode
 
+CONSTRAINTS = "constraints"
+
 
 class DanglymeshNode(TrimeshNode):
 
@@ -42,13 +44,20 @@ class DanglymeshNode(TrimeshNode):
         self.add_constraints_to_object(obj)
 
     def add_constraints_to_object(self, obj):
-        """
-        Creates a vertex group for the object to contain the vertex
-        weights for the danglymesh. The weights are called "constraints"
-        in NWN. Range is [0.0, 255.0] as opposed to [0.0, 1.0] in Blender
-        """
-        vgroup = obj.vertex_groups.new(name="constraints")
+        group = obj.vertex_groups.new(name=CONSTRAINTS)
         for vert_idx, constraint in enumerate(self.constraints):
-            weight = constraint/255
-            vgroup.add([vert_idx], weight, 'REPLACE')
-        obj.kb.constraints = vgroup.name
+            weight = constraint / 255
+            group.add([vert_idx], weight, 'REPLACE')
+        obj.kb.constraints = group.name
+
+    def load_object_data(self, obj):
+        TrimeshNode.load_object_data(self, obj)
+
+        self.period = obj.kb.period
+        self.tightness = obj.kb.tightness
+        self.displacement = obj.kb.displacement
+
+        if CONSTRAINTS not in obj.vertex_groups:
+            return
+        group = obj.vertex_groups[CONSTRAINTS]
+        self.constraints = [255.0 * group.weight(i) for i in range(len(self.verts))]

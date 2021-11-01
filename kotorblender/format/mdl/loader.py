@@ -584,10 +584,6 @@ class MdlLoader:
                     self.mdl.seek(MDL_OFFSET + index_offset_arr.offset)
                     off_indices = self.mdl.get_uint32()
 
-            if type_flags & NODE_DANGLY:
-                self.mdl.seek(MDL_OFFSET + constraint_arr.offset)
-                node.constraints = [self.mdl.get_float() for _ in range(constraint_arr.count)]
-
             node.verts = []
             node.tverts = []
             node.tverts1 = []
@@ -638,6 +634,10 @@ class MdlLoader:
                             node_name = self.node_names[node_idx]
                             vert_weights.append([node_name, bone_weights[i]])
                         node.weights.append(vert_weights)
+
+        if type_flags & NODE_DANGLY:
+            self.mdl.seek(MDL_OFFSET + constraint_arr.offset)
+            node.constraints = [self.mdl.get_float() for _ in range(constraint_arr.count)]
 
         self.mdl.seek(MDL_OFFSET + children_arr.offset)
         child_offsets = [self.mdl.get_uint32() for _ in range(children_arr.count)]

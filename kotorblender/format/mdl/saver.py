@@ -16,12 +16,9 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-from ntpath import realpath
 import os
 
 from ...defines import Nodetype
-
-from ... import defines
 
 from ..binwriter import BinaryWriter
 
@@ -73,6 +70,9 @@ class MdlSaver:
         self.flare_colorshifts_offsets = dict()
         self.flare_texture_offset_offsets = dict()
         self.flare_textures_offsets = dict()
+
+        self.constraints_offsets = dict()
+        self.dangly_verts_offsets = dict()
 
     def save(self):
         self.peek_model()
@@ -152,6 +152,13 @@ class MdlSaver:
                 if self.tsl:
                     self.mdl_pos += 8
 
+            if type_flags & NODE_SKIN:
+                self.mdl_pos += 100  # skinmesh header
+
+            if type_flags & NODE_DANGLY:
+                self.mdl_pos += 28  # danglymesh header
+
+            if type_flags & NODE_MESH:
                 self.faces_offsets[node_idx] = self.mdl_pos
                 self.mdl_pos += 32 * len(node.facelist.faces)  # faces
 
@@ -178,6 +185,18 @@ class MdlSaver:
                 if node.tverts1:
                     self.mdx_pos += 4 * 2 * (len(node.tverts1) + 1)
 
+            if type_flags & NODE_DANGLY:
+                # constraints
+                self.constraints_offsets[node_idx] = self.mdl_pos
+                self.mdl_pos += 4 * len(node.constraints)
+
+                # vertices
+                self.dangly_verts_offsets[node_idx] = self.mdl_pos
+                self.mdl_pos += 4 * 3 * len(node.verts)
+
+            self.children_offsets.append(self.mdl_pos)
+            self.mdl_pos += 4 * len(node.children)
+
             ctrl_keys = []
             ctrl_data = []
             self.peek_controllers(node, type_flags, ctrl_keys, ctrl_data)
@@ -187,9 +206,6 @@ class MdlSaver:
             self.controller_data.append(ctrl_data)
             self.controller_counts.append(ctrl_count)
             self.controller_data_counts.append(ctrl_data_count)
-
-            self.children_offsets.append(self.mdl_pos)
-            self.mdl_pos += 4 * len(node.children)
 
             self.controller_offsets.append(self.mdl_pos)
             self.mdl_pos += 16 * ctrl_count
@@ -448,12 +464,8 @@ class MdlSaver:
                 self.mdl.put_uint32(reattachable)
 
             if type_flags & NODE_MESH:
-                if self.tsl:
-                    fn_ptr1 = MESH_FN_PTR_1_K2_PC
-                    fn_ptr2 = MESH_FN_PTR_2_K2_PC
-                else:
-                    fn_ptr1 = MESH_FN_PTR_1_K1_PC
-                    fn_ptr2 = MESH_FN_PTR_2_K1_PC
+                fn_ptr1, fn_ptr2 = self.get_mesh_fn_ptr(type_flags)
+
                 bounding_box = [0.0] * 6
                 radius = 0.0
                 average = [0.0] * 3
@@ -575,6 +587,35 @@ class MdlSaver:
                 self.mdl.put_uint32(mdx_offset)
                 self.mdl.put_uint32(off_vert_array)
 
+            if type_flags & NODE_SKIN:
+                pass
+                '''
+                unknown_arr = self.get_array_def()
+                off_mdx_bone_weights = self.mdl.get_uint32()
+                off_mdx_bone_indices = self.mdl.get_uint32()
+                off_bonemap = self.mdl.get_uint32()
+                num_bonemap = self.mdl.get_uint32()
+                qbone_arr = self.get_array_def()
+                tbone_arr = self.get_array_def()
+                garbage_arr = self.get_array_def()
+                for _ in range(16):
+                    bone_indices = self.mdl.get_uint16()
+                self.mdl.skip(4)  # padding
+                '''
+
+            if type_flags & NODE_DANGLY:
+                displacement = node.displacement
+                tightness = node.tightness
+                period = node.period
+                off_vert_data = self.dangly_verts_offsets[node_idx]
+
+                self.put_array_def(self.constraints_offsets[node_idx], len(node.constraints))
+                self.mdl.put_float(displacement)
+                self.mdl.put_float(tightness)
+                self.mdl.put_float(period)
+                self.mdl.put_uint32(off_vert_data)
+
+            if type_flags & NODE_MESH:
                 for i in range(len(node.facelist.faces)):
                     normal = node.facelist.normals[i]
                     plane_distance = 0.0
@@ -619,11 +660,17 @@ class MdlSaver:
                 self.mdl.put_uint32(3 * len(node.facelist.faces))  # index count
                 self.mdl.put_uint32(98)  # inverted count
 
+                # vertex indices
                 for face in node.facelist.faces:
                     for val in face:
                         self.mdl.put_uint16(val)
 
-            # TODO: support all node types
+            if type_flags & NODE_DANGLY:
+                for val in node.constraints:
+                    self.mdl.put_float(val)
+                for vert in node.verts:
+                    for val in vert:
+                        self.mdl.put_float(val)
 
             for child_idx in child_indices:
                 self.mdl.put_uint32(self.node_offsets[child_idx])
@@ -654,7 +701,7 @@ class MdlSaver:
             Nodetype.DUMMY: NODE_BASE,
             Nodetype.REFERENCE: NODE_BASE | NODE_REFERENCE,
             Nodetype.TRIMESH: NODE_BASE | NODE_MESH,
-            Nodetype.DANGLYMESH: NODE_BASE | NODE_MESH,  # NODE_DANGLY
+            Nodetype.DANGLYMESH: NODE_BASE | NODE_MESH | NODE_DANGLY,
             Nodetype.SKIN: NODE_BASE | NODE_MESH,  # NODE_SKIN
             Nodetype.EMITTER: NODE_BASE | NODE_EMITTER,
             Nodetype.LIGHT: NODE_BASE | NODE_LIGHT,
@@ -662,3 +709,28 @@ class MdlSaver:
             Nodetype.LIGHTSABER: NODE_BASE | NODE_MESH  # NODE_SABER
         }
         return switch[node.nodetype]
+
+    def get_mesh_fn_ptr(self, type_flags):
+        if type_flags & NODE_SKIN:
+            if self.tsl:
+                fn_ptr1 = SKIN_FN_PTR_1_K2_PC
+                fn_ptr2 = SKIN_FN_PTR_2_K2_PC
+            else:
+                fn_ptr1 = SKIN_FN_PTR_1_K1_PC
+                fn_ptr2 = SKIN_FN_PTR_2_K1_PC
+        elif type_flags & NODE_DANGLY:
+            if self.tsl:
+                fn_ptr1 = DANGLY_FN_PTR_1_K2_PC
+                fn_ptr2 = DANGLY_FN_PTR_2_K2_PC
+            else:
+                fn_ptr1 = DANGLY_FN_PTR_1_K1_PC
+                fn_ptr2 = DANGLY_FN_PTR_2_K1_PC
+        else:
+            if self.tsl:
+                fn_ptr1 = MESH_FN_PTR_1_K2_PC
+                fn_ptr2 = MESH_FN_PTR_2_K2_PC
+            else:
+                fn_ptr1 = MESH_FN_PTR_1_K1_PC
+                fn_ptr2 = MESH_FN_PTR_2_K1_PC
+
+        return (fn_ptr1, fn_ptr2)
