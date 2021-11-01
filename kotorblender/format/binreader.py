@@ -34,7 +34,7 @@ class BinaryReader:
         self.file.seek(offset, 1)
 
     def tell(self):
-        return self.tell()
+        return self.file.tell()
 
     def get_int8(self):
         return int.from_bytes(self.file.read(1), self.byteorder, signed=True)

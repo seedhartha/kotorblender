@@ -45,3 +45,6 @@ class SkinmeshNode(TrimeshNode):
                     vgroup = obj.vertex_groups.new(name=membership[0])
                     skin_group_dict[membership[0]] = vgroup
                     vgroup.add([vert_idx], membership[1], 'REPLACE')
+
+    def load_object_data(self, obj):
+        TrimeshNode.load_object_data(self, obj)
