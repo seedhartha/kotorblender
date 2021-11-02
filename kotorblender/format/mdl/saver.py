@@ -211,7 +211,7 @@ class MdlSaver:
                 # Controllers
                 ctrl_keys = []
                 ctrl_data = []
-                self.peek_anim_controllers(node, type_flags, ctrl_keys, ctrl_data)
+                self.peek_anim_controllers(model_node, node, type_flags, ctrl_keys, ctrl_data)
                 ctrl_count = len(ctrl_keys)
                 ctrl_data_count = len(ctrl_data)
                 self.anim_controller_keys[anim_idx].append(ctrl_keys)
@@ -457,7 +457,7 @@ class MdlSaver:
                         out_data.append(val)
                 data_count += 1 + dim
 
-    def peek_anim_controllers(self, node, type_flags, out_keys, out_data):
+    def peek_anim_controllers(self, model_node, node, type_flags, out_keys, out_data):
         if not node.parent:
             return
 
@@ -473,7 +473,9 @@ class MdlSaver:
             for i in range(num_rows):
                 out_data.append(keyframes[i][0])  # timekey
             for i in range(num_rows):
-                for val in keyframes[i][1:1+num_columns]:
+                values = keyframes[i][1:1+num_columns]
+                position = Vector(values) - model_node.position
+                for val in position:
                     out_data.append(val)
             data_count += (1 + num_columns) * num_rows
 
@@ -485,8 +487,10 @@ class MdlSaver:
             for i in range(num_rows):
                 out_data.append(keyframes[i][0])  # timekey
             for i in range(num_rows):
-                for val in keyframes[i][1:1+num_columns]:
+                values = keyframes[i][1:1+num_columns]
+                for val in values[1:4]:
                     out_data.append(val)
+                out_data.append(values[0])
             data_count += (1 + num_columns) * num_rows
 
         if "scale" in node.keyframes:
