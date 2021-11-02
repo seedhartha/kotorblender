@@ -74,6 +74,7 @@ class MdlSaver:
         self.bonemap_offsets = dict()
         self.qbone_offsets = dict()
         self.tbone_offsets = dict()
+        self.skin_garbage_offsets = dict()
 
         # Danglymeshes
         self.constraints_offsets = dict()
@@ -245,6 +246,10 @@ class MdlSaver:
                 # TBones
                 self.tbone_offsets[node_idx] = self.mdl_pos
                 self.mdl_pos += 4 * 3 * num_bones
+
+                # Garbage
+                self.skin_garbage_offsets[node_idx] = self.mdl_pos
+                self.mdl_pos += 4 * num_bones
 
             # Dangly Data
             if type_flags & NODE_DANGLY:
@@ -696,16 +701,16 @@ class MdlSaver:
                 off_mdx_bone_weights = mdx_data_size - 4 * 8
                 off_mdx_bone_indices = mdx_data_size - 4 * 4
                 off_bonemap = self.bonemap_offsets[node_idx]
-                num_bonemap = len(self.nodes)
+                num_bones = len(self.nodes)
 
                 self.put_array_def(0, 0)  # unknown
                 self.mdl.put_uint32(off_mdx_bone_weights)
                 self.mdl.put_uint32(off_mdx_bone_indices)
                 self.mdl.put_uint32(off_bonemap)
-                self.mdl.put_uint32(num_bonemap)
-                self.put_array_def(self.qbone_offsets[node_idx], num_bonemap)  # QBones
-                self.put_array_def(self.tbone_offsets[node_idx], num_bonemap)  # TBones
-                self.put_array_def(0, 0)  # garbage
+                self.mdl.put_uint32(num_bones)
+                self.put_array_def(self.qbone_offsets[node_idx], num_bones)  # QBones
+                self.put_array_def(self.tbone_offsets[node_idx], num_bones)  # TBones
+                self.put_array_def(self.skin_garbage_offsets[node_idx], num_bones)  # garbage
                 for i in range(16):
                     if i < len(bone_indices):
                         self.mdl.put_uint16(bone_indices[i])
@@ -831,6 +836,10 @@ class MdlSaver:
                 for _ in range(num_bones):
                     for _ in range(3):
                         self.mdl.put_float(0.0)
+
+                # Garbage
+                for _ in range(num_bones):
+                    self.mdl.put_uint32(0)
 
             # Dangly Data
 
