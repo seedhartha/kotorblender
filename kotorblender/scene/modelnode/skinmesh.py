@@ -36,15 +36,22 @@ class SkinmeshNode(TrimeshNode):
         self.add_skin_groups_to_object(obj)
 
     def add_skin_groups_to_object(self, obj):
-        skin_group_dict = {}
-        for vert_idx, vert_memberships in enumerate(self.weights):
-            for membership in vert_memberships:
-                if membership[0] in skin_group_dict:
-                    skin_group_dict[membership[0]].add([vert_idx], membership[1], 'REPLACE')
+        groups = dict()
+        for vert_idx, memberships in enumerate(self.weights):
+            for name, weight in memberships:
+                if name in groups:
+                    groups[name].add([vert_idx], weight, 'REPLACE')
                 else:
-                    vgroup = obj.vertex_groups.new(name=membership[0])
-                    skin_group_dict[membership[0]] = vgroup
-                    vgroup.add([vert_idx], membership[1], 'REPLACE')
+                    group = obj.vertex_groups.new(name=name)
+                    group.add([vert_idx], weight, 'REPLACE')
+                    groups[name] = group
 
     def load_object_data(self, obj):
         TrimeshNode.load_object_data(self, obj)
+
+        for vert in obj.data.vertices:
+            weights = []
+            for group_weight in vert.groups:
+                group = obj.vertex_groups[group_weight.group]
+                weights.append((group.name, group_weight.weight))
+            self.weights.append(weights)

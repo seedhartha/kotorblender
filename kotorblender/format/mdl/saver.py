@@ -46,17 +46,18 @@ class MdlSaver:
         self.name_offsets = []
         self.node_offsets = []
         self.children_offsets = []
-
         self.parent_indices = []
         self.child_indices = []
+        self.node_idx_by_name = dict()
 
-        self.controller_keys = []
-        self.controller_data = []
-        self.controller_offsets = []
-        self.controller_counts = []
-        self.controller_data_offsets = []
-        self.controller_data_counts = []
+        # Lights
+        self.flare_sizes_offsets = dict()
+        self.flare_positions_offsets = dict()
+        self.flare_colorshifts_offsets = dict()
+        self.flare_texture_offset_offsets = dict()
+        self.flare_textures_offsets = dict()
 
+        # Meshes
         self.verts_offsets = dict()
         self.faces_offsets = dict()
         self.index_count_offsets = dict()
@@ -65,14 +66,22 @@ class MdlSaver:
         self.indices_offsets = dict()
         self.mdx_offsets = dict()
 
-        self.flare_sizes_offsets = dict()
-        self.flare_positions_offsets = dict()
-        self.flare_colorshifts_offsets = dict()
-        self.flare_texture_offset_offsets = dict()
-        self.flare_textures_offsets = dict()
+        # Skinmeshes
+        self.bonemap_offsets = dict()
+        self.qbone_offsets = dict()
+        self.tbone_offsets = dict()
 
+        # Danglymeshes
         self.constraints_offsets = dict()
         self.dangly_verts_offsets = dict()
+
+        # Controllers
+        self.controller_keys = []
+        self.controller_data = []
+        self.controller_offsets = []
+        self.controller_counts = []
+        self.controller_data_offsets = []
+        self.controller_data_counts = []
 
     def save(self):
         self.peek_model()
@@ -97,6 +106,9 @@ class MdlSaver:
         self.mdl_size = self.mdl_pos
         self.mdx_size = self.mdx_pos
 
+        for node_idx, node in enumerate(self.nodes):
+            self.node_idx_by_name[node.name] = node_idx
+
     def peek_nodes(self, node, parent_idx=None):
         node_idx = len(self.nodes)
         self.nodes.append(node)
@@ -115,14 +127,17 @@ class MdlSaver:
 
     def peek_node_data(self):
         for node_idx, node in enumerate(self.nodes):
+            # Geometry Header
             self.node_offsets.append(self.mdl_pos)
-            self.mdl_pos += 80  # geometry header
+            self.mdl_pos += 80
 
             type_flags = self.get_node_flags(node)
 
+            # Light Header
             if type_flags & NODE_LIGHT:
-                self.mdl_pos += 92  # light header
+                self.mdl_pos += 92
 
+                # Lens Flares
                 if node.lensflares:
                     self.flare_sizes_offsets[node_idx] = self.mdl_pos
                     self.mdl_pos += 4 * len(node.flare_list.sizes)
@@ -141,62 +156,99 @@ class MdlSaver:
                         self.flare_textures_offsets[node_idx].append(self.mdl_pos)
                         self.mdl_pos += len(tex) + 1
 
+            # Emitter Header
             if type_flags & NODE_EMITTER:
-                self.mdl_pos += 224  # emitter header
+                self.mdl_pos += 224
 
+            # Reference Header
             if type_flags & NODE_REFERENCE:
-                self.mdl_pos += 36  # reference header
+                self.mdl_pos += 36
 
+            # Mesh Header
             if type_flags & NODE_MESH:
-                self.mdl_pos += 332  # mesh header
+                self.mdl_pos += 332
                 if self.tsl:
                     self.mdl_pos += 8
 
+            # Skin Header
             if type_flags & NODE_SKIN:
-                self.mdl_pos += 100  # skinmesh header
+                self.mdl_pos += 100
 
+            # Dangly Header
             if type_flags & NODE_DANGLY:
-                self.mdl_pos += 28  # danglymesh header
+                self.mdl_pos += 28
 
+            # Mesh Data
             if type_flags & NODE_MESH:
+                num_verts = len(node.verts)
+                num_faces = len(node.facelist.faces)
+
+                # Faces
                 self.faces_offsets[node_idx] = self.mdl_pos
-                self.mdl_pos += 32 * len(node.facelist.faces)  # faces
+                self.mdl_pos += 32 * num_faces
 
+                # Vertex Indices Offset
                 self.index_offset_offsets[node_idx] = self.mdl_pos
-                self.mdl_pos += 4  # index offset
+                self.mdl_pos += 4
 
+                # Vertices
                 self.verts_offsets[node_idx] = self.mdl_pos
-                self.mdl_pos += 4 * 3 * len(node.verts)  # vertices
+                self.mdl_pos += 4 * 3 * num_verts
 
+                # Vertex Indices Count
                 self.index_count_offsets[node_idx] = self.mdl_pos
-                self.mdl_pos += 4  # index count
+                self.mdl_pos += 4
 
+                # Inverted Count
                 self.inv_count_offsets[node_idx] = self.mdl_pos
-                self.mdl_pos += 4  # inverted count
+                self.mdl_pos += 4
 
+                # Vertex Indices
                 self.indices_offsets[node_idx] = self.mdl_pos
-                self.mdl_pos += 2 * 3 * len(node.facelist.faces)  # indices
+                self.mdl_pos += 2 * 3 * num_faces
 
+                # MDX data
                 self.mdx_offsets[node_idx] = self.mdx_pos
-                self.mdx_pos += 4 * 3 * (len(node.verts) + 1)
-                self.mdx_pos += 4 * 3 * (len(node.normals) + 1)
+                self.mdx_pos += 4 * 3 * (num_verts + 1)
+                self.mdx_pos += 4 * 3 * (num_verts + 1)
                 if node.tverts:
-                    self.mdx_pos += 4 * 2 * (len(node.tverts) + 1)
+                    self.mdx_pos += 4 * 2 * (num_verts + 1)
                 if node.tverts1:
-                    self.mdx_pos += 4 * 2 * (len(node.tverts1) + 1)
+                    self.mdx_pos += 4 * 2 * (num_verts + 1)
+                if type_flags & NODE_SKIN:
+                    self.mdx_pos += 4 * 8 * (num_verts + 1)
 
+            # Skin Data
+            if type_flags & NODE_SKIN:
+                num_bones = len(self.nodes)
+
+                # Bonemap
+                self.bonemap_offsets[node_idx] = self.mdl_pos
+                self.mdl_pos += 4 * num_bones
+
+                # QBones
+                self.qbone_offsets[node_idx] = self.mdl_pos
+                self.mdl_pos += 4 * 4 * num_bones
+
+                # TBones
+                self.tbone_offsets[node_idx] = self.mdl_pos
+                self.mdl_pos += 4 * 3 * num_bones
+
+            # Dangly Data
             if type_flags & NODE_DANGLY:
-                # constraints
+                # Constraints
                 self.constraints_offsets[node_idx] = self.mdl_pos
                 self.mdl_pos += 4 * len(node.constraints)
 
-                # vertices
+                # Vertices
                 self.dangly_verts_offsets[node_idx] = self.mdl_pos
                 self.mdl_pos += 4 * 3 * len(node.verts)
 
+            # Children
             self.children_offsets.append(self.mdl_pos)
             self.mdl_pos += 4 * len(node.children)
 
+            # Controllers
             ctrl_keys = []
             ctrl_data = []
             self.peek_controllers(node, type_flags, ctrl_keys, ctrl_data)
@@ -206,10 +258,10 @@ class MdlSaver:
             self.controller_data.append(ctrl_data)
             self.controller_counts.append(ctrl_count)
             self.controller_data_counts.append(ctrl_data_count)
-
             self.controller_offsets.append(self.mdl_pos)
             self.mdl_pos += 16 * ctrl_count
 
+            # Controller Data
             self.controller_data_offsets.append(self.mdl_pos)
             self.mdl_pos += 4 * ctrl_data_count
 
@@ -218,6 +270,8 @@ class MdlSaver:
             return
 
         data_count = 0
+
+        # Base Controllers
 
         out_keys.append(ControllerKey(CTRL_BASE_POSITION, 1, data_count, data_count + 1, 3))
         out_data.append(0.0)  # timekey
@@ -237,6 +291,8 @@ class MdlSaver:
         out_data.append(node.scale)
         data_count += 2
 
+        # Mesh Controllers
+
         if type_flags & NODE_MESH:
             out_keys.append(ControllerKey(CTRL_MESH_SELFILLUMCOLOR, 1, data_count, data_count + 1, 3))
             out_data.append(0.0)  # timekey
@@ -248,6 +304,8 @@ class MdlSaver:
             out_data.append(0.0)  # timekey
             out_data.append(node.alpha)
             data_count += 2
+
+        # Light Controllers
 
         if type_flags & NODE_LIGHT:
             out_keys.append(ControllerKey(CTRL_LIGHT_COLOR, 1, data_count, data_count + 1, 3))
@@ -336,6 +394,8 @@ class MdlSaver:
 
     def save_nodes(self):
         for node_idx, node in enumerate(self.nodes):
+            # Geometry Header
+
             type_flags = self.get_node_flags(node)
             supernode_number = node_idx
             name_index = node_idx
@@ -359,6 +419,8 @@ class MdlSaver:
             self.put_array_def(self.children_offsets[node_idx], len(child_indices))
             self.put_array_def(self.controller_offsets[node_idx], self.controller_counts[node_idx])
             self.put_array_def(self.controller_data_offsets[node_idx], self.controller_data_counts[node_idx])
+
+            # Light Header
 
             if type_flags & NODE_LIGHT:
                 shadow = node.shadow
@@ -384,6 +446,7 @@ class MdlSaver:
                 self.mdl.put_uint32(flare)
                 self.mdl.put_uint32(fading_light)
 
+                # Lens Flares
                 if node.lensflares:
                     for size in node.flare_list.sizes:
                         self.mdl.put_float(size)
@@ -397,6 +460,8 @@ class MdlSaver:
                         self.mdl.put_uint32(off_tex)
                     for tex in node.flare_list.textures:
                         self.mdl.put_c_string(tex)
+
+            # Emitter Header
 
             if type_flags & NODE_EMITTER:
                 update = node.update.ljust(32, '\0')
@@ -456,12 +521,16 @@ class MdlSaver:
                 self.mdl.put_uint8(0)  # padding
                 self.mdl.put_uint32(flags)
 
+            # Reference Header
+
             if type_flags & NODE_REFERENCE:
                 ref_model = node.refmodel.ljust(32, '\0')
                 reattachable = node.reattachable
 
                 self.mdl.put_string(ref_model)
                 self.mdl.put_uint32(reattachable)
+
+            # Mesh Header
 
             if type_flags & NODE_MESH:
                 fn_ptr1, fn_ptr2 = self.get_mesh_fn_ptr(type_flags)
@@ -503,6 +572,8 @@ class MdlSaver:
                     mdx_data_bitmap |= MDX_FLAG_UV2
                     off_mdx_uv2 = mdx_data_size
                     mdx_data_size += 4 * 2
+                if type_flags & NODE_SKIN:
+                    mdx_data_size += 4 * 8  # bone weights + bone indices
 
                 num_verts = len(node.verts)
                 num_textures = 0
@@ -587,21 +658,41 @@ class MdlSaver:
                 self.mdl.put_uint32(mdx_offset)
                 self.mdl.put_uint32(off_vert_array)
 
+            # Skin Header
+
             if type_flags & NODE_SKIN:
-                pass
-                '''
-                unknown_arr = self.get_array_def()
-                off_mdx_bone_weights = self.mdl.get_uint32()
-                off_mdx_bone_indices = self.mdl.get_uint32()
-                off_bonemap = self.mdl.get_uint32()
-                num_bonemap = self.mdl.get_uint32()
-                qbone_arr = self.get_array_def()
-                tbone_arr = self.get_array_def()
-                garbage_arr = self.get_array_def()
-                for _ in range(16):
-                    bone_indices = self.mdl.get_uint16()
-                self.mdl.skip(4)  # padding
-                '''
+                bone_names = set()
+                for vert_weights in node.weights:
+                    for bone_name, _ in vert_weights:
+                        bone_names.add(bone_name)
+                bone_indices = []
+                for bone_name in bone_names:
+                    bone_indices.append(self.node_idx_by_name[bone_name])
+                bonemap = [-1] * len(self.nodes)
+                for bone_idx, bone_node_idx in enumerate(bone_indices):
+                    bonemap[bone_node_idx] = bone_idx
+
+                off_mdx_bone_weights = mdx_data_size - 4 * 8
+                off_mdx_bone_indices = mdx_data_size - 4 * 4
+                off_bonemap = self.bonemap_offsets[node_idx]
+                num_bonemap = len(self.nodes)
+
+                self.put_array_def(0, 0)  # unknown
+                self.mdl.put_uint32(off_mdx_bone_weights)
+                self.mdl.put_uint32(off_mdx_bone_indices)
+                self.mdl.put_uint32(off_bonemap)
+                self.mdl.put_uint32(num_bonemap)
+                self.put_array_def(self.qbone_offsets[node_idx], num_bonemap)  # QBones
+                self.put_array_def(self.tbone_offsets[node_idx], num_bonemap)  # TBones
+                self.put_array_def(0, 0)  # garbage
+                for i in range(16):
+                    if i < len(bone_indices):
+                        self.mdl.put_uint16(bone_indices[i])
+                    else:
+                        self.mdl.put_uint16(0xffff)
+                self.mdl.put_uint32(0)  # padding
+
+            # Dangly Header
 
             if type_flags & NODE_DANGLY:
                 displacement = node.displacement
@@ -615,7 +706,10 @@ class MdlSaver:
                 self.mdl.put_float(period)
                 self.mdl.put_uint32(off_vert_data)
 
+            # Mesh Data
+
             if type_flags & NODE_MESH:
+                # Faces
                 for i in range(len(node.facelist.faces)):
                     normal = node.facelist.normals[i]
                     plane_distance = 0.0
@@ -632,11 +726,17 @@ class MdlSaver:
                     for val in vert_indices:
                         self.mdl.put_uint16(val)
 
+                # Vertex Indices Offset
                 self.mdl.put_uint32(self.indices_offsets[node_idx])
 
-                for vert_idx, vert in enumerate(node.verts):
+                # Vertices
+                for vert in node.verts:
                     for val in vert:
                         self.mdl.put_float(val)
+
+                # MDX data
+                for vert_idx, vert in enumerate(node.verts):
+                    for val in vert:
                         self.mdx.put_float(val)
                     for val in node.normals[vert_idx]:
                         self.mdx.put_float(val)
@@ -646,6 +746,23 @@ class MdlSaver:
                     if node.tverts1:
                         for val in node.tverts1[vert_idx]:
                             self.mdx.put_float(val)
+                    if type_flags & NODE_SKIN:
+                        vert_weights = node.weights[vert_idx]
+                        bone_weights = []
+                        for bone_name, weight in vert_weights:
+                            bone_node_idx = self.node_idx_by_name[bone_name]
+                            bone_idx = bonemap[bone_node_idx]
+                            bone_weights.append((bone_idx, weight))
+                        for i in range(4):
+                            if i < len(bone_weights):
+                                self.mdx.put_float(bone_weights[i][1])
+                            else:
+                                self.mdx.put_float(0.0)
+                        for i in range(4):
+                            if i < len(bone_weights):
+                                self.mdx.put_float(float(bone_weights[i][0]))
+                            else:
+                                self.mdx.put_float(-1.0)
 
                 # Extra MDX data
                 for _ in range(6):
@@ -656,14 +773,40 @@ class MdlSaver:
                 if node.tverts1:
                     for _ in range(2):
                         self.mdx.put_float(0.0)
+                if type_flags & NODE_SKIN:
+                    self.mdx.put_float(1.0)
+                    for _ in range(7):
+                        self.mdx.put_float(0.0)
 
                 self.mdl.put_uint32(3 * len(node.facelist.faces))  # index count
                 self.mdl.put_uint32(98)  # inverted count
 
-                # vertex indices
+                # Vertex Indices
                 for face in node.facelist.faces:
                     for val in face:
                         self.mdl.put_uint16(val)
+
+            # Skin Data
+
+            if type_flags & NODE_SKIN:
+                # Bonemap
+                for bone_idx in bonemap:
+                    self.mdl.put_float(float(bone_idx))
+
+                num_bones = len(bonemap)
+
+                # QBones
+                for _ in range(num_bones):
+                    self.mdl.put_float(1.0)
+                    for _ in range(3):
+                        self.mdl.put_float(0.0)
+
+                # TBones
+                for _ in range(num_bones):
+                    for _ in range(3):
+                        self.mdl.put_float(0.0)
+
+            # Dangly Data
 
             if type_flags & NODE_DANGLY:
                 for val in node.constraints:
@@ -672,8 +815,12 @@ class MdlSaver:
                     for val in vert:
                         self.mdl.put_float(val)
 
+            # Children
+
             for child_idx in child_indices:
                 self.mdl.put_uint32(self.node_offsets[child_idx])
+
+            # Controllers
 
             for key in self.controller_keys[node_idx]:
                 unk1 = 0xffff
@@ -687,6 +834,8 @@ class MdlSaver:
 
                 for _ in range(3):
                     self.mdl.put_uint8(0)  # padding
+
+            # Controller Data
 
             for val in self.controller_data[node_idx]:
                 self.mdl.put_float(val)
@@ -702,7 +851,7 @@ class MdlSaver:
             Nodetype.REFERENCE: NODE_BASE | NODE_REFERENCE,
             Nodetype.TRIMESH: NODE_BASE | NODE_MESH,
             Nodetype.DANGLYMESH: NODE_BASE | NODE_MESH | NODE_DANGLY,
-            Nodetype.SKIN: NODE_BASE | NODE_MESH,  # NODE_SKIN
+            Nodetype.SKIN: NODE_BASE | NODE_MESH | NODE_SKIN,
             Nodetype.EMITTER: NODE_BASE | NODE_EMITTER,
             Nodetype.LIGHT: NODE_BASE | NODE_LIGHT,
             Nodetype.AABB: NODE_BASE | NODE_MESH,  # NODE_AABB
