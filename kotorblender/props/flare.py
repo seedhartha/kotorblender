@@ -28,7 +28,7 @@ class FlarePropertyGroup(bpy.types.PropertyGroup):
 
     texture: bpy.props.StringProperty(name="Texture",
                                       description="Texture name",
-                                      default=defines.null)
+                                      default=defines.NULL)
     size: bpy.props.FloatProperty(name="Size",
                                   description="Flare size",
                                   default=1)

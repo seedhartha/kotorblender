@@ -79,7 +79,7 @@ class ObjectPropertyGroup(bpy.types.PropertyGroup):
                                              (defines.Dummytype.PTHROOT,   "PTH Rootdummy",       "All children are considered path points",                    7)],
                                       default=defines.Dummytype.NONE)
     # For MDL Rootdummy
-    supermodel: bpy.props.StringProperty(name="Supermodel", description="Name of the model to inherit animations from", default=defines.null)
+    supermodel: bpy.props.StringProperty(name="Supermodel", description="Name of the model to inherit animations from", default=defines.NULL)
     classification: bpy.props.EnumProperty(name="Classification",
                                            items=[(defines.Classification.UNKNOWN,   "Other",     "Unknown classification",              0),
                                                   (defines.Classification.EFFECT,    "Effect",    "Effects",                             1),
@@ -314,7 +314,7 @@ class ObjectPropertyGroup(bpy.types.PropertyGroup):
     loop: bpy.props.BoolProperty(name="Loop", description="Loop", default=False, options=set())
     renderorder: bpy.props.IntProperty(name="Render order", description="Render Order", default=0, min=0, options=set())
     frame_blending: bpy.props.BoolProperty(name="Frame Blending", default=False, options=set())
-    depth_texture_name: bpy.props.StringProperty(name="Depth Texture Name", description="Depth Texture Name", default=defines.null, maxlen=32, options=set())
+    depth_texture_name: bpy.props.StringProperty(name="Depth Texture Name", description="Depth Texture Name", default=defines.NULL, maxlen=32, options=set())
 
     # Emitter flags
     p2p: bpy.props.BoolProperty(name="p2p", description="Use Point to Point settings", default=False, options=set())

@@ -18,7 +18,11 @@
 
 import os
 
+from mathutils import Vector
+
 from ...defines import Nodetype
+
+from ... import aabb
 
 from ..binwriter import BinaryWriter
 
@@ -74,6 +78,10 @@ class MdlSaver:
         # Danglymeshes
         self.constraints_offsets = dict()
         self.dangly_verts_offsets = dict()
+
+        # AABB
+        self.aabbs = dict()
+        self.aabb_offsets = dict()
 
         # Controllers
         self.controller_keys = []
@@ -178,6 +186,10 @@ class MdlSaver:
             if type_flags & NODE_DANGLY:
                 self.mdl_pos += 28
 
+            # AABB Header
+            if type_flags & NODE_AABB:
+                self.mdl_pos += 4
+
             # Mesh Data
             if type_flags & NODE_MESH:
                 num_verts = len(node.verts)
@@ -243,6 +255,15 @@ class MdlSaver:
                 # Vertices
                 self.dangly_verts_offsets[node_idx] = self.mdl_pos
                 self.mdl_pos += 4 * 3 * len(node.verts)
+
+            # AABB Data
+            if type_flags & NODE_AABB:
+                self.aabb_offsets[node_idx] = []
+                aabbs = self.generate_aabb_tree(node)
+                for _ in range(len(aabbs)):
+                    self.aabb_offsets[node_idx].append(self.mdl_pos)
+                    self.mdl_pos += 40
+                self.aabbs[node_idx] = aabbs
 
             # Children
             self.children_offsets.append(self.mdl_pos)
@@ -706,6 +727,11 @@ class MdlSaver:
                 self.mdl.put_float(period)
                 self.mdl.put_uint32(off_vert_data)
 
+            # AABB Header
+
+            if type_flags & NODE_AABB:
+                self.mdl.put_uint32(self.aabb_offsets[node_idx][0])
+
             # Mesh Data
 
             if type_flags & NODE_MESH:
@@ -815,6 +841,42 @@ class MdlSaver:
                     for val in vert:
                         self.mdl.put_float(val)
 
+            # AABB Data
+
+            if type_flags & NODE_AABB:
+                for aabb in self.aabbs[node_idx]:
+                    child_idx1 = aabb[6]
+                    child_idx2 = aabb[7]
+                    face_idx = aabb[8]
+                    split_axis = aabb[9]
+
+                    if face_idx == -1:
+                        off_child1 = self.aabb_offsets[node_idx][child_idx1]
+                        off_child2 = self.aabb_offsets[node_idx][child_idx2]
+                    else:
+                        off_child1 = 0
+                        off_child2 = 0
+
+                    switch = {
+                        -3: AABB_NEGATIVE_Z,
+                        -2: AABB_NEGATIVE_Y,
+                        -1: AABB_NEGATIVE_X,
+                        0: AABB_NO_CHILDREN,
+                        1: AABB_POSITIVE_X,
+                        2: AABB_POSITIVE_Y,
+                        3: AABB_POSITIVE_Z
+                    }
+                    most_significant_plane = switch[split_axis]
+
+                    # Bounding Box
+                    for val in aabb[:6]:
+                        self.mdl.put_float(val)
+
+                    self.mdl.put_uint32(off_child1)
+                    self.mdl.put_uint32(off_child2)
+                    self.mdl.put_int32(face_idx)
+                    self.mdl.put_uint32(most_significant_plane)
+
             # Children
 
             for child_idx in child_indices:
@@ -854,7 +916,7 @@ class MdlSaver:
             Nodetype.SKIN: NODE_BASE | NODE_MESH | NODE_SKIN,
             Nodetype.EMITTER: NODE_BASE | NODE_EMITTER,
             Nodetype.LIGHT: NODE_BASE | NODE_LIGHT,
-            Nodetype.AABB: NODE_BASE | NODE_MESH,  # NODE_AABB
+            Nodetype.AABB: NODE_BASE | NODE_MESH | NODE_AABB,
             Nodetype.LIGHTSABER: NODE_BASE | NODE_MESH  # NODE_SABER
         }
         return switch[node.nodetype]
@@ -883,3 +945,20 @@ class MdlSaver:
                 fn_ptr2 = MESH_FN_PTR_2_K1_PC
 
         return (fn_ptr1, fn_ptr2)
+
+    def generate_aabb_tree(self, node):
+        face_list = []
+        face_idx = 0
+
+        for face in node.facelist.faces:
+            v0 = Vector(node.verts[face[0]])
+            v1 = Vector(node.verts[face[1]])
+            v2 = Vector(node.verts[face[2]])
+            centroid = (v0 + v1 + v2) / 3
+            face_list.append((face_idx, [v0, v1, v2], centroid))
+            face_idx += 1
+
+        aabbs = []
+        aabb.generate_tree(aabbs, face_list)
+
+        return aabbs

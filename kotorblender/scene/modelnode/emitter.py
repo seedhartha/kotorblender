@@ -128,7 +128,7 @@ class EmitterNode(GeometryNode):
         self.loop = False
         self.renderorder = 0
         self.frame_blending = False
-        self.depth_texture_name = defines.null
+        self.depth_texture_name = defines.NULL
         # flags
         self.p2p = False
         self.p2p_sel = False

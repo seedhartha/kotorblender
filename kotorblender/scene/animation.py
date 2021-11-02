@@ -27,7 +27,7 @@ class Animation:
         self.name = name
         self.length = 1.0
         self.transtime = 1.0
-        self.animroot = defines.null
+        self.animroot = defines.NULL
         self.event_list = []
 
         self.nodes = []
@@ -48,7 +48,7 @@ class Animation:
     def create_list_anim(self, mdl_root):
         result = utils.create_anim_list_item(mdl_root)
         result.name = self.name
-        result.transtime = defines.fps * self.transtime
+        result.transtime = defines.FPS * self.transtime
         result.root = result.root_obj = self.get_anim_target(mdl_root).name
         result.frame_end = utils.nwtime2frame(self.length) + result.frame_start
         return result

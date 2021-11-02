@@ -17,17 +17,17 @@
 # ##### END GPL LICENSE BLOCK #####
 
 # Null value for parents, textures, etc.
-null = "NULL"
+NULL = "NULL"
 
 # Frame at which to start all animations
-anim_globstart = 1
+ANIM_GLOBSTART = 1
 
 # Offset between two imported animations (minimum)
-anim_offset = 60
+ANIM_OFFSET = 60
 
-fps = 30
+FPS = 30
 
-wok_materials = [["wok_NotDefined", (0.400, 0.400, 0.400), 0.0],
+WOK_MATERIALS = [["wok_NotDefined", (0.400, 0.400, 0.400), 0.0],
                  ["wok_Dirt", (0.610, 0.235, 0.050), 0.0],
                  ["wok_Obscuring", (0.100, 0.100, 0.100), 0.5],
                  ["wok_Grass", (0.000, 0.600, 0.000), 0.0],

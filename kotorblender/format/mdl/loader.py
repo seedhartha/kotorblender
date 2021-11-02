@@ -327,7 +327,7 @@ class MdlLoader:
             node.loop = loop != 0
             node.renderorder = render_order
             node.frame_blending = frame_blending != 0
-            node.depth_texture_name = depth_texture_name if len(depth_texture_name) > 0 and depth_texture_name.lower() != "null" else defines.null
+            node.depth_texture_name = depth_texture_name if len(depth_texture_name) > 0 and depth_texture_name.lower() != "null" else defines.NULL
             # flags
             node.p2p = flags & EMITTER_FLAG_P2P != 0
             node.p2p_sel = flags & EMITTER_FLAG_P2P_SEL != 0
@@ -719,7 +719,7 @@ class MdlLoader:
         name = self.names[name_index]
         node = AnimationNode(name)
         node.nodetype = self.get_node_type(type_flags)
-        node.parent = parent.name if parent else defines.null
+        node.parent = parent.name if parent else defines.NULL
         anim.nodes.append(node)
 
         if controller_arr.count > 0:
