@@ -175,7 +175,7 @@ class AnimationNode:
             values = []
             keyframe_points = fcurve.keyframe_points
             for kfp in keyframe_points:
-                if kfp.co[0] < anim.frame_start or kfp.co[0] > anim.frame_end:
+                if kfp.co[0] < anim.frame_start or kfp.co[0] > 1 + anim.frame_end:
                     continue
                 frames.append(kfp.co[0])
                 values.append(kfp.co[1])
