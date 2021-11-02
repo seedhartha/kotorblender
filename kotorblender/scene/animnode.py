@@ -23,6 +23,7 @@ from .. import defines
 DATA_PATH_BY_LABEL = {
     "position": "location",
     "orientation": "rotation_quaternion",
+    "scale": "scale",
 
     # Meshes
     "alpha": "kb.alpha",
@@ -30,7 +31,6 @@ DATA_PATH_BY_LABEL = {
 
     # Lights
     "color": "color",
-    "radius": "distance",
 
     # Emitters
     "alphastart": "kb.alphastart",
@@ -82,8 +82,14 @@ DATA_PATH_BY_LABEL = {
     "colorend": "kb.colorend"
 }
 
+LABEL_BY_DATA_PATH = {value: key for key, value in DATA_PATH_BY_LABEL.items()}
+
 CONVERTER_BY_LABEL = {
     "scale": lambda val: [val[0] * 3]
+}
+
+CONVERTER_BY_DATA_PATH = {
+    "scale": lambda val: [val[0]]
 }
 
 
@@ -118,7 +124,7 @@ class AnimationNode:
             # Animation Data
 
             target = obj
-            if obj.type == 'LIGHT' and label in ["color", "radius"]:
+            if obj.type == 'LIGHT' and label == "color":
                 target = obj.data
             self.get_or_create_animation_data(target, action)
 
@@ -148,7 +154,67 @@ class AnimationNode:
                 kfp.update()
 
     def load_keyframes_from_object(self, anim, obj):
-        pass
+        anim_data = obj.animation_data
+        if not anim_data:
+            return
+
+        action = anim_data.action
+        if not action:
+            return
+
+        # Extract keyframes
+
+        fcurve_frames = dict()
+        fcurve_values = dict()
+        for fcurve in action.fcurves:
+            data_path = fcurve.data_path
+            if data_path not in LABEL_BY_DATA_PATH:
+                continue
+
+            frames = []
+            values = []
+            keyframe_points = fcurve.keyframe_points
+            for kfp in keyframe_points:
+                if kfp.co[0] < anim.frame_start or kfp.co[0] > anim.frame_end:
+                    continue
+                frames.append(kfp.co[0])
+                values.append(kfp.co[1])
+
+            if data_path not in fcurve_frames:
+                fcurve_frames[data_path] = []
+            fcurve_frames[data_path].append(frames)
+
+            if data_path not in fcurve_values:
+                fcurve_values[data_path] = []
+            fcurve_values[data_path].append(values)
+
+        if not fcurve_frames:
+            return
+
+        # Flatten Keyframes
+
+        flat_fcurve_frames = dict()
+        for label, frames in fcurve_frames.items():
+            flat_fcurve_frames[label] = frames[0]
+
+        flat_fcurve_values = dict()
+        for label, values in fcurve_values.items():
+            flat_fcurve_values[label] = list(zip(*values))
+
+        # Convert to animation node keyframes
+
+        for data_path in flat_fcurve_frames.keys():
+            frames = flat_fcurve_frames[data_path]
+            timekeys = [(frame-anim.frame_start)/defines.FPS for frame in frames]
+
+            if data_path in CONVERTER_BY_DATA_PATH:
+                converter = CONVERTER_BY_DATA_PATH[data_path]
+                values = [converter(val) for val in flat_fcurve_values[data_path]]
+            else:
+                values = flat_fcurve_values[data_path]
+
+            label = LABEL_BY_DATA_PATH[data_path]
+            self.keyframes[label] = [[time] + list(values[i]) for i, time in enumerate(timekeys)]
 
     def get_or_create_action(self, name):
         if name in bpy.data.actions:

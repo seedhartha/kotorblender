@@ -97,7 +97,12 @@ class Animation:
         node = AnimationNode(obj.name)
         node.supernode_number = obj.kb.node_number
         node.parent = parent
+
         node.load_keyframes_from_object(anim, obj)
+        if obj.type == 'LIGHT':
+            node.load_keyframes_from_object(anim, obj.data)
+
+        print(node.keyframes)
 
         for child_obj in sorted(obj.children, key=lambda o: o.kb.export_order):
             child = Animation.animation_node_from_object(anim, child_obj, node)
