@@ -45,14 +45,17 @@ class MdlSaver:
         self.mdl_size = 0
         self.mdx_size = 0
         self.off_name_offsets = 0
+        self.off_anim_offsets = 0
 
         self.nodes = []
+        self.node_names = []
         self.name_offsets = []
         self.node_offsets = []
         self.children_offsets = []
         self.parent_indices = []
         self.child_indices = []
         self.node_idx_by_name = dict()
+        self.node_idx_by_number = dict()
 
         # Lights
         self.flare_sizes_offsets = dict()
@@ -92,6 +95,21 @@ class MdlSaver:
         self.controller_data_offsets = []
         self.controller_data_counts = []
 
+        # Animations
+        self.anim_offsets = []
+        self.anim_events_offsets = []
+        self.anim_nodes = []
+        self.anim_node_offsets = []
+        self.anim_children_offsets = []
+        self.anim_parent_indices = []
+        self.anim_child_indices = []
+        self.anim_controller_keys = []
+        self.anim_controller_data = []
+        self.anim_controller_offsets = []
+        self.anim_controller_counts = []
+        self.anim_controller_data_offsets = []
+        self.anim_controller_data_counts = []
+
     def save(self):
         self.peek_model()
 
@@ -99,6 +117,7 @@ class MdlSaver:
         self.save_geometry_header()
         self.save_model_header()
         self.save_names()
+        self.save_animations()
         self.save_nodes()
 
     def peek_model(self):
@@ -107,16 +126,25 @@ class MdlSaver:
 
         self.peek_nodes(self.model.root_node)
 
+        for node_idx, node in enumerate(self.nodes):
+            self.node_names.append(node.name)
+            self.node_idx_by_name[node.name] = node_idx
+            self.node_idx_by_number[node.supernode_number] = node_idx
+
+        for anim_idx, anim in enumerate(self.model.animations):
+            self.anim_nodes.append([])
+            self.anim_parent_indices.append([])
+            self.anim_child_indices.append([])
+            self.peek_anim_nodes(anim_idx, anim.root_node)
+
         self.mdl_pos += 4 * len(self.nodes)  # name offsets
 
         self.peek_node_names()
+        self.peek_animations()
         self.peek_node_data()
 
         self.mdl_size = self.mdl_pos
         self.mdx_size = self.mdx_pos
-
-        for node_idx, node in enumerate(self.nodes):
-            self.node_idx_by_name[node.name] = node_idx
 
     def peek_nodes(self, node, parent_idx=None):
         node_idx = len(self.nodes)
@@ -129,10 +157,73 @@ class MdlSaver:
             self.child_indices[node_idx].append(child_idx)
             self.peek_nodes(child, node_idx)
 
+    def peek_anim_nodes(self, anim_idx, node, parent_idx=None):
+        node_idx = len(self.anim_nodes[anim_idx])
+        self.anim_nodes[anim_idx].append(node)
+        self.anim_parent_indices[anim_idx].append(parent_idx)
+        self.anim_child_indices[anim_idx].append([])
+
+        for child in node.children:
+            child_idx = len(self.anim_nodes[anim_idx])
+            self.anim_child_indices[anim_idx][node_idx].append(child_idx)
+            self.peek_anim_nodes(anim_idx, child, node_idx)
+
     def peek_node_names(self):
         for node in self.nodes:
             self.name_offsets.append(self.mdl_pos)
             self.mdl_pos += len(node.name) + 1
+
+    def peek_animations(self):
+        self.off_anim_offsets = self.mdl_pos
+        self.mdl_pos += 4 * len(self.model.animations)
+
+        for anim_idx, anim in enumerate(self.model.animations):
+            # Animation Header
+            self.anim_offsets.append(self.mdl_pos)
+            self.mdl_pos += 136
+
+            # Events
+            self.anim_events_offsets.append(self.mdl_pos)
+            self.mdl_pos += 36 * len(anim.events)
+
+            self.anim_node_offsets.append([])
+            self.anim_children_offsets.append([])
+            self.anim_controller_keys.append([])
+            self.anim_controller_data.append([])
+            self.anim_controller_counts.append([])
+            self.anim_controller_data_counts.append([])
+            self.anim_controller_offsets.append([])
+            self.anim_controller_data_offsets.append([])
+
+            # Animation Nodes
+            for node in self.anim_nodes[anim_idx]:
+                model_node = self.nodes[self.node_idx_by_number[node.supernode_number]]
+                type_flags = self.get_node_flags(model_node)
+
+                # Geometry Header
+                self.anim_node_offsets[anim_idx].append(self.mdl_pos)
+                self.mdl_pos += 80
+
+                # Children
+                self.anim_children_offsets[anim_idx].append(self.mdl_pos)
+                self.mdl_pos += 4 * len(node.children)
+
+                # Controllers
+                ctrl_keys = []
+                ctrl_data = []
+                self.peek_anim_controllers(node, type_flags, ctrl_keys, ctrl_data)
+                ctrl_count = len(ctrl_keys)
+                ctrl_data_count = len(ctrl_data)
+                self.anim_controller_keys[anim_idx].append(ctrl_keys)
+                self.anim_controller_data[anim_idx].append(ctrl_data)
+                self.anim_controller_counts[anim_idx].append(ctrl_count)
+                self.anim_controller_data_counts[anim_idx].append(ctrl_data_count)
+                self.anim_controller_offsets[anim_idx].append(self.mdl_pos)
+                self.mdl_pos += 16 * ctrl_count
+
+                # Controller Data
+                self.anim_controller_data_offsets[anim_idx].append(self.mdl_pos)
+                self.mdl_pos += 4 * ctrl_data_count
 
     def peek_node_data(self):
         for node_idx, node in enumerate(self.nodes):
@@ -307,7 +398,7 @@ class MdlSaver:
 
         out_keys.append(ControllerKey(CTRL_BASE_ORIENTATION, 1, data_count, data_count + 1, 4))
         out_data.append(0.0)  # timekey
-        for val in node.orientation[1:4]:
+        for val in node.orientation[1: 4]:
             out_data.append(val)
         out_data.append(node.orientation[0])
         data_count += 5
@@ -349,6 +440,9 @@ class MdlSaver:
             out_data.append(0.0)  # timekey
             out_data.append(node.multiplier)
             data_count += 2
+
+    def peek_anim_controllers(self, node, type_flags, out_keys, out_data):
+        return
 
     def save_file_header(self):
         self.mdl.put_uint32(0)  # pseudo signature
@@ -399,7 +493,7 @@ class MdlSaver:
         self.mdl.put_uint8(0)  # unknown
         self.mdl.put_uint8(affected_by_fog)
         self.mdl.put_uint32(num_child_models)
-        self.put_array_def(0, 0)  # animation array
+        self.put_array_def(self.off_anim_offsets, len(self.model.animations))  # animation offsets
         self.mdl.put_uint32(supermodel_ref)
         for val in bounding_box:
             self.mdl.put_float(val)
@@ -417,6 +511,99 @@ class MdlSaver:
             self.mdl.put_uint32(offset)
         for node in self.nodes:
             self.mdl.put_c_string(node.name)
+
+    def save_animations(self):
+        for offset in self.anim_offsets:
+            self.mdl.put_uint32(offset)
+
+        for anim_idx, anim in enumerate(self.model.animations):
+            if self.tsl:
+                fn_ptr1 = ANIM_FN_PTR_1_K2_PC
+                fn_ptr2 = ANIM_FN_PTR_2_K2_PC
+            else:
+                fn_ptr1 = ANIM_FN_PTR_1_K1_PC
+                fn_ptr2 = ANIM_FN_PTR_2_K1_PC
+            name = anim.name.ljust(32, '\0')
+            off_root_node = self.anim_node_offsets[anim_idx][0]
+            total_num_nodes = len(self.anim_nodes[anim_idx])
+            ref_count = 0
+            model_type = 5
+            anim_root = anim.animroot.ljust(32, '\0')
+
+            self.mdl.put_uint32(fn_ptr1)
+            self.mdl.put_uint32(fn_ptr2)
+            self.mdl.put_string(name)
+            self.mdl.put_uint32(off_root_node)
+            self.mdl.put_uint32(total_num_nodes)
+            self.put_array_def(0, 0)  # runtime array
+            self.put_array_def(0, 0)  # runtime array
+            self.mdl.put_uint32(ref_count)
+            self.mdl.put_uint8(model_type)
+            for _ in range(3):
+                self.mdl.put_uint8(0)  # padding
+            self.mdl.put_float(anim.length)
+            self.mdl.put_float(anim.transtime)
+            self.mdl.put_string(anim_root)
+            self.put_array_def(self.anim_events_offsets[anim_idx], len(anim.events))
+            self.mdl.put_uint32(0)  # padding
+
+            for time, event in anim.events:
+                self.mdl.put_float(time)
+                self.mdl.put_string(event.ljust(32, '\0'))
+
+            self.save_anim_nodes(anim_idx)
+
+    def save_anim_nodes(self, anim_idx):
+        for node_idx, node in enumerate(self.anim_nodes[anim_idx]):
+            # Geometry Header
+
+            type_flags = NODE_BASE
+            name_index = self.node_names.index(node.name)
+            off_root = self.anim_offsets[anim_idx]
+            parent_idx = self.anim_parent_indices[anim_idx][node_idx]
+            off_parent = self.anim_node_offsets[anim_idx][parent_idx] if parent_idx is not None else 0
+            position = [0.0] * 3
+            orientation = [1.0, 0.0, 0.0, 0.0]
+            child_indices = self.anim_child_indices[anim_idx][node_idx]
+
+            self.mdl.put_uint16(type_flags)
+            self.mdl.put_uint16(node.supernode_number)
+            self.mdl.put_uint16(name_index)
+            self.mdl.put_uint16(0)  # padding
+            self.mdl.put_uint32(off_root)
+            self.mdl.put_uint32(off_parent)
+            for val in position:
+                self.mdl.put_float(val)
+            for val in orientation:
+                self.mdl.put_float(val)
+            self.put_array_def(self.anim_children_offsets[anim_idx][node_idx], len(child_indices))
+            self.put_array_def(self.anim_controller_offsets[anim_idx][node_idx], self.anim_controller_counts[anim_idx][node_idx])
+            self.put_array_def(self.anim_controller_data_offsets[anim_idx][node_idx], self.anim_controller_data_counts[anim_idx][node_idx])
+
+            # Children
+
+            for child_idx in child_indices:
+                self.mdl.put_uint32(self.anim_node_offsets[anim_idx][child_idx])
+
+            # Controllers
+
+            for key in self.anim_controller_keys[anim_idx][node_idx]:
+                unk1 = 0xffff
+
+                self.mdl.put_uint32(key.ctrl_type)
+                self.mdl.put_uint16(unk1)
+                self.mdl.put_uint16(key.num_rows)
+                self.mdl.put_uint16(key.timekeys_start)
+                self.mdl.put_uint16(key.values_start)
+                self.mdl.put_uint8(key.num_columns)
+
+                for _ in range(3):
+                    self.mdl.put_uint8(0)  # padding
+
+            # Controller Data
+
+            for val in self.anim_controller_data[anim_idx][node_idx]:
+                self.mdl.put_float(val)
 
     def save_nodes(self):
         for node_idx, node in enumerate(self.nodes):
@@ -878,7 +1065,7 @@ class MdlSaver:
                     most_significant_plane = switch[split_axis]
 
                     # Bounding Box
-                    for val in aabb[:6]:
+                    for val in aabb[: 6]:
                         self.mdl.put_float(val)
 
                     self.mdl.put_uint32(off_child1)

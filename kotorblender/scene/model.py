@@ -21,6 +21,7 @@ from ..exception.malformedfile import MalformedFile
 
 from .. import defines, glob
 
+from .animation import Animation
 from .modelnode.aabb import AabbNode
 from .modelnode.danglymesh import DanglymeshNode
 from .modelnode.dummy import DummyNode
@@ -101,11 +102,12 @@ class Model:
         model.animscale = root_obj.kb.animscale
 
         model.root_node = Model.model_node_from_object(root_obj)
+        model.animations = [Animation.from_list_anim(anim, root_obj) for anim in root_obj.kb.anim_list]
 
         return model
 
     @classmethod
-    def model_node_from_object(cls, obj):
+    def model_node_from_object(cls, obj, parent=None):
         if obj.type == 'EMPTY':
             if obj.kb.dummytype == Dummytype.REFERENCE:
                 node_type = Nodetype.REFERENCE
@@ -139,12 +141,13 @@ class Model:
             Nodetype.LIGHTSABER: LightsaberNode
         }
         node = switch[node_type](obj.name)
+        node.parent = parent
         node.load_object_data(obj)
 
         for child_obj in sorted(obj.children, key=lambda o: o.kb.export_order):
-            child = Model.model_node_from_object(child_obj)
             if child_obj.type == 'EMPTY' and child_obj.kb.dummytype in [Dummytype.PWKROOT, Dummytype.DWKROOT]:
                 continue
+            child = Model.model_node_from_object(child_obj, node)
             node.children.append(child)
 
         return node

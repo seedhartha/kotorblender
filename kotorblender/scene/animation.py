@@ -18,7 +18,11 @@
 
 import math
 
+from ..defines import Dummytype
+
 from .. import defines, utils
+
+from .animnode import AnimationNode
 
 
 class Animation:
@@ -28,8 +32,9 @@ class Animation:
         self.length = 1.0
         self.transtime = 1.0
         self.animroot = defines.NULL
-        self.events = []
         self.root_node = None
+
+        self.events = []
 
     def add_to_objects(self, mdl_root):
         list_anim = Animation.append_to_object(mdl_root, self.name, self.length, self.transtime, self.animroot)
@@ -71,3 +76,37 @@ class Animation:
     def get_next_frame(mdl_root):
         last_frame = max([defines.ANIM_GLOBSTART] + [a.frame_end for a in mdl_root.kb.anim_list])
         return int(math.ceil((last_frame + defines.ANIM_OFFSET) / 10.0)) * 10
+
+    @staticmethod
+    def from_list_anim(list_anim, mdl_root):
+        anim = Animation(list_anim.name)
+        anim.length = Animation.frame_to_time(list_anim.frame_end - list_anim.frame_start)
+        anim.transtime = Animation.frame_to_time(list_anim.transtime)
+        anim.animroot = list_anim.root_obj
+        anim.root_node = Animation.animation_node_from_object(list_anim, mdl_root)
+
+        for event in list_anim.event_list:
+            time = Animation.frame_to_time(event.frame - list_anim.frame_start)
+            name = event.name
+            anim.events.append((time, name))
+
+        return anim
+
+    @staticmethod
+    def animation_node_from_object(anim, obj, parent=None):
+        node = AnimationNode(obj.name)
+        node.supernode_number = obj.kb.node_number
+        node.parent = parent
+        node.load_keyframes_from_object(anim, obj)
+
+        for child_obj in sorted(obj.children, key=lambda o: o.kb.export_order):
+            child = Animation.animation_node_from_object(anim, child_obj, node)
+            if child_obj.type == 'EMPTY' and child_obj.kb.dummytype in [Dummytype.PWKROOT, Dummytype.DWKROOT]:
+                continue
+            node.children.append(child)
+
+        return node
+
+    @staticmethod
+    def frame_to_time(frame):
+        return frame / defines.FPS
