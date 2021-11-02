@@ -698,8 +698,8 @@ class MdlLoader:
                 event_name = self.mdl.get_c_string_up_to(32)
                 anim.events.append((time, event_name))
 
+        anim.root_node = self.load_anim_nodes(off_root_node, anim)
         self.model.animations.append(anim)
-        self.load_anim_nodes(off_root_node, anim)
 
     def load_anim_nodes(self, offset, anim, parent=None):
         self.mdl.seek(MDL_OFFSET + offset)
@@ -718,9 +718,9 @@ class MdlLoader:
 
         name = self.names[name_index]
         node = AnimationNode(name)
+        node.supernode_number = supernode_number
         node.nodetype = self.get_node_type(type_flags)
-        node.parent = parent.name if parent else defines.NULL
-        anim.nodes.append(node)
+        node.parent = parent
 
         if controller_arr.count > 0:
             if not supernode_number in self.node_by_number:
@@ -753,7 +753,10 @@ class MdlLoader:
         self.mdl.seek(MDL_OFFSET + children_arr.offset)
         child_offsets = [self.mdl.get_uint32() for _ in range(children_arr.count)]
         for off_child in child_offsets:
-            self.load_anim_nodes(off_child, anim, node)
+            child = self.load_anim_nodes(off_child, anim, node)
+            node.children.append(child)
+
+        return node
 
     def load_controllers(self, controller_arr, controller_data_arr):
         self.mdl.seek(MDL_OFFSET + controller_arr.offset)
