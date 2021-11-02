@@ -66,7 +66,8 @@ class ObjectPropertyGroup(bpy.types.PropertyGroup):
     """
 
     # For all objects
-    export_order: bpy.props.IntProperty(name="Export Order", description="Export order within parent", default=0, min=0, max=1000)
+    node_number: bpy.props.IntProperty(name="Node Number", description="Node number must be equal to this nodes number in supermodel", default=0, min=0, max=1000)
+    export_order: bpy.props.IntProperty(name="Export Order", description="Export order relative to parent", default=0, min=0, max=1000)
 
     # For all emptys
     dummytype: bpy.props.EnumProperty(name="Type",
@@ -108,7 +109,7 @@ class ObjectPropertyGroup(bpy.types.PropertyGroup):
                                                 ("CL01", "DWK: Closed 1st", "Closed State, 1st node for 'Use' anim",  12),
                                                 ("CL02", "DWK: Closed 2nd", "Closed State, 2nd node for 'Use' anim",  13)],
                                          default="NONE")
-    animscale: bpy.props.FloatProperty(name="Animationscale", description="Animation scale for all animations", default=1.00, min=0.0)
+    animscale: bpy.props.FloatProperty(name="Animation Scale", description="Animation scale for all animations", default=1.00, min=0.0)
     # Animation Data (for separation)
     anim_list: bpy.props.CollectionProperty(type=AnimPropertyGroup)
     anim_list_idx: bpy.props.IntProperty(name="Index for anim List",
