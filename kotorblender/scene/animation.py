@@ -28,9 +28,8 @@ class Animation:
         self.length = 1.0
         self.transtime = 1.0
         self.animroot = defines.NULL
-
-        self.nodes = []
         self.events = []
+        self.root_node = None
 
     def add_to_objects(self, mdl_root):
         list_anim = Animation.append_to_object(mdl_root, self.name, self.length, self.transtime, self.animroot)
@@ -38,12 +37,15 @@ class Animation:
             Animation.append_event_to_object_anim(list_anim, name, time)
 
         objects = utils.get_children_recursive(mdl_root)
-        object_by_name = {obj.name.lower(): obj for obj in objects}
-        for node in self.nodes:
-            name_lower = node.name.lower()
-            if not name_lower in object_by_name:
-                continue
-            node.add_keyframes_to_object(list_anim, object_by_name[name_lower], mdl_root.name)
+        object_by_number = {obj.kb.node_number: obj for obj in objects}
+        self.add_nodes_to_objects(self.root_node, object_by_number, list_anim, mdl_root.name)
+
+    def add_nodes_to_objects(self, node, object_by_number, anim, root_name):
+        if node.supernode_number in object_by_number:
+            obj = object_by_number[node.supernode_number]
+            node.add_keyframes_to_object(anim, obj, root_name)
+        for child in node.children:
+            self.add_nodes_to_objects(child, object_by_number, anim, root_name)
 
     @staticmethod
     def append_to_object(mdl_root, name, length=0.0, transtime=0.25, animroot=defines.NULL):

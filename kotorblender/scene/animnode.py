@@ -92,8 +92,9 @@ class AnimationNode:
     def __init__(self, name="UNNAMED"):
         self.nodetype = defines.Nodetype.DUMMY
         self.name = name
-        self.parent = defines.NULL
-
+        self.supernode_number = 0
+        self.parent = None
+        self.children = []
         self.keyframes = dict()
 
     def add_keyframes_to_object(self, anim, obj, root_name):
