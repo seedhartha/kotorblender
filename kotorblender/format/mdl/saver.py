@@ -164,6 +164,8 @@ class MdlSaver:
         self.anim_child_indices[anim_idx].append([])
 
         for child in node.children:
+            if not child.animated:
+                continue
             child_idx = len(self.anim_nodes[anim_idx])
             self.anim_child_indices[anim_idx][node_idx].append(child_idx)
             self.peek_anim_nodes(anim_idx, child, node_idx)
@@ -196,7 +198,7 @@ class MdlSaver:
             self.anim_controller_data_offsets.append([])
 
             # Animation Nodes
-            for node in self.anim_nodes[anim_idx]:
+            for node_idx, node in enumerate(self.anim_nodes[anim_idx]):
                 model_node = self.nodes[self.node_idx_by_number[node.supernode_number]]
                 type_flags = self.get_node_flags(model_node)
 
@@ -206,7 +208,7 @@ class MdlSaver:
 
                 # Children
                 self.anim_children_offsets[anim_idx].append(self.mdl_pos)
-                self.mdl_pos += 4 * len(node.children)
+                self.mdl_pos += 4 * len(self.anim_child_indices[anim_idx][node_idx])
 
                 # Controllers
                 ctrl_keys = []

@@ -103,6 +103,8 @@ class AnimationNode:
         self.children = []
         self.keyframes = dict()
 
+        self.animated = False  # this node or its children contain keyframes
+
     def add_keyframes_to_object(self, anim, obj, root_name):
         for label, data in self.keyframes.items():
             if label not in DATA_PATH_BY_LABEL or not data:
