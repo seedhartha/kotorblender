@@ -147,6 +147,9 @@ class AnimationNode:
             for kfp in keyframe_points:
                 kfp.update()
 
+    def load_keyframes_from_object(self, anim, obj):
+        pass
+
     def get_or_create_action(self, name):
         if name in bpy.data.actions:
             return bpy.data.actions[name]
