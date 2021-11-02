@@ -232,6 +232,7 @@ class MdlLoader:
 
     def load_nodes(self, offset, export_order, parent=None):
         self.mdl.seek(MDL_OFFSET + offset)
+        print("Loading node from {}".format(offset))
 
         type_flags = self.mdl.get_uint16()
         supernode_number = self.mdl.get_uint16()
@@ -445,8 +446,7 @@ class MdlLoader:
             qbone_arr = self.get_array_def()
             tbone_arr = self.get_array_def()
             garbage_arr = self.get_array_def()
-            for _ in range(16):
-                bone_indices = self.mdl.get_uint16()
+            bone_indices = [self.mdl.get_uint16() for _ in range(16)]
             self.mdl.skip(4)  # padding
 
         if type_flags & NODE_DANGLY:
