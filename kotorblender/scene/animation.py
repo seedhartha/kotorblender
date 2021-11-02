@@ -102,8 +102,6 @@ class Animation:
         if obj.type == 'LIGHT':
             node.load_keyframes_from_object(anim, obj.data)
 
-        print(node.keyframes)
-
         for child_obj in sorted(obj.children, key=lambda o: o.kb.export_order):
             child = Animation.animation_node_from_object(anim, child_obj, node)
             if child_obj.type == 'EMPTY' and child_obj.kb.dummytype in [Dummytype.PWKROOT, Dummytype.DWKROOT]:
