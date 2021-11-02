@@ -383,7 +383,7 @@ class MdlSaver:
             self.mdl_pos += 4 * ctrl_data_count
 
     def peek_controllers(self, node, type_flags, out_keys, out_data):
-        if node.parent:
+        if not node.parent:
             return
 
         data_count = 0
@@ -440,6 +440,22 @@ class MdlSaver:
             out_data.append(0.0)  # timekey
             out_data.append(node.multiplier)
             data_count += 2
+
+        # Emitter Controllers
+
+        if type_flags & NODE_EMITTER:
+            for ctrl_val, key, dim in EMITTER_CONTROLLER_KEYS:
+                value = getattr(node, key, None)
+                if not value:
+                    continue
+                out_keys.append(ControllerKey(ctrl_val, 1, data_count, data_count + 1, dim))
+                out_data.append(0.0)  # timekey
+                if dim == 1:
+                    out_data.append(value)
+                else:
+                    for val in value:
+                        out_data.append(val)
+                data_count += 1 + dim
 
     def peek_anim_controllers(self, node, type_flags, out_keys, out_data):
         return
