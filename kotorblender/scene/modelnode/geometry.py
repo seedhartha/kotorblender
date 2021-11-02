@@ -45,6 +45,7 @@ class GeometryNode:
         return obj
 
     def set_object_data(self, obj):
+        obj.kb.node_number = self.supernode_number
         obj.kb.export_order = self.export_order
         obj.location = self.position
         obj.rotation_mode = 'QUATERNION'
@@ -52,6 +53,7 @@ class GeometryNode:
         obj.scale = (self.scale, self.scale, self.scale)
 
     def load_object_data(self, obj):
+        self.supernode_number = obj.kb.node_number
         self.export_order = obj.kb.export_order
         self.position = obj.location
         self.orientation = obj.rotation_quaternion

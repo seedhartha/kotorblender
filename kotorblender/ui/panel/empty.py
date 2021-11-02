@@ -43,6 +43,8 @@ class KB_PT_empty(bpy.types.Panel):
         row = layout.row()
         row.prop(obj.kb, "dummytype", text="Type")
         row = layout.row()
+        row.prop(obj.kb, "node_number")
+        row = layout.row()
         row.prop(obj.kb, "export_order")
 
         layout.separator()

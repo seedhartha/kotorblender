@@ -41,6 +41,8 @@ class KB_PT_light(bpy.types.Panel):
         layout = self.layout
 
         row = layout.row()
+        row.prop(obj.kb, "node_number")
+        row = layout.row()
         row.prop(obj.kb, "export_order")
 
         layout.separator()

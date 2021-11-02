@@ -423,7 +423,7 @@ class MdlSaver:
             # Geometry Header
 
             type_flags = self.get_node_flags(node)
-            supernode_number = node_idx
+            supernode_number = node.supernode_number
             name_index = node_idx
             off_root = 0
             parent_idx = self.parent_indices[node_idx]
