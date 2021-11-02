@@ -43,8 +43,6 @@ class Model:
         self.classification = defines.Classification.UNKNOWN
         self.subclassification = 0
         self.ignorefog = False
-        self.compress_quats = False
-        self.headlink = False
 
         self.root_node = None
         self.animations = []
@@ -60,8 +58,6 @@ class Model:
         root_obj.kb.classification = self.classification
         root_obj.kb.subclassification = self.subclassification
         root_obj.kb.ignorefog = (self.ignorefog >= 1)
-        root_obj.kb.compress_quats = (self.compress_quats >= 1)
-        root_obj.kb.headlink = (self.headlink >= 1)
         root_obj.kb.animscale = self.animscale
 
         for child in self.root_node.children:
@@ -86,16 +82,8 @@ class Model:
             self.import_nodes_to_collection(child, obj, collection)
 
     def create_animations(self, mdl_root, armature_object):
-        # Load the 'default' animation first, so it is at the front
-        anims = [a for a in self.animations if a.name == "default"]
-        for a in anims:
-            a.add_to_objects(mdl_root)
-        # Load the rest of the anims
-        anims = [a for a in self.animations if a.name != "default"]
-        for a in anims:
-            a.add_to_objects(mdl_root)
-        if armature_object:
-            armature.create_armature_animations(mdl_root, armature_object)
+        for anim in self.animations:
+            anim.add_to_objects(mdl_root)
 
     def find_node(self, test):
         if test(self.root_node):
@@ -110,8 +98,6 @@ class Model:
         model.classification = root_obj.kb.classification
         model.subclassification = root_obj.kb.subclassification
         model.ignorefog = root_obj.kb.ignorefog
-        model.compress_quats = root_obj.kb.compress_quats
-        model.headlink = root_obj.kb.headlink
         model.animscale = root_obj.kb.animscale
 
         model.root_node = Model.model_node_from_object(root_obj)

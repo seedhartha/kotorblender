@@ -42,52 +42,52 @@ class KB_PT_animlist(bpy.types.Panel):
     def draw(self, context):
         """Draw the panel."""
         layout = self.layout
-        mdl_base = utils.get_mdl_root_from_object(context.object)
-        if mdl_base:
-            # Display and add/remove animations
+        mdl_root = context.object
+
+        # Display and add/remove animations
+        row = layout.row()
+        row.template_list("KB_UL_anims", "TheAnimList",
+                          mdl_root.kb, "anim_list",
+                          mdl_root.kb, "anim_list_idx",
+                          rows=7)
+        col = row.column(align=True)
+        col.operator("kb.anim_new", icon='ADD', text="")
+        col.operator("kb.anim_delete", icon='REMOVE', text="")
+        col.separator()
+        col.operator("kb.anim_move",
+                     icon='TRIA_UP', text="").direction = "UP"
+        col.operator("kb.anim_move",
+                     icon='TRIA_DOWN', text="").direction = "DOWN"
+        anim_list = mdl_root.kb.anim_list
+        anim_list_idx = mdl_root.kb.anim_list_idx
+        if anim_list_idx >= 0 and len(anim_list) > anim_list_idx:
+            anim = anim_list[anim_list_idx]
             row = layout.row()
-            row.template_list("KB_UL_anims", "TheAnimList",
-                              mdl_base.kb, "anim_list",
-                              mdl_base.kb, "anim_list_idx",
-                              rows=7)
+            row.prop(anim, "name")
+            row = layout.row()
+            row.prop(anim, "root_obj")
+            row = layout.row()
+            row.prop(anim, "transtime")
+            row = layout.row()
+            split = row.split()
+            col = split.column(align=True)
+            col.prop(anim, "frame_start")
+            col.prop(anim, "frame_end")
+
+            # Event Helper. Display and add/remove events.
+            box = layout.box()
+            box.label(text="Events")
+
+            row = box.row()
+            row.template_list("KB_UL_anim_events", "TheEventList",
+                              anim, "event_list",
+                              anim, "event_list_idx")
             col = row.column(align=True)
-            col.operator("kb.anim_new", icon='ADD', text="")
-            col.operator("kb.anim_delete", icon='REMOVE', text="")
+            col.operator("kb.anim_event_new", text="", icon='ADD')
+            col.operator("kb.anim_event_delete", text="", icon='REMOVE')
             col.separator()
-            col.operator("kb.anim_move",
+            col.operator("kb.anim_event_move",
                          icon='TRIA_UP', text="").direction = "UP"
-            col.operator("kb.anim_move",
+            col.operator("kb.anim_event_move",
                          icon='TRIA_DOWN', text="").direction = "DOWN"
-            anim_list = mdl_base.kb.anim_list
-            anim_list_idx = mdl_base.kb.anim_list_idx
-            if anim_list_idx >= 0 and len(anim_list) > anim_list_idx:
-                anim = anim_list[anim_list_idx]
-                row = layout.row()
-                row.prop(anim, "name")
-                row = layout.row()
-                row.prop(anim, "root_obj")
-                row = layout.row()
-                row.prop(anim, "transtime")
-                row = layout.row()
-                split = row.split()
-                col = split.column(align=True)
-                col.prop(anim, "frame_start")
-                col.prop(anim, "frame_end")
-
-                # Event Helper. Display and add/remove events.
-                box = layout.box()
-                box.label(text="Events")
-
-                row = box.row()
-                row.template_list("KB_UL_anim_events", "TheEventList",
-                                  anim, "event_list",
-                                  anim, "event_list_idx")
-                col = row.column(align=True)
-                col.operator("kb.anim_event_new", text="", icon='ADD')
-                col.operator("kb.anim_event_delete", text="", icon='REMOVE')
-                col.separator()
-                col.operator("kb.anim_event_move",
-                             icon='TRIA_UP', text="").direction = "UP"
-                col.operator("kb.anim_event_move",
-                             icon='TRIA_DOWN', text="").direction = "DOWN"
-            layout.separator()
+        layout.separator()

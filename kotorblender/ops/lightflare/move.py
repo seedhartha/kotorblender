@@ -28,7 +28,7 @@ class KB_OT_move_lightflare(bpy.types.Operator):
     direction: bpy.props.EnumProperty(items=(("UP", "Up", ""), ("DOWN", "Down", "")))
 
     @classmethod
-    def poll(self, context):
+    def poll(cls, context):
         return len(context.object.kb.flare_list) > 0
 
     def move_index(self, context):

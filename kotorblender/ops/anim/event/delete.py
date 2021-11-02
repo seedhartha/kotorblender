@@ -29,25 +29,26 @@ class KB_OT_anim_event_delete(bpy.types.Operator):
     bl_options = {'UNDO'}
 
     @classmethod
-    def poll(self, context):
-        """Enable only if the list isn't empty."""
-        mdl_base = utils.get_mdl_root_from_object(context.object)
-        if mdl_base is not None:
-            anim_list = mdl_base.kb.anim_list
-            anim_list_idx = mdl_base.kb.anim_list_idx
-            if (anim_list_idx >= 0) and len(anim_list) > anim_list_idx:
-                anim = anim_list[anim_list_idx]
-                ev_list = anim.event_list
-                ev_list_idx = anim.event_list_idx
-                return ev_list_idx >= 0 and len(ev_list) > ev_list_idx
-        return False
+    def poll(cls, context):
+        if not utils.is_root_dummy(context.object):
+            return False
+
+        mdl_root = context.object
+        anim_list = mdl_root.kb.anim_list
+        anim_list_idx = mdl_root.kb.anim_list_idx
+        if anim_list_idx < 0 or anim_list_idx >= len(anim_list):
+            return False
+
+        anim = anim_list[anim_list_idx]
+        return anim.event_list_idx >= 0 and anim.event_list_idx < len(anim.event_list)
 
     def execute(self, context):
-        mdl_base = utils.get_mdl_root_from_object(context.object)
-        anim = mdl_base.kb.anim_list[mdl_base.kb.anim_list_idx]
+        mdl_root = context.object
+        anim = mdl_root.kb.anim_list[mdl_root.kb.anim_list_idx]
+
+        if anim.event_list_idx == len(anim.event_list) - 1 and anim.event_list_idx > 0:
+            anim.event_list_idx -= 1
 
         anim.event_list.remove(anim.event_list_idx)
-        if anim.event_list_idx > 0:
-            anim.event_list_idx = anim.event_list_idx - 1
 
         return {'FINISHED'}

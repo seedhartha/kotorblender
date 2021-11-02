@@ -61,7 +61,7 @@ def rebuild_material_nodes(material, obj):
     output.location = (1200, 0)
 
     # Shader node
-    selfillumed = not utils.isclose_3f(obj.kb.selfillumcolor, [0.0] * 3)
+    selfillumed = not utils.is_close_3(obj.kb.selfillumcolor, [0.0] * 3)
     if selfillumed:
         shader = nodes.new("ShaderNodeEmission")
     else:

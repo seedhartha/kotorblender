@@ -32,31 +32,33 @@ class KB_OT_anim_move(bpy.types.Operator):
                                              ("DOWN", "Down", "")))
 
     @classmethod
-    def poll(self, context):
-        """Prevent execution if animation list has less than 2 elements."""
-        mdl_base = utils.get_mdl_root_from_object(context.object)
-        if mdl_base is not None:
-            return (len(mdl_base.kb.anim_list) > 1)
-        return False
+    def poll(cls, context):
+        if not utils.is_root_dummy(context.object):
+            return False
+
+        mdl_root = context.object
+        anim_list = mdl_root.kb.anim_list
+        anim_list_idx = mdl_root.kb.anim_list_idx
+        num_anims = len(anim_list)
+
+        return anim_list_idx >= 0 and anim_list_idx < len(anim_list) and num_anims >= 2
 
     def execute(self, context):
-        """Move an item in the animation list."""
-        mdl_base = utils.get_mdl_root_from_object(context.object)
-        anim_list = mdl_base.kb.anim_list
+        mdl_root = context.object
+        anim_list = mdl_root.kb.anim_list
+        prev_idx = mdl_root.kb.anim_list_idx
 
-        current_idx = mdl_base.kb.anim_list_idx
-        new_idx = 0
-        max_idx = len(anim_list) - 1
-        if self.direction == "DOWN":
-            new_idx = current_idx + 1
-        elif self.direction == "UP":
-            new_idx = current_idx - 1
+        if self.direction == 'DOWN':
+            new_idx = min(len(anim_list) - 1, prev_idx + 1)
+        elif self.direction == 'UP':
+            new_idx = max(0, prev_idx - 1)
         else:
             return {'CANCELLED'}
 
-        new_idx = max(0, min(new_idx, max_idx))
-        if new_idx == current_idx:
+        if new_idx == prev_idx:
             return {'CANCELLED'}
-        anim_list.move(current_idx, new_idx)
-        mdl_base.kb.anim_list_idx = new_idx
+
+        anim_list.move(prev_idx, new_idx)
+        mdl_root.kb.anim_list_idx = new_idx
+
         return {'FINISHED'}

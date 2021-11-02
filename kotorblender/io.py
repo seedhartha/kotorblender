@@ -31,7 +31,7 @@ from .scene.modelnode.trimesh import TrimeshNode
 
 from .defines import Dummytype
 
-from . import glob, utils
+from . import defines, glob, utils
 
 
 def load_mdl(
@@ -110,7 +110,7 @@ def load_pth(
 
 def save_mdl(filepath, export_for_tsl=False):
     # reset pose
-    bpy.context.scene.frame_set(1)
+    bpy.context.scene.frame_set(defines.ANIM_GLOBSTART)
 
     mdl_root = next(iter(obj for obj in bpy.context.selected_objects if utils.is_root_dummy(obj)), None)
     if not mdl_root:
@@ -126,7 +126,7 @@ def save_mdl(filepath, export_for_tsl=False):
 
 def save_lyt(filepath):
     def describe_object(obj):
-        parent = utils.get_mdl_root(obj)
+        parent = utils.get_object_root(obj)
         orientation = obj.rotation_euler.to_quaternion()
         return "{} {} {:.7g} {:.7g} {:.7g} {:.7g} {:.7g} {:.7g} {:.7g}".format(parent.name if parent else "NULL", obj.name, *obj.matrix_world.translation, *orientation)
 
@@ -261,7 +261,7 @@ def do_load_mdl(filepath, position=(0.0, 0.0, 0.0)):
         dwk_walkmesh3.import_to_collection(model_root, collection)
 
     # reset pose
-    bpy.context.scene.frame_set(1)
+    bpy.context.scene.frame_set(defines.ANIM_GLOBSTART)
 
 
 def do_load_lyt(filepath):

@@ -728,59 +728,27 @@ class MdlLoader:
             supernode = self.node_by_number[supernode_number]
             controllers = self.load_controllers(controller_arr, controller_data_arr)
             if CTRL_BASE_POSITION in controllers:
-                node.object_data["position"] = (
-                    [[row.timekey] + self.position_controller_to_vector(row.values, supernode.position) for row in controllers[CTRL_BASE_POSITION]],
-                    "location",
-                    3
-                )
+                node.keyframes["position"] = [[row.timekey] + self.position_controller_to_vector(row.values, supernode.position) for row in controllers[CTRL_BASE_POSITION]]
             if CTRL_BASE_ORIENTATION in controllers:
-                node.object_data["orientation"] = (
-                    [[row.timekey] + self.orientation_controller_to_quaternion(row.values) for row in controllers[CTRL_BASE_ORIENTATION]],
-                    "rotation_quaternion",
-                    4
-                )
+                node.keyframes["orientation"] = [[row.timekey] + self.orientation_controller_to_quaternion(row.values) for row in controllers[CTRL_BASE_ORIENTATION]]
             if CTRL_BASE_SCALE in controllers:
-                node.object_data["scale"] = (
-                    [[row.timekey] + [row.values[0]] * 3 for row in controllers[CTRL_BASE_SCALE]],
-                    "scale",
-                    3
-                )
+                node.keyframes["scale"] = [[row.timekey] + [row.values[0]] * 3 for row in controllers[CTRL_BASE_SCALE]]
             if isinstance(supernode, TrimeshNode):
                 if CTRL_MESH_ALPHA in controllers:
-                    node.object_data["alpha"] = (
-                        [[row.timekey] + [row.values[0]] for row in controllers[CTRL_MESH_ALPHA]],
-                        "kb.alpha",
-                        1
-                    )
+                    node.keyframes["alpha"] = [[row.timekey] + [row.values[0]] for row in controllers[CTRL_MESH_ALPHA]]
                 if CTRL_MESH_SELFILLUMCOLOR in controllers:
-                    node.object_data["selfillumcolor"] = (
-                        [[row.timekey] + row.values[:3] for row in controllers[CTRL_MESH_SELFILLUMCOLOR]],
-                        "kb.selfillumcolor",
-                        3
-                    )
+                    node.keyframes["selfillumcolor"] = [[row.timekey] + row.values[:3] for row in controllers[CTRL_MESH_SELFILLUMCOLOR]]
             if isinstance(supernode, LightNode):
                 if CTRL_LIGHT_COLOR in controllers:
-                    node.object_data["color"] = (
-                        [[row.timekey] + row.values[:3] for row in controllers[CTRL_LIGHT_COLOR]],
-                        "color",
-                        3
-                    )
+                    node.keyframes["color"] = [[row.timekey] + row.values[:3] for row in controllers[CTRL_LIGHT_COLOR]]
                 if CTRL_LIGHT_RADIUS in controllers:
-                    node.object_data["radius"] = (
-                        [[row.timekey] + [row.values[0]] for row in controllers[CTRL_LIGHT_RADIUS]],
-                        "distance",
-                        1
-                    )
+                    node.keyframes["radius"] = [[row.timekey] + [row.values[0]] for row in controllers[CTRL_LIGHT_RADIUS]]
             if isinstance(supernode, EmitterNode):
                 for key in EMITTER_CONTROLLER_KEYS:
                     if not key[0] in controllers:
                         continue
                     num_columns = key[2]
-                    node.emitter_data[key[1]] = (
-                        [[row.timekey] + row.values[:num_columns] for row in controllers[key[0]]],
-                        "",
-                        num_columns
-                    )
+                    node.keyframes[key[1]] = [[row.timekey] + row.values[:num_columns] for row in controllers[key[0]]]
 
         self.mdl.seek(MDL_OFFSET + children_arr.offset)
         child_offsets = [self.mdl.get_uint32() for _ in range(children_arr.count)]

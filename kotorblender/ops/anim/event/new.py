@@ -18,6 +18,8 @@
 
 import bpy
 
+from ....scene.animation import Animation
+
 from .... import utils
 
 
@@ -29,25 +31,18 @@ class KB_OT_anim_event_new(bpy.types.Operator):
     bl_options = {'UNDO'}
 
     @classmethod
-    def poll(self, context):
-        """Enable only if there is an animation."""
-        mdl_base = utils.get_mdl_root_from_object(context.object)
-        if mdl_base is not None:
-            anim_list = mdl_base.kb.anim_list
-            anim_list_idx = mdl_base.kb.anim_list_idx
-            return (anim_list_idx >= 0) and len(anim_list) > anim_list_idx
-        return False
+    def poll(cls, context):
+        return utils.is_root_dummy(context.object)
 
     def execute(self, context):
-        """Add the new item."""
-        mdl_base = utils.get_mdl_root_from_object(context.object)
-        anim = mdl_base.kb.anim_list[mdl_base.kb.anim_list_idx]
+        mdl_root = context.object
+        anim_list = mdl_root.kb.anim_list
+        anim_list_idx = mdl_root.kb.anim_list_idx
 
-        event_list = anim.event_list
-        new_event = event_list.add()
-        if anim.frame_start <= bpy.context.scene.frame_current <= anim.frame_end:
-            new_event.frame = bpy.context.scene.frame_current
-        else:
-            new_event.frame = anim.frame_start
+        if anim_list_idx < 0 or anim_list_idx > len(anim_list):
+            return {'CANCELLED'}
+
+        anim = anim_list[anim_list_idx]
+        Animation.append_event_to_object_anim(anim, "changeit", 0)
 
         return {'FINISHED'}
