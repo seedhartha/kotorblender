@@ -19,6 +19,8 @@
 import bpy
 from mathutils import Matrix, Quaternion, Vector
 
+from ..defines import Meshtype
+
 from .. import defines, utils
 
 
@@ -35,7 +37,7 @@ def recreate_armature(mdl_root):
         return None
 
     # Create an armature and make it active
-    armature_name = "Armature_"+mdl_root.name
+    armature_name = "Armature_" + mdl_root.name
     if armature_name in bpy.data.armatures:
         armature = bpy.data.armatures[armature_name]
         if armature.animation_data:
@@ -77,11 +79,13 @@ def create_bones_recursive(armature, obj, parent_bone=None):
 
     bone = armature.edit_bones.new(obj.name)
     bone.parent = parent_bone
-    bone.head = [0.0]*3
+    bone.head = [0.0] * 3
     bone.tail = Vector((0.0, 1e-3, 0.0))
     bone.matrix = mat_bone
 
     for child in obj.children:
+        if child.type == 'MESH' and child.kb.meshtype == Meshtype.SKIN:
+            continue
         create_bones_recursive(armature, child, bone)
 
 
