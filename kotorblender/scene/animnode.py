@@ -105,7 +105,7 @@ class AnimationNode:
 
     def add_keyframes_to_object(self, anim, obj, root_name):
         for label, data in self.keyframes.items():
-            if label not in DATA_PATH_BY_LABEL:
+            if label not in DATA_PATH_BY_LABEL or not data:
                 continue
             if label in CONVERTER_BY_LABEL:
                 converter = CONVERTER_BY_LABEL[label]
