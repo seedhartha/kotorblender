@@ -16,7 +16,75 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-from .. import defines, utils
+import bpy
+
+from .. import defines
+
+DATA_PATH_BY_LABEL = {
+    "position": "location",
+    "orientation": "rotation_quaternion",
+
+    # Meshes
+    "alpha": "kb.alpha",
+    "selfillumcolor": "kb.selfillumcolor",
+
+    # Lights
+    "color": "color",
+    "radius": "distance",
+
+    # Emitters
+    "alphastart": "kb.alphastart",
+    "alphamid": "kb.alphamid",
+    "alphaend": "kb.alphaend",
+    "birthrate": "kb.birthrate",
+    "random_birth_rate": "kb.random_birth_rate",
+    "bounce_co": "kb.bounce_co",
+    "combinetime": "kb.combinetime",
+    "drag": "kb.drag",
+    "fps": "kb.fps",
+    "frame_end": "kb.frame_end",
+    "frame_start": "kb.frame_start",
+    "grav": "kb.grav",
+    "lifeexp": "kb.lifeexp",
+    "mass": "kb.mass",
+    "p2p_bezier2": "kb.p2p_bezier2",
+    "p2p_bezier3": "kb.p2p_bezier3",
+    "particlerot": "kb.particlerot",
+    "randvel": "kb.randvel",
+    "sizestart": "kb.sizestart",
+    "sizemid": "kb.sizemid",
+    "sizeend": "kb.sizeend",
+    "sizestart_y": "kb.sizestart_y",
+    "sizemid_y": "kb.sizemid_y",
+    "sizeend_y": "kb.sizeend_y",
+    "spread": "kb.spread",
+    "threshold": "kb.threshold",
+    "velocity": "kb.velocity",
+    "xsize": "kb.xsize",
+    "ysize": "kb.ysize",
+    "blurlength": "kb.blurlength",
+    "lightningdelay": "kb.lightningdelay",
+    "lightningradius": "kb.lightningradius",
+    "lightningsubdiv": "kb.lightningsubdiv",
+    "lightningscale": "kb.lightningscale",
+    "lightningzigzag": "kb.lightningzigzag",
+    "percentstart": "kb.percentstart",
+    "percentmid": "kb.percentmid",
+    "percentend": "kb.percentend",
+    "targetsize": "kb.targetsize",
+    "numcontrolpts": "kb.numcontrolpts",
+    "controlptradius": "kb.controlptradius",
+    "controlptdelay": "kb.controlptdelay",
+    "tangentspread": "kb.tangentspread",
+    "tangentlength": "kb.tangentlength",
+    "colorstart": "kb.colorstart",
+    "colormid": "kb.colormid",
+    "colorend": "kb.colorend"
+}
+
+CONVERTER_BY_LABEL = {
+    "scale": lambda val: [val[0] * 3]
+}
 
 
 class AnimationNode:
@@ -26,126 +94,73 @@ class AnimationNode:
         self.name = name
         self.parent = defines.NULL
 
-        self.emitter_data = dict()
-        self.object_data = dict()
+        self.keyframes = dict()
 
-    def add_object_keyframes(self, obj, anim, options={}):
-        if self.object_data:
-            self.create_data_object(obj, anim, options)
-        if self.emitter_data:
-            self.create_data_emitter(obj, anim, options)
-
-    def create_data_object(self, obj, anim, options={}):
-        """Creates animations in object actions."""
-        fps = defines.FPS
-        frame_start = anim.frame_start
-
-        # Insert keyframes of each type
-        for label, (data, data_path, data_dim) in self.object_data.items():
-            frames = [fps * d[0] + frame_start for d in data]
-
-            if obj.type == 'LIGHT' and label in ["radius", "color"]:
-                # For light radius and color, target the object data
-                use_action = utils.get_action(obj.data, options["mdlname"] + "." + obj.name)
+    def add_keyframes_to_object(self, anim, obj, root_name):
+        for label, data in self.keyframes.items():
+            if label not in DATA_PATH_BY_LABEL:
+                continue
+            if label in CONVERTER_BY_LABEL:
+                converter = CONVERTER_BY_LABEL[label]
+                values = [converter(d[1:]) for d in data]
             else:
-                # Otherwise, target the object
-                use_action = utils.get_action(obj, options["mdlname"] + "." + obj.name)
+                values = [d[1:] for d in data]
 
-            if label == "position":
-                values = [d[1:4] for d in data]
-                data_dim = 3  # TODO: add support for Bezier keys
-            elif label == "orientation":
-                values = [d[1:5] for d in data]
-                data_dim = 4
-            elif label == "scale":
-                values = [[d[1]]*3 for d in data]
-                data_dim = 3
-            else:
-                values = [d[1:data_dim+1] for d in data]
+            frames = [anim.frame_start + defines.FPS * d[0] for d in data]
+            dim = len(values[0])
 
-            AnimationNode.insert_kfp(frames, values, use_action, data_path, data_dim)
+            # Action
 
-    def create_data_emitter(self, obj, anim, options={}):
-        """Creates animations in emitter actions."""
-        fps = defines.FPS
-        frame_start = anim.frame_start
-        action = utils.get_action(obj, options["mdlname"] + "." + obj.name)
-        for label, (data, _, data_dim) in self.emitter_data.items():
-            frames = [fps * d[0] + frame_start for d in data]
-            values = [d[1:data_dim+1] for d in data]
-            dp = "kb.{}".format(label)
-            dp_dim = data_dim
-            AnimationNode.insert_kfp(frames, values, action, dp, dp_dim, "Odyssey Emitter")
+            action_name = "{}.{}".format(root_name, obj.name)
+            action = self.get_or_create_action(action_name)
 
-    @staticmethod
-    def create_restpose(obj, frame=1):
-        def insert_kfp(fcurves, frame, val, dim):
-            # dim = len(val)
-            for j in range(dim):
-                kf = fcurves[j].keyframe_points.insert(frame, val[j], options={'FAST'})
-                kf.interpolation = 'LINEAR'
-        # Get animation data
-        animData = obj.animation_data
-        if not animData:
-            return  # No data = no animation = no need for rest pose
-        # Get action
-        action = animData.action
-        if not action:
-            return  # No action = no animation = no need for rest pose
-        fcu = [action.fcurves.find("rotation_quaternion", index=i) for i in range(4)]
-        if fcu.count(None) < 1:
-            q = obj.rotation_quaternion
-            insert_kfp(fcu, frame, [q.w, q.x, q.y, q.z], 4)
-        fcu = [action.fcurves.find("location", index=i) for i in range(3)]
-        if fcu.count(None) < 1:
-            insert_kfp(fcu, frame, obj.location, 3)
-        fcu = [action.fcurves.find("scale", index=i) for i in range(3)]
-        if fcu.count(None) < 1:
-            insert_kfp(fcu, frame, obj.scale, 3)
+            # Animation Data
 
-    @staticmethod
-    def insert_kfp(frames, values, action, dp, dp_dim, action_group=None):
-        if not frames or not values:
-            return
-        fcu = [utils.get_fcurve(action, dp, i, action_group)
-               for i in range(dp_dim)]
-        kfp_list = [fcu[i].keyframe_points for i in range(dp_dim)]
-        kfp_cnt = list(map(lambda x: len(x), kfp_list))
-        list(map(lambda x: x.add(len(values)), kfp_list))
-        for i, (frm, val) in enumerate(zip(frames, values)):
-            for d in range(dp_dim):
-                p = kfp_list[d][kfp_cnt[d]+i]
-                p.co = frm, val[d]
-                p.interpolation = 'LINEAR'
-                # could do len == dp_dim * 3...
-                if len(val) > dp_dim:
-                    p.interpolation = 'BEZIER'
-                    p.handle_left_type = 'FREE'
-                    p.handle_right_type = 'FREE'
-                    # initialize left and right handle x positions
-                    h_left_frame = frm - defines.FPS
-                    h_right_frame = frm + defines.FPS
-                    # adjust handle x positions based on previous/next keyframes
-                    if i > 0:
-                        p_left = frames[i - 1]
-                        print(" left {} frm {}".format(p_left, frm))
-                        # place 1/3 into the distance from current keyframe
-                        # to previous keyframe
-                        h_left_frame = frm - ((frm - p_left) / 3.0)
-                    if i < len(values) - 1:
-                        p_right = frames[i + 1]
-                        print("right {} frm {}".format(p_right, frm))
-                        # place 1/3 into the distance from current keyframe
-                        # to next keyframe
-                        h_right_frame = frm + ((p_right - frm) / 3.0)
-                    # set bezier handle positions,
-                    # y values are relative, so added to initial value
-                    p.handle_left[:] = [
-                        h_left_frame,
-                        val[d + dp_dim] + val[d]
-                    ]
-                    p.handle_right[:] = [
-                        h_right_frame,
-                        val[d + (2 * dp_dim)] + val[d]
-                    ]
-        list(map(lambda c: c.update(), fcu))
+            target = obj
+            if obj.type == 'LIGHT' and label in ["color", "radius"]:
+                target = obj.data
+            self.get_or_create_animation_data(target, action)
+
+            # Keyframe Points
+
+            data_path = DATA_PATH_BY_LABEL[label]
+            fcurves = [self.get_or_create_fcurve(action, data_path, i) for i in range(dim)]
+            keyframe_points = [fcurve.keyframe_points for fcurve in fcurves]
+
+            # Rest Pose Keyframes
+
+            rest_pose_empty = all([fcurve.is_empty for fcurve in fcurves])
+            if rest_pose_empty:
+                if data_path.startswith("kb."):
+                    rest_values = getattr(target.kb, data_path[3:])
+                else:
+                    rest_values = getattr(target, data_path)
+                for i in range(dim):
+                    keyframe_points[i].insert(defines.ANIM_GLOBSTART, rest_values[i], options={'FAST'})
+
+            # Animation Keyframes
+
+            for frame, val in zip(frames, values):
+                for i in range(dim):
+                    keyframe_points[i].insert(frame, val[i], options={'FAST'})
+            for kfp in keyframe_points:
+                kfp.update()
+
+    def get_or_create_action(self, name):
+        if name in bpy.data.actions:
+            return bpy.data.actions[name]
+        else:
+            return bpy.data.actions.new(name=name)
+
+    def get_or_create_animation_data(self, target, action):
+        anim_data = target.animation_data
+        if not anim_data:
+            anim_data = target.animation_data_create()
+            anim_data.action = action
+        return anim_data
+
+    def get_or_create_fcurve(self, action, data_path, index):
+        fcurve = action.fcurves.find(data_path, index=index)
+        if not fcurve:
+            fcurve = action.fcurves.new(data_path=data_path, index=index)
+        return fcurve

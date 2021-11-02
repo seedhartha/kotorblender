@@ -92,8 +92,6 @@ class ObjectPropertyGroup(bpy.types.PropertyGroup):
                                            default=defines.Classification.UNKNOWN)
     subclassification: bpy.props.IntProperty(name="Unknown", description="Unknown byte-2 in the classification bytes section of the model header", default=0)
     ignorefog: bpy.props.BoolProperty(name="Ignore Fog", description="If true, model will not be occluded by area fog in-game", default=False)
-    compress_quats: bpy.props.BoolProperty(name="Use Compressed Quaternions", description="If true, model will use compressed quaternions in animations", default=False)
-    headlink: bpy.props.BoolProperty(name="Head Model", description="If true, this model is a Head", default=False)
     dummysubtype: bpy.props.EnumProperty(name="Subtype",
                                          items=[("NONE", "None",            "Simple dummy object",                     0),
                                                 ("HAND", "Hand",            "Hand node for spells and effects. \n (for door and placeable models)",        1),

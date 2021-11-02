@@ -57,15 +57,11 @@ class KB_PT_empty(bpy.types.Panel):
             col.label(text="Supermodel:")
             col.label(text="Ignore Fog:")
             col.label(text="Animation Scale:")
-            if obj.kb.classification == defines.Classification.CHARACTER:
-                col.label(text="Head Model:")
             col = split.column()
             col.prop(obj.kb, "classification", text="")
             col.prop(obj.kb, "supermodel", text="")
             col.prop(obj.kb, "ignorefog", text="")
             col.prop(obj.kb, "animscale", text="")
-            if obj.kb.classification == defines.Classification.CHARACTER:
-                col.prop(obj.kb, "headlink", text="")
             box.operator("kb.recreate_armature")
             layout.separator()
 

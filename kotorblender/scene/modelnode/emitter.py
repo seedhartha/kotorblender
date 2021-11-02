@@ -202,16 +202,16 @@ class EmitterNode(GeometryNode):
     def create_mesh(self, objName):
         # Create the mesh itself
         mesh = bpy.data.meshes.new(objName)
-        a_bmesh = bmesh.new(use_operators=False)
-        a_bmesh.verts.new(((self.xsize/2) / 100.0,  (self.ysize/2) / 100.0, 0.0))
-        a_bmesh.verts.new(((self.xsize/2) / 100.0, (-self.ysize/2) / 100.0, 0.0))
-        a_bmesh.verts.new(((-self.xsize/2) / 100.0, (-self.ysize/2) / 100.0, 0.0))
-        a_bmesh.verts.new(((-self.xsize/2) / 100.0,  (self.ysize/2) / 100.0, 0.0))
-        a_bmesh.verts.ensure_lookup_table()
-        face_verts = [a_bmesh.verts[i] for i in range(4)]
-        a_bmesh.faces.new((*face_verts, ))
-        a_bmesh.to_mesh(mesh)
-        a_bmesh.free()
+        bm = bmesh.new(use_operators=False)
+        bm.verts.new(((self.xsize/2) / 100.0, (self.ysize/2) / 100.0, 0.0))
+        bm.verts.new(((self.xsize/2) / 100.0, (-self.ysize/2) / 100.0, 0.0))
+        bm.verts.new(((-self.xsize/2) / 100.0, (-self.ysize/2) / 100.0, 0.0))
+        bm.verts.new(((-self.xsize/2) / 100.0, (self.ysize/2) / 100.0, 0.0))
+        bm.verts.ensure_lookup_table()
+        face_verts = [bm.verts[i] for i in range(4)]
+        bm.faces.new((*face_verts, ))
+        bm.to_mesh(mesh)
+        bm.free()
         return mesh
 
     def set_object_data(self, obj):

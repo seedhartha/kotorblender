@@ -56,7 +56,7 @@ class AabbNode(TrimeshNode):
                 mdl_verts = [self.verts[idx] for idx in mdl_vert_indices]
                 mdl_verts_from_root = [self.from_root @ Vector(vert) for vert in mdl_verts]
                 mdl_verts_lyt_space = [vert + self.lytposition for vert in mdl_verts_from_root]
-                if all([utils.isclose_3f(wok_verts[i], mdl_verts_lyt_space[i]) for i in range(3)]):
+                if all([utils.is_close_3(wok_verts[i], mdl_verts_lyt_space[i]) for i in range(3)]):
                     self.roomlinks.append((3 * face_idx + (edge[0] % 3), edge[1]))
                     break
 

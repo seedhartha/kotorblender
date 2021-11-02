@@ -32,8 +32,6 @@ class KB_OT_recreate_armature(bpy.types.Operator):
     def execute(self, context):
         obj = context.object
         if utils.is_root_dummy(obj):
-            armature_object = armature.recreate_armature(obj)
-            if armature_object:
-                armature.create_armature_animations(obj, armature_object)
+            armature.recreate_armature(obj)
 
         return {'FINISHED'}
