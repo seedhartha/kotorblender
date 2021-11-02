@@ -24,7 +24,7 @@ from . import defines
 
 
 def is_null(s):
-    return (not s or s.lower() == defines.null.lower())
+    return (not s or s.lower() == defines.NULL.lower())
 
 
 def isclose(a, b, rel_tol=1e-09, abs_tol=0.0):
@@ -133,7 +133,7 @@ def get_action(target, action_name):
 def get_last_keyframe(root_obj):
     """Get the last keyed frame of this object and its children."""
     def get_max_frame(target):
-        frame = defines.anim_globstart
+        frame = defines.ANIM_GLOBSTART
         if target:
             if target.animation_data and target.animation_data.action:
                 for fcu in target.animation_data.action.fcurves:
@@ -142,7 +142,7 @@ def get_last_keyframe(root_obj):
             return frame
     obj_list = [root_obj]
     get_children_recursive(root_obj, obj_list)
-    frame_list = [defines.anim_globstart]
+    frame_list = [defines.ANIM_GLOBSTART]
     for obj in obj_list:
         frame_list.append(get_max_frame(obj))
         mat = obj.active_material
@@ -156,19 +156,19 @@ def get_last_keyframe(root_obj):
 
 def create_anim_list_item(mdl_base, check_keyframes=False):
     """Append a new animation at the and of the animation list."""
-    last_frame = max([defines.anim_globstart] +
+    last_frame = max([defines.ANIM_GLOBSTART] +
                      [a.frame_end for a in mdl_base.kb.anim_list])
     if check_keyframes:
         last_frame = max(last_frame, get_last_keyframe(mdl_base))
     anim = mdl_base.kb.anim_list.add()
     anim.name = mdl_base.name
-    start = int(math.ceil((last_frame + defines.anim_offset) / 10.0)) * 10
+    start = int(math.ceil((last_frame + defines.ANIM_OFFSET) / 10.0)) * 10
     anim.frame_start = start
     anim.frame_end = start
     return anim
 
 
-def nwtime2frame(time, fps=defines.fps):
+def nwtime2frame(time, fps=defines.FPS):
     """
     For animations: Convert key time to frame number
     """

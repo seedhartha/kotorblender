@@ -154,6 +154,14 @@ EMITTER_FLAG_INHERIT_PART = 0x0400
 EMITTER_FLAG_DEPTH_TEXTURE = 0x0800
 EMITTER_FLAG_13 = 0x1000
 
+AABB_NO_CHILDREN = 0x00
+AABB_POSITIVE_X = 0x01
+AABB_POSITIVE_Y = 0x02
+AABB_POSITIVE_Z = 0x04
+AABB_NEGATIVE_X = 0x08
+AABB_NEGATIVE_Y = 0x10
+AABB_NEGATIVE_Z = 0x20
+
 
 class ControllerKey:
     def __init__(self, ctrl_type, num_rows, timekeys_start, values_start, num_columns):

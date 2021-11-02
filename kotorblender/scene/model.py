@@ -38,7 +38,7 @@ class Model:
 
     def __init__(self):
         self.name = "UNNAMED"
-        self.supermodel = defines.null
+        self.supermodel = defines.NULL
         self.animscale = 1.0
         self.classification = defines.Classification.UNKNOWN
         self.subclassification = 0

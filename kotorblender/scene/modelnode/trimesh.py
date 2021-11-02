@@ -67,8 +67,8 @@ class TrimeshNode(GeometryNode):
         self.selfillumcolor = (0.0, 0.0, 0.0)
         self.ambient = (0.0, 0.0, 0.0)
         self.diffuse = (0.0, 0.0, 0.0)
-        self.bitmap = defines.null
-        self.bitmap2 = defines.null
+        self.bitmap = defines.NULL
+        self.bitmap2 = defines.NULL
         self.tangentspace = 0
         self.rotatetexture = 0
         self.verts = []  # list of vertices
@@ -104,7 +104,7 @@ class TrimeshNode(GeometryNode):
         # Special handling for mesh in walkmesh files
         if self.roottype in ["pwk", "dwk", "wok"]:
             # Create walkmesh materials
-            for wok_mat in defines.wok_materials:
+            for wok_mat in defines.WOK_MATERIALS:
                 mat_name = wok_mat[0]
                 # Walkmesh materials will be shared across multiple walkmesh
                 # objects
@@ -172,7 +172,7 @@ class TrimeshNode(GeometryNode):
         GeometryNode.load_object_data(self, obj)
 
         self.meshtype = obj.kb.meshtype
-        self.bitmap = obj.kb.bitmap if obj.kb.bitmap else defines.null
+        self.bitmap = obj.kb.bitmap if obj.kb.bitmap else defines.NULL
         self.bitmap2 = obj.kb.bitmap2 if obj.kb.bitmap2 else ""
         self.alpha = obj.kb.alpha
         self.lightmapped = 1 if obj.kb.lightmapped else 0

@@ -16,7 +16,7 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-class MdxNotFound(RuntimeError):
+class AabbGenerationError(RuntimeError):
     def __init__(self, message):
         self.message = message
 

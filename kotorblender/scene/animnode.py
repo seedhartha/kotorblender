@@ -16,8 +16,6 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-from mathutils import Quaternion
-
 from .. import defines, utils
 
 
@@ -26,7 +24,7 @@ class AnimationNode:
     def __init__(self, name="UNNAMED"):
         self.nodetype = defines.Nodetype.DUMMY
         self.name = name
-        self.parent = defines.null
+        self.parent = defines.NULL
 
         self.emitter_data = dict()
         self.object_data = dict()
@@ -39,7 +37,7 @@ class AnimationNode:
 
     def create_data_object(self, obj, anim, options={}):
         """Creates animations in object actions."""
-        fps = defines.fps
+        fps = defines.FPS
         frame_start = anim.frame_start
 
         # Insert keyframes of each type
@@ -69,7 +67,7 @@ class AnimationNode:
 
     def create_data_emitter(self, obj, anim, options={}):
         """Creates animations in emitter actions."""
-        fps = defines.fps
+        fps = defines.FPS
         frame_start = anim.frame_start
         action = utils.get_action(obj, options["mdlname"] + "." + obj.name)
         for label, (data, _, data_dim) in self.emitter_data.items():
@@ -125,8 +123,8 @@ class AnimationNode:
                     p.handle_left_type = 'FREE'
                     p.handle_right_type = 'FREE'
                     # initialize left and right handle x positions
-                    h_left_frame = frm - defines.fps
-                    h_right_frame = frm + defines.fps
+                    h_left_frame = frm - defines.FPS
+                    h_right_frame = frm + defines.FPS
                     # adjust handle x positions based on previous/next keyframes
                     if i > 0:
                         p_left = frames[i - 1]

@@ -80,7 +80,7 @@ class AabbNode(TrimeshNode):
         mesh.polygons.foreach_set("loop_total", (3,) * num_faces)
 
         # Create materials
-        for wok_mat in defines.wok_materials:
+        for wok_mat in defines.WOK_MATERIALS:
             mat_name = wok_mat[0]
             # Walkmesh materials will be shared across multiple walkmesh
             # objects
@@ -120,6 +120,11 @@ class AabbNode(TrimeshNode):
         TrimeshNode.set_object_data(self, obj)
 
         obj.kb.lytposition = self.lytposition
+
+    def load_object_data(self, obj):
+        TrimeshNode.load_object_data(self, obj)
+
+        self.lytposition = obj.kb.lytposition
 
     def set_room_links(self, mesh):
         if not "RoomLinks" in mesh.vertex_colors:

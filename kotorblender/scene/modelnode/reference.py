@@ -28,7 +28,7 @@ class ReferenceNode(GeometryNode):
         self.nodetype = "reference"
 
         self.dummytype = defines.Dummytype.REFERENCE
-        self.refmodel = defines.null
+        self.refmodel = defines.NULL
         self.reattachable = 0
 
     def set_object_data(self, obj):
