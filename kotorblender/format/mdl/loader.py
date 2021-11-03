@@ -182,7 +182,7 @@ class MdlLoader:
 
     def load_nodes(self, offset, export_order, parent=None):
         self.mdl.seek(MDL_OFFSET + offset)
-        print("Loading model node at {}".format(offset))
+        #print("Loading model node at {}".format(offset))
 
         type_flags = self.mdl.get_uint16()
         supernode_number = self.mdl.get_uint16()
@@ -580,7 +580,7 @@ class MdlLoader:
 
     def load_animation(self, offset):
         self.mdl.seek(MDL_OFFSET + offset)
-        print("Loading animation at {}".format(offset))
+        #print("Loading animation at {}".format(offset))
 
         fn_ptr1 = self.mdl.get_uint32()
         fn_ptr2 = self.mdl.get_uint32()
@@ -615,7 +615,7 @@ class MdlLoader:
 
     def load_anim_nodes(self, offset, anim, parent=None):
         self.mdl.seek(MDL_OFFSET + offset)
-        print("Loading animation node at {}".format(offset))
+        #print("Loading animation node at {}".format(offset))
 
         type_flags = self.mdl.get_uint16()
         supernode_number = self.mdl.get_uint16()

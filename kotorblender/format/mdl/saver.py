@@ -799,6 +799,8 @@ class MdlSaver:
                 self.mdl.put_float(val)
 
     def save_nodes(self):
+        mesh_inv_count = 0
+
         for node_idx, node in enumerate(self.nodes):
             # Geometry Header
 
@@ -1002,6 +1004,11 @@ class MdlSaver:
                 total_area = self.mesh_total_areas[node_idx]
                 mdx_offset = self.mdx_offsets[node_idx]
                 off_vert_array = self.verts_offsets[node_idx]
+
+                mesh_inv_count += 1
+                quo = mesh_inv_count // 100
+                mod = mesh_inv_count % 100
+                inv_count = int(pow(2, quo) * 100 - mesh_inv_count + (100 * quo if mod else 0) + (0 if quo else -1))
 
                 self.mdl.put_uint32(fn_ptr1)
                 self.mdl.put_uint32(fn_ptr2)
@@ -1212,7 +1219,7 @@ class MdlSaver:
                         self.mdx.put_float(0.0)
 
                 self.mdl.put_uint32(3 * len(node.facelist.faces))  # index count
-                self.mdl.put_uint32(98)  # inverted count
+                self.mdl.put_uint32(inv_count)
 
                 # Vertex Indices
                 for face in node.facelist.faces:
