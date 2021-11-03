@@ -20,7 +20,7 @@ import os
 
 from math import sqrt
 
-from mathutils import Vector
+from mathutils import Matrix, Vector
 
 from ...defines import Nodetype
 
@@ -1230,23 +1230,26 @@ class MdlSaver:
 
             if type_flags & NODE_SKIN:
                 # Bonemap
+
                 for bone_idx in bonemap:
                     self.mdl.put_float(float(bone_idx))
 
                 num_bones = len(bonemap)
 
-                # QBones
+                # QBones, TBones
+
+                inv_transform = self.calculate_inverse_transform(node)
+
                 for _ in range(num_bones):
                     self.mdl.put_float(1.0)
                     for _ in range(3):
                         self.mdl.put_float(0.0)
-
-                # TBones
                 for _ in range(num_bones):
                     for _ in range(3):
                         self.mdl.put_float(0.0)
 
                 # Garbage
+
                 for _ in range(num_bones):
                     self.mdl.put_uint32(0)
 
@@ -1320,11 +1323,6 @@ class MdlSaver:
             for val in self.controller_data[node_idx]:
                 self.mdl.put_float(val)
 
-    def put_array_def(self, offset, count):
-        self.mdl.put_uint32(offset)
-        self.mdl.put_uint32(count)
-        self.mdl.put_uint32(count)
-
     def get_node_flags(self, node):
         switch = {
             Nodetype.DUMMY: NODE_BASE,
@@ -1376,6 +1374,9 @@ class MdlSaver:
         area2 = s * (s - a) * (s - b) * (s - c)
         return sqrt(area2)
 
+    def calculate_inverse_transform(self, node):
+        return Matrix()
+
     def generate_aabb_tree(self, node):
         face_list = []
         face_idx = 0
@@ -1392,3 +1393,8 @@ class MdlSaver:
         aabb.generate_tree(aabbs, face_list)
 
         return aabbs
+
+    def put_array_def(self, offset, count):
+        self.mdl.put_uint32(offset)
+        self.mdl.put_uint32(count)
+        self.mdl.put_uint32(count)

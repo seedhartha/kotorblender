@@ -141,8 +141,11 @@ class Model:
             Nodetype.LIGHTSABER: LightsaberNode
         }
         node = switch[node_type](obj.name)
-        node.parent = parent
+        if parent:
+            node.parent = parent
+            node.from_root = parent.from_root
         node.load_object_data(obj)
+        node.from_root = node.from_root @ obj.matrix_local
 
         for child_obj in sorted(obj.children, key=lambda o: o.kb.export_order):
             if child_obj.type == 'EMPTY' and child_obj.kb.dummytype in [Dummytype.PWKROOT, Dummytype.DWKROOT]:
