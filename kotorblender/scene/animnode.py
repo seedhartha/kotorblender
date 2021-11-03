@@ -211,6 +211,9 @@ class AnimationNode:
 
         for data_path in flat_fcurve_frames.keys():
             frames = flat_fcurve_frames[data_path]
+            if not frames:
+                continue
+
             timekeys = [(frame-anim.frame_start)/defines.FPS for frame in frames]
 
             if data_path in CONVERTER_BY_DATA_PATH:
