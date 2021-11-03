@@ -605,6 +605,18 @@ class MdlSaver:
                         out_data.append(val)
                 data_count += (1 + num_columns) * num_rows
 
+            if "multiplier" in node.keyframes:
+                keyframes = node.keyframes["multiplier"]
+                num_rows = len(keyframes)
+                num_columns = 1
+                out_keys.append(ControllerKey(CTRL_LIGHT_MULTIPLIER, num_rows, data_count, data_count + num_rows, num_columns))
+                for i in range(num_rows):
+                    out_data.append(keyframes[i][0])  # timekey
+                for i in range(num_rows):
+                    for val in keyframes[i][1:1+num_columns]:
+                        out_data.append(val)
+                data_count += (1 + num_columns) * num_rows
+
         # Emitter Controllers
 
         if type_flags & NODE_EMITTER:
@@ -766,7 +778,10 @@ class MdlSaver:
             # Controllers
 
             for key in self.anim_controller_keys[anim_idx][node_idx]:
-                unk1 = 0xffff
+                if key.ctrl_type in [CTRL_BASE_POSITION, CTRL_BASE_ORIENTATION]:
+                    unk1 = key.ctrl_type + 8
+                else:
+                    unk1 = 0xffff
 
                 self.mdl.put_uint32(key.ctrl_type)
                 self.mdl.put_uint16(unk1)
