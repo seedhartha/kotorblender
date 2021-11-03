@@ -17,6 +17,7 @@
 # ##### END GPL LICENSE BLOCK #####
 
 import math
+import re
 
 from ..defines import Dummytype
 
@@ -94,7 +95,11 @@ class Animation:
 
     @staticmethod
     def animation_node_from_object(anim, obj, parent=None):
-        node = AnimationNode(obj.name)
+        name = obj.name
+        if re.match(r".+\.\d{3}$", name):
+            name = name[:-4]
+
+        node = AnimationNode(name)
         node.supernode_number = obj.kb.node_number
         node.parent = parent
 
