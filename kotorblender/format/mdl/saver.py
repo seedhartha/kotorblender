@@ -20,7 +20,7 @@ import os
 
 from math import sqrt
 
-from mathutils import Matrix, Vector
+from mathutils import Matrix, Quaternion, Vector
 
 from ...defines import Nodetype
 
@@ -1238,15 +1238,36 @@ class MdlSaver:
 
                 # QBones, TBones
 
-                inv_transform = self.calculate_inverse_transform(node)
-
-                for _ in range(num_bones):
-                    self.mdl.put_float(1.0)
-                    for _ in range(3):
-                        self.mdl.put_float(0.0)
-                for _ in range(num_bones):
-                    for _ in range(3):
-                        self.mdl.put_float(0.0)
+                position, orientation = self.get_inverted_transform(node)
+                it = node
+                while it:
+                    it_position, it_orientation = self.get_inverted_transform(it)
+                    position += it_position
+                    position = it_orientation.to_matrix() @ position
+                    it = it.parent
+                tbones = dict()
+                qbones = dict()
+                self.calculate_qt_bones(self.nodes[0], position, orientation, tbones, qbones)
+                for tbone_node_idx in tbones.keys():
+                    tbone = tbones[tbone_node_idx]
+                    qbone = qbones[tbone_node_idx]
+                    qbone.w *= -1.0
+                    tbone -= node.position
+                    tbone *= -1.0
+                    tbone = qbone.to_matrix() @ tbone
+                    tbones[tbone_node_idx] = tbone
+                    qbones[tbone_node_idx] = qbone
+                for i in range(num_bones):
+                    qbone = qbones[i]
+                    self.mdl.put_float(qbone.w)
+                    self.mdl.put_float(qbone.x)
+                    self.mdl.put_float(qbone.y)
+                    self.mdl.put_float(qbone.z)
+                for i in range(num_bones):
+                    tbone = tbones[i]
+                    self.mdl.put_float(tbone.x)
+                    self.mdl.put_float(tbone.y)
+                    self.mdl.put_float(tbone.z)
 
                 # Garbage
 
@@ -1374,8 +1395,20 @@ class MdlSaver:
         area2 = s * (s - a) * (s - b) * (s - c)
         return sqrt(area2)
 
-    def calculate_inverse_transform(self, node):
-        return Matrix()
+    def get_inverted_transform(self, node):
+        position = -1.0 * Vector(node.position)
+        orientation = Quaternion(node.orientation)
+        orientation.w *= -1.0
+        position = orientation.to_matrix() @ position
+        return (position, orientation)
+
+    def calculate_qt_bones(self, node, position, orientation, tbones, qbones):
+        node_idx = self.node_idx_by_number[node.supernode_number]
+        tbones[node_idx] = (orientation.to_matrix() @ Vector(node.position)) + position
+        qbones[node_idx] = orientation @ Quaternion(node.orientation)
+
+        for child in node.children:
+            self.calculate_qt_bones(child, tbones[node_idx], qbones[node_idx], tbones, qbones)
 
     def generate_aabb_tree(self, node):
         face_list = []
