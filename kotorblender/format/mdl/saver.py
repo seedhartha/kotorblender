@@ -20,7 +20,7 @@ import os
 
 from math import sqrt
 
-from mathutils import Matrix, Quaternion, Vector
+from mathutils import Quaternion, Vector
 
 from ...defines import Nodetype
 
