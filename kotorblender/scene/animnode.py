@@ -144,8 +144,11 @@ class AnimationNode:
                     rest_values = getattr(target.kb, data_path[3:])
                 else:
                     rest_values = getattr(target, data_path)
-                for i in range(dim):
-                    keyframe_points[i].insert(defines.ANIM_GLOBSTART, rest_values[i], options={'FAST'})
+                if dim == 1:
+                    keyframe_points[0].insert(defines.ANIM_GLOBSTART, rest_values, options={'FAST'})
+                else:
+                    for i in range(dim):
+                        keyframe_points[i].insert(defines.ANIM_GLOBSTART, rest_values[i], options={'FAST'})
 
             # Animation Keyframes
 
