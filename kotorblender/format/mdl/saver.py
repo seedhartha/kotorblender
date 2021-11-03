@@ -18,6 +18,8 @@
 
 import os
 
+from math import sqrt
+
 from mathutils import Vector
 
 from ...defines import Nodetype
@@ -40,6 +42,7 @@ class MdlSaver:
         self.model = model
         self.tsl = tsl
 
+        # Model
         self.mdl_pos = 0
         self.mdx_pos = 0
         self.mdl_size = 0
@@ -47,6 +50,7 @@ class MdlSaver:
         self.off_name_offsets = 0
         self.off_anim_offsets = 0
 
+        # Nodes
         self.nodes = []
         self.node_names = []
         self.name_offsets = []
@@ -65,6 +69,10 @@ class MdlSaver:
         self.flare_textures_offsets = dict()
 
         # Meshes
+        self.mesh_bounding_boxes = dict()
+        self.mesh_averages = dict()
+        self.mesh_radii = dict()
+        self.mesh_total_areas = dict()
         self.verts_offsets = dict()
         self.faces_offsets = dict()
         self.index_count_offsets = dict()
@@ -126,11 +134,13 @@ class MdlSaver:
 
         self.peek_nodes(self.model.root_node)
 
+        # Nodes
         for node_idx, node in enumerate(self.nodes):
             self.node_names.append(node.name)
             self.node_idx_by_name[node.name] = node_idx
             self.node_idx_by_number[node.supernode_number] = node_idx
 
+        # Animation Nodes
         for anim_idx, anim in enumerate(self.model.animations):
             self.anim_nodes.append([])
             self.anim_parent_indices.append([])
@@ -323,6 +333,40 @@ class MdlSaver:
                     self.mdx_pos += 4 * 2 * (num_verts + 1)
                 if type_flags & NODE_SKIN:
                     self.mdx_pos += 4 * 8 * (num_verts + 1)
+
+                # Bounding Box, Average, Total Area
+                bb_min = Vector((0.0, 0.0, 0.0))
+                bb_max = Vector((0.0, 0.0, 0.0))
+                average = Vector((0.0, 0.0, 0.0))
+                total_area = 0.0
+                for face in node.facelist.faces:
+                    verts = [Vector(node.verts[i]) for i in face]
+                    for vert in verts:
+                        bb_min.x = min(bb_min.x, vert.x)
+                        bb_min.y = min(bb_min.y, vert.y)
+                        bb_min.z = min(bb_min.z, vert.z)
+                        bb_max.x = max(bb_max.x, vert.x)
+                        bb_max.y = max(bb_max.y, vert.y)
+                        bb_max.z = max(bb_max.z, vert.z)
+                        average += vert
+                    edge1 = verts[1] - verts[0]
+                    edge2 = verts[2] - verts[0]
+                    edge3 = verts[2] - verts[1]
+                    area = self.calculate_face_area(edge1, edge2, edge3)
+                    if area != 1.0:
+                        total_area += area
+                average /= 3 * len(node.facelist.faces)
+                self.mesh_bounding_boxes[node_idx] = [*bb_min, *bb_max]
+                self.mesh_averages[node_idx] = [*average]
+                self.mesh_total_areas[node_idx] = total_area
+
+                # Radius
+                radius = 0.0
+                for face in node.facelist.faces:
+                    verts = [Vector(node.verts[i]) for i in face]
+                    for vert in verts:
+                        radius = max(radius, (vert - average).length)
+                self.mesh_radii[node_idx] = radius
 
             # Skin Data
             if type_flags & NODE_SKIN:
@@ -594,7 +638,7 @@ class MdlSaver:
         off_root_node = self.node_offsets[0]
         total_num_nodes = len(self.nodes)
         ref_count = 0
-        model_type = 2
+        model_type = MODEL_MODEL
 
         self.mdl.put_uint32(fn_ptr1)
         self.mdl.put_uint32(fn_ptr2)
@@ -618,7 +662,7 @@ class MdlSaver:
         radius = 7.0  # TODO
         scale = self.model.animscale
         supermodel_name = self.model.supermodel.ljust(32, '\0')
-        off_head_root_node = self.node_offsets[0]
+        off_head_root_node = self.node_offsets[0]  # TODO: headlink
         mdx_size = self.mdx_size
         mdx_offset = 0
 
@@ -661,7 +705,7 @@ class MdlSaver:
             off_root_node = self.anim_node_offsets[anim_idx][0]
             total_num_nodes = len(self.anim_nodes[anim_idx])
             ref_count = 0
-            model_type = 5
+            model_type = MODEL_ANIM
             anim_root = anim.animroot.ljust(32, '\0')
 
             self.mdl.put_uint32(fn_ptr1)
@@ -882,9 +926,9 @@ class MdlSaver:
             if type_flags & NODE_MESH:
                 fn_ptr1, fn_ptr2 = self.get_mesh_fn_ptr(type_flags)
 
-                bounding_box = [0.0] * 6
-                radius = 0.0
-                average = [0.0] * 3
+                bounding_box = self.mesh_bounding_boxes[node_idx]
+                radius = self.mesh_radii[node_idx]
+                average = self.mesh_averages[node_idx]
                 diffuse = node.diffuse
                 ambient = node.ambient
                 transparency_hint = node.transparencyhint
@@ -923,7 +967,13 @@ class MdlSaver:
                     mdx_data_size += 4 * 8  # bone weights + bone indices
 
                 num_verts = len(node.verts)
+
                 num_textures = 0
+                if node.tverts:
+                    num_textures += 1
+                if node.tverts1:
+                    num_textures += 1
+
                 has_lightmap = node.lightmapped
                 rotate_texture = node.rotatetexture
                 background_geometry = node.background_geometry
@@ -934,7 +984,7 @@ class MdlSaver:
                 dirt_texture = node.dirt_texture
                 dirt_coord_space = node.dirt_worldspace
                 hide_in_holograms = node.hologram_donotdraw
-                total_area = 0.0
+                total_area = self.mesh_total_areas[node_idx]
                 mdx_offset = self.mdx_offsets[node_idx]
                 off_vert_array = self.verts_offsets[node_idx]
 
@@ -1275,6 +1325,18 @@ class MdlSaver:
                 fn_ptr2 = MESH_FN_PTR_2_K1_PC
 
         return (fn_ptr1, fn_ptr2)
+
+    def calculate_face_area(self, edge1, edge2, edge3):
+        a = edge1.length
+        b = edge2.length
+        c = edge3.length
+        s = (a + b + c) / 2.0
+        if a <= 0.0 or b <= 0.0 or c <= 0.0:
+            return -1.0
+        if a > b + c or b > a + c or c > a + b:
+            return -1.0
+        area2 = s * (s - a) * (s - b) * (s - c)
+        return sqrt(area2)
 
     def generate_aabb_tree(self, node):
         face_list = []
