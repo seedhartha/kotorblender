@@ -656,6 +656,8 @@ class MdlLoader:
                     node.keyframes["color"] = [[row.timekey] + row.values[:3] for row in controllers[CTRL_LIGHT_COLOR]]
                 if CTRL_LIGHT_RADIUS in controllers:
                     node.keyframes["radius"] = [[row.timekey] + [row.values[0]] for row in controllers[CTRL_LIGHT_RADIUS]]
+                if CTRL_LIGHT_MULTIPLIER in controllers:
+                    node.keyframes["multiplier"] = [[row.timekey] + [row.values[0]] for row in controllers[CTRL_LIGHT_MULTIPLIER]]
             if isinstance(supernode, EmitterNode):
                 for key in EMITTER_CONTROLLER_KEYS:
                     if not key[0] in controllers:
