@@ -1127,12 +1127,28 @@ class MdlSaver:
 
             if type_flags & NODE_MESH:
                 # Faces
-                for i in range(len(node.facelist.faces)):
-                    normal = node.facelist.normals[i]
-                    plane_distance = 0.0
-                    material_id = node.facelist.matId[i]
+                for face_idx, face in enumerate(node.facelist.faces):
+                    # Adjacent Faces
                     adjacent_faces = [0xffff] * 3
-                    vert_indices = node.facelist.faces[i]
+                    edges = [tuple(sorted(edge)) for edge in [(face[0], face[1]),
+                                                              (face[1], face[2]),
+                                                              (face[2], face[0])]]
+                    for adj_face_idx, adj_face in enumerate(node.facelist.faces):
+                        if adj_face_idx == face_idx:
+                            continue
+                        adj_edges = set([tuple(sorted(edge)) for edge in [(adj_face[0], adj_face[1]),
+                                                                          (adj_face[1], adj_face[2]),
+                                                                          (adj_face[2], adj_face[0])]])
+                        for i in range(3):
+                            if edges[i] in adj_edges:
+                                adjacent_faces[i] = adj_face_idx
+                        if all(map(lambda f: f != 0xffff, adjacent_faces)):
+                            break
+
+                    vert1 = Vector(node.verts[face[0]])
+                    normal = Vector(node.facelist.normals[face_idx])
+                    plane_distance = -1.0 * (normal @ vert1)
+                    material_id = node.facelist.matId[face_idx]
 
                     for val in normal:
                         self.mdl.put_float(val)
@@ -1140,7 +1156,7 @@ class MdlSaver:
                     self.mdl.put_uint32(material_id)
                     for val in adjacent_faces:
                         self.mdl.put_uint16(val)
-                    for val in vert_indices:
+                    for val in face:
                         self.mdl.put_uint16(val)
 
                 # Vertex Indices Offset
