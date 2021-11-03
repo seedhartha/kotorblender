@@ -16,6 +16,8 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+import re
+
 from ..defines import Dummytype, Meshtype, Nodetype
 from ..exception.malformedfile import MalformedFile
 
@@ -140,7 +142,12 @@ class Model:
             Nodetype.AABB: AabbNode,
             Nodetype.LIGHTSABER: LightsaberNode
         }
-        node = switch[node_type](obj.name)
+
+        name = obj.name
+        if re.match(r".+\.\d{3}$", name):
+            name = name[:-4]
+
+        node = switch[node_type](name)
         if parent:
             node.parent = parent
             node.from_root = parent.from_root
