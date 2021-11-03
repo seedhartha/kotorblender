@@ -20,6 +20,7 @@ import bmesh
 import bpy
 
 from bpy_extras.io_utils import unpack_list
+from mathutils import Vector
 
 from ... import defines, glob, utils
 
@@ -71,12 +72,14 @@ class TrimeshNode(GeometryNode):
         self.bitmap2 = defines.NULL
         self.tangentspace = 0
         self.rotatetexture = 0
-        self.verts = []  # list of vertices
-        self.normals = []  # list of normals
+        self.verts = []
+        self.normals = []
+        self.tangentspacenormals = []
+        self.tangents = []
+        self.bitangents = []
         self.facelist = FaceList()
         self.tverts = []  # list of texture vertices
         self.tverts1 = []  # list of texture vertices
-        self.texindices1 = []  # list of texture vertex indices
 
     def add_to_collection(self, collection):
         mesh = self.create_mesh(self.name)
@@ -129,10 +132,7 @@ class TrimeshNode(GeometryNode):
 
         # Create lightmap UV map
         if len(self.tverts1) > 0:
-            if len(self.texindices1) > 0:
-                uv = unpack_list([self.tverts1[i] for indices in self.texindices1 for i in indices])
-            else:
-                uv = unpack_list([self.tverts1[i] for indices in self.facelist.uvIdx for i in indices])
+            uv = unpack_list([self.tverts1[i] for indices in self.facelist.uvIdx for i in indices])
             uv_layer = mesh.uv_layers.new(name=UV_MAP_LIGHTMAP, do_init=False)
             uv_layer.data.foreach_set("uv", uv)
 
@@ -206,6 +206,9 @@ class TrimeshNode(GeometryNode):
         bm.to_mesh(mesh)
         bm.free()
 
+        if self.tangentspace:
+            mesh.calc_tangents()
+
         for vert in mesh.vertices:
             self.verts.append(vert.co[:3])
             self.normals.append(vert.normal[:3])
@@ -213,11 +216,31 @@ class TrimeshNode(GeometryNode):
         self.tverts = self.get_tverts_from_uv_layer(mesh, UV_MAP_DIFFUSE)
         self.tverts1 = self.get_tverts_from_uv_layer(mesh, UV_MAP_LIGHTMAP)
 
+        num_verts = len(mesh.vertices)
+        tangentspacenormals = [Vector((0.0, 0.0, 0.0))] * num_verts
+        tangents = [Vector((0.0, 0.0, 0.0))] * num_verts
+
         for polygon in mesh.polygons:
             self.facelist.faces.append(polygon.vertices[:3])
             self.facelist.uvIdx.append(polygon.vertices[:3])
             self.facelist.matId.append(polygon.material_index)
             self.facelist.normals.append(polygon.normal)
+
+            if self.tangentspace:
+                for loop in [mesh.loops[i] for i in polygon.loop_indices]:
+                    vert_idx = loop.vertex_index
+                    tangentspacenormals[vert_idx] += loop.normal
+                    tangents[vert_idx] += loop.tangent
+
+        if self.tangentspace:
+            for i in range(num_verts):
+                normal = tangentspacenormals[i].normalized()
+                tangent = tangents[i].normalized()
+                tangent = (tangent - tangent.dot(normal) * normal).normalized()
+                bitangent = normal.cross(tangent)
+                self.tangentspacenormals.append(normal)
+                self.tangents.append(tangent)
+                self.bitangents.append(bitangent)
 
     def get_tverts_from_uv_layer(self, mesh, layer_name):
         if not layer_name in mesh.uv_layers:

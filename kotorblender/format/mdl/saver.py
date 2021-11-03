@@ -331,6 +331,8 @@ class MdlSaver:
                     self.mdx_pos += 4 * 2 * (num_verts + 1)
                 if node.tverts1:
                     self.mdx_pos += 4 * 2 * (num_verts + 1)
+                if node.tangentspace:
+                    self.mdx_pos += 4 * 9 * (num_verts + 1)
                 if type_flags & NODE_SKIN:
                     self.mdx_pos += 4 * 8 * (num_verts + 1)
 
@@ -980,6 +982,10 @@ class MdlSaver:
                     mdx_data_bitmap |= MDX_FLAG_UV2
                     off_mdx_uv2 = mdx_data_size
                     mdx_data_size += 4 * 2
+                if node.tangentspace:
+                    mdx_data_bitmap |= MDX_FLAG_TANGENT1
+                    off_mdx_tan_space1 = mdx_data_size
+                    mdx_data_size += 4 * 9
                 if type_flags & NODE_SKIN:
                     mdx_data_size += 4 * 8  # bone weights + bone indices
 
@@ -1186,6 +1192,13 @@ class MdlSaver:
                     if node.tverts1:
                         for val in node.tverts1[vert_idx]:
                             self.mdx.put_float(val)
+                    if node.tangentspace:
+                        for val in node.bitangents[vert_idx]:
+                            self.mdx.put_float(val)
+                        for val in node.tangents[vert_idx]:
+                            self.mdx.put_float(val)
+                        for val in node.tangentspacenormals[vert_idx]:
+                            self.mdx.put_float(val)
                     if type_flags & NODE_SKIN:
                         vert_weights = node.weights[vert_idx]
                         bone_weights = []
@@ -1214,6 +1227,9 @@ class MdlSaver:
                         self.mdx.put_float(0.0)
                 if node.tverts1:
                     for _ in range(2):
+                        self.mdx.put_float(0.0)
+                if node.tangentspace:
+                    for _ in range(9):
                         self.mdx.put_float(0.0)
                 if type_flags & NODE_SKIN:
                     self.mdx.put_float(1.0)
