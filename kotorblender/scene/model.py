@@ -21,7 +21,7 @@ import re
 from ..defines import Dummytype, Meshtype, Nodetype
 from ..exception.malformedfile import MalformedFile
 
-from .. import defines, glob
+from .. import defines, glob, utils
 
 from .animation import Animation
 from .modelnode.aabb import AabbNode
@@ -106,13 +106,16 @@ class Model:
         model.headlink = root_obj.kb.headlink
         model.animscale = root_obj.kb.animscale
 
-        model.root_node = Model.model_node_from_object(root_obj)
+        model.root_node = cls.model_node_from_object(root_obj)
         model.animations = [Animation.from_list_anim(anim, root_obj) for anim in root_obj.kb.anim_list]
 
         return model
 
     @classmethod
     def model_node_from_object(cls, obj, parent=None):
+        if utils.is_pwk_root(obj) or utils.is_dwk_root(obj):
+            return None
+
         if obj.type == 'EMPTY':
             if obj.kb.dummytype == Dummytype.REFERENCE:
                 node_type = Nodetype.REFERENCE
@@ -158,9 +161,8 @@ class Model:
         node.from_root = node.from_root @ obj.matrix_local
 
         for child_obj in sorted(obj.children, key=lambda o: o.kb.export_order):
-            if child_obj.type == 'EMPTY' and child_obj.kb.dummytype in [Dummytype.PWKROOT, Dummytype.DWKROOT]:
-                continue
-            child = Model.model_node_from_object(child_obj, node)
-            node.children.append(child)
+            child = cls.model_node_from_object(child_obj, node)
+            if child:
+                node.children.append(child)
 
         return node
