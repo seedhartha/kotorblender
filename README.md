@@ -10,9 +10,9 @@ This add-on is a fork of KotorBlender, upgraded to support Blender 2.8+. KotorBl
 
 ## Installation
 
-1. Clone this repository or donwload a ZIP release
-1. Copy or unpack the **kotorblender** folder into Blender addons directory, e.g. "C:/Users/USERNAME/AppData/Roaming/Blender Foundation/Blender/BLENDER_VERSION/scripts/addons"
-1. Enable the add-on in Blender Preferences via Edit → Preferences → Add-ons
+1. Clone GitHub repository or download the latest release
+1. Copy **kotorblender** folder into Blender addons directory, e.g. "C:/Users/USERNAME/AppData/Roaming/Blender Foundation/Blender/BLENDER_VERSION/scripts/addons"
+1. Enable add-on "Import-Export: KotorBlender" in Blender Preferences via Edit → Preferences → Add-ons
 
 ## Usage
 
