@@ -156,6 +156,7 @@ class MdlLoader:
         self.model.supermodel = supermodel_name
         self.model.animscale = scale
         self.model.ignorefog = affected_by_fog == 0
+        self.model.headlink = off_head_root_node != self.off_root_node
 
     def load_names(self):
         self.names = []
