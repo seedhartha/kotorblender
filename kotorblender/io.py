@@ -241,7 +241,6 @@ def do_load_mdl(filepath, position=(0.0, 0.0, 0.0)):
     mdl = MdlLoader(filepath)
     model = mdl.load()
 
-    wok_walkmesh = None
     pwk_walkmesh = None
     dwk_walkmesh1 = None
     dwk_walkmesh2 = None
@@ -251,12 +250,13 @@ def do_load_mdl(filepath, position=(0.0, 0.0, 0.0)):
         wok_path = filepath[:-4] + ".wok"
         if os.path.exists(wok_path):
             wok = BwmLoader(wok_path, model.name)
-            wok_walkmesh = wok.load()
+            walkmesh = wok.load()
             aabb = model.find_node(lambda n: isinstance(n, AabbNode))
-            aabb_wok = wok_walkmesh.find_node(lambda n: isinstance(n, AabbNode))
+            aabb_wok = walkmesh.find_node(lambda n: isinstance(n, AabbNode))
             if aabb and aabb_wok:
+                aabb.bwmposition = aabb_wok.bwmposition
+                aabb.roomlinks = aabb_wok.roomlinks
                 aabb.compute_lyt_position(aabb_wok)
-                aabb.copy_room_links(aabb_wok, wok_walkmesh.roomlinks)
 
         pwk_path = filepath[:-4] + ".pwk"
         if os.path.exists(pwk_path):
