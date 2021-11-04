@@ -26,7 +26,7 @@ from .. import utils
 
 
 def recreate_armature(mdl_root):
-    if not utils.is_root_dummy(mdl_root):
+    if not utils.is_mdl_root(mdl_root):
         return None
 
     skinmeshes = utils.get_children_recursive(mdl_root, utils.is_skin_mesh)

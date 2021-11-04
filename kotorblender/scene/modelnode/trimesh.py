@@ -104,26 +104,6 @@ class TrimeshNode(GeometryNode):
         mesh.polygons.foreach_set("loop_start", range(0, 3 * num_faces, 3))
         mesh.polygons.foreach_set("loop_total", (3,) * num_faces)
 
-        # Special handling for mesh in walkmesh files
-        if self.roottype in ["pwk", "dwk", "wok"]:
-            # Create walkmesh materials
-            for wok_mat in defines.WOK_MATERIALS:
-                mat_name = wok_mat[0]
-                # Walkmesh materials will be shared across multiple walkmesh
-                # objects
-                if mat_name in bpy.data.materials:
-                    material = bpy.data.materials[mat_name]
-                else:
-                    material = bpy.data.materials.new(mat_name)
-                    material.diffuse_color = [*wok_mat[1], 1.0]
-                    material.specular_color = (0.0, 0.0, 0.0)
-                    material.specular_intensity = wok_mat[2]
-                mesh.materials.append(material)
-
-            # Apply the walkmesh materials to each face
-            for idx, polygon in enumerate(mesh.polygons):
-                polygon.material_index = self.facelist.matId[idx]
-
         # Create UV map
         if len(self.tverts) > 0:
             uv = unpack_list([self.tverts[i] for indices in self.facelist.uvIdx for i in indices])

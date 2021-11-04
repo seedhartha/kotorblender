@@ -32,7 +32,7 @@ class KB_OT_anim_event_new(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        return utils.is_root_dummy(context.object)
+        return utils.is_mdl_root(context.object)
 
     def execute(self, context):
         mdl_root = context.object

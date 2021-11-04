@@ -31,7 +31,7 @@ class KB_OT_recreate_armature(bpy.types.Operator):
 
     def execute(self, context):
         obj = context.object
-        if utils.is_root_dummy(obj):
+        if utils.is_mdl_root(obj):
             armature.recreate_armature(obj)
 
         return {'FINISHED'}

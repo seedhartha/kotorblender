@@ -112,9 +112,9 @@ def save_mdl(filepath, export_for_tsl=False):
     # reset pose
     bpy.context.scene.frame_set(defines.ANIM_GLOBSTART)
 
-    mdl_root = next(iter(obj for obj in bpy.context.selected_objects if utils.is_root_dummy(obj)), None)
+    mdl_root = next(iter(obj for obj in bpy.context.selected_objects if utils.is_mdl_root(obj)), None)
     if not mdl_root:
-        mdl_root = next(iter(obj for obj in bpy.context.collection.objects if utils.is_root_dummy(obj)), None)
+        mdl_root = next(iter(obj for obj in bpy.context.collection.objects if utils.is_mdl_root(obj)), None)
     if not mdl_root:
         return
     print("Exporting MDL root {}".format(mdl_root.name))
@@ -225,10 +225,10 @@ def do_load_mdl(filepath, position=(0.0, 0.0, 0.0)):
             wok = BwmLoader(wok_path, model.name)
             wok_walkmesh = wok.load()
             aabb = model.find_node(lambda n: isinstance(n, AabbNode))
-            wok_geom = wok_walkmesh.find_node(lambda n: isinstance(n, TrimeshNode))
-            if aabb and wok_geom:
-                aabb.compute_lyt_position(wok_geom)
-                aabb.compute_room_links(wok_geom, wok_walkmesh.outer_edges)
+            aabb_wok = wok_walkmesh.find_node(lambda n: isinstance(n, AabbNode))
+            if aabb and aabb_wok:
+                aabb.compute_lyt_position(aabb_wok)
+                aabb.compute_room_links(aabb_wok, wok_walkmesh.outer_edges)
 
         pwk_path = filepath[:-4] + ".pwk"
         if os.path.exists(pwk_path):
@@ -248,11 +248,6 @@ def do_load_mdl(filepath, position=(0.0, 0.0, 0.0)):
 
     model_root = model.import_to_collection(collection, position)
 
-    if wok_walkmesh:
-        aabb = model.find_node(lambda n: isinstance(n, AabbNode))
-        wok_geom = wok_walkmesh.find_node(lambda n: isinstance(n, TrimeshNode))
-        if aabb and wok_geom:
-            aabb.set_room_links(collection.objects[aabb.name].data)
     if pwk_walkmesh:
         pwk_walkmesh.import_to_collection(model_root, collection)
     if dwk_walkmesh1 and dwk_walkmesh2 and dwk_walkmesh3:

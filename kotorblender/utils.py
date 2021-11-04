@@ -19,8 +19,16 @@
 from .defines import *
 
 
-def is_root_dummy(obj):
+def is_mdl_root(obj):
     return is_dummy_type(obj, Dummytype.MDLROOT)
+
+
+def is_pwk_root(obj):
+    return is_dummy_type(obj, Dummytype.PWKROOT)
+
+
+def is_dwk_root(obj):
+    return is_dummy_type(obj, Dummytype.DWKROOT)
 
 
 def is_path_point(obj):
@@ -40,7 +48,7 @@ def is_mesh_type(obj, meshtype):
 
 
 def get_object_root(obj):
-    if is_root_dummy(obj):
+    if is_mdl_root(obj):
         return obj
     if not obj.parent:
         return None

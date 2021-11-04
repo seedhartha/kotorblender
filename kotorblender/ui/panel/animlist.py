@@ -37,7 +37,7 @@ class KB_PT_animlist(bpy.types.Panel):
     @classmethod
     def poll(cls, context):
         """Draw only if part of a valid mdl is selected."""
-        return utils.is_root_dummy(context.object)
+        return utils.is_mdl_root(context.object)
 
     def draw(self, context):
         """Draw the panel."""

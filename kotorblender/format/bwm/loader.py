@@ -18,15 +18,14 @@
 
 from ...defines import Dummytype
 from ...exception.malformedfile import MalformedFile
-from ...scene.areawalkmesh import AreaWalkmesh
+from ...scene.modelnode.aabb import AabbNode
 from ...scene.modelnode.dummy import DummyNode
-from ...scene.modelnode.trimesh import FaceList, TrimeshNode
+from ...scene.modelnode.trimesh import FaceList
 from ...scene.walkmesh import Walkmesh
 
 from ..binreader import BinaryReader
 
-WALKMESH_TYPE_SITUATED = 0
-WALKMESH_TYPE_AREA = 1
+from .types import *
 
 
 class AABB:
@@ -134,7 +133,7 @@ class BwmLoader:
     def load_adjacent_edges(self):
         adj_edges = []
         self.bwm.seek(self.off_adj_edges)
-        for i in range(self.num_adj_edges):
+        for _ in range(self.num_adj_edges):
             adj_edges.append([self.bwm.get_int32() for _ in range(3)])
 
     def load_outer_edges(self):
@@ -151,25 +150,30 @@ class BwmLoader:
     def new_walkmesh(self):
         if self.walkmesh_type == WALKMESH_TYPE_AREA:
             return self.new_area_walkmesh()
-        elif self.walkmesh_type == WALKMESH_TYPE_SITUATED:
-            return self.new_situated_walkmesh()
+        elif self.walkmesh_type == WALKMESH_TYPE_PLACEABLE:
+            return self.new_placeable_walkmesh()
         else:
             raise MalformedFile("Unsupported walkmesh type: " + str(self.walkmesh_type))
 
     def new_area_walkmesh(self):
-        geom_node = TrimeshNode("{}_wok_wg".format(self.model_name))
+        root_node = DummyNode("{}_wok".format(self.model_name))
+        root_node.position = self.position
+
+        geom_node = AabbNode("{}_wok_wg".format(self.model_name))
+        geom_node.parent = root_node
         geom_node.roottype = "wok"
-        geom_node.position = self.position
         geom_node.verts = self.verts
         geom_node.facelist = self.facelist
 
-        walkmesh = AreaWalkmesh()
-        walkmesh.root_node = geom_node
+        root_node.children.append(geom_node)
+
+        walkmesh = Walkmesh("wok")
+        walkmesh.root_node = root_node
         walkmesh.outer_edges = self.outer_edges
 
         return walkmesh
 
-    def new_situated_walkmesh(self):
+    def new_placeable_walkmesh(self):
         type_name = "dwk" if self.path.endswith("dwk") else "pwk"
         if type_name == "dwk":
             if self.path.endswith("0.dwk"):
@@ -190,10 +194,10 @@ class BwmLoader:
 
         root_node = DummyNode(root_name)
         root_node.dummytype = Dummytype.DWKROOT if type_name == "dwk" else Dummytype.PWKROOT
+        root_node.position = self.position
 
-        geom_node = TrimeshNode(geom_name)
+        geom_node = AabbNode(geom_name)
         geom_node.roottype = type_name
-        geom_node.position = self.position
         geom_node.parent = root_node
         geom_node.verts = self.verts
         geom_node.facelist = self.facelist
