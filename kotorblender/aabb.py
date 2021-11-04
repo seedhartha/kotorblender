@@ -47,7 +47,7 @@ def generate_tree(aabb_tree, face_list, rlevel=0):
     # Only one face left - this node is a leaf
     if len(face_list) == 1:
         face_idx = face_list[0][0]
-        aabb_tree.append([*bb_min[:3], *bb_max[:3], 0, 0, face_idx, 0])
+        aabb_tree.append([*bb_min[:3], *bb_max[:3], -1, -1, face_idx, 0])
         return
 
     # Find longest axis
