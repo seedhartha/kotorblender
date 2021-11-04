@@ -34,6 +34,7 @@ class BwmLoader:
         self.model_name = model_name
         self.bwm = BinaryReader(path, 'little')
 
+        self.position = [0.0] * 3
         self.verts = []
         self.facelist = FaceList()
         self.outer_edges = []
@@ -83,7 +84,7 @@ class BwmLoader:
     def load_vertices(self):
         self.bwm.seek(self.off_verts)
         for _ in range(self.num_verts):
-            vert = [self.bwm.get_float() for _ in range(3)]
+            vert = [self.bwm.get_float() - self.position[i] for i in range(3)]
             self.verts.append(vert)
 
     def load_faces(self):
@@ -131,7 +132,7 @@ class BwmLoader:
         self.bwm.seek(self.off_outer_edges)
         for _ in range(self.num_outer_edges):
             index = self.bwm.get_uint32()
-            transition = self.bwm.get_uint32()
+            transition = self.bwm.get_int32()
             self.outer_edges.append((index, transition))
 
     def load_perimeters(self):
@@ -148,19 +149,19 @@ class BwmLoader:
 
     def new_area_walkmesh(self):
         root_node = DummyNode("{}_wok".format(self.model_name))
-        root_node.position = self.position
 
         geom_node = AabbNode("{}_wok_wg".format(self.model_name))
         geom_node.parent = root_node
         geom_node.roottype = "wok"
         geom_node.verts = self.verts
         geom_node.facelist = self.facelist
+        geom_node.bwmposition = self.position
+        geom_node.roomlinks = {edge_idx: transition for edge_idx, transition in self.outer_edges if transition != -1}
 
         root_node.children.append(geom_node)
 
         walkmesh = Walkmesh("wok")
         walkmesh.root_node = root_node
-        walkmesh.roomlinks = [(edge_idx, transition) for edge_idx, transition in self.outer_edges if transition != 0xffffffff]
 
         return walkmesh
 
@@ -185,27 +186,27 @@ class BwmLoader:
 
         root_node = DummyNode(root_name)
         root_node.dummytype = Dummytype.DWKROOT if type_name == "dwk" else Dummytype.PWKROOT
-        root_node.position = self.position
 
         geom_node = AabbNode(geom_name)
         geom_node.roottype = type_name
         geom_node.parent = root_node
         geom_node.verts = self.verts
         geom_node.facelist = self.facelist
+        geom_node.bwmposition = self.position
 
         use_node1 = DummyNode(use_name1)
         use_node1.dummysubtype = DummySubtype.USE1
         use_node1.position = self.rel_use_vec1
-        use_node1.parent = geom_node
+        use_node1.parent = root_node
 
         use_node2 = DummyNode(use_name2)
         use_node2.dummysubtype = DummySubtype.USE2
         use_node2.position = self.rel_use_vec2
-        use_node2.parent = geom_node
+        use_node2.parent = root_node
 
         root_node.children.append(geom_node)
-        geom_node.children.append(use_node1)
-        geom_node.children.append(use_node2)
+        root_node.children.append(use_node1)
+        root_node.children.append(use_node2)
 
         walkmesh = Walkmesh(type_name)
         walkmesh.root_node = root_node

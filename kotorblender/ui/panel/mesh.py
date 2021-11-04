@@ -141,6 +141,8 @@ class KB_PT_mesh(bpy.types.Panel):
             row = layout.row()
             box = row.box()
             row = box.row()
+            row.prop(obj.kb, "bwmposition", text="BWM Position")
+            row = box.row()
             row.prop(obj.kb, "lytposition", text="LYT Position")
             row = box.row()
             row.operator("kb.load_wok_mats", text="Load walkmesh materials", icon='NONE')

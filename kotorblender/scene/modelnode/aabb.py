@@ -25,6 +25,8 @@ from ... import defines, utils
 
 from .trimesh import TrimeshNode, UV_MAP_DIFFUSE, UV_MAP_LIGHTMAP
 
+ROOM_LINKS_COLORS = "RoomLinks"
+
 
 class AabbNode(TrimeshNode):
 
@@ -32,8 +34,10 @@ class AabbNode(TrimeshNode):
         TrimeshNode.__init__(self, name)
         self.nodetype = "aabb"
         self.meshtype = defines.Meshtype.AABB
-        self.roomlinks = []
+
+        self.bwmposition = (0.0, 0.0, 0.0)
         self.lytposition = (0.0, 0.0, 0.0)
+        self.roomlinks = dict()
 
     def compute_lyt_position(self, wok_geom):
         wok_vert = Vector(wok_geom.verts[wok_geom.facelist.faces[0][0]])
@@ -43,20 +47,8 @@ class AabbNode(TrimeshNode):
             if mdl_mat_id == wok_mat_id:
                 mdl_vert = self.verts[self.facelist.faces[i][0]]
                 mdl_vert_from_root = self.from_root @ Vector(mdl_vert)
-                self.lytposition = wok_vert - mdl_vert_from_root
+                self.lytposition = wok_vert - mdl_vert_from_root + Vector(self.bwmposition)
                 break
-
-    def copy_room_links(self, wok_geom, roomlinks):
-        for edge_idx, transition in roomlinks:
-            wok_face = wok_geom.facelist.faces[edge_idx // 3]
-            wok_verts = [wok_geom.verts[idx] for idx in wok_face]
-            for face_idx, mdl_vert_indices in enumerate(self.facelist.faces):
-                mdl_verts = [self.verts[idx] for idx in mdl_vert_indices]
-                mdl_verts_from_root = [self.from_root @ Vector(vert) for vert in mdl_verts]
-                mdl_verts_lyt_space = [vert + self.lytposition for vert in mdl_verts_from_root]
-                if all([utils.is_close_3(wok_verts[i], mdl_verts_lyt_space[i]) for i in range(3)]):
-                    self.roomlinks.append((3 * face_idx + (edge_idx % 3), transition))
-                    break
 
     def add_to_collection(self, collection):
         mesh = self.create_mesh(self.name)
@@ -119,33 +111,49 @@ class AabbNode(TrimeshNode):
         return mesh
 
     def apply_room_links(self, mesh):
-        if not "RoomLinks" in mesh.vertex_colors:
-            room_vert_colors = mesh.vertex_colors.new(name="RoomLinks")
+        if ROOM_LINKS_COLORS in mesh.vertex_colors:
+            colors = mesh.vertex_colors[ROOM_LINKS_COLORS]
         else:
-            room_vert_colors = mesh.vertex_colors["RoomLinks"]
-        for link in self.roomlinks:
-            face_idx = int(link[0] / 3)
-            edge_idx = link[0] % 3
-            room_color = [0.0 / 255, (200 + link[1]) / 255.0, 0.0 / 255]
-            real_idx = 0
-            for polygon_idx, polygon in enumerate(mesh.polygons):
-                if polygon.material_index not in defines.WkmMaterial.NONWALKABLE:
-                    if real_idx == face_idx:
-                        face_idx = polygon_idx
-                        break
-                    else:
-                        real_idx += 1
-            face = mesh.polygons[face_idx]
-            for vert_idx, loop_idx in zip(face.vertices, face.loop_indices):
-                if vert_idx in face.edge_keys[edge_idx]:
-                    room_vert_colors.data[loop_idx].color = [*room_color, 1.0]
+            colors = mesh.vertex_colors.new(name=ROOM_LINKS_COLORS)
+
+        for wok_edge_idx, transition in self.roomlinks.items():
+            wok_face_idx = wok_edge_idx // 3
+            aabb_face = None
+            for walkable_idx, polygon in enumerate([p for p in mesh.polygons if p.material_index not in defines.WkmMaterial.NONWALKABLE]):
+                if walkable_idx == wok_face_idx:
+                    aabb_face = polygon
+                    break
+            if not aabb_face:
+                continue
+            for vert_idx, loop_idx in zip(aabb_face.vertices, aabb_face.loop_indices):
+                if vert_idx in aabb_face.edge_keys[wok_edge_idx % 3]:
+                    color = [0.0, (200.0 + transition) / 255.0, 0.0]
+                    colors.data[loop_idx].color = [*color, 1.0]
+
+    def unapply_room_links(self, mesh):
+        self.roomlinks = dict()
+        if ROOM_LINKS_COLORS not in mesh.vertex_colors:
+            return
+        colors = mesh.vertex_colors[ROOM_LINKS_COLORS]
+        for walkable_idx, polygon in enumerate([p for p in mesh.polygons if p.material_index not in defines.WkmMaterial.NONWALKABLE]):
+            for edge, loop_idx in enumerate(polygon.loop_indices):
+                color = colors.data[loop_idx].color
+                if color[0] > 0.0 or color[2] > 0.0 and (255.0 * color[1]) < 200.0:
+                    continue
+                edge_idx = 3 * walkable_idx + edge
+                transition = int((255.0 * color[1]) - 200.0)
+                self.roomlinks[edge_idx] = transition
 
     def set_object_data(self, obj):
         TrimeshNode.set_object_data(self, obj)
 
+        obj.kb.bwmposition = self.bwmposition
         obj.kb.lytposition = self.lytposition
 
     def load_object_data(self, obj):
         TrimeshNode.load_object_data(self, obj)
 
+        self.bwmposition = obj.kb.bwmposition
         self.lytposition = obj.kb.lytposition
+
+        self.unapply_room_links(obj.data)
