@@ -104,6 +104,12 @@ class AabbNode(TrimeshNode):
             uv_layer = mesh.uv_layers.new(name=UV_MAP_DIFFUSE, do_init=False)
             uv_layer.data.foreach_set("uv", uv)
 
+        # Create lightmap UV map
+        if len(self.tverts1) > 0:
+            uv = unpack_list([self.tverts1[i] for indices in self.facelist.uvIdx for i in indices])
+            uv_layer = mesh.uv_layers.new(name=UV_MAP_LIGHTMAP, do_init=False)
+            uv_layer.data.foreach_set("uv", uv)
+
         mesh.update()
         return mesh
 
