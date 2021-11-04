@@ -41,6 +41,7 @@ class BwmSaver:
         self.num_verts = 0
         self.off_verts = 0
         self.num_faces = 0
+        self.num_walkable_faces = 0
         self.off_vert_indices = 0
         self.off_material_ids = 0
         self.off_normals = 0
@@ -56,6 +57,8 @@ class BwmSaver:
 
         self.facelist = FaceList()
         self.aabbs = []
+        self.adjacent_edges = []
+        self.perimeters = []
 
     def save(self):
         self.peek_walkmesh()
@@ -64,6 +67,7 @@ class BwmSaver:
         self.save_vertices()
         self.save_faces()
         self.save_aabbs()
+        self.save_adjacent_edges()
 
     def peek_walkmesh(self):
         # Header
@@ -72,6 +76,7 @@ class BwmSaver:
         self.geom_node = self.walkmesh.root_node.find_child(lambda node: isinstance(node, AabbNode))
         self.peek_faces()
         self.peek_aabbs()
+        self.peek_adjacent_edges()
 
         self.num_verts = len(self.geom_node.verts)
         self.num_faces = len(self.facelist.faces)
@@ -100,6 +105,10 @@ class BwmSaver:
         self.off_aabbs = self.bwm_pos
         self.bwm_pos += 44 * len(self.aabbs)
 
+        # Adjacent Edges
+        self.off_adjacent_edges = self.bwm_pos
+        self.bwm_pos += 4 * 3 * self.num_walkable_faces
+
         self.bwm_size = self.bwm_pos
 
     def peek_faces(self):
@@ -111,6 +120,7 @@ class BwmSaver:
                 non_walkable_face_indices.append(face_idx)
             else:
                 walkable_face_indices.append(face_idx)
+                self.num_walkable_faces += 1
         face_indices = walkable_face_indices + non_walkable_face_indices
         for face_idx in face_indices:
             self.facelist.faces.append(self.geom_node.facelist.faces[face_idx])
@@ -151,6 +161,27 @@ class BwmSaver:
 
             self.aabbs.append(AABB(aabb_node[:6], face_idx, most_significant_plane, child_idx1, child_idx2))
 
+    def peek_adjacent_edges(self):
+        for face_idx in range(self.num_walkable_faces):
+            face = self.facelist.faces[face_idx]
+            adj_edges = [-1] * 3
+            edges = [tuple(sorted(edge)) for edge in [(face[0], face[1]), (face[1], face[2]), (face[2], face[0])]]
+            for other_face_idx in range(self.num_walkable_faces):
+                if other_face_idx == face_idx:
+                    continue
+                other_face = self.facelist.faces[other_face_idx]
+                other_edges = [tuple(sorted(edge)) for edge in [(other_face[0], other_face[1]), (other_face[1], other_face[2]), (other_face[2], other_face[0])]]
+                for i in range(3):
+                    if adj_edges[i] != -1:
+                        continue
+                    for j in range(3):
+                        if other_edges[j] == edges[i]:
+                            adj_edges[i] = 3 * other_face_idx + j
+                            break
+                if all(map(lambda x: x != -1, adj_edges)):
+                    break
+            self.adjacent_edges.append(adj_edges)
+
     def save_header(self):
         walkmesh_type = WALKMESH_TYPE_AREA if self.walkmesh.walkmesh_type == "wok" else WALKMESH_TYPE_PLACEABLE
         rel_use_vec1 = self.use_node1.position if self.use_node1 else [0.0] * 3
@@ -167,12 +198,21 @@ class BwmSaver:
         num_verts = len(self.geom_node.verts)
         num_faces = len(self.facelist.faces)
         num_aabbs = len(self.aabbs)
-        num_adj_edges = 0
-        off_adj_edges = 0
-        num_outer_edges = 0
-        off_outer_edges = 0
-        num_perimeters = 0
-        off_perimeters = 0
+
+        if walkmesh_type == WALKMESH_TYPE_AREA:
+            num_adj_edges = self.num_walkable_faces
+            off_adj_edges = self.off_adjacent_edges
+            num_outer_edges = len(self.walkmesh.outer_edges)
+            off_outer_edges = self.off_outer_edges
+            num_perimeters = len(self.perimeters)
+            off_perimeters = self.off_perimeters
+        else:
+            num_adj_edges = 0
+            off_adj_edges = 0
+            num_outer_edges = 0
+            off_outer_edges = 0
+            num_perimeters = 0
+            off_perimeters = 0
 
         self.bwm.put_string("BWM V1.0")
         self.bwm.put_uint32(walkmesh_type)
@@ -237,5 +277,11 @@ class BwmSaver:
             self.bwm.put_int32(aabb.face_idx)
             self.bwm.put_uint32(0)  # unknown
             self.bwm.put_uint32(aabb.most_significant_plane)
-            self.bwm.put_uint32(aabb.child_idx1)
-            self.bwm.put_uint32(aabb.child_idx2)
+            self.bwm.put_int32(aabb.child_idx1)
+            self.bwm.put_int32(aabb.child_idx2)
+
+    def save_adjacent_edges(self):
+        print(self.adjacent_edges)
+        for edges in self.adjacent_edges:
+            for val in edges:
+                self.bwm.put_int32(val)
