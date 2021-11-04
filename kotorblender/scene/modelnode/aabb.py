@@ -46,25 +46,23 @@ class AabbNode(TrimeshNode):
                 self.lytposition = wok_vert - mdl_vert_from_root
                 break
 
-    def compute_room_links(self, wok_geom, outer_edges):
-        for edge in outer_edges:
-            if edge[1] == 0xffffffff:
-                continue
-            wok_face = wok_geom.facelist.faces[edge[0] // 3]
+    def copy_room_links(self, wok_geom, roomlinks):
+        for edge_idx, transition in roomlinks:
+            wok_face = wok_geom.facelist.faces[edge_idx // 3]
             wok_verts = [wok_geom.verts[idx] for idx in wok_face]
             for face_idx, mdl_vert_indices in enumerate(self.facelist.faces):
                 mdl_verts = [self.verts[idx] for idx in mdl_vert_indices]
                 mdl_verts_from_root = [self.from_root @ Vector(vert) for vert in mdl_verts]
                 mdl_verts_lyt_space = [vert + self.lytposition for vert in mdl_verts_from_root]
                 if all([utils.is_close_3(wok_verts[i], mdl_verts_lyt_space[i]) for i in range(3)]):
-                    self.roomlinks.append((3 * face_idx + (edge[0] % 3), edge[1]))
+                    self.roomlinks.append((3 * face_idx + (edge_idx % 3), transition))
                     break
 
     def add_to_collection(self, collection):
         mesh = self.create_mesh(self.name)
         obj = bpy.data.objects.new(self.name, mesh)
         self.set_object_data(obj)
-        self.set_room_links(mesh)
+        self.apply_room_links(mesh)
         collection.objects.link(obj)
 
         # Merge Vertices By Distance
@@ -120,17 +118,7 @@ class AabbNode(TrimeshNode):
         mesh.update()
         return mesh
 
-    def set_object_data(self, obj):
-        TrimeshNode.set_object_data(self, obj)
-
-        obj.kb.lytposition = self.lytposition
-
-    def load_object_data(self, obj):
-        TrimeshNode.load_object_data(self, obj)
-
-        self.lytposition = obj.kb.lytposition
-
-    def set_room_links(self, mesh):
+    def apply_room_links(self, mesh):
         if not "RoomLinks" in mesh.vertex_colors:
             room_vert_colors = mesh.vertex_colors.new(name="RoomLinks")
         else:
@@ -151,3 +139,13 @@ class AabbNode(TrimeshNode):
             for vert_idx, loop_idx in zip(face.vertices, face.loop_indices):
                 if vert_idx in face.edge_keys[edge_idx]:
                     room_vert_colors.data[loop_idx].color = [*room_color, 1.0]
+
+    def set_object_data(self, obj):
+        TrimeshNode.set_object_data(self, obj)
+
+        obj.kb.lytposition = self.lytposition
+
+    def load_object_data(self, obj):
+        TrimeshNode.load_object_data(self, obj)
+
+        self.lytposition = obj.kb.lytposition

@@ -160,7 +160,7 @@ class BwmLoader:
 
         walkmesh = Walkmesh("wok")
         walkmesh.root_node = root_node
-        walkmesh.outer_edges = self.outer_edges
+        walkmesh.roomlinks = [(edge_idx, transition) for edge_idx, transition in self.outer_edges if transition != 0xffffffff]
 
         return walkmesh
 
@@ -209,6 +209,5 @@ class BwmLoader:
 
         walkmesh = Walkmesh(type_name)
         walkmesh.root_node = root_node
-        walkmesh.outer_edges = self.outer_edges
 
         return walkmesh

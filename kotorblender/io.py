@@ -256,7 +256,7 @@ def do_load_mdl(filepath, position=(0.0, 0.0, 0.0)):
             aabb_wok = wok_walkmesh.find_node(lambda n: isinstance(n, AabbNode))
             if aabb and aabb_wok:
                 aabb.compute_lyt_position(aabb_wok)
-                aabb.compute_room_links(aabb_wok, wok_walkmesh.outer_edges)
+                aabb.copy_room_links(aabb_wok, wok_walkmesh.roomlinks)
 
         pwk_path = filepath[:-4] + ".pwk"
         if os.path.exists(pwk_path):
