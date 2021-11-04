@@ -53,8 +53,8 @@ class Animation:
         for child in node.children:
             self.add_nodes_to_objects(child, object_by_number, anim, root_name)
 
-    @staticmethod
-    def append_to_object(mdl_root, name, length=0.0, transtime=0.25, animroot=defines.NULL):
+    @classmethod
+    def append_to_object(cls, mdl_root, name, length=0.0, transtime=0.25, animroot=defines.NULL):
         anim = mdl_root.kb.anim_list.add()
         anim.name = name
         anim.root_obj = animroot
@@ -63,23 +63,23 @@ class Animation:
         anim.frame_end = anim.frame_start + Animation.time_to_frame(length)
         return anim
 
-    @staticmethod
-    def append_event_to_object_anim(list_anim, name, time):
+    @classmethod
+    def append_event_to_object_anim(cls, list_anim, name, time):
         event = list_anim.event_list.add()
         event.name = name
         event.frame = list_anim.frame_start + Animation.time_to_frame(time)
 
-    @staticmethod
-    def time_to_frame(time):
+    @classmethod
+    def time_to_frame(cls, time):
         return round(defines.FPS * time)
 
-    @staticmethod
-    def get_next_frame(mdl_root):
+    @classmethod
+    def get_next_frame(cls, mdl_root):
         last_frame = max([defines.ANIM_GLOBSTART] + [a.frame_end for a in mdl_root.kb.anim_list])
         return int(math.ceil((last_frame + defines.ANIM_OFFSET) / 10.0)) * 10
 
-    @staticmethod
-    def from_list_anim(list_anim, mdl_root):
+    @classmethod
+    def from_list_anim(cls, list_anim, mdl_root):
         anim = Animation(list_anim.name)
         anim.length = Animation.frame_to_time(list_anim.frame_end - list_anim.frame_start)
         anim.transtime = Animation.frame_to_time(list_anim.transtime)
@@ -93,8 +93,8 @@ class Animation:
 
         return anim
 
-    @staticmethod
-    def animation_node_from_object(anim, obj, parent=None):
+    @classmethod
+    def animation_node_from_object(cls, anim, obj, parent=None):
         name = obj.name
         if re.match(r".+\.\d{3}$", name):
             name = name[:-4]
@@ -118,6 +118,6 @@ class Animation:
 
         return node
 
-    @staticmethod
-    def frame_to_time(frame):
+    @classmethod
+    def frame_to_time(cls, frame):
         return frame / defines.FPS
