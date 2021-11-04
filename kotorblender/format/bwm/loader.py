@@ -28,15 +28,6 @@ from ..binreader import BinaryReader
 from .types import *
 
 
-class AABB:
-    def __init__(self, bounding_box, face_idx, most_significant_plane, child_idx1, child_idx2):
-        self.bounding_box = bounding_box
-        self.face_idx = face_idx
-        self.most_significant_plane = most_significant_plane
-        self.child_idx1 = child_idx1
-        self.child_idx2 = child_idx2
-
-
 class BwmLoader:
     def __init__(self, path, model_name):
         self.path = path
