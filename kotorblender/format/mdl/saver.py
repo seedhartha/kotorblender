@@ -339,9 +339,9 @@ class MdlSaver:
                     self.mdx_pos += 4 * 8 * (num_verts + 1)
 
                 # Bounding Box, Average, Total Area
-                bb_min = Vector((0.0, 0.0, 0.0))
-                bb_max = Vector((0.0, 0.0, 0.0))
-                average = Vector((0.0, 0.0, 0.0))
+                bb_min = Vector()
+                bb_max = Vector()
+                average = Vector()
                 total_area = 0.0
                 for face in node.facelist.faces:
                     verts = [Vector(node.verts[i]) for i in face]
@@ -1200,12 +1200,10 @@ class MdlSaver:
                         for val in node.tverts1[vert_idx]:
                             self.mdx.put_float(val)
                     if node.tangentspace:
-                        for val in node.bitangents[vert_idx]:
-                            self.mdx.put_float(val)
-                        for val in node.tangents[vert_idx]:
-                            self.mdx.put_float(val)
-                        for val in node.tangentspacenormals[vert_idx]:
-                            self.mdx.put_float(val)
+                        for i in range(3):
+                            self.mdx.put_float(node.tangents[vert_idx][i])
+                            self.mdx.put_float(node.bitangents[vert_idx][i])
+                            self.mdx.put_float(node.tangentspacenormals[vert_idx][i])
                     if type_flags & NODE_SKIN:
                         vert_weights = node.weights[vert_idx]
                         bone_weights = []

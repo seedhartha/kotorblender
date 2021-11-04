@@ -74,9 +74,9 @@ class TrimeshNode(GeometryNode):
         self.rotatetexture = 0
         self.verts = []
         self.normals = []
-        self.tangentspacenormals = []
         self.tangents = []
         self.bitangents = []
+        self.tangentspacenormals = []
         self.facelist = FaceList()
         self.tverts = []  # list of texture vertices
         self.tverts1 = []  # list of texture vertices
@@ -206,9 +206,6 @@ class TrimeshNode(GeometryNode):
         bm.to_mesh(mesh)
         bm.free()
 
-        if self.tangentspace:
-            mesh.calc_tangents()
-
         for vert in mesh.vertices:
             self.verts.append(vert.co[:3])
             self.normals.append(vert.normal[:3])
@@ -216,9 +213,12 @@ class TrimeshNode(GeometryNode):
         self.tverts = self.get_tverts_from_uv_layer(mesh, UV_MAP_DIFFUSE)
         self.tverts1 = self.get_tverts_from_uv_layer(mesh, UV_MAP_LIGHTMAP)
 
-        num_verts = len(mesh.vertices)
-        tangentspacenormals = [Vector((0.0, 0.0, 0.0))] * num_verts
-        tangents = [Vector((0.0, 0.0, 0.0))] * num_verts
+        if self.tangentspace and self.tverts:
+            mesh.calc_tangents(uvmap=UV_MAP_DIFFUSE)
+            num_verts = len(mesh.vertices)
+            self.tangents = [Vector() for _ in range(num_verts)]
+            self.bitangents = [Vector() for _ in range(num_verts)]
+            self.tangentspacenormals = [Vector() for _ in range(num_verts)]
 
         for polygon in mesh.polygons:
             self.facelist.faces.append(polygon.vertices[:3])
@@ -226,21 +226,18 @@ class TrimeshNode(GeometryNode):
             self.facelist.matId.append(polygon.material_index)
             self.facelist.normals.append(polygon.normal)
 
-            if self.tangentspace:
+            if self.tangentspace and self.tverts:
                 for loop in [mesh.loops[i] for i in polygon.loop_indices]:
                     vert_idx = loop.vertex_index
-                    tangentspacenormals[vert_idx] += loop.normal
-                    tangents[vert_idx] += loop.tangent
+                    self.tangents[vert_idx] += loop.tangent
+                    self.bitangents[vert_idx] += loop.bitangent
+                    self.tangentspacenormals[vert_idx] += loop.normal
 
-        if self.tangentspace:
-            for i in range(num_verts):
-                normal = tangentspacenormals[i].normalized()
-                tangent = tangents[i].normalized()
-                tangent = (tangent - tangent.dot(normal) * normal).normalized()
-                bitangent = normal.cross(tangent)
-                self.tangentspacenormals.append(normal)
-                self.tangents.append(tangent)
-                self.bitangents.append(bitangent)
+        if self.tangentspace and self.tverts:
+            for vert_idx in range(num_verts):
+                self.tangents[vert_idx].normalize()
+                self.bitangents[vert_idx].normalize()
+                self.tangentspacenormals[vert_idx].normalize()
 
     def get_tverts_from_uv_layer(self, mesh, layer_name):
         if not layer_name in mesh.uv_layers:
