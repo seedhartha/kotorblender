@@ -30,7 +30,7 @@ class Walkmesh(Model):
         Model.__init__(self)
         self.walkmesh_type = walkmesh_type
 
-        self.outer_edges = []
+        self.roomlinks = []
 
     def import_to_collection(self, parent_obj, collection):
         if type(self.root_node) != DummyNode or self.root_node.parent:
