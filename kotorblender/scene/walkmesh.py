@@ -17,7 +17,6 @@
 # ##### END GPL LICENSE BLOCK #####
 
 from ..exception.malformedfile import MalformedFile
-from ..defines import Meshtype
 
 from .. import utils
 
@@ -40,12 +39,22 @@ class Walkmesh(Model):
         self.import_nodes_to_collection(self.root_node, parent_obj, collection)
 
     @classmethod
-    def from_object(cls, obj):
+    def from_aabb_node(cls, aabb):
+        root_node = DummyNode("wok")
+        root_node.children.append(aabb)
+
+        walkmesh = Walkmesh("wok")
+        walkmesh.root_node = root_node
+
+        return walkmesh
+
+    @classmethod
+    def from_root_object(cls, obj):
         if utils.is_pwk_root(obj):
             walkmesh_type = "pwk"
         elif utils.is_dwk_root(obj):
             walkmesh_type = "dwk"
-        elif utils.is_mesh_type(obj, Meshtype.AABB):
-            walkmesh_type = "wok"
+        else:
+            raise ValueError("Cannot create walkmesh from root object {}".format(obj.name))
         walkmesh = Walkmesh(walkmesh_type)
         return walkmesh

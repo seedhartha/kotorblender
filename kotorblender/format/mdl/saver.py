@@ -1167,12 +1167,12 @@ class MdlSaver:
 
                     vert1 = Vector(node.verts[face[0]])
                     normal = Vector(node.facelist.normals[face_idx])
-                    plane_distance = -1.0 * (normal @ vert1)
+                    distance = -1.0 * (normal @ vert1)
                     material_id = node.facelist.matId[face_idx]
 
                     for val in normal:
                         self.mdl.put_float(val)
-                    self.mdl.put_float(plane_distance)
+                    self.mdl.put_float(distance)
                     self.mdl.put_uint32(material_id)
                     for val in adjacent_faces:
                         self.mdl.put_uint16(val)

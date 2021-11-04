@@ -140,10 +140,10 @@ class AabbNode(TrimeshNode):
             edge_idx = link[0] % 3
             room_color = [0.0 / 255, (200 + link[1]) / 255.0, 0.0 / 255]
             real_idx = 0
-            for polyglon_idx, polygon in enumerate(mesh.polygons):
+            for polygon_idx, polygon in enumerate(mesh.polygons):
                 if polygon.material_index not in defines.WkmMaterial.NONWALKABLE:
                     if real_idx == face_idx:
-                        face_idx = polyglon_idx
+                        face_idx = polygon_idx
                         break
                     else:
                         real_idx += 1

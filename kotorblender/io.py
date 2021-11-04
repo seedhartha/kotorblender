@@ -21,13 +21,14 @@ import os
 import bpy
 
 from .format.bwm.loader import BwmLoader
+from .format.bwm.saver import BwmSaver
 from .format.gff.loader import GffLoader
 from .format.gff.saver import GffSaver
 from .format.mdl.loader import MdlLoader
 from .format.mdl.saver import MdlSaver
 from .scene.model import Model
 from .scene.modelnode.aabb import AabbNode
-from .scene.modelnode.trimesh import TrimeshNode
+from .scene.walkmesh import Walkmesh
 
 from .defines import Dummytype
 
@@ -117,11 +118,20 @@ def save_mdl(filepath, export_for_tsl=False):
         mdl_root = next(iter(obj for obj in bpy.context.collection.objects if utils.is_mdl_root(obj)), None)
     if not mdl_root:
         return
-    print("Exporting MDL root {}".format(mdl_root.name))
-    model = Model.from_mdl_root(mdl_root)
 
+    print("Exporting {}".format(filepath))
+    model = Model.from_mdl_root(mdl_root)
     mdl = MdlSaver(filepath, model, export_for_tsl)
     mdl.save()
+
+    aabb_node = model.find_node(lambda node: isinstance(node, AabbNode))
+    if aabb_node:
+        base_path, _ = os.path.splitext(filepath)
+        wok_path = base_path + ".wok"
+        print("Exporting {}".format(wok_path))
+        walkmesh = Walkmesh.from_aabb_node(aabb_node)
+        bwm = BwmSaver(wok_path, walkmesh)
+        bwm.save()
 
 
 def save_lyt(filepath):

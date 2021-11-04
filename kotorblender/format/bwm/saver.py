@@ -16,9 +16,11 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-from ...scene.modelnode.trimesh import FaceList, TrimeshNode
+from mathutils import Vector
 
-from ... import utils
+from ...defines import WkmMaterial
+from ...scene.modelnode.aabb import AabbNode
+from ...scene.modelnode.trimesh import FaceList
 
 from ..binwriter import BinaryWriter
 
@@ -33,7 +35,9 @@ class BwmSaver:
         self.bwm_pos = 0
         self.bwm_size = 0
 
+        self.num_verts = 0
         self.off_verts = 0
+        self.num_faces = 0
         self.off_vert_indices = 0
         self.off_material_ids = 0
         self.off_normals = 0
@@ -43,10 +47,11 @@ class BwmSaver:
         self.off_outer_edges = 0
         self.off_perimeters = 0
 
-        self.root_node = None
         self.geom_node = None
         self.use_node1 = None
         self.use_node2 = None
+
+        self.facelist = FaceList()
 
     def save(self):
         self.peek_walkmesh()
@@ -57,45 +62,57 @@ class BwmSaver:
         self.save_aabbs()
 
     def peek_walkmesh(self):
-        self.bwm_pos += 136  # header
+        # Header
+        self.bwm_pos += 136
 
-        # In area walkmeshes, geometry node is root node. In placeable
-        # walkmeshes, geometry node is the only child of the root node.
-        geom_node = self.walkmesh.root_node
-        if utils.is_dwk_root(geom_node) or utils.is_pwk_root(geom_node):
-            geom_node = geom_node.children[0]
-        if not isinstance(geom_node, TrimeshNode):
-            raise ValueError("Unable to find geometry node while saving BWM")
+        self.geom_node = self.walkmesh.root_node.find_child(lambda node: isinstance(node, AabbNode))
+        self.peek_faces()
+
+        self.num_verts = len(self.geom_node.verts)
+        self.num_faces = len(self.facelist.faces)
 
         # Vertices
         self.off_verts = self.bwm_pos
-        self.bwm_pos += 4 * 3 * len(geom_node.verts)
-
-        num_faces = len(geom_node.facelist.faces)
+        self.bwm_pos += 4 * 3 * self.num_verts
 
         # Vertex Indices
         self.off_vert_indices = self.bwm_pos
-        self.bwm_pos += 4 * 3 * num_faces
+        self.bwm_pos += 4 * 3 * self.num_faces
 
         # Material Ids
         self.off_material_ids = self.bwm_pos
-        self.bwm_pos += 4 * num_faces
+        self.bwm_pos += 4 * self.num_faces
 
         # Normals
         self.off_normals = self.bwm_pos
-        self.bwm_pos += 4 * 3 * num_faces
+        self.bwm_pos += 4 * 3 * self.num_faces
 
         # Distances
         self.off_distances = self.bwm_pos
-        self.bwm_pos += 4 * num_faces
+        self.bwm_pos += 4 * self.num_faces
 
         self.bwm_size = self.bwm_pos
+
+    def peek_faces(self):
+        walkable_face_indices = []
+        non_walkable_face_indices = []
+        for face_idx, _ in enumerate(self.geom_node.facelist.faces):
+            mat_id = self.geom_node.facelist.matId[face_idx]
+            if mat_id in WkmMaterial.NONWALKABLE:
+                non_walkable_face_indices.append(face_idx)
+            else:
+                walkable_face_indices.append(face_idx)
+        face_indices = walkable_face_indices + non_walkable_face_indices
+        for face_idx in face_indices:
+            self.facelist.faces.append(self.geom_node.facelist.faces[face_idx])
+            self.facelist.matId.append(self.geom_node.facelist.matId[face_idx])
+            self.facelist.normals.append(self.geom_node.facelist.normals[face_idx])
 
     def save_header(self):
         walkmesh_type = WALKMESH_TYPE_AREA if self.walkmesh.walkmesh_type == "wok" else WALKMESH_TYPE_PLACEABLE
         rel_use_vec1 = self.use_node1.position if self.use_node1 else [0.0] * 3
         rel_use_vec2 = self.use_node2.position if self.use_node2 else [0.0] * 3
-        position = self.
+        position = self.walkmesh.root_node.position
 
         if self.walkmesh.walkmesh_type == "dwk":
             abs_use_vec1 = [position[i] + rel_use_vec1[i] for i in range(3)]
@@ -105,7 +122,7 @@ class BwmSaver:
             abs_use_vec2 = [0.0] * 3
 
         num_verts = len(self.geom_node.verts)
-        num_faces = len(self.geom_node.facelist.faces)
+        num_faces = len(self.facelist.faces)
         num_aabbs = 0
         off_aabbs = 0
         num_adj_edges = 0
@@ -145,10 +162,31 @@ class BwmSaver:
         self.bwm.put_uint32(off_perimeters)
 
     def save_vertices(self):
-        pass
+        for vert in self.geom_node.verts:
+            for val in vert:
+                self.bwm.put_float(val)
 
     def save_faces(self):
-        pass
+        # Vertex Indices
+        for face in self.facelist.faces:
+            for val in face:
+                self.bwm.put_uint32(val)
+
+        # Material Ids
+        for mat_id in self.facelist.matId:
+            self.bwm.put_uint32(mat_id)
+
+        # Normals
+        for normal in self.facelist.normals:
+            for val in normal:
+                self.bwm.put_float(val)
+
+        # Distances
+        for face_idx, face in enumerate(self.facelist.faces):
+            vert1 = Vector(self.geom_node.verts[face[0]])
+            normal = Vector(self.facelist.normals[face_idx])
+            distance = -1.0 * (normal @ vert1)
+            self.bwm.put_float(distance)
 
     def save_aabbs(self):
         pass
