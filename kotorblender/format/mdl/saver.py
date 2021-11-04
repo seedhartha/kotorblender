@@ -20,7 +20,7 @@ import os
 
 from math import sqrt
 
-from mathutils import Quaternion, Vector
+from mathutils import Vector
 
 from ...defines import Nodetype
 
@@ -29,6 +29,8 @@ from ... import aabb
 from ..binwriter import BinaryWriter
 
 from .types import *
+
+NECK_BONE_NAME = "neck_g"
 
 
 class MdlSaver:
@@ -676,7 +678,12 @@ class MdlSaver:
         radius = 7.0  # TODO
         scale = self.model.animscale
         supermodel_name = self.model.supermodel.ljust(32, '\0')
-        off_head_root_node = self.node_offsets[0]  # TODO: headlink
+
+        head_root_idx = 0
+        if self.model.headlink and self.node_names.count(NECK_BONE_NAME) > 0:
+            head_root_idx = self.node_names.index(NECK_BONE_NAME)
+        off_head_root_node = self.node_offsets[head_root_idx]
+
         mdx_size = self.mdx_size
         mdx_offset = 0
 
