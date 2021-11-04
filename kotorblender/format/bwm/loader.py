@@ -16,7 +16,7 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-from ...defines import Dummytype
+from ...defines import Dummytype, DummySubtype
 from ...exception.malformedfile import MalformedFile
 from ...scene.modelnode.aabb import AabbNode
 from ...scene.modelnode.dummy import DummyNode
@@ -193,17 +193,19 @@ class BwmLoader:
         geom_node.verts = self.verts
         geom_node.facelist = self.facelist
 
-        use1_node = DummyNode(use_name1)
-        use1_node.position = self.rel_use_vec1
-        use1_node.parent = geom_node
+        use_node1 = DummyNode(use_name1)
+        use_node1.dummysubtype = DummySubtype.USE1
+        use_node1.position = self.rel_use_vec1
+        use_node1.parent = geom_node
 
-        use2_node = DummyNode(use_name2)
-        use2_node.position = self.rel_use_vec2
-        use2_node.parent = geom_node
+        use_node2 = DummyNode(use_name2)
+        use_node2.dummysubtype = DummySubtype.USE2
+        use_node2.position = self.rel_use_vec2
+        use_node2.parent = geom_node
 
         root_node.children.append(geom_node)
-        geom_node.children.append(use1_node)
-        geom_node.children.append(use2_node)
+        geom_node.children.append(use_node1)
+        geom_node.children.append(use_node2)
 
         walkmesh = Walkmesh(type_name)
         walkmesh.root_node = root_node

@@ -95,20 +95,9 @@ class ObjectPropertyGroup(bpy.types.PropertyGroup):
     ignorefog: bpy.props.BoolProperty(name="Ignore Fog", description="If true, model will not be occluded by area fog in-game", default=False)
     headlink: bpy.props.BoolProperty(name="Head Model", description="If true, this model is a Head", default=False)
     dummysubtype: bpy.props.EnumProperty(name="Subtype",
-                                         items=[("NONE", "None",            "Simple dummy object",                     0),
-                                                ("HAND", "Hand",            "Hand node for spells and effects. \n (for door and placeable models)",        1),
-                                                ("HEAD", "Head",            "Head node for spells and effects. \n (for door and placeable models)",        2),
-                                                ("HHIT", "Head hit",        "Head hit node for spells and effects. \n (for door and placeable models)",    3),
-                                                ("IMPC", "Impact",          "Impact node for spells and effects. \n (for door and placeable models)",      4),
-                                                ("GRND", "Ground",          "Ground node for spells and effects. \n (for door and placeable models)",      5),
-                                                ("USE1", "PWK: Use 1",      "1st node for 'Use' animation",            6),
-                                                ("USE2", "PWK: Use 2",      "2nd node for 'Use' animation",            7),
-                                                ("O101", "DWK: Open 1 1st", "Open 1 State, 1st node for 'Use' anim",   8),
-                                                ("O102", "DWK: Open 1 2nd", "Open 1 State, 2nd node for 'Use' anim",   9),
-                                                ("O201", "DWK: Open 2 1st", "Open 2 State, 1st node for 'Use' anim",  10),
-                                                ("O202", "DWK: Open 2 2nd", "Open 2 State, 2nd node for 'Use' anim",  11),
-                                                ("CL01", "DWK: Closed 1st", "Closed State, 1st node for 'Use' anim",  12),
-                                                ("CL02", "DWK: Closed 2nd", "Closed State, 2nd node for 'Use' anim",  13)],
+                                         items=[("NONE", "None", "Simple dummy object", 0),
+                                                ("USE1", "Use 1", "1st node for 'Use' animation", 1),
+                                                ("USE2", "Use 2", "2nd node for 'Use' animation", 2)],
                                          default="NONE")
     animscale: bpy.props.FloatProperty(name="Animation Scale", description="Animation scale for all animations", default=1.00, min=0.0)
     # Animation Data (for separation)

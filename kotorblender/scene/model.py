@@ -18,7 +18,7 @@
 
 import re
 
-from ..defines import Dummytype, Meshtype, Nodetype
+from ..defines import DummySubtype, Dummytype, Meshtype, Nodetype
 from ..exception.malformedfile import MalformedFile
 
 from .. import defines, glob, utils
@@ -91,9 +91,7 @@ class Model:
             anim.add_to_objects(mdl_root)
 
     def find_node(self, test):
-        if test(self.root_node):
-            return self.root_node
-        return self.root_node.find_child(test)
+        return self.root_node.find_node(test)
 
     @classmethod
     def from_mdl_root(cls, root_obj):
@@ -112,8 +110,8 @@ class Model:
         return model
 
     @classmethod
-    def model_node_from_object(cls, obj, parent=None):
-        if utils.is_pwk_root(obj) or utils.is_dwk_root(obj):
+    def model_node_from_object(cls, obj, parent=None, exclude_xwk=True):
+        if exclude_xwk and (utils.is_pwk_root(obj) or utils.is_dwk_root(obj)):
             return None
 
         if obj.type == 'EMPTY':
@@ -161,7 +159,7 @@ class Model:
         node.from_root = node.from_root @ obj.matrix_local
 
         for child_obj in sorted(obj.children, key=lambda o: o.kb.export_order):
-            child = cls.model_node_from_object(child_obj, node)
+            child = cls.model_node_from_object(child_obj, node, exclude_xwk)
             if child:
                 node.children.append(child)
 

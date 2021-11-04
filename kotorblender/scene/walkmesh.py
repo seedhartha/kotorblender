@@ -56,5 +56,8 @@ class Walkmesh(Model):
             walkmesh_type = "dwk"
         else:
             raise ValueError("Cannot create walkmesh from root object {}".format(obj.name))
+
         walkmesh = Walkmesh(walkmesh_type)
+        walkmesh.root_node = cls.model_node_from_object(obj, exclude_xwk=False)
+
         return walkmesh
