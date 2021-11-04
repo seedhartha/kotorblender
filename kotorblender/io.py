@@ -110,7 +110,7 @@ def load_pth(
 
 
 def save_mdl(filepath, export_for_tsl=False):
-    # reset pose
+    # Reset Pose
     bpy.context.scene.frame_set(defines.ANIM_GLOBSTART)
 
     mdl_root = next(iter(obj for obj in bpy.context.selected_objects if utils.is_mdl_root(obj)), None)
@@ -119,18 +119,36 @@ def save_mdl(filepath, export_for_tsl=False):
     if not mdl_root:
         return
 
-    print("Exporting {}".format(filepath))
+    # Export MDL
     model = Model.from_mdl_root(mdl_root)
     mdl = MdlSaver(filepath, model, export_for_tsl)
     mdl.save()
 
+    # Export WOK
     aabb_node = model.find_node(lambda node: isinstance(node, AabbNode))
     if aabb_node:
         base_path, _ = os.path.splitext(filepath)
         wok_path = base_path + ".wok"
-        print("Exporting {}".format(wok_path))
         walkmesh = Walkmesh.from_aabb_node(aabb_node)
         bwm = BwmSaver(wok_path, walkmesh)
+        bwm.save()
+
+    # Export PWK, DWK
+    xwk_roots = utils.get_children_recursive(mdl_root, lambda obj: utils.is_pwk_root(obj) or utils.is_dwk_root(obj))
+    for xwk_root in xwk_roots:
+        base_path, _ = os.path.splitext(filepath)
+        if utils.is_pwk_root(xwk_root):
+            xwk_path = base_path + ".pwk"
+        else:
+            if xwk_root.name.endswith("open1"):
+                dwk_state = 0
+            elif xwk_root.name.endswith("open2"):
+                dwk_state = 1
+            elif xwk_root.name.endswith("closed"):
+                dwk_state = 2
+            xwk_path = "{}{}.dwk".format(base_path, dwk_state)
+        walkmesh = Walkmesh.from_root_object(xwk_root)
+        bwm = BwmSaver(xwk_path, walkmesh)
         bwm.save()
 
 

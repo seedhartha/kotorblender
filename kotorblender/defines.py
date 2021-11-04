@@ -80,66 +80,8 @@ class WkmMaterial:
 
 class DummySubtype:
     NONE = "NONE"
-    HAND = "HAND"
-    HEAD = "HEAD"
-    HEAD_HIT = "HHIT"
-    IMPACT = "IMPC"
-    GROUND = "GRND"
     USE1 = "USE1"
     USE2 = "USE2"
-    OPEN1_01 = "O101"
-    OPEN1_02 = "O102"
-    OPEN2_01 = "O201"
-    OPEN2_02 = "O202"
-    CLOSED_01 = "CL01"
-    CLOSED_02 = "CL02"
-
-    SUFFIX_LIST = [
-        ("use01",     USE1),
-        ("use02",     USE2),
-        ("hand",      HAND),
-        ("head",      HEAD),
-        ("head_hit",  HEAD_HIT),
-        ("hhit",      HEAD_HIT),
-        ("impact",    IMPACT),
-        ("impc",      IMPACT),
-        ("ground",    GROUND),
-        ("grnd",      GROUND),
-        ("open1_01",  OPEN1_01),
-        ("open1_02",  OPEN1_02),
-        ("open2_01",  OPEN2_01),
-        ("open2_02",  OPEN2_02),
-        ("closed_01", CLOSED_01),
-        ("closed_02", CLOSED_02)
-    ]
-
-    SUFFIX_PWK = {
-        NONE: "",
-        HAND: "hand",
-        HEAD: "head",
-        HEAD_HIT: "head_hit",
-        IMPACT: "impact",
-        GROUND: "ground",
-        USE1: "use01",
-        USE2: "use02"
-    }
-
-    SUFFIX_DWK = {
-        NONE: "",
-        HAND: "hand",
-        HEAD: "head",
-        HEAD_HIT: "hhit",
-        IMPACT: "impc",
-        GROUND: "grnd",
-        USE1: "use01",
-        USE2: "use02",
-        OPEN1_01: "open1_01",
-        OPEN1_02: "open1_02",
-        OPEN2_01: "open2_01",
-        OPEN2_02: "open2_02",
-        CLOSED_01: "closed_01",
-        CLOSED_01: "closed_02"
-    }
 
 
 class Meshtype:

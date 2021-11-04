@@ -35,6 +35,7 @@ NECK_BONE_NAME = "neck_g"
 
 class MdlSaver:
     def __init__(self, path, model, tsl):
+        self.path = path
         self.mdl = BinaryWriter(path, 'little')
 
         basepath, _ = os.path.splitext(path)
@@ -121,6 +122,8 @@ class MdlSaver:
         self.anim_controller_data_counts = []
 
     def save(self):
+        print("Saving MDL {}".format(self.path))
+
         self.peek_model()
 
         self.save_file_header()

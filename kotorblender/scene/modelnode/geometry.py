@@ -59,5 +59,10 @@ class GeometryNode:
         self.orientation = obj.rotation_quaternion
         self.scale = obj.scale[0]
 
-    def find_child(self, test):
-        return next(iter(child for child in self.children if test(child)), None)
+    def find_node(self, test):
+        if test(self):
+            return self
+        for child in self.children:
+            if test(child):
+                return child
+        return None

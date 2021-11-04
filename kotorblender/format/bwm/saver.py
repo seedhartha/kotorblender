@@ -18,8 +18,9 @@
 
 from mathutils import Vector
 
-from ...defines import WkmMaterial
+from ...defines import DummySubtype, WkmMaterial
 from ...scene.modelnode.aabb import AabbNode
+from ...scene.modelnode.dummy import DummyNode
 from ...scene.modelnode.trimesh import FaceList
 
 from ... import aabb
@@ -32,6 +33,7 @@ from .types import *
 
 class BwmSaver:
     def __init__(self, path, walkmesh):
+        self.path = path
         self.bwm = BinaryWriter(path, 'little')
         self.walkmesh = walkmesh
 
@@ -61,6 +63,8 @@ class BwmSaver:
         self.perimeters = []
 
     def save(self):
+        print("Saving BWM '{}'".format(self.path))
+
         self.peek_walkmesh()
 
         self.save_header()
@@ -70,16 +74,19 @@ class BwmSaver:
         self.save_adjacent_edges()
 
     def peek_walkmesh(self):
-        # Header
-        self.bwm_pos += 136
+        self.geom_node = self.walkmesh.root_node.find_node(lambda node: isinstance(node, AabbNode))
+        self.use_node1 = self.geom_node.find_node(lambda node: isinstance(node, DummyNode) and node.dummysubtype == DummySubtype.USE1)
+        self.use_node2 = self.geom_node.find_node(lambda node: isinstance(node, DummyNode) and node.dummysubtype == DummySubtype.USE2)
 
-        self.geom_node = self.walkmesh.root_node.find_child(lambda node: isinstance(node, AabbNode))
         self.peek_faces()
         self.peek_aabbs()
         self.peek_adjacent_edges()
 
         self.num_verts = len(self.geom_node.verts)
         self.num_faces = len(self.facelist.faces)
+
+        # Header
+        self.bwm_pos += 136
 
         # Vertices
         self.off_verts = self.bwm_pos
@@ -281,7 +288,6 @@ class BwmSaver:
             self.bwm.put_int32(aabb.child_idx2)
 
     def save_adjacent_edges(self):
-        print(self.adjacent_edges)
         for edges in self.adjacent_edges:
             for val in edges:
                 self.bwm.put_int32(val)

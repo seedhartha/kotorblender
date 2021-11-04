@@ -50,7 +50,7 @@ class KB_PT_empty(bpy.types.Panel):
         layout.separator()
 
         # Display properties depending on type of the empty
-        if (obj.kb.dummytype == defines.Dummytype.MDLROOT):
+        if obj.kb.dummytype == defines.Dummytype.MDLROOT:
             row = layout.row()
             box = row.box()
             split = box.split()

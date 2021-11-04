@@ -16,7 +16,7 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-from ... import defines
+from ...defines import Dummytype, DummySubtype
 
 from .geometry import GeometryNode
 
@@ -27,15 +27,17 @@ class DummyNode(GeometryNode):
         GeometryNode.__init__(self, name)
 
         self.nodetype = "dummy"
-        self.dummytype = defines.Dummytype.NONE
+        self.dummytype = Dummytype.NONE
+        self.dummysubtype = DummySubtype.NONE
 
     def set_object_data(self, obj):
         GeometryNode.set_object_data(self, obj)
 
         obj.kb.dummytype = self.dummytype
-        obj.kb.dummysubtype = defines.DummySubtype.NONE
+        obj.kb.dummysubtype = self.dummysubtype
 
-        for element in defines.DummySubtype.SUFFIX_LIST:
-            if self.name.endswith(element[0]):
-                obj.kb.dummysubtype = element[1]
-                break
+    def load_object_data(self, obj):
+        GeometryNode.load_object_data(self, obj)
+
+        self.dummytype = obj.kb.dummytype
+        self.dummysubtype = obj.kb.dummysubtype
