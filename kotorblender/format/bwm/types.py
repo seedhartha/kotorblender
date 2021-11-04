@@ -16,10 +16,5 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-from .walkmesh import Walkmesh
-
-
-class AreaWalkmesh(Walkmesh):
-
-    def __init__(self):
-        Walkmesh.__init__(self, "wok")
+WALKMESH_TYPE_PLACEABLE = 0
+WALKMESH_TYPE_AREA = 1

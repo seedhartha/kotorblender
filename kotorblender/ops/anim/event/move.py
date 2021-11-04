@@ -33,7 +33,7 @@ class KB_OT_anim_event_move(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        if not utils.is_root_dummy(context.object):
+        if not utils.is_mdl_root(context.object):
             return False
 
         mdl_root = context.object
