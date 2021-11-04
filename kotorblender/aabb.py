@@ -31,7 +31,7 @@ def generate_tree(aabb_tree, face_list, rlevel=0):
     # Calculate bounding box min/max and centroid
     bb_min = Vector((100000.0, 100000.0, 100000.0))
     bb_max = Vector((-100000.0, -100000.0, -100000.0))
-    bb_centroid = Vector((0.0, 0.0, 0.0))
+    bb_centroid = Vector()
     for face in face_list:
         face_verts = face[1]
         for vert in face_verts:
