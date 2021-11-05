@@ -302,7 +302,7 @@ class MdlSaver:
             # Mesh Data
             if type_flags & NODE_MESH:
                 num_verts = len(node.verts)
-                num_faces = len(node.facelist.faces)
+                num_faces = len(node.facelist.vertices)
 
                 # Faces
                 self.faces_offsets[node_idx] = self.mdl_pos
@@ -346,7 +346,7 @@ class MdlSaver:
                 bb_max = Vector()
                 average = Vector()
                 total_area = 0.0
-                for face in node.facelist.faces:
+                for face in node.facelist.vertices:
                     verts = [Vector(node.verts[i]) for i in face]
                     for vert in verts:
                         bb_min.x = min(bb_min.x, vert.x)
@@ -362,14 +362,14 @@ class MdlSaver:
                     area = self.calculate_face_area(edge1, edge2, edge3)
                     if area != 1.0:
                         total_area += area
-                average /= 3 * len(node.facelist.faces)
+                average /= 3 * len(node.facelist.vertices)
                 self.mesh_bounding_boxes[node_idx] = [*bb_min, *bb_max]
                 self.mesh_averages[node_idx] = [*average]
                 self.mesh_total_areas[node_idx] = total_area
 
                 # Radius
                 radius = 0.0
-                for face in node.facelist.faces:
+                for face in node.facelist.vertices:
                     verts = [Vector(node.verts[i]) for i in face]
                     for vert in verts:
                         radius = max(radius, (vert - average).length)
@@ -1028,7 +1028,7 @@ class MdlSaver:
 
                 self.mdl.put_uint32(fn_ptr1)
                 self.mdl.put_uint32(fn_ptr2)
-                self.put_array_def(self.faces_offsets[node_idx], len(node.facelist.faces))  # faces
+                self.put_array_def(self.faces_offsets[node_idx], len(node.facelist.vertices))  # faces
                 for val in bounding_box:
                     self.mdl.put_float(val)
                 self.mdl.put_float(radius)
@@ -1150,13 +1150,13 @@ class MdlSaver:
 
             if type_flags & NODE_MESH:
                 # Faces
-                for face_idx, face in enumerate(node.facelist.faces):
+                for face_idx, face in enumerate(node.facelist.vertices):
                     # Adjacent Faces
                     adjacent_faces = [0xffff] * 3
                     edges = [tuple(sorted(edge)) for edge in [(face[0], face[1]),
                                                               (face[1], face[2]),
                                                               (face[2], face[0])]]
-                    for adj_face_idx, adj_face in enumerate(node.facelist.faces):
+                    for adj_face_idx, adj_face in enumerate(node.facelist.vertices):
                         if adj_face_idx == face_idx:
                             continue
                         adj_edges = set([tuple(sorted(edge)) for edge in [(adj_face[0], adj_face[1]),
@@ -1171,7 +1171,7 @@ class MdlSaver:
                     vert1 = Vector(node.verts[face[0]])
                     normal = Vector(node.facelist.normals[face_idx])
                     distance = -1.0 * (normal @ vert1)
-                    material_id = node.facelist.matId[face_idx]
+                    material_id = node.facelist.materials[face_idx]
 
                     for val in normal:
                         self.mdl.put_float(val)
@@ -1244,11 +1244,11 @@ class MdlSaver:
                     for _ in range(7):
                         self.mdx.put_float(0.0)
 
-                self.mdl.put_uint32(3 * len(node.facelist.faces))  # index count
+                self.mdl.put_uint32(3 * len(node.facelist.vertices))  # index count
                 self.mdl.put_uint32(inv_count)
 
                 # Vertex Indices
-                for face in node.facelist.faces:
+                for face in node.facelist.vertices:
                     for val in face:
                         self.mdl.put_uint16(val)
 
@@ -1409,7 +1409,7 @@ class MdlSaver:
         face_list = []
         face_idx = 0
 
-        for face in node.facelist.faces:
+        for face in node.facelist.vertices:
             v0 = Vector(node.verts[face[0]])
             v1 = Vector(node.verts[face[1]])
             v2 = Vector(node.verts[face[2]])

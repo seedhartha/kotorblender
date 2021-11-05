@@ -40,12 +40,12 @@ class AabbNode(TrimeshNode):
         self.roomlinks = dict()
 
     def compute_lyt_position(self, wok_geom):
-        wok_vert = Vector(wok_geom.verts[wok_geom.facelist.faces[0][0]])
-        wok_mat_id = wok_geom.facelist.matId[0]
-        for i in range(len(self.facelist.faces)):
-            mdl_mat_id = self.facelist.matId[i]
+        wok_vert = Vector(wok_geom.verts[wok_geom.facelist.vertices[0][0]])
+        wok_mat_id = wok_geom.facelist.materials[0]
+        for i in range(len(self.facelist.vertices)):
+            mdl_mat_id = self.facelist.materials[i]
             if mdl_mat_id == wok_mat_id:
-                mdl_vert = self.verts[self.facelist.faces[i][0]]
+                mdl_vert = self.verts[self.facelist.vertices[i][0]]
                 mdl_vert_from_root = self.from_root @ Vector(mdl_vert)
                 self.lytposition = wok_vert - mdl_vert_from_root + Vector(self.bwmposition)
                 break
@@ -70,9 +70,9 @@ class AabbNode(TrimeshNode):
         mesh = bpy.data.meshes.new(name)
         mesh.vertices.add(len(self.verts))
         mesh.vertices.foreach_set("co", unpack_list(self.verts))
-        num_faces = len(self.facelist.faces)
+        num_faces = len(self.facelist.vertices)
         mesh.loops.add(3 * num_faces)
-        mesh.loops.foreach_set("vertex_index", unpack_list(self.facelist.faces))
+        mesh.loops.foreach_set("vertex_index", unpack_list(self.facelist.vertices))
         mesh.polygons.add(num_faces)
         mesh.polygons.foreach_set("loop_start", range(0, 3 * num_faces, 3))
         mesh.polygons.foreach_set("loop_total", (3,) * num_faces)
@@ -93,17 +93,17 @@ class AabbNode(TrimeshNode):
 
         # Apply the walkmesh materials to each face
         for idx, polygon in enumerate(mesh.polygons):
-            polygon.material_index = self.facelist.matId[idx]
+            polygon.material_index = self.facelist.materials[idx]
 
         # Create UV map
         if len(self.tverts) > 0:
-            uv = unpack_list([self.tverts[i] for indices in self.facelist.uvIdx for i in indices])
+            uv = unpack_list([self.tverts[i] for indices in self.facelist.uv for i in indices])
             uv_layer = mesh.uv_layers.new(name=UV_MAP_DIFFUSE, do_init=False)
             uv_layer.data.foreach_set("uv", uv)
 
         # Create lightmap UV map
         if len(self.tverts1) > 0:
-            uv = unpack_list([self.tverts1[i] for indices in self.facelist.uvIdx for i in indices])
+            uv = unpack_list([self.tverts1[i] for indices in self.facelist.uv for i in indices])
             uv_layer = mesh.uv_layers.new(name=UV_MAP_LIGHTMAP, do_init=False)
             uv_layer.data.foreach_set("uv", uv)
 

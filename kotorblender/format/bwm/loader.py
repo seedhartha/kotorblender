@@ -106,9 +106,9 @@ class BwmLoader:
         distances = [self.bwm.get_float() for _ in range(self.num_faces)]
 
         for i in range(self.num_faces):
-            self.facelist.faces.append(vert_indices[i])
-            self.facelist.uvIdx.append([0] * 3)
-            self.facelist.matId.append(material_ids[i])
+            self.facelist.vertices.append(vert_indices[i])
+            self.facelist.uv.append([0] * 3)
+            self.facelist.materials.append(material_ids[i])
 
     def load_aabbs(self):
         aabbs = []
