@@ -37,12 +37,14 @@ from . import defines, glob, utils
 
 def load_mdl(
     filepath="",
+    import_normals=True,
     import_animations=True,
     import_walkmeshes=True,
     import_materials=True,
     import_armatures=True,
     texture_search_recursive=False
 ):
+    glob.import_normals = import_normals
     glob.import_animations = import_animations
     glob.import_walkmeshes = import_walkmeshes
     glob.import_materials = import_materials
@@ -55,11 +57,13 @@ def load_mdl(
 
 def load_lyt(
     filepath="",
+    import_normals=True,
     import_animations=True,
     import_walkmeshes=True,
     import_materials=True,
     texture_search_recursive=False
 ):
+    glob.import_normals = import_normals
     glob.import_animations = import_animations
     glob.import_walkmeshes = import_walkmeshes
     glob.import_materials = import_materials

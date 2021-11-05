@@ -104,6 +104,7 @@ class TrimeshNode(GeometryNode):
         mesh.polygons.add(num_faces)
         mesh.polygons.foreach_set("loop_start", range(0, 3 * num_faces, 3))
         mesh.polygons.foreach_set("loop_total", (3,) * num_faces)
+        mesh.polygons.foreach_set("use_smooth", [True] * num_faces)
 
         # Create UV map
         if len(self.uv1) > 0:
@@ -118,6 +119,12 @@ class TrimeshNode(GeometryNode):
             uv_layer.data.foreach_set("uv", uv)
 
         mesh.update()
+
+        # Set custom normals
+        if glob.import_normals:
+            mesh.normals_split_custom_set_from_vertices(self.normals)
+            mesh.use_auto_smooth = True
+
         return mesh
 
     def set_object_data(self, obj):
@@ -185,8 +192,8 @@ class TrimeshNode(GeometryNode):
             self.verts.append(vert.co[:3])
             self.normals.append(vert.normal[:3])
 
-        self.uv1 = self.get_tverts_from_uv_layer(mesh, UV_MAP_DIFFUSE)
-        self.uv2 = self.get_tverts_from_uv_layer(mesh, UV_MAP_LIGHTMAP)
+        self.uv1 = self.get_uv_from_uv_layer(mesh, UV_MAP_DIFFUSE)
+        self.uv2 = self.get_uv_from_uv_layer(mesh, UV_MAP_LIGHTMAP)
 
         if self.tangentspace and self.uv1:
             mesh.calc_tangents(uvmap=UV_MAP_DIFFUSE)
@@ -214,7 +221,7 @@ class TrimeshNode(GeometryNode):
                 self.bitangents[vert_idx].normalize()
                 self.tangentspacenormals[vert_idx].normalize()
 
-    def get_tverts_from_uv_layer(self, mesh, layer_name):
+    def get_uv_from_uv_layer(self, mesh, layer_name):
         if not layer_name in mesh.uv_layers:
             return []
         layer_data = mesh.uv_layers[layer_name].data
