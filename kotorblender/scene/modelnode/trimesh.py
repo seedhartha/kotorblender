@@ -16,7 +16,6 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-import bmesh
 import bpy
 
 from bpy_extras.io_utils import unpack_list
@@ -178,13 +177,7 @@ class TrimeshNode(GeometryNode):
         self.ambient = obj.kb.ambient
 
         mesh = obj.data
-
-        # Triangulation
-        bm = bmesh.new()
-        bm.from_mesh(mesh)
-        bmesh.ops.triangulate(bm, faces=bm.faces)
-        bm.to_mesh(mesh)
-        bm.free()
+        mesh.calc_loop_triangles()
 
         for vert in mesh.vertices:
             self.verts.append(vert.co[:3])
@@ -200,14 +193,14 @@ class TrimeshNode(GeometryNode):
             self.bitangents = [Vector() for _ in range(num_verts)]
             self.tangentspacenormals = [Vector() for _ in range(num_verts)]
 
-        for polygon in mesh.polygons:
-            self.facelist.faces.append(polygon.vertices[:3])
-            self.facelist.uvIdx.append(polygon.vertices[:3])
-            self.facelist.matId.append(polygon.material_index)
-            self.facelist.normals.append(polygon.normal)
+        for tri in mesh.loop_triangles:
+            self.facelist.faces.append(tri.vertices[:3])
+            self.facelist.uvIdx.append(tri.vertices[:3])
+            self.facelist.matId.append(tri.material_index)
+            self.facelist.normals.append(tri.normal)
 
             if self.tangentspace and self.tverts:
-                for loop in [mesh.loops[i] for i in polygon.loop_indices]:
+                for loop in [mesh.loops[i] for i in tri.loops]:
                     vert_idx = loop.vertex_index
                     self.tangents[vert_idx] += loop.tangent
                     self.bitangents[vert_idx] += loop.bitangent
