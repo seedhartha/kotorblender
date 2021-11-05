@@ -16,8 +16,9 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-import bmesh
 import bpy
+
+from bpy_extras.io_utils import unpack_list
 
 from ... import defines
 
@@ -199,19 +200,28 @@ class EmitterNode(GeometryNode):
         collection.objects.link(obj)
         return obj
 
-    def create_mesh(self, objName):
+    def create_mesh(self, name):
+        verts = [
+            ((self.xsize/2) / 100.0, (self.ysize/2) / 100.0, 0.0),
+            ((self.xsize/2) / 100.0, (-self.ysize/2) / 100.0, 0.0),
+            ((-self.xsize/2) / 100.0, (-self.ysize/2) / 100.0, 0.0),
+            ((-self.xsize/2) / 100.0, (self.ysize/2) / 100.0, 0.0)
+        ]
+        indices = [
+            (0, 1, 2),
+            (0, 2, 3)
+        ]
         # Create the mesh itself
-        mesh = bpy.data.meshes.new(objName)
-        bm = bmesh.new(use_operators=False)
-        bm.verts.new(((self.xsize/2) / 100.0, (self.ysize/2) / 100.0, 0.0))
-        bm.verts.new(((self.xsize/2) / 100.0, (-self.ysize/2) / 100.0, 0.0))
-        bm.verts.new(((-self.xsize/2) / 100.0, (-self.ysize/2) / 100.0, 0.0))
-        bm.verts.new(((-self.xsize/2) / 100.0, (self.ysize/2) / 100.0, 0.0))
-        bm.verts.ensure_lookup_table()
-        face_verts = [bm.verts[i] for i in range(4)]
-        bm.faces.new((*face_verts, ))
-        bm.to_mesh(mesh)
-        bm.free()
+        mesh = bpy.data.meshes.new(name)
+        mesh.vertices.add(len(verts))
+        mesh.vertices.foreach_set("co", unpack_list(verts))
+        num_faces = len(indices)
+        mesh.loops.add(3 * num_faces)
+        mesh.loops.foreach_set("vertex_index", unpack_list(indices))
+        mesh.polygons.add(num_faces)
+        mesh.polygons.foreach_set("loop_start", range(0, 3 * num_faces, 3))
+        mesh.polygons.foreach_set("loop_total", (3,) * num_faces)
+        mesh.update()
         return mesh
 
     def set_object_data(self, obj):
