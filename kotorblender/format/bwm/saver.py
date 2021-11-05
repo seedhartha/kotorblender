@@ -89,7 +89,7 @@ class BwmSaver:
         self.peek_edges()
 
         self.num_verts = len(self.verts)
-        self.num_faces = len(self.facelist.faces)
+        self.num_faces = len(self.facelist.vertices)
 
         # Header
         self.bwm_pos += 136
@@ -139,8 +139,8 @@ class BwmSaver:
     def peek_faces(self):
         walkable_face_indices = []
         non_walkable_face_indices = []
-        for face_idx, _ in enumerate(self.geom_node.facelist.faces):
-            mat_id = self.geom_node.facelist.matId[face_idx]
+        for face_idx, _ in enumerate(self.geom_node.facelist.vertices):
+            mat_id = self.geom_node.facelist.materials[face_idx]
             if mat_id in WkmMaterial.NONWALKABLE:
                 non_walkable_face_indices.append(face_idx)
             else:
@@ -148,8 +148,8 @@ class BwmSaver:
                 self.num_walkable_faces += 1
         face_indices = walkable_face_indices + non_walkable_face_indices
         for face_idx in face_indices:
-            self.facelist.faces.append(self.geom_node.facelist.faces[face_idx])
-            self.facelist.matId.append(self.geom_node.facelist.matId[face_idx])
+            self.facelist.vertices.append(self.geom_node.facelist.vertices[face_idx])
+            self.facelist.materials.append(self.geom_node.facelist.materials[face_idx])
             self.facelist.normals.append(self.geom_node.facelist.normals[face_idx])
 
     def peek_aabbs(self):
@@ -159,7 +159,7 @@ class BwmSaver:
         face_list = []
         face_idx = 0
 
-        for face in self.facelist.faces:
+        for face in self.facelist.vertices:
             v0 = Vector(self.verts[face[0]])
             v1 = Vector(self.verts[face[1]])
             v2 = Vector(self.verts[face[2]])
@@ -192,13 +192,13 @@ class BwmSaver:
     def peek_edges(self):
         # Adjacent Edges
         for face_idx in range(self.num_walkable_faces):
-            face = self.facelist.faces[face_idx]
+            face = self.facelist.vertices[face_idx]
             adj_edges = [-1] * 3
             edges = [tuple(sorted(edge)) for edge in [(face[0], face[1]), (face[1], face[2]), (face[2], face[0])]]
             for other_face_idx in range(self.num_walkable_faces):
                 if other_face_idx == face_idx:
                     continue
-                other_face = self.facelist.faces[other_face_idx]
+                other_face = self.facelist.vertices[other_face_idx]
                 other_edges = [tuple(sorted(edge)) for edge in [(other_face[0], other_face[1]), (other_face[1], other_face[2]), (other_face[2], other_face[0])]]
                 for i in range(3):
                     if adj_edges[i] != -1:
@@ -253,7 +253,7 @@ class BwmSaver:
             abs_use_vec2 = [0.0] * 3
 
         num_verts = len(self.verts)
-        num_faces = len(self.facelist.faces)
+        num_faces = len(self.facelist.vertices)
 
         if self.walkmesh_type == WALKMESH_TYPE_AREA:
             num_aabbs = len(self.aabbs)
@@ -310,12 +310,12 @@ class BwmSaver:
 
     def save_faces(self):
         # Vertex Indices
-        for face in self.facelist.faces:
+        for face in self.facelist.vertices:
             for val in face:
                 self.bwm.put_uint32(val)
 
         # Material Ids
-        for mat_id in self.facelist.matId:
+        for mat_id in self.facelist.materials:
             self.bwm.put_uint32(mat_id)
 
         # Normals
@@ -324,7 +324,7 @@ class BwmSaver:
                 self.bwm.put_float(val)
 
         # Distances
-        for face_idx, face in enumerate(self.facelist.faces):
+        for face_idx, face in enumerate(self.facelist.vertices):
             vert1 = Vector(self.verts[face[0]])
             normal = Vector(self.facelist.normals[face_idx])
             distance = -1.0 * (normal @ vert1)

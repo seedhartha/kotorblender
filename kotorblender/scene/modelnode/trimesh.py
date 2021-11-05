@@ -33,10 +33,10 @@ UV_MAP_LIGHTMAP = "UVMap_lm"
 
 class FaceList:
     def __init__(self):
-        self.faces = []  # int 3-tuple, vertex indices
-        self.uvIdx = []  # int 3-tuple, texture/uv vertex indices
-        self.matId = []  # int, material index
-        self.normals = []  # float 3-tuple, normal
+        self.vertices = []  # vertex indices
+        self.uv = []  # UV indices
+        self.materials = []
+        self.normals = []
 
 
 class TrimeshNode(GeometryNode):
@@ -96,22 +96,22 @@ class TrimeshNode(GeometryNode):
         mesh = bpy.data.meshes.new(name)
         mesh.vertices.add(len(self.verts))
         mesh.vertices.foreach_set("co", unpack_list(self.verts))
-        num_faces = len(self.facelist.faces)
+        num_faces = len(self.facelist.vertices)
         mesh.loops.add(3 * num_faces)
-        mesh.loops.foreach_set("vertex_index", unpack_list(self.facelist.faces))
+        mesh.loops.foreach_set("vertex_index", unpack_list(self.facelist.vertices))
         mesh.polygons.add(num_faces)
         mesh.polygons.foreach_set("loop_start", range(0, 3 * num_faces, 3))
         mesh.polygons.foreach_set("loop_total", (3,) * num_faces)
 
         # Create UV map
         if len(self.tverts) > 0:
-            uv = unpack_list([self.tverts[i] for indices in self.facelist.uvIdx for i in indices])
+            uv = unpack_list([self.tverts[i] for indices in self.facelist.uv for i in indices])
             uv_layer = mesh.uv_layers.new(name=UV_MAP_DIFFUSE, do_init=False)
             uv_layer.data.foreach_set("uv", uv)
 
         # Create lightmap UV map
         if len(self.tverts1) > 0:
-            uv = unpack_list([self.tverts1[i] for indices in self.facelist.uvIdx for i in indices])
+            uv = unpack_list([self.tverts1[i] for indices in self.facelist.uv for i in indices])
             uv_layer = mesh.uv_layers.new(name=UV_MAP_LIGHTMAP, do_init=False)
             uv_layer.data.foreach_set("uv", uv)
 
@@ -194,9 +194,9 @@ class TrimeshNode(GeometryNode):
             self.tangentspacenormals = [Vector() for _ in range(num_verts)]
 
         for tri in mesh.loop_triangles:
-            self.facelist.faces.append(tri.vertices[:3])
-            self.facelist.uvIdx.append(tri.vertices[:3])
-            self.facelist.matId.append(tri.material_index)
+            self.facelist.vertices.append(tri.vertices[:3])
+            self.facelist.uv.append(tri.vertices[:3])
+            self.facelist.materials.append(tri.material_index)
             self.facelist.normals.append(tri.normal)
 
             if self.tangentspace and self.tverts:

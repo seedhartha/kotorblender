@@ -474,9 +474,9 @@ class MdlLoader:
             node.facelist = FaceList()
             if type_flags & NODE_SABER:
                 for face in SABER_FACES:
-                    node.facelist.faces.append(face)
-                    node.facelist.uvIdx.append(face)
-                    node.facelist.matId.append(0)
+                    node.facelist.vertices.append(face)
+                    node.facelist.uv.append(face)
+                    node.facelist.materials.append(0)
             elif face_arr.count > 0:
                 self.mdl.seek(MDL_OFFSET + face_arr.offset)
                 for _ in range(face_arr.count):
@@ -485,9 +485,9 @@ class MdlLoader:
                     material_id = self.mdl.get_uint32()
                     adjacent_faces = [self.mdl.get_uint16() for _ in range(3)]
                     vert_indices = [self.mdl.get_uint16() for _ in range(3)]
-                    node.facelist.faces.append(tuple(vert_indices))
-                    node.facelist.uvIdx.append(tuple(vert_indices))
-                    node.facelist.matId.append(material_id)
+                    node.facelist.vertices.append(tuple(vert_indices))
+                    node.facelist.uv.append(tuple(vert_indices))
+                    node.facelist.materials.append(material_id)
                 if index_count_arr.count > 0:
                     self.mdl.seek(MDL_OFFSET + index_count_arr.offset)
                     num_indices = self.mdl.get_uint32()
