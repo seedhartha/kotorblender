@@ -127,7 +127,7 @@ class Model:
             elif obj.kb.meshtype == Meshtype.SKIN:
                 node_type = Nodetype.SKIN
             elif obj.kb.meshtype == Meshtype.LIGHTSABER:
-                node_type = Nodetype.LIGHT
+                node_type = Nodetype.LIGHTSABER
             elif obj.kb.meshtype == Meshtype.DANGLYMESH:
                 node_type = Nodetype.DANGLYMESH
             else:
