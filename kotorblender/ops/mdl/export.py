@@ -34,6 +34,11 @@ class KB_OT_export_mdl(bpy.types.Operator, bpy_extras.io_utils.ExportHelper):
         default="*.mdl",
         options={'HIDDEN'})
 
+    export_custom_normals: bpy.props.BoolProperty(
+        name="Export Custom Normals",
+        description="Export previously imported normals, if any",
+        default=True)
+
     export_for_tsl: bpy.props.BoolProperty(
         name="Export for TSL",
         description="Use The Sith Lords MDL format",
