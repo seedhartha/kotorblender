@@ -71,14 +71,16 @@ class TrimeshNode(GeometryNode):
         self.bitmap2 = defines.NULL
         self.tangentspace = 0
         self.rotatetexture = 0
+
         self.verts = []
         self.normals = []
+        self.uv1 = []
+        self.uv2 = []
         self.tangents = []
         self.bitangents = []
         self.tangentspacenormals = []
+
         self.facelist = FaceList()
-        self.tverts = []  # list of texture vertices
-        self.tverts1 = []  # list of texture vertices
 
     def add_to_collection(self, collection):
         mesh = self.create_mesh(self.name)
@@ -104,14 +106,14 @@ class TrimeshNode(GeometryNode):
         mesh.polygons.foreach_set("loop_total", (3,) * num_faces)
 
         # Create UV map
-        if len(self.tverts) > 0:
-            uv = unpack_list([self.tverts[i] for indices in self.facelist.uv for i in indices])
+        if len(self.uv1) > 0:
+            uv = unpack_list([self.uv1[i] for indices in self.facelist.uv for i in indices])
             uv_layer = mesh.uv_layers.new(name=UV_MAP_DIFFUSE, do_init=False)
             uv_layer.data.foreach_set("uv", uv)
 
         # Create lightmap UV map
-        if len(self.tverts1) > 0:
-            uv = unpack_list([self.tverts1[i] for indices in self.facelist.uv for i in indices])
+        if len(self.uv2) > 0:
+            uv = unpack_list([self.uv2[i] for indices in self.facelist.uv for i in indices])
             uv_layer = mesh.uv_layers.new(name=UV_MAP_LIGHTMAP, do_init=False)
             uv_layer.data.foreach_set("uv", uv)
 
@@ -183,10 +185,10 @@ class TrimeshNode(GeometryNode):
             self.verts.append(vert.co[:3])
             self.normals.append(vert.normal[:3])
 
-        self.tverts = self.get_tverts_from_uv_layer(mesh, UV_MAP_DIFFUSE)
-        self.tverts1 = self.get_tverts_from_uv_layer(mesh, UV_MAP_LIGHTMAP)
+        self.uv1 = self.get_tverts_from_uv_layer(mesh, UV_MAP_DIFFUSE)
+        self.uv2 = self.get_tverts_from_uv_layer(mesh, UV_MAP_LIGHTMAP)
 
-        if self.tangentspace and self.tverts:
+        if self.tangentspace and self.uv1:
             mesh.calc_tangents(uvmap=UV_MAP_DIFFUSE)
             num_verts = len(mesh.vertices)
             self.tangents = [Vector() for _ in range(num_verts)]
@@ -199,14 +201,14 @@ class TrimeshNode(GeometryNode):
             self.facelist.materials.append(tri.material_index)
             self.facelist.normals.append(tri.normal)
 
-            if self.tangentspace and self.tverts:
+            if self.tangentspace and self.uv1:
                 for loop in [mesh.loops[i] for i in tri.loops]:
                     vert_idx = loop.vertex_index
                     self.tangents[vert_idx] += loop.tangent
                     self.bitangents[vert_idx] += loop.bitangent
                     self.tangentspacenormals[vert_idx] += loop.normal
 
-        if self.tangentspace and self.tverts:
+        if self.tangentspace and self.uv1:
             for vert_idx in range(num_verts):
                 self.tangents[vert_idx].normalize()
                 self.bitangents[vert_idx].normalize()
