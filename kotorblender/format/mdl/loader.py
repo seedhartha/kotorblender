@@ -525,6 +525,9 @@ class MdlLoader:
                 for i in range(num_verts):
                     self.mdx.seek(mdx_offset + i * mdx_data_size + off_mdx_verts)
                     node.verts.append(tuple([self.mdx.get_float() for _ in range(3)]))
+                    if mdx_data_bitmap & MDX_FLAG_NORMAL:
+                        self.mdx.seek(mdx_offset + i * mdx_data_size + off_mdx_normals)
+                        node.normals.append(tuple([self.mdx.get_float() for _ in range(3)]))
                     if mdx_data_bitmap & MDX_FLAG_UV1:
                         self.mdx.seek(mdx_offset + i * mdx_data_size + off_mdx_uv1)
                         node.uv1.append(tuple([self.mdx.get_float() for _ in range(2)]))

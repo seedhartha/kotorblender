@@ -35,6 +35,10 @@ class KB_OT_import_lyt(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
         default="*.lyt",
         options={'HIDDEN'})
 
+    import_normals: bpy.props.BoolProperty(
+        name="Import Normals",
+        default=True)
+
     import_animations: bpy.props.BoolProperty(
         name="Import Animations",
         default=True)
