@@ -85,7 +85,7 @@ DATA_PATH_BY_LABEL = {
 LABEL_BY_DATA_PATH = {value: key for key, value in DATA_PATH_BY_LABEL.items()}
 
 CONVERTER_BY_LABEL = {
-    "scale": lambda val: [val[0] * 3]
+    "scale": lambda val: [val[0], val[0], val[0]]
 }
 
 CONVERTER_BY_DATA_PATH = {

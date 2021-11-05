@@ -503,24 +503,26 @@ class MdlLoader:
             if type_flags & NODE_SABER:
                 saber_verts = []
                 self.mdl.seek(MDL_OFFSET + off_saber_verts)
-                for i in range(176):
+                for i in range(NUM_SABER_VERTS):
                     saber_verts.append([self.mdl.get_float() for _ in range(3)])
                 saber_tverts = []
                 self.mdl.seek(MDL_OFFSET + off_saber_uv)
-                for i in range(176):
+                for i in range(NUM_SABER_VERTS):
                     saber_tverts.append([self.mdl.get_float() for _ in range(2)])
-                for i in range(4):
+                saber_normals = []
+                self.mdl.seek(MDL_OFFSET + off_saber_normals)
+                for i in range(NUM_SABER_VERTS):
+                    saber_normals.append([self.mdl.get_float() for _ in range(3)])
+
+                for i in range(8):
                     node.verts.append(saber_verts[i])
+                    node.normals.append(saber_normals[i])
                     node.uv1.append(saber_tverts[i])
-                for i in range(4):
+                for i in range(88, 96):
                     node.verts.append(saber_verts[i])
-                    node.uv1.append(saber_tverts[4+i])
-                for i in range(88, 92):
-                    node.verts.append(saber_verts[i])
+                    node.normals.append(saber_normals[i])
                     node.uv1.append(saber_tverts[i])
-                for i in range(88, 92):
-                    node.verts.append(saber_verts[i])
-                    node.uv1.append(saber_tverts[4+i])
+
             elif mdx_data_size > 0:
                 for i in range(num_verts):
                     self.mdx.seek(mdx_offset + i * mdx_data_size + off_mdx_verts)
@@ -649,7 +651,7 @@ class MdlLoader:
             if CTRL_BASE_ORIENTATION in controllers:
                 node.keyframes["orientation"] = [[row.timekey] + self.orientation_controller_to_quaternion(row.values) for row in controllers[CTRL_BASE_ORIENTATION]]
             if CTRL_BASE_SCALE in controllers:
-                node.keyframes["scale"] = [[row.timekey] + [row.values[0]] * 3 for row in controllers[CTRL_BASE_SCALE]]
+                node.keyframes["scale"] = [[row.timekey] + [row.values[0]] for row in controllers[CTRL_BASE_SCALE]]
             if isinstance(supernode, TrimeshNode):
                 if CTRL_MESH_ALPHA in controllers:
                     node.keyframes["alpha"] = [[row.timekey] + [row.values[0]] for row in controllers[CTRL_MESH_ALPHA]]

@@ -98,6 +98,11 @@ class MdlSaver:
         self.aabbs = dict()
         self.aabb_offsets = dict()
 
+        # Sabers
+        self.saber_verts_offsets = dict()
+        self.saber_uv_offsets = dict()
+        self.saber_normals_offsets = dict()
+
         # Controllers
         self.controller_keys = []
         self.controller_data = []
@@ -299,9 +304,12 @@ class MdlSaver:
             if type_flags & NODE_AABB:
                 self.mdl_pos += 4
 
+            # Saber Header
+            if type_flags & NODE_SABER:
+                self.mdl_pos += 20
+
             # Mesh Data
             if type_flags & NODE_MESH:
-                num_verts = len(node.verts)
                 num_faces = len(node.facelist.vertices)
 
                 # Faces
@@ -310,36 +318,44 @@ class MdlSaver:
 
                 # Vertex Indices Offset
                 self.index_offset_offsets[node_idx] = self.mdl_pos
-                self.mdl_pos += 4
+                if not type_flags & NODE_SABER:
+                    self.mdl_pos += 4
 
                 # Vertices
+                num_verts = NUM_SABER_VERTS if type_flags & NODE_SABER else len(node.verts)
                 self.verts_offsets[node_idx] = self.mdl_pos
                 self.mdl_pos += 4 * 3 * num_verts
 
                 # Vertex Indices Count
                 self.index_count_offsets[node_idx] = self.mdl_pos
-                self.mdl_pos += 4
+                if not type_flags & NODE_SABER:
+                    self.mdl_pos += 4
 
-                # Inverted Count
+                # Inverted Counter
                 self.inv_count_offsets[node_idx] = self.mdl_pos
-                self.mdl_pos += 4
+                if not type_flags & NODE_SABER:
+                    self.mdl_pos += 4
 
                 # Vertex Indices
                 self.indices_offsets[node_idx] = self.mdl_pos
-                self.mdl_pos += 2 * 3 * num_faces
+                if not type_flags & NODE_SABER:
+                    self.mdl_pos += 2 * 3 * num_faces
 
                 # MDX data
-                self.mdx_offsets[node_idx] = self.mdx_pos
-                self.mdx_pos += 4 * 3 * (num_verts + 1)
-                self.mdx_pos += 4 * 3 * (num_verts + 1)
-                if node.uv1:
-                    self.mdx_pos += 4 * 2 * (num_verts + 1)
-                if node.uv2:
-                    self.mdx_pos += 4 * 2 * (num_verts + 1)
-                if node.tangentspace:
-                    self.mdx_pos += 4 * 9 * (num_verts + 1)
-                if type_flags & NODE_SKIN:
-                    self.mdx_pos += 4 * 8 * (num_verts + 1)
+                if type_flags & NODE_SABER:
+                    self.mdx_offsets[node_idx] = 0
+                else:
+                    self.mdx_offsets[node_idx] = self.mdx_pos
+                    self.mdx_pos += 4 * 3 * (num_verts + 1)
+                    self.mdx_pos += 4 * 3 * (num_verts + 1)
+                    if node.uv1:
+                        self.mdx_pos += 4 * 2 * (num_verts + 1)
+                    if node.uv2:
+                        self.mdx_pos += 4 * 2 * (num_verts + 1)
+                    if node.tangentspace:
+                        self.mdx_pos += 4 * 9 * (num_verts + 1)
+                    if type_flags & NODE_SKIN:
+                        self.mdx_pos += 4 * 8 * (num_verts + 1)
 
                 # Bounding Box, Average, Total Area
                 bb_min = Vector()
@@ -413,6 +429,17 @@ class MdlSaver:
                     self.aabb_offsets[node_idx].append(self.mdl_pos)
                     self.mdl_pos += 40
                 self.aabbs[node_idx] = aabbs
+
+            # Saber Data
+            if type_flags & NODE_SABER:
+                self.saber_verts_offsets[node_idx] = self.mdl_pos
+                self.mdl_pos += 4 * 3 * NUM_SABER_VERTS
+
+                self.saber_uv_offsets[node_idx] = self.mdl_pos
+                self.mdl_pos += 4 * 2 * NUM_SABER_VERTS
+
+                self.saber_normals_offsets[node_idx] = self.mdl_pos
+                self.mdl_pos += 4 * 3 * NUM_SABER_VERTS
 
             # Children
             self.children_offsets.append(self.mdl_pos)
@@ -811,7 +838,7 @@ class MdlSaver:
                 self.mdl.put_float(val)
 
     def save_nodes(self):
-        mesh_inv_count = 0
+        num_meshes = 0
 
         for node_idx, node in enumerate(self.nodes):
             # Geometry Header
@@ -971,10 +998,10 @@ class MdlSaver:
                 uv_jitter = node.uvjitter
                 uv_jitter_speed = node.uvjitterspeed
 
-                mdx_data_size = 4 * (3 + 3)
-                mdx_data_bitmap = MDX_FLAG_VERTEX | MDX_FLAG_NORMAL
-                off_mdx_verts = 0
-                off_mdx_normals = 4 * 3
+                mdx_data_size = 0
+                mdx_data_bitmap = 0
+                off_mdx_verts = 0xffffffff
+                off_mdx_normals = 0xffffffff
                 off_mdx_colors = 0xffffffff
                 off_mdx_uv1 = 0xffffffff
                 off_mdx_uv2 = 0xffffffff
@@ -984,22 +1011,43 @@ class MdlSaver:
                 off_mdx_tan_space2 = 0xffffffff
                 off_mdx_tan_space3 = 0xffffffff
                 off_mdx_tan_space4 = 0xffffffff
-                if node.uv1:
-                    mdx_data_bitmap |= MDX_FLAG_UV1
-                    off_mdx_uv1 = mdx_data_size
-                    mdx_data_size += 4 * 2
-                if node.uv2:
-                    mdx_data_bitmap |= MDX_FLAG_UV2
-                    off_mdx_uv2 = mdx_data_size
-                    mdx_data_size += 4 * 2
-                if node.tangentspace:
-                    mdx_data_bitmap |= MDX_FLAG_TANGENT1
-                    off_mdx_tan_space1 = mdx_data_size
-                    mdx_data_size += 4 * 9
-                if type_flags & NODE_SKIN:
-                    mdx_data_size += 4 * 8  # bone weights + bone indices
+                if not type_flags & NODE_SABER:
+                    mdx_data_size += 4 * (3 + 3)
+                    mdx_data_bitmap = MDX_FLAG_VERTEX | MDX_FLAG_NORMAL
+                    off_mdx_verts = 0
+                    off_mdx_normals = 4 * 3
+                    if node.uv1:
+                        mdx_data_bitmap |= MDX_FLAG_UV1
+                        off_mdx_uv1 = mdx_data_size
+                        mdx_data_size += 4 * 2
+                    if node.uv2:
+                        mdx_data_bitmap |= MDX_FLAG_UV2
+                        off_mdx_uv2 = mdx_data_size
+                        mdx_data_size += 4 * 2
+                    if node.tangentspace:
+                        mdx_data_bitmap |= MDX_FLAG_TANGENT1
+                        off_mdx_tan_space1 = mdx_data_size
+                        mdx_data_size += 4 * 9
+                    if type_flags & NODE_SKIN:
+                        mdx_data_size += 4 * 8  # bone weights + bone indices
 
-                num_verts = len(node.verts)
+                if type_flags & NODE_SABER:
+                    saber_vert_indices = []
+                    for i in range(8):
+                        saber_vert_indices.append(i)
+                    for i in range(20):
+                        for j in range(4):
+                            saber_vert_indices.append(j)
+                    for i in range(8, 16):
+                        saber_vert_indices.append(i)
+                    for i in range(20):
+                        for j in range(8, 12):
+                            saber_vert_indices.append(j)
+                    num_verts = NUM_SABER_VERTS
+                else:
+                    num_verts = len(node.verts)
+
+                num_faces = len(node.facelist.vertices)
 
                 num_textures = 0
                 if node.uv1:
@@ -1021,14 +1069,9 @@ class MdlSaver:
                 mdx_offset = self.mdx_offsets[node_idx]
                 off_vert_array = self.verts_offsets[node_idx]
 
-                mesh_inv_count += 1
-                quo = mesh_inv_count // 100
-                mod = mesh_inv_count % 100
-                inv_count = int(pow(2, quo) * 100 - mesh_inv_count + (100 * quo if mod else 0) + (0 if quo else -1))
-
                 self.mdl.put_uint32(fn_ptr1)
                 self.mdl.put_uint32(fn_ptr2)
-                self.put_array_def(self.faces_offsets[node_idx], len(node.facelist.vertices))  # faces
+                self.put_array_def(self.faces_offsets[node_idx], num_faces)  # faces
                 for val in bounding_box:
                     self.mdl.put_float(val)
                 self.mdl.put_float(radius)
@@ -1043,9 +1086,16 @@ class MdlSaver:
                 self.mdl.put_string(bitmap2)
                 self.mdl.put_string(bitmap3)
                 self.mdl.put_string(bitmap4)
-                self.put_array_def(self.index_count_offsets[node_idx], 1)  # indices count
-                self.put_array_def(self.index_offset_offsets[node_idx], 1)  # indices offset
-                self.put_array_def(self.inv_count_offsets[node_idx], 1)  # inv counter
+
+                if type_flags & NODE_SABER:
+                    self.put_array_def(self.index_count_offsets[node_idx], 0)  # indices count
+                    self.put_array_def(self.index_offset_offsets[node_idx], 0)  # indices offset
+                    self.put_array_def(self.inv_count_offsets[node_idx], 0)  # inverted counter
+                else:
+                    self.put_array_def(self.index_count_offsets[node_idx], 1)  # indices count
+                    self.put_array_def(self.index_offset_offsets[node_idx], 1)  # indices offset
+                    self.put_array_def(self.inv_count_offsets[node_idx], 1)  # inverted counter
+
                 self.mdl.put_uint32(0xffffffff)  # unknown
                 self.mdl.put_uint32(0xffffffff)  # unknown
                 self.mdl.put_uint32(0)  # unknown
@@ -1146,6 +1196,19 @@ class MdlSaver:
             if type_flags & NODE_AABB:
                 self.mdl.put_uint32(self.aabb_offsets[node_idx][0])
 
+            # Saber Header
+
+            if type_flags & NODE_SABER:
+                saber_inv_count1 = self.get_inverted_counter(num_meshes + 1)
+                saber_inv_count2 = self.get_inverted_counter(num_meshes + 2)
+                num_meshes += 2
+
+                self.mdl.put_uint32(self.saber_verts_offsets[node_idx])
+                self.mdl.put_uint32(self.saber_uv_offsets[node_idx])
+                self.mdl.put_uint32(self.saber_normals_offsets[node_idx])
+                self.mdl.put_uint32(saber_inv_count1)
+                self.mdl.put_uint32(saber_inv_count2)
+
             # Mesh Data
 
             if type_flags & NODE_MESH:
@@ -1183,74 +1246,85 @@ class MdlSaver:
                         self.mdl.put_uint16(val)
 
                 # Vertex Indices Offset
-                self.mdl.put_uint32(self.indices_offsets[node_idx])
+                if not type_flags & NODE_SABER:
+                    self.mdl.put_uint32(self.indices_offsets[node_idx])
 
                 # Vertices
-                for vert in node.verts:
-                    for val in vert:
-                        self.mdl.put_float(val)
+                if type_flags & NODE_SABER:
+                    for vert_idx in saber_vert_indices:
+                        for val in node.verts[vert_idx]:
+                            self.mdl.put_float(val)
+                else:
+                    for vert in node.verts:
+                        for val in vert:
+                            self.mdl.put_float(val)
+
+                # Vertex Indices Count, Inverted Mesh Counter, Vertex Indices
+                if not type_flags & NODE_SABER:
+                    num_meshes += 1
+                    mesh_inv_count = self.get_inverted_counter(num_meshes)
+
+                    self.mdl.put_uint32(3 * len(node.facelist.vertices))  # vertex index count
+                    self.mdl.put_uint32(mesh_inv_count)  # inverted mesh counter
+
+                    # Vertex Indices
+                    for face in node.facelist.vertices:
+                        for val in face:
+                            self.mdl.put_uint16(val)
 
                 # MDX data
-                for vert_idx, vert in enumerate(node.verts):
-                    for val in vert:
-                        self.mdx.put_float(val)
-                    for val in node.normals[vert_idx]:
-                        self.mdx.put_float(val)
+                if not type_flags & NODE_SABER:
+                    for vert_idx, vert in enumerate(node.verts):
+                        for val in vert:
+                            self.mdx.put_float(val)
+                        for val in node.normals[vert_idx]:
+                            self.mdx.put_float(val)
+                        if node.uv1:
+                            for val in node.uv1[vert_idx]:
+                                self.mdx.put_float(val)
+                        if node.uv2:
+                            for val in node.uv2[vert_idx]:
+                                self.mdx.put_float(val)
+                        if node.tangentspace:
+                            for i in range(3):
+                                self.mdx.put_float(node.tangents[vert_idx][i])
+                                self.mdx.put_float(node.bitangents[vert_idx][i])
+                                self.mdx.put_float(node.tangentspacenormals[vert_idx][i])
+                        if type_flags & NODE_SKIN:
+                            vert_weights = node.weights[vert_idx]
+                            bone_weights = []
+                            for bone_name, weight in vert_weights:
+                                bone_node_idx = self.node_idx_by_name[bone_name]
+                                bone_idx = bonemap[bone_node_idx]
+                                bone_weights.append((bone_idx, weight))
+                            for i in range(4):
+                                if i < len(bone_weights):
+                                    self.mdx.put_float(bone_weights[i][1])
+                                else:
+                                    self.mdx.put_float(0.0)
+                            for i in range(4):
+                                if i < len(bone_weights):
+                                    self.mdx.put_float(float(bone_weights[i][0]))
+                                else:
+                                    self.mdx.put_float(-1.0)
+                    # Extra MDX data
+                    for _ in range(3):
+                        self.mdx.put_float(1000000.0)
+                    for _ in range(3):
+                        self.mdx.put_float(0.0)
                     if node.uv1:
-                        for val in node.uv1[vert_idx]:
-                            self.mdx.put_float(val)
+                        for _ in range(2):
+                            self.mdx.put_float(0.0)
                     if node.uv2:
-                        for val in node.uv2[vert_idx]:
-                            self.mdx.put_float(val)
+                        for _ in range(2):
+                            self.mdx.put_float(0.0)
                     if node.tangentspace:
-                        for i in range(3):
-                            self.mdx.put_float(node.tangents[vert_idx][i])
-                            self.mdx.put_float(node.bitangents[vert_idx][i])
-                            self.mdx.put_float(node.tangentspacenormals[vert_idx][i])
+                        for _ in range(9):
+                            self.mdx.put_float(0.0)
                     if type_flags & NODE_SKIN:
-                        vert_weights = node.weights[vert_idx]
-                        bone_weights = []
-                        for bone_name, weight in vert_weights:
-                            bone_node_idx = self.node_idx_by_name[bone_name]
-                            bone_idx = bonemap[bone_node_idx]
-                            bone_weights.append((bone_idx, weight))
-                        for i in range(4):
-                            if i < len(bone_weights):
-                                self.mdx.put_float(bone_weights[i][1])
-                            else:
-                                self.mdx.put_float(0.0)
-                        for i in range(4):
-                            if i < len(bone_weights):
-                                self.mdx.put_float(float(bone_weights[i][0]))
-                            else:
-                                self.mdx.put_float(-1.0)
-
-                # Extra MDX data
-                for _ in range(3):
-                    self.mdx.put_float(1000000.0)
-                for _ in range(3):
-                    self.mdx.put_float(0.0)
-                if node.uv1:
-                    for _ in range(2):
-                        self.mdx.put_float(0.0)
-                if node.uv2:
-                    for _ in range(2):
-                        self.mdx.put_float(0.0)
-                if node.tangentspace:
-                    for _ in range(9):
-                        self.mdx.put_float(0.0)
-                if type_flags & NODE_SKIN:
-                    self.mdx.put_float(1.0)
-                    for _ in range(7):
-                        self.mdx.put_float(0.0)
-
-                self.mdl.put_uint32(3 * len(node.facelist.vertices))  # index count
-                self.mdl.put_uint32(inv_count)
-
-                # Vertex Indices
-                for face in node.facelist.vertices:
-                    for val in face:
-                        self.mdl.put_uint16(val)
+                        self.mdx.put_float(1.0)
+                        for _ in range(7):
+                            self.mdx.put_float(0.0)
 
             # Skin Data
 
@@ -1329,6 +1403,19 @@ class MdlSaver:
                     self.mdl.put_int32(face_idx)
                     self.mdl.put_uint32(most_significant_plane)
 
+            # Saber Data
+
+            if type_flags & NODE_SABER:
+                for vert_idx in saber_vert_indices:
+                    for val in node.verts[vert_idx]:
+                        self.mdl.put_float(val)
+                for vert_idx in saber_vert_indices:
+                    for val in node.uv1[vert_idx]:
+                        self.mdl.put_float(val)
+                for vert_idx in saber_vert_indices:
+                    for val in node.normals[vert_idx]:
+                        self.mdl.put_float(val)
+
             # Children
 
             for child_idx in child_indices:
@@ -1364,7 +1451,7 @@ class MdlSaver:
             Nodetype.EMITTER: NODE_BASE | NODE_EMITTER,
             Nodetype.LIGHT: NODE_BASE | NODE_LIGHT,
             Nodetype.AABB: NODE_BASE | NODE_MESH | NODE_AABB,
-            Nodetype.LIGHTSABER: NODE_BASE | NODE_MESH  # NODE_SABER
+            Nodetype.LIGHTSABER: NODE_BASE | NODE_MESH | NODE_SABER
         }
         return switch[node.nodetype]
 
@@ -1421,6 +1508,11 @@ class MdlSaver:
         aabb.generate_tree(aabbs, face_list)
 
         return aabbs
+
+    def get_inverted_counter(self, count):
+        quo = count // 100
+        mod = count % 100
+        return int(pow(2, quo) * 100 - count + (100 * quo if mod else 0) + (0 if quo else -1))
 
     def put_array_def(self, offset, count):
         self.mdl.put_uint32(offset)
