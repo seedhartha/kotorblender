@@ -332,9 +332,9 @@ class MdlSaver:
                 self.mdx_offsets[node_idx] = self.mdx_pos
                 self.mdx_pos += 4 * 3 * (num_verts + 1)
                 self.mdx_pos += 4 * 3 * (num_verts + 1)
-                if node.tverts:
+                if node.uv1:
                     self.mdx_pos += 4 * 2 * (num_verts + 1)
-                if node.tverts1:
+                if node.uv2:
                     self.mdx_pos += 4 * 2 * (num_verts + 1)
                 if node.tangentspace:
                     self.mdx_pos += 4 * 9 * (num_verts + 1)
@@ -984,11 +984,11 @@ class MdlSaver:
                 off_mdx_tan_space2 = 0xffffffff
                 off_mdx_tan_space3 = 0xffffffff
                 off_mdx_tan_space4 = 0xffffffff
-                if node.tverts:
+                if node.uv1:
                     mdx_data_bitmap |= MDX_FLAG_UV1
                     off_mdx_uv1 = mdx_data_size
                     mdx_data_size += 4 * 2
-                if node.tverts1:
+                if node.uv2:
                     mdx_data_bitmap |= MDX_FLAG_UV2
                     off_mdx_uv2 = mdx_data_size
                     mdx_data_size += 4 * 2
@@ -1002,9 +1002,9 @@ class MdlSaver:
                 num_verts = len(node.verts)
 
                 num_textures = 0
-                if node.tverts:
+                if node.uv1:
                     num_textures += 1
-                if node.tverts1:
+                if node.uv2:
                     num_textures += 1
 
                 has_lightmap = node.lightmapped
@@ -1196,11 +1196,11 @@ class MdlSaver:
                         self.mdx.put_float(val)
                     for val in node.normals[vert_idx]:
                         self.mdx.put_float(val)
-                    if node.tverts:
-                        for val in node.tverts[vert_idx]:
+                    if node.uv1:
+                        for val in node.uv1[vert_idx]:
                             self.mdx.put_float(val)
-                    if node.tverts1:
-                        for val in node.tverts1[vert_idx]:
+                    if node.uv2:
+                        for val in node.uv2[vert_idx]:
                             self.mdx.put_float(val)
                     if node.tangentspace:
                         for i in range(3):
@@ -1230,10 +1230,10 @@ class MdlSaver:
                     self.mdx.put_float(1000000.0)
                 for _ in range(3):
                     self.mdx.put_float(0.0)
-                if node.tverts:
+                if node.uv1:
                     for _ in range(2):
                         self.mdx.put_float(0.0)
-                if node.tverts1:
+                if node.uv2:
                     for _ in range(2):
                         self.mdx.put_float(0.0)
                 if node.tangentspace:

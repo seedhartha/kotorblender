@@ -496,8 +496,8 @@ class MdlLoader:
                     off_indices = self.mdl.get_uint32()
 
             node.verts = []
-            node.tverts = []
-            node.tverts1 = []
+            node.uv1 = []
+            node.uv2 = []
             node.weights = []
 
             if type_flags & NODE_SABER:
@@ -511,26 +511,26 @@ class MdlLoader:
                     saber_tverts.append([self.mdl.get_float() for _ in range(2)])
                 for i in range(4):
                     node.verts.append(saber_verts[i])
-                    node.tverts.append(saber_tverts[i])
+                    node.uv1.append(saber_tverts[i])
                 for i in range(4):
                     node.verts.append(saber_verts[i])
-                    node.tverts.append(saber_tverts[4+i])
+                    node.uv1.append(saber_tverts[4+i])
                 for i in range(88, 92):
                     node.verts.append(saber_verts[i])
-                    node.tverts.append(saber_tverts[i])
+                    node.uv1.append(saber_tverts[i])
                 for i in range(88, 92):
                     node.verts.append(saber_verts[i])
-                    node.tverts.append(saber_tverts[4+i])
+                    node.uv1.append(saber_tverts[4+i])
             elif mdx_data_size > 0:
                 for i in range(num_verts):
                     self.mdx.seek(mdx_offset + i * mdx_data_size + off_mdx_verts)
                     node.verts.append(tuple([self.mdx.get_float() for _ in range(3)]))
                     if mdx_data_bitmap & MDX_FLAG_UV1:
                         self.mdx.seek(mdx_offset + i * mdx_data_size + off_mdx_uv1)
-                        node.tverts.append(tuple([self.mdx.get_float() for _ in range(2)]))
+                        node.uv1.append(tuple([self.mdx.get_float() for _ in range(2)]))
                     if mdx_data_bitmap & MDX_FLAG_UV2:
                         self.mdx.seek(mdx_offset + i * mdx_data_size + off_mdx_uv2)
-                        node.tverts1.append(tuple([self.mdx.get_float() for _ in range(2)]))
+                        node.uv2.append(tuple([self.mdx.get_float() for _ in range(2)]))
                     if type_flags & NODE_SKIN:
                         self.mdx.seek(mdx_offset + i * mdx_data_size + off_mdx_bone_weights)
                         bone_weights = [self.mdx.get_float() for _ in range(4)]

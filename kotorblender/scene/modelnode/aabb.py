@@ -96,14 +96,14 @@ class AabbNode(TrimeshNode):
             polygon.material_index = self.facelist.materials[idx]
 
         # Create UV map
-        if len(self.tverts) > 0:
-            uv = unpack_list([self.tverts[i] for indices in self.facelist.uv for i in indices])
+        if len(self.uv1) > 0:
+            uv = unpack_list([self.uv1[i] for indices in self.facelist.uv for i in indices])
             uv_layer = mesh.uv_layers.new(name=UV_MAP_DIFFUSE, do_init=False)
             uv_layer.data.foreach_set("uv", uv)
 
         # Create lightmap UV map
-        if len(self.tverts1) > 0:
-            uv = unpack_list([self.tverts1[i] for indices in self.facelist.uv for i in indices])
+        if len(self.uv2) > 0:
+            uv = unpack_list([self.uv2[i] for indices in self.facelist.uv for i in indices])
             uv_layer = mesh.uv_layers.new(name=UV_MAP_LIGHTMAP, do_init=False)
             uv_layer.data.foreach_set("uv", uv)
 
