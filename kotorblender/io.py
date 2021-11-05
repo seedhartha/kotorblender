@@ -113,7 +113,7 @@ def load_pth(
                 connection.point = name
 
 
-def save_mdl(filepath, export_for_tsl=False):
+def save_mdl(filepath, export_custom_normals=True, export_for_tsl=False):
     # Reset Pose
     bpy.context.scene.frame_set(defines.ANIM_GLOBSTART)
 

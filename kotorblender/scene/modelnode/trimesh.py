@@ -190,7 +190,22 @@ class TrimeshNode(GeometryNode):
 
         for vert in mesh.vertices:
             self.verts.append(vert.co[:3])
-            self.normals.append(vert.normal[:3])
+
+        if glob.export_custom_normals and mesh.has_custom_normals:
+            mesh.calc_normals_split()
+            normals = dict()
+            for loop in mesh.loops:
+                vert_idx = loop.vertex_index
+                if loop.vertex_index not in normals:
+                    normals[vert_idx] = loop.normal
+                else:
+                    normals[vert_idx] += loop.normal
+            for vert_idx in range(len(mesh.vertices)):
+                normal = normals[vert_idx].normalized()
+                self.normals.append(normal)
+        else:
+            for vert in mesh.vertices:
+                self.normals.append(vert.normal[:3])
 
         self.uv1 = self.get_uv_from_uv_layer(mesh, UV_MAP_DIFFUSE)
         self.uv2 = self.get_uv_from_uv_layer(mesh, UV_MAP_LIGHTMAP)
