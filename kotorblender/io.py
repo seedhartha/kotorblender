@@ -124,9 +124,9 @@ def save_mdl(filepath, export_custom_normals=True, export_for_tsl=False):
         return
 
     # Export MDL
-    model = Model.from_mdl_root(mdl_root)
+    model = utils.measure_time(lambda: Model.from_mdl_root(mdl_root))
     mdl = MdlSaver(filepath, model, export_for_tsl)
-    mdl.save()
+    utils.measure_time(lambda: mdl.save())
 
     # Export WOK
     aabb_node = model.find_node(lambda node: isinstance(node, AabbNode))
@@ -135,7 +135,7 @@ def save_mdl(filepath, export_custom_normals=True, export_for_tsl=False):
         wok_path = base_path + ".wok"
         walkmesh = Walkmesh.from_aabb_node(aabb_node)
         bwm = BwmSaver(wok_path, walkmesh)
-        bwm.save()
+        utils.measure_time(lambda: bwm.save())
 
     # Export PWK, DWK
     xwk_roots = utils.get_children_recursive(mdl_root, lambda obj: utils.is_pwk_root(obj) or utils.is_dwk_root(obj))
@@ -153,7 +153,7 @@ def save_mdl(filepath, export_custom_normals=True, export_for_tsl=False):
             xwk_path = "{}{}.dwk".format(base_path, dwk_state)
         walkmesh = Walkmesh.from_root_object(xwk_root)
         bwm = BwmSaver(xwk_path, walkmesh)
-        bwm.save()
+        utils.measure_time(lambda: bwm.save())
 
 
 def save_lyt(filepath):
@@ -243,7 +243,7 @@ def do_load_mdl(filepath, position=(0.0, 0.0, 0.0)):
     collection = bpy.context.collection
 
     mdl = MdlLoader(filepath)
-    model = mdl.load()
+    model = utils.measure_time(lambda: mdl.load())
 
     pwk_walkmesh = None
     dwk_walkmesh1 = None
@@ -254,7 +254,7 @@ def do_load_mdl(filepath, position=(0.0, 0.0, 0.0)):
         wok_path = filepath[:-4] + ".wok"
         if os.path.exists(wok_path):
             wok = BwmLoader(wok_path, model.name)
-            walkmesh = wok.load()
+            walkmesh = utils.measure_time(lambda: wok.load())
             aabb = model.find_node(lambda n: isinstance(n, AabbNode))
             aabb_wok = walkmesh.find_node(lambda n: isinstance(n, AabbNode))
             if aabb and aabb_wok:
@@ -265,7 +265,7 @@ def do_load_mdl(filepath, position=(0.0, 0.0, 0.0)):
         pwk_path = filepath[:-4] + ".pwk"
         if os.path.exists(pwk_path):
             pwk = BwmLoader(pwk_path, model.name)
-            pwk_walkmesh = pwk.load()
+            pwk_walkmesh = utils.measure_time(lambda: pwk.load())
 
         dwk0_path = filepath[:-4] + "0.dwk"
         dwk1_path = filepath[:-4] + "1.dwk"
@@ -274,11 +274,11 @@ def do_load_mdl(filepath, position=(0.0, 0.0, 0.0)):
             dwk1 = BwmLoader(dwk0_path, model.name)
             dwk2 = BwmLoader(dwk1_path, model.name)
             dwk3 = BwmLoader(dwk2_path, model.name)
-            dwk_walkmesh1 = dwk1.load()
-            dwk_walkmesh2 = dwk2.load()
-            dwk_walkmesh3 = dwk3.load()
+            dwk_walkmesh1 = utils.measure_time(lambda: dwk1.load())
+            dwk_walkmesh2 = utils.measure_time(lambda: dwk2.load())
+            dwk_walkmesh3 = utils.measure_time(lambda: dwk3.load())
 
-    model_root = model.import_to_collection(collection, position)
+    model_root = utils.measure_time(lambda: model.import_to_collection(collection, position))
 
     if pwk_walkmesh:
         pwk_walkmesh.import_to_collection(model_root, collection)

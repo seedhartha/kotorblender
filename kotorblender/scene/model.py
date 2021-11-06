@@ -55,6 +55,8 @@ class Model:
         if type(self.root_node) != DummyNode or self.root_node.parent:
             raise MalformedFile("Root node has to be a dummy without a parent")
 
+        print("Importing model '{}' to collection".format(self.name))
+
         root_obj = self.root_node.add_to_collection(collection)
         root_obj.location = position
         root_obj.kb.dummytype = defines.Dummytype.MDLROOT
@@ -95,6 +97,8 @@ class Model:
 
     @classmethod
     def from_mdl_root(cls, root_obj):
+        print("Constructing model from object '{}'".format(root_obj.name))
+
         model = Model()
         model.name = root_obj.name
         model.supermodel = root_obj.kb.supermodel

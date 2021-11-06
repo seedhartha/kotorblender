@@ -16,6 +16,8 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+import time
+
 from .defines import *
 
 
@@ -91,3 +93,12 @@ def float_to_byte(val):
 
 def int_to_hex(val):
     return "{:02X}".format(val)
+
+
+def measure_time(action):
+    pre = time.perf_counter_ns()
+    result = action()
+    post = time.perf_counter_ns()
+    delta = (post - pre) / 1e9
+    print("Done in {} seconds".format(delta))
+    return result
