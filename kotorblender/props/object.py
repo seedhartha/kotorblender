@@ -93,12 +93,12 @@ class ObjectPropertyGroup(bpy.types.PropertyGroup):
                                            default=defines.Classification.UNKNOWN)
     subclassification: bpy.props.IntProperty(name="Unknown", description="Unknown byte-2 in the classification bytes section of the model header", default=0)
     ignorefog: bpy.props.BoolProperty(name="Ignore Fog", description="If true, model will not be occluded by area fog in-game", default=False)
-    headlink: bpy.props.BoolProperty(name="Head Model", description="If true, this model is a Head", default=False)
     dummysubtype: bpy.props.EnumProperty(name="Subtype",
                                          items=[("NONE", "None", "Simple dummy object", 0),
                                                 ("USE1", "Use 1", "1st node for 'Use' animation", 1),
                                                 ("USE2", "Use 2", "2nd node for 'Use' animation", 2)],
                                          default="NONE")
+    animroot: bpy.props.StringProperty(name="Animation Root", description="Root node to apply animations from", default=defines.NULL)
     animscale: bpy.props.FloatProperty(name="Animation Scale", description="Animation scale for all animations", default=1.00, min=0.0)
     # Animation Data (for separation)
     anim_list: bpy.props.CollectionProperty(type=AnimPropertyGroup)
