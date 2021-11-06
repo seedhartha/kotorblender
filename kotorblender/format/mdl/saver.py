@@ -524,7 +524,7 @@ class MdlSaver:
         if type_flags & NODE_EMITTER:
             for ctrl_val, key, dim in EMITTER_CONTROLLER_KEYS:
                 value = getattr(node, key, None)
-                if not value:
+                if value is None:
                     continue
                 out_keys.append(ControllerKey(ctrl_val, 1, data_count, data_count + 1, dim))
                 out_data.append(0.0)  # timekey
