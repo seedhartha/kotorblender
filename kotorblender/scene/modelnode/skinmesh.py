@@ -52,5 +52,6 @@ class SkinmeshNode(TrimeshNode):
         for vert in obj.data.vertices:
             vert_weights = []
             for group_weight in vert.groups:
-                vert_weights.append((group_weight.group, group_weight.weight))
+                group = obj.vertex_groups[group_weight.group]
+                vert_weights.append((group.name, group_weight.weight))
             self.weights.append(vert_weights)
