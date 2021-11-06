@@ -45,7 +45,7 @@ class KB_OT_import_mdl(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
 
     import_walkmeshes: bpy.props.BoolProperty(
         name="Import Walkmeshes",
-        description="Import area, placeable and door walkmeshes",
+        description="Import area, door and placeable walkmeshes",
         default=True)
 
     import_materials: bpy.props.BoolProperty(

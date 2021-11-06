@@ -109,7 +109,9 @@ class Model:
         model.animscale = root_obj.kb.animscale
 
         model.root_node = cls.model_node_from_object(root_obj)
-        model.animations = [Animation.from_list_anim(anim, root_obj) for anim in root_obj.kb.anim_list]
+
+        if glob.export_animations:
+            model.animations = [Animation.from_list_anim(anim, root_obj) for anim in root_obj.kb.anim_list]
 
         return model
 

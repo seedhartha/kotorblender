@@ -113,7 +113,16 @@ def load_pth(
                 connection.point = name
 
 
-def save_mdl(filepath, export_custom_normals=True, export_for_tsl=False):
+def save_mdl(
+    filepath,
+    export_for_tsl=False,
+    export_animations=True,
+    export_walkmeshes=True,
+    export_custom_normals=True
+):
+    glob.export_animations = export_animations
+    glob.export_custom_normals = export_custom_normals
+
     # Reset Pose
     bpy.context.scene.frame_set(defines.ANIM_GLOBSTART)
 
@@ -128,32 +137,33 @@ def save_mdl(filepath, export_custom_normals=True, export_for_tsl=False):
     mdl = MdlSaver(filepath, model, export_for_tsl)
     utils.measure_time(lambda: mdl.save())
 
-    # Export WOK
-    aabb_node = model.find_node(lambda node: isinstance(node, AabbNode))
-    if aabb_node:
-        base_path, _ = os.path.splitext(filepath)
-        wok_path = base_path + ".wok"
-        walkmesh = Walkmesh.from_aabb_node(aabb_node)
-        bwm = BwmSaver(wok_path, walkmesh)
-        utils.measure_time(lambda: bwm.save())
+    if export_walkmeshes:
+        # Export WOK
+        aabb_node = model.find_node(lambda node: isinstance(node, AabbNode))
+        if aabb_node:
+            base_path, _ = os.path.splitext(filepath)
+            wok_path = base_path + ".wok"
+            walkmesh = Walkmesh.from_aabb_node(aabb_node)
+            bwm = BwmSaver(wok_path, walkmesh)
+            utils.measure_time(lambda: bwm.save())
 
-    # Export PWK, DWK
-    xwk_roots = utils.get_children_recursive(mdl_root, lambda obj: utils.is_pwk_root(obj) or utils.is_dwk_root(obj))
-    for xwk_root in xwk_roots:
-        base_path, _ = os.path.splitext(filepath)
-        if utils.is_pwk_root(xwk_root):
-            xwk_path = base_path + ".pwk"
-        else:
-            if xwk_root.name.endswith("open1"):
-                dwk_state = 0
-            elif xwk_root.name.endswith("open2"):
-                dwk_state = 1
-            elif xwk_root.name.endswith("closed"):
-                dwk_state = 2
-            xwk_path = "{}{}.dwk".format(base_path, dwk_state)
-        walkmesh = Walkmesh.from_root_object(xwk_root)
-        bwm = BwmSaver(xwk_path, walkmesh)
-        utils.measure_time(lambda: bwm.save())
+        # Export PWK, DWK
+        xwk_roots = utils.get_children_recursive(mdl_root, lambda obj: utils.is_pwk_root(obj) or utils.is_dwk_root(obj))
+        for xwk_root in xwk_roots:
+            base_path, _ = os.path.splitext(filepath)
+            if utils.is_pwk_root(xwk_root):
+                xwk_path = base_path + ".pwk"
+            else:
+                if xwk_root.name.endswith("open1"):
+                    dwk_state = 0
+                elif xwk_root.name.endswith("open2"):
+                    dwk_state = 1
+                elif xwk_root.name.endswith("closed"):
+                    dwk_state = 2
+                xwk_path = "{}{}.dwk".format(base_path, dwk_state)
+            walkmesh = Walkmesh.from_root_object(xwk_root)
+            bwm = BwmSaver(xwk_path, walkmesh)
+            utils.measure_time(lambda: bwm.save())
 
 
 def save_lyt(filepath):
