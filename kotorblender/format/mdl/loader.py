@@ -155,7 +155,7 @@ class MdlLoader:
         self.model.subclassification = subclassification
         self.model.supermodel = supermodel_name
         self.model.animscale = scale
-        self.model.ignorefog = affected_by_fog == 0
+        self.model.affected_by_fog = affected_by_fog
 
     def load_names(self):
         self.names = []

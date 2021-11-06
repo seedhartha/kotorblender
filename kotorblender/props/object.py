@@ -92,7 +92,7 @@ class ObjectPropertyGroup(bpy.types.PropertyGroup):
                                                   (defines.Classification.FLYER,     "Flyer",     "Non-interactive scene elements",      64)],
                                            default=defines.Classification.UNKNOWN)
     subclassification: bpy.props.IntProperty(name="Unknown", description="Unknown byte-2 in the classification bytes section of the model header", default=0)
-    ignorefog: bpy.props.BoolProperty(name="Ignore Fog", description="If true, model will not be occluded by area fog in-game", default=False)
+    affected_by_fog: bpy.props.BoolProperty(name="Affected by Fog", description="If true, model will be occluded by area fog in-game", default=True)
     dummysubtype: bpy.props.EnumProperty(name="Subtype",
                                          items=[("NONE", "None", "Simple dummy object", 0),
                                                 ("USE1", "Use 1", "1st node for 'Use' animation", 1),

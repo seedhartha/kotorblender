@@ -46,7 +46,7 @@ class Model:
         self.supermodel = defines.NULL
         self.classification = defines.Classification.UNKNOWN
         self.subclassification = 0
-        self.ignorefog = False
+        self.affected_by_fog = True
         self.animroot = defines.NULL
         self.animscale = 1.0
 
@@ -65,7 +65,7 @@ class Model:
         root_obj.kb.supermodel = self.supermodel
         root_obj.kb.classification = self.classification
         root_obj.kb.subclassification = self.subclassification
-        root_obj.kb.ignorefog = self.ignorefog
+        root_obj.kb.affected_by_fog = self.affected_by_fog
         root_obj.kb.animroot = self.animroot
         root_obj.kb.animscale = self.animscale
 
@@ -160,7 +160,7 @@ class Model:
         model.supermodel = root_obj.kb.supermodel
         model.classification = root_obj.kb.classification
         model.subclassification = root_obj.kb.subclassification
-        model.ignorefog = root_obj.kb.ignorefog
+        model.affected_by_fog = root_obj.kb.affected_by_fog
         model.animroot = root_obj.kb.animroot
         model.animscale = root_obj.kb.animscale
 
