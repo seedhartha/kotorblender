@@ -55,7 +55,7 @@ class KB_OT_import_mdl(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
     import_armatures: bpy.props.BoolProperty(
         name="Import Armatures",
         description="Create armature from bone nodes",
-        default=True)
+        default=False)
 
     texture_search_recursive: bpy.props.BoolProperty(
         name="Recursive Texture Search",

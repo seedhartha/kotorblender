@@ -41,7 +41,7 @@ def load_mdl(
     import_animations=True,
     import_walkmeshes=True,
     import_materials=True,
-    import_armatures=True,
+    import_armatures=False,
     texture_search_recursive=False
 ):
     glob.import_normals = import_normals
@@ -148,7 +148,7 @@ def save_mdl(
             utils.measure_time(lambda: bwm.save())
 
         # Export PWK, DWK
-        xwk_roots = utils.get_children_recursive(mdl_root, lambda obj: utils.is_pwk_root(obj) or utils.is_dwk_root(obj))
+        xwk_roots = utils.find_objects(mdl_root, lambda obj: utils.is_pwk_root(obj) or utils.is_dwk_root(obj))
         for xwk_root in xwk_roots:
             base_path, _ = os.path.splitext(filepath)
             if utils.is_pwk_root(xwk_root):

@@ -57,12 +57,22 @@ def get_object_root(obj):
     return get_object_root(obj.parent)
 
 
-def get_children_recursive(obj, test=lambda _: True):
+def find_object(obj, test=lambda _: True):
+    if test(obj):
+        return obj
+    for child in obj.children:
+        match = find_object(child, test)
+        if match:
+            return match
+    return None
+
+
+def find_objects(obj, test=lambda _: True):
     nodes = []
     if test(obj):
         nodes.append(obj)
     for child in obj.children:
-        nodes.extend(get_children_recursive(child, test))
+        nodes.extend(find_objects(child, test))
     return nodes
 
 

@@ -20,7 +20,7 @@ import_normals = True
 import_animations = True
 import_walkmeshes = True
 import_materials = True
-import_armatures = True
+import_armatures = False
 
 export_animations = True
 export_custom_normals = True
