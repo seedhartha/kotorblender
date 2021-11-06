@@ -31,6 +31,10 @@ DATA_PATH_BY_LABEL = {
 
     # Lights
     "color": "color",
+    "radius": "kb.radius",
+    "shadowradius": "kb.shadowradius",
+    "verticaldisplacement": "kb.verticaldisplacement",
+    "multiplier": "kb.multiplier",
 
     # Emitters
     "alphastart": "kb.alphastart",

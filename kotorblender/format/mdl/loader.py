@@ -432,6 +432,9 @@ class MdlLoader:
             elif type_flags & NODE_LIGHT:
                 node.color = controllers[CTRL_LIGHT_COLOR][0].values if CTRL_LIGHT_COLOR in controllers else [1.0] * 3
                 node.radius = controllers[CTRL_LIGHT_RADIUS][0].values[0] if CTRL_LIGHT_RADIUS in controllers else 1.0
+                node.shadowradius = controllers[CTRL_LIGHT_SHADOWRADIUS][0].values[0] if CTRL_LIGHT_SHADOWRADIUS in controllers else 0.0
+                node.verticaldisplacement = controllers[CTRL_LIGHT_VERTICALDISPLACEMENT].values[0] if CTRL_LIGHT_VERTICALDISPLACEMENT in controllers else 0.0
+                node.radius = controllers[CTRL_LIGHT_RADIUS][0].values[0] if CTRL_LIGHT_RADIUS in controllers else 1.0
                 node.multiplier = controllers[CTRL_LIGHT_MULTIPLIER][0].values[0] if CTRL_LIGHT_MULTIPLIER in controllers else 1.0
             elif type_flags & NODE_EMITTER:
                 for val, key, dim in EMITTER_CONTROLLER_KEYS:
@@ -664,6 +667,10 @@ class MdlLoader:
                     node.keyframes["color"] = [[row.timekey] + row.values[:3] for row in controllers[CTRL_LIGHT_COLOR]]
                 if CTRL_LIGHT_RADIUS in controllers:
                     node.keyframes["radius"] = [[row.timekey] + [row.values[0]] for row in controllers[CTRL_LIGHT_RADIUS]]
+                if CTRL_LIGHT_SHADOWRADIUS in controllers:
+                    node.keyframes["shadowradius"] = [[row.timekey] + [row.values[0]] for row in controllers[CTRL_LIGHT_SHADOWRADIUS]]
+                if CTRL_LIGHT_VERTICALDISPLACEMENT in controllers:
+                    node.keyframes["verticaldisplacement"] = [[row.timekey] + [row.values[0]] for row in controllers[CTRL_LIGHT_VERTICALDISPLACEMENT]]
                 if CTRL_LIGHT_MULTIPLIER in controllers:
                     node.keyframes["multiplier"] = [[row.timekey] + [row.values[0]] for row in controllers[CTRL_LIGHT_MULTIPLIER]]
             if isinstance(supernode, EmitterNode):

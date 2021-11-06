@@ -49,6 +49,9 @@ class LightNode(GeometryNode):
         self.fadinglight = 1
         self.lensflares = 0
         self.flareradius = 1.0
+        self.shadowradius = 0.0
+        self.verticaldisplacement = 0.0
+
         self.flare_list = FlareList()
 
     def add_to_collection(self, collection):
@@ -76,6 +79,8 @@ class LightNode(GeometryNode):
         obj.kb.isdynamic = self.ndynamictype
         obj.kb.affectdynamic = (self.affectdynamic >= 1)
         obj.kb.flareradius = self.flareradius
+        obj.kb.shadowradius = self.shadowradius
+        obj.kb.verticaldisplacement = self.verticaldisplacement
 
         if (self.flareradius > 0) or (self.lensflares >= 1):
             obj.kb.lensflares = True
@@ -102,6 +107,8 @@ class LightNode(GeometryNode):
         self.ndynamictype = obj.kb.isdynamic
         self.affectdynamic = 1 if obj.kb.affectdynamic else 0
         self.flareradius = obj.kb.flareradius
+        self.shadowradius = obj.kb.shadowradius
+        self.verticaldisplacement = obj.kb.verticaldisplacement
 
         if obj.kb.lensflares:
             self.lensflares = 1
