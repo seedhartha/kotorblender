@@ -1212,25 +1212,35 @@ class MdlSaver:
             # Mesh Data
 
             if type_flags & NODE_MESH:
-                # Faces
+                # Face Adjacencies
+                face_adjacencies = []
+                for face_idx in range(num_faces):
+                    face_adjacencies.append([-1, -1, -1])
                 for face_idx, face in enumerate(node.facelist.vertices):
-                    # Adjacent Faces
-                    adjacent_faces = [0xffff] * 3
                     edges = [tuple(sorted(edge)) for edge in [(face[0], face[1]),
                                                               (face[1], face[2]),
                                                               (face[2], face[0])]]
-                    for adj_face_idx, adj_face in enumerate(node.facelist.vertices):
-                        if adj_face_idx == face_idx:
-                            continue
-                        adj_edges = set([tuple(sorted(edge)) for edge in [(adj_face[0], adj_face[1]),
-                                                                          (adj_face[1], adj_face[2]),
-                                                                          (adj_face[2], adj_face[0])]])
+                    for other_face_idx in range(face_idx + 1, num_faces):
+                        other_face = node.facelist.vertices[other_face_idx]
+                        other_edges = [tuple(sorted(edge)) for edge in [(other_face[0], other_face[1]),
+                                                                        (other_face[1], other_face[2]),
+                                                                        (other_face[2], other_face[0])]]
+                        adj_faces_found = 0
                         for i in range(3):
-                            if edges[i] in adj_edges:
-                                adjacent_faces[i] = adj_face_idx
-                        if all(map(lambda f: f != 0xffff, adjacent_faces)):
+                            if face_adjacencies[face_idx][i] != -1:
+                                adj_faces_found += 1
+                                continue
+                            for j in range(3):
+                                if edges[i] == other_edges[j]:
+                                    face_adjacencies[face_idx][i] = other_face_idx
+                                    face_adjacencies[other_face_idx][j] = face_idx
+                                    adj_faces_found += 1
+                                    break
+                        if adj_faces_found == 3:
                             break
 
+                # Faces
+                for face_idx, face in enumerate(node.facelist.vertices):
                     vert1 = Vector(node.verts[face[0]])
                     normal = Vector(node.facelist.normals[face_idx])
                     distance = -1.0 * (normal @ vert1)
@@ -1240,8 +1250,8 @@ class MdlSaver:
                         self.mdl.put_float(val)
                     self.mdl.put_float(distance)
                     self.mdl.put_uint32(material_id)
-                    for val in adjacent_faces:
-                        self.mdl.put_uint16(val)
+                    for val in face_adjacencies[face_idx]:
+                        self.mdl.put_int16(val)
                     for val in face:
                         self.mdl.put_uint16(val)
 
