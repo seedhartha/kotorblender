@@ -182,7 +182,6 @@ class MdlLoader:
 
     def load_nodes(self, offset, export_order, parent=None):
         self.mdl.seek(MDL_OFFSET + offset)
-        #print("Loading model node at {}".format(offset))
 
         type_flags = self.mdl.get_uint16()
         supernode_number = self.mdl.get_uint16()
@@ -427,23 +426,20 @@ class MdlLoader:
         if controller_arr.count > 0:
             controllers = self.load_controllers(controller_arr, controller_data_arr)
             if type_flags & NODE_MESH:
-                node.alpha = controllers[CTRL_MESH_ALPHA][0].values[0] if CTRL_MESH_ALPHA in controllers else 1.0
-                node.selfillumcolor = controllers[CTRL_MESH_SELFILLUMCOLOR][0].values if CTRL_MESH_SELFILLUMCOLOR in controllers else [0.0] * 3
+                node.alpha = controllers[CTRL_MESH_ALPHA][0][1] if CTRL_MESH_ALPHA in controllers else 1.0
+                node.selfillumcolor = controllers[CTRL_MESH_SELFILLUMCOLOR][0][1:] if CTRL_MESH_SELFILLUMCOLOR in controllers else [0.0] * 3
             elif type_flags & NODE_LIGHT:
-                node.color = controllers[CTRL_LIGHT_COLOR][0].values if CTRL_LIGHT_COLOR in controllers else [1.0] * 3
-                node.radius = controllers[CTRL_LIGHT_RADIUS][0].values[0] if CTRL_LIGHT_RADIUS in controllers else 1.0
-                node.shadowradius = controllers[CTRL_LIGHT_SHADOWRADIUS][0].values[0] if CTRL_LIGHT_SHADOWRADIUS in controllers else 0.0
-                node.verticaldisplacement = controllers[CTRL_LIGHT_VERTICALDISPLACEMENT].values[0] if CTRL_LIGHT_VERTICALDISPLACEMENT in controllers else 0.0
-                node.radius = controllers[CTRL_LIGHT_RADIUS][0].values[0] if CTRL_LIGHT_RADIUS in controllers else 1.0
-                node.multiplier = controllers[CTRL_LIGHT_MULTIPLIER][0].values[0] if CTRL_LIGHT_MULTIPLIER in controllers else 1.0
+                node.color = controllers[CTRL_LIGHT_COLOR][0][1:] if CTRL_LIGHT_COLOR in controllers else [1.0] * 3
+                node.radius = controllers[CTRL_LIGHT_RADIUS][0][1] if CTRL_LIGHT_RADIUS in controllers else 1.0
+                node.multiplier = controllers[CTRL_LIGHT_MULTIPLIER][0][1] if CTRL_LIGHT_MULTIPLIER in controllers else 1.0
             elif type_flags & NODE_EMITTER:
                 for val, key, dim in EMITTER_CONTROLLER_KEYS:
                     if val not in controllers:
                         continue
                     if dim == 1:
-                        setattr(node, key, controllers[val][0].values[0])
+                        setattr(node, key, controllers[val][0][1])
                     else:
-                        setattr(node, key, controllers[val][0].values[:dim])
+                        setattr(node, key, controllers[val][0][1:dim+1])
 
         if type_flags & NODE_LIGHT:
             self.mdl.seek(MDL_OFFSET + flare_size_arr.offset)
@@ -591,7 +587,6 @@ class MdlLoader:
 
     def load_animation(self, offset):
         self.mdl.seek(MDL_OFFSET + offset)
-        #print("Loading animation at {}".format(offset))
 
         fn_ptr1 = self.mdl.get_uint32()
         fn_ptr2 = self.mdl.get_uint32()
@@ -626,7 +621,6 @@ class MdlLoader:
 
     def load_anim_nodes(self, offset, anim, parent=None):
         self.mdl.seek(MDL_OFFSET + offset)
-        #print("Loading animation node at {}".format(offset))
 
         type_flags = self.mdl.get_uint16()
         supernode_number = self.mdl.get_uint16()
@@ -652,33 +646,31 @@ class MdlLoader:
             supernode = self.node_by_number[supernode_number]
             controllers = self.load_controllers(controller_arr, controller_data_arr)
             if CTRL_BASE_POSITION in controllers:
-                node.keyframes["position"] = [[row.timekey] + self.position_controller_to_vector(row.values, supernode.position) for row in controllers[CTRL_BASE_POSITION]]
+                positions = [self.add_vectors(row[1:4], supernode.position) for row in controllers[CTRL_BASE_POSITION]]
+                node.keyframes["position"] = [[row[0]] + positions[i] for i, row in enumerate(controllers[CTRL_BASE_POSITION])]
             if CTRL_BASE_ORIENTATION in controllers:
-                node.keyframes["orientation"] = [[row.timekey] + self.orientation_controller_to_quaternion(row.values) for row in controllers[CTRL_BASE_ORIENTATION]]
+                orientations = [self.orientation_controller_to_quaternion(row[1:]) for row in controllers[CTRL_BASE_ORIENTATION]]
+                node.keyframes["orientation"] = [[row[0]] + orientations[i] for i, row in enumerate(controllers[CTRL_BASE_ORIENTATION])]
             if CTRL_BASE_SCALE in controllers:
-                node.keyframes["scale"] = [[row.timekey] + [row.values[0]] for row in controllers[CTRL_BASE_SCALE]]
+                node.keyframes["scale"] = [row[:2] for row in controllers[CTRL_BASE_SCALE]]
             if isinstance(supernode, TrimeshNode):
                 if CTRL_MESH_ALPHA in controllers:
-                    node.keyframes["alpha"] = [[row.timekey] + [row.values[0]] for row in controllers[CTRL_MESH_ALPHA]]
+                    node.keyframes["alpha"] = [row[:2] for row in controllers[CTRL_MESH_ALPHA]]
                 if CTRL_MESH_SELFILLUMCOLOR in controllers:
-                    node.keyframes["selfillumcolor"] = [[row.timekey] + row.values[:3] for row in controllers[CTRL_MESH_SELFILLUMCOLOR]]
+                    node.keyframes["selfillumcolor"] = [row[:4] for row in controllers[CTRL_MESH_SELFILLUMCOLOR]]
             if isinstance(supernode, LightNode):
                 if CTRL_LIGHT_COLOR in controllers:
-                    node.keyframes["color"] = [[row.timekey] + row.values[:3] for row in controllers[CTRL_LIGHT_COLOR]]
+                    node.keyframes["color"] = [row[:4] for row in controllers[CTRL_LIGHT_COLOR]]
                 if CTRL_LIGHT_RADIUS in controllers:
-                    node.keyframes["radius"] = [[row.timekey] + [row.values[0]] for row in controllers[CTRL_LIGHT_RADIUS]]
-                if CTRL_LIGHT_SHADOWRADIUS in controllers:
-                    node.keyframes["shadowradius"] = [[row.timekey] + [row.values[0]] for row in controllers[CTRL_LIGHT_SHADOWRADIUS]]
-                if CTRL_LIGHT_VERTICALDISPLACEMENT in controllers:
-                    node.keyframes["verticaldisplacement"] = [[row.timekey] + [row.values[0]] for row in controllers[CTRL_LIGHT_VERTICALDISPLACEMENT]]
+                    node.keyframes["radius"] = [row[:2] for row in controllers[CTRL_LIGHT_RADIUS]]
                 if CTRL_LIGHT_MULTIPLIER in controllers:
-                    node.keyframes["multiplier"] = [[row.timekey] + [row.values[0]] for row in controllers[CTRL_LIGHT_MULTIPLIER]]
+                    node.keyframes["multiplier"] = [row[:2] for row in controllers[CTRL_LIGHT_MULTIPLIER]]
             if isinstance(supernode, EmitterNode):
                 for key in EMITTER_CONTROLLER_KEYS:
                     if not key[0] in controllers:
                         continue
                     num_columns = key[2]
-                    node.keyframes[key[1]] = [[row.timekey] + row.values[:num_columns] for row in controllers[key[0]]]
+                    node.keyframes[key[1]] = [row[:num_columns+1] for row in controllers[key[0]]]
 
         self.mdl.seek(MDL_OFFSET + children_arr.offset)
         child_offsets = [self.mdl.get_uint32() for _ in range(children_arr.count)]
@@ -711,11 +703,11 @@ class MdlLoader:
             else:
                 integral = False
                 num_columns = key.num_columns & 0xf
-                bezier = key.num_columns & 0x10
+                bezier = key.num_columns & CTRL_FLAG_BEZIER
                 if bezier:
                     num_columns *= 3
             values = [self.mdl.get_uint32() if integral else self.mdl.get_float() for _ in range(num_columns * key.num_rows)]
-            controllers[key.ctrl_type] = [ControllerRow(timekeys[i], values[i*num_columns:i*num_columns+num_columns]) for i in range(key.num_rows)]
+            controllers[key.ctrl_type] = [[timekeys[i]] + values[i*num_columns:i*num_columns+num_columns] for i in range(key.num_rows)]
         return controllers
 
     def get_node_type(self, flags):
@@ -754,12 +746,8 @@ class MdlLoader:
         except KeyError:
             raise MalformedFile("Invalid node type")
 
-    def position_controller_to_vector(self, values, base_position):
-        return [
-            values[0] + base_position[0],
-            values[1] + base_position[1],
-            values[2] + base_position[2]
-        ]
+    def add_vectors(self, a, b):
+        return [a[i] + b[i] for i in range(3)]
 
     def orientation_controller_to_quaternion(self, values):
         num_columns = len(values)

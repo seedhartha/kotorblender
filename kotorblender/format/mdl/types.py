@@ -170,19 +170,20 @@ AABB_NEGATIVE_Y = 0x10
 AABB_NEGATIVE_Z = 0x20
 
 NUM_SABER_VERTS = 176
+CTRL_FLAG_BEZIER = 0x10
 
 EMITTER_CONTROLLER_KEYS = [
     (CTRL_EMITTER_ALPHASTART, "alphastart", 1),
     (CTRL_EMITTER_ALPHAMID, "alphamid", 1),
     (CTRL_EMITTER_ALPHAEND, "alphaend", 1),
     (CTRL_EMITTER_BIRTHRATE, "birthrate", 1),
-    (CTRL_EMITTER_RANDOMBIRTHRATE, "random_birth_rate", 1),
+    (CTRL_EMITTER_RANDOMBIRTHRATE, "randombirthrate", 1),
     (CTRL_EMITTER_BOUNCE_CO, "bounce_co", 1),
     (CTRL_EMITTER_COMBINETIME, "combinetime", 1),
     (CTRL_EMITTER_DRAG, "drag", 1),
     (CTRL_EMITTER_FPS, "fps", 1),
-    (CTRL_EMITTER_FRAMEEND, "frame_end", 1),
-    (CTRL_EMITTER_FRAMESTART, "frame_start", 1),
+    (CTRL_EMITTER_FRAMEEND, "frameend", 1),
+    (CTRL_EMITTER_FRAMESTART, "framestart", 1),
     (CTRL_EMITTER_GRAV, "grav", 1),
     (CTRL_EMITTER_LIFEEXP, "lifeexp", 1),
     (CTRL_EMITTER_MASS, "mass", 1),
@@ -229,12 +230,3 @@ class ControllerKey:
         self.timekeys_start = timekeys_start
         self.values_start = values_start
         self.num_columns = num_columns
-
-
-class ControllerRow:
-    def __init__(self, timekey, values):
-        self.timekey = timekey
-        self.values = values
-
-    def __repr__(self):
-        return "{{timekey={}, values={}}}".format(self.timekey, self.values)

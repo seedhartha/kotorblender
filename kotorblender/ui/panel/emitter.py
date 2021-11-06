@@ -157,7 +157,7 @@ class KB_PT_emitter(bpy.types.Panel):
         if obj.kb.update == "Lightning":
             col.enabled = False
         col = row.column()
-        col.prop(obj.kb, "random_birth_rate", text="Random")
+        col.prop(obj.kb, "randombirthrate", text="Random")
         if obj.kb.update == "Lightning":
             col.enabled = False
         row = box.row()
