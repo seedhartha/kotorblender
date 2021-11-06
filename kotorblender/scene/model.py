@@ -73,10 +73,12 @@ class Model:
             self.import_nodes_to_collection(child, root_obj, collection)
 
         if glob.import_armatures:
-            armature = self.create_armature(root_obj)
+            armature_obj = self.create_armature(root_obj)
+        else:
+            armature_obj = None
 
         if glob.import_animations:
-            self.create_animations(root_obj, armature)
+            self.create_animations(root_obj, armature_obj)
 
         return root_obj
 
@@ -90,7 +92,7 @@ class Model:
 
     def create_armature(self, mdl_root):
         # MDL root must have at least one skinmesh
-        skinmeshes = utils.get_children_recursive(mdl_root, utils.is_skin_mesh)
+        skinmeshes = utils.find_objects(mdl_root, utils.is_skin_mesh)
         if not skinmeshes:
             return None
 
@@ -136,13 +138,15 @@ class Model:
         bone.matrix = obj.matrix_world
 
         for child in obj.children:
-            if utils.is_skin_mesh(child):
+            if child.type == 'EMPTY' and child.kb.dummytype != Dummytype.NONE:
+                continue
+            if child.type == 'MESH' and child.kb.meshtype != Meshtype.TRIMESH:
                 continue
             self.create_bones_recursive(armature, child, bone)
 
-    def create_animations(self, mdl_root, armature):
+    def create_animations(self, mdl_root, armature_obj):
         for anim in self.animations:
-            anim.add_to_objects(mdl_root, armature)
+            anim.add_to_objects(mdl_root, armature_obj)
 
     def find_node(self, test):
         return self.root_node.find_node(test)

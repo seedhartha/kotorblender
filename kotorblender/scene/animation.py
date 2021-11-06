@@ -19,6 +19,8 @@
 import math
 import re
 
+import bpy
+
 from ..defines import Dummytype
 
 from .. import defines, utils
@@ -37,21 +39,38 @@ class Animation:
 
         self.events = []
 
-    def add_to_objects(self, mdl_root, armature):
+    def add_to_objects(self, mdl_root, armature_obj):
         list_anim = Animation.append_to_object(mdl_root, self.name, self.length, self.transtime, self.animroot)
         for time, name in self.events:
             Animation.append_event_to_object_anim(list_anim, name, time)
 
-        objects = utils.get_children_recursive(mdl_root)
-        object_by_number = {obj.kb.node_number: obj for obj in objects}
-        self.add_nodes_to_objects(self.root_node, object_by_number, list_anim, mdl_root.name)
+        self.add_nodes_to_objects(list_anim, self.root_node, mdl_root, armature_obj)
 
-    def add_nodes_to_objects(self, node, object_by_number, anim, root_name):
-        if node.supernode_number in object_by_number:
-            obj = object_by_number[node.supernode_number]
-            node.add_keyframes_to_object(anim, obj, root_name)
+        if armature_obj:
+            # Enter Pose Mode
+            bpy.ops.object.mode_set(mode='POSE')
+
+            self.add_nodes_to_armature_bones(list_anim, self.root_node, armature_obj)
+
+            # Enter Object Mode
+            bpy.ops.object.mode_set(mode='OBJECT')
+
+    def add_nodes_to_objects(self, anim, node, mdl_root, armature_obj):
+        obj = utils.find_object(mdl_root, lambda o: o.kb.node_number == node.supernode_number)
+        if obj:
+            exclude_spatial = armature_obj and obj.name in armature_obj.pose.bones
+            node.add_keyframes_to_object(anim, obj, mdl_root.name, exclude_spatial)
+
         for child in node.children:
-            self.add_nodes_to_objects(child, object_by_number, anim, root_name)
+            self.add_nodes_to_objects(anim, child, mdl_root, armature_obj)
+
+    def add_nodes_to_armature_bones(self, anim, node, armature_obj):
+        if node.name in armature_obj.pose.bones:
+            bone = armature_obj.pose.bones[node.name]
+            node.add_keyframes_to_armature_bone(anim, armature_obj, bone)
+
+        for child in node.children:
+            self.add_nodes_to_armature_bones(anim, child, armature_obj)
 
     @classmethod
     def append_to_object(cls, mdl_root, name, length=0.0, transtime=0.25, animroot=defines.NULL):

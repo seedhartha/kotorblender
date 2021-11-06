@@ -18,6 +18,8 @@
 
 import bpy
 
+from mathutils import Matrix, Quaternion, Vector
+
 from .. import defines
 
 DATA_PATH_BY_LABEL = {
@@ -107,18 +109,12 @@ class AnimationNode:
 
         self.animated = False  # this node or its children contain keyframes
 
-    def add_keyframes_to_object(self, anim, obj, root_name):
+    def add_keyframes_to_object(self, anim, obj, root_name, exclude_spatial):
         for label, data in self.keyframes.items():
+            if label in ["position", "orientation"] and exclude_spatial:
+                continue
             if label not in DATA_PATH_BY_LABEL or not data:
                 continue
-            if label in CONVERTER_BY_LABEL:
-                converter = CONVERTER_BY_LABEL[label]
-                values = [converter(d[1:]) for d in data]
-            else:
-                values = [d[1:] for d in data]
-
-            frames = [anim.frame_start + defines.FPS * d[0] for d in data]
-            dim = len(values[0])
 
             # Action
 
@@ -131,6 +127,18 @@ class AnimationNode:
             if obj.type == 'LIGHT' and label == "color":
                 target = obj.data
             self.get_or_create_animation_data(target, action)
+
+            # Convert to frames, values
+
+            frames = [anim.frame_start + defines.FPS * d[0] for d in data]
+
+            if label in CONVERTER_BY_LABEL:
+                converter = CONVERTER_BY_LABEL[label]
+                values = [converter(d[1:]) for d in data]
+            else:
+                values = [d[1:] for d in data]
+
+            dim = len(values[0])
 
             # Keyframe Points
 
@@ -159,6 +167,33 @@ class AnimationNode:
                     keyframe_points[i].insert(frame, val[i], options={'FAST'})
             for kfp in keyframe_points:
                 kfp.update()
+
+    def add_keyframes_to_armature_bone(self, anim, armature_obj, bone):
+        positions = []
+        orientations = []
+
+        for label, data in self.keyframes.items():
+            if label == "position":
+                positions = [(anim.frame_start + defines.FPS * d[0], Vector(d[1:])) for d in data]
+            elif label == "orientation":
+                orientations = [(anim.frame_start + defines.FPS * d[0], Quaternion(d[1:])) for d in data]
+            else:
+                continue
+
+        restmat = bone.bone.matrix_local
+        if bone.parent:
+            restmat = bone.parent.bone.matrix_local.inverted() @ restmat
+        restmat_inv = restmat.inverted()
+
+        for frame, position in positions:
+            bonemat = Matrix.Translation(position) @ restmat.to_quaternion().to_matrix().to_4x4()
+            bone.matrix_basis = restmat_inv @ bonemat
+            bone.keyframe_insert("location", frame=frame)
+
+        for frame, orientation in orientations:
+            bonemat = Matrix.Translation(restmat.to_translation()) @ orientation.to_matrix().to_4x4()
+            bone.matrix_basis = restmat_inv @ bonemat
+            bone.keyframe_insert("rotation_quaternion", frame=frame)
 
     def load_keyframes_from_object(self, anim, obj):
         anim_data = obj.animation_data
