@@ -616,7 +616,7 @@ class MdlSaver:
     def save_model_header(self):
         classification = next(iter(key for key, value in CLASS_BY_VALUE.items() if value == self.model.classification))
         subclassification = self.model.subclassification
-        affected_by_fog = 0 if self.model.ignorefog else 1
+        affected_by_fog = 1 if self.model.affected_by_fog else 0
         num_child_models = 0
         supermodel_ref = 0
         bounding_box = [-5.0, -5.0, -1.0, 5.0, 5.0, 10.0]
