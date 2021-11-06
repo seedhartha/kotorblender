@@ -85,7 +85,6 @@ class Model:
     def import_nodes_to_collection(self, node, parent_obj, collection):
         obj = node.add_to_collection(collection)
         obj.parent = parent_obj
-        obj.matrix_parent_inverse = parent_obj.matrix_world.inverted()
 
         for child in node.children:
             self.import_nodes_to_collection(child, obj, collection)
