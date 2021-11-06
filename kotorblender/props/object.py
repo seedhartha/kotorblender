@@ -18,7 +18,7 @@
 
 import bpy
 
-from ..scene import light
+from ..scene.modelnode.light import LightNode
 
 from .. import defines, utils
 
@@ -29,7 +29,7 @@ from .pathconnection import PathConnectionPropertyGroup
 
 def update_light_power(self, context):
     if context.object and context.object.type == 'LIGHT':
-        light.calc_light_power(context.object)
+        LightNode.calc_light_power(context.object)
 
 
 def update_shadow_prop(self, context):

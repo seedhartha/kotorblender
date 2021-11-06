@@ -18,8 +18,6 @@
 
 import bpy
 
-from .. import light
-
 from .geometry import GeometryNode
 
 
@@ -88,7 +86,7 @@ class LightNode(GeometryNode):
                 newItem.size = self.flare_list.sizes[i]
                 newItem.position = self.flare_list.positions[i]
 
-        light.calc_light_power(obj)
+        LightNode.calc_light_power(obj)
 
     def load_object_data(self, obj):
         GeometryNode.load_object_data(self, obj)
@@ -111,3 +109,10 @@ class LightNode(GeometryNode):
                 self.flare_list.sizes.append(item.size)
                 self.flare_list.positions.append(item.position)
                 self.flare_list.colorshifts.append(item.colorshift)
+
+    @classmethod
+    def calc_light_power(cls, light):
+        """
+        Calculate Eevee light power from Aurora light radius and multiplier
+        """
+        light.data.energy = light.kb.multiplier * light.kb.radius * light.kb.radius
