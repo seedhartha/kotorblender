@@ -54,10 +54,10 @@ class KB_PT_animlist(bpy.types.Panel):
         col.operator("kb.anim_new", icon='ADD', text="")
         col.operator("kb.anim_delete", icon='REMOVE', text="")
         col.separator()
-        col.operator("kb.anim_move",
-                     icon='TRIA_UP', text="").direction = "UP"
-        col.operator("kb.anim_move",
-                     icon='TRIA_DOWN', text="").direction = "DOWN"
+        col.operator("kb.anim_move", icon='TRIA_UP', text="").direction = "UP"
+        col.operator("kb.anim_move", icon='TRIA_DOWN', text="").direction = "DOWN"
+        col.separator()
+        col.operator("kb.anim_focus", icon='PLAY', text="")
         anim_list = mdl_root.kb.anim_list
         anim_list_idx = mdl_root.kb.anim_list_idx
         if anim_list_idx >= 0 and len(anim_list) > anim_list_idx:
