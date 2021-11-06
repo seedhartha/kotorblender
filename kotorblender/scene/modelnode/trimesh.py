@@ -210,12 +210,13 @@ class TrimeshNode(GeometryNode):
         self.uv1 = self.get_uv_from_uv_layer(mesh, UV_MAP_DIFFUSE)
         self.uv2 = self.get_uv_from_uv_layer(mesh, UV_MAP_LIGHTMAP)
 
-        if self.tangentspace and self.uv1:
-            mesh.calc_tangents(uvmap=UV_MAP_DIFFUSE)
+        if self.tangentspace:
             num_verts = len(mesh.vertices)
             self.tangents = [Vector() for _ in range(num_verts)]
             self.bitangents = [Vector() for _ in range(num_verts)]
             self.tangentspacenormals = [Vector() for _ in range(num_verts)]
+            if self.uv1:
+                mesh.calc_tangents(uvmap=UV_MAP_DIFFUSE)
 
         for tri in mesh.loop_triangles:
             self.facelist.vertices.append(tri.vertices[:3])
@@ -230,11 +231,17 @@ class TrimeshNode(GeometryNode):
                     self.bitangents[vert_idx] += loop.bitangent
                     self.tangentspacenormals[vert_idx] += loop.normal
 
-        if self.tangentspace and self.uv1:
-            for vert_idx in range(num_verts):
-                self.tangents[vert_idx].normalize()
-                self.bitangents[vert_idx].normalize()
-                self.tangentspacenormals[vert_idx].normalize()
+        if self.tangentspace:
+            if self.uv1:
+                for vert_idx in range(num_verts):
+                    self.tangents[vert_idx].normalize()
+                    self.bitangents[vert_idx].normalize()
+                    self.tangentspacenormals[vert_idx].normalize()
+            else:
+                for vert_idx in range(num_verts):
+                    self.tangents[vert_idx] = Vector((1.0, 0.0, 0.0))
+                    self.bitangents[vert_idx] = Vector((0.0, 1.0, 0.0))
+                    self.tangentspacenormals[vert_idx] = Vector((0.0, 0.0, 1.0))
 
     def get_uv_from_uv_layer(self, mesh, layer_name):
         if not layer_name in mesh.uv_layers:
