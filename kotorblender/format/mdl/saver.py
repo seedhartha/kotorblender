@@ -1225,18 +1225,18 @@ class MdlSaver:
                         other_edges = [tuple(sorted(edge)) for edge in [(other_face[0], other_face[1]),
                                                                         (other_face[1], other_face[2]),
                                                                         (other_face[2], other_face[0])]]
-                        adj_faces_found = 0
+                        num_adj_faces = 0
                         for i in range(3):
                             if face_adjacencies[face_idx][i] != -1:
-                                adj_faces_found += 1
+                                num_adj_faces += 1
                                 continue
                             for j in range(3):
                                 if edges[i] == other_edges[j]:
                                     face_adjacencies[face_idx][i] = other_face_idx
                                     face_adjacencies[other_face_idx][j] = face_idx
-                                    adj_faces_found += 1
+                                    num_adj_faces += 1
                                     break
-                        if adj_faces_found == 3:
+                        if num_adj_faces == 3:
                             break
 
                 # Faces

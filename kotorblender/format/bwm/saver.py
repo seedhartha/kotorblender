@@ -191,25 +191,27 @@ class BwmSaver:
 
     def peek_edges(self):
         # Adjacent Edges
+        for _ in range(self.num_walkable_faces):
+            self.adjacent_edges.append([-1, -1, -1])
         for face_idx in range(self.num_walkable_faces):
             face = self.facelist.vertices[face_idx]
-            adj_edges = [-1] * 3
             edges = [tuple(sorted(edge)) for edge in [(face[0], face[1]), (face[1], face[2]), (face[2], face[0])]]
-            for other_face_idx in range(self.num_walkable_faces):
-                if other_face_idx == face_idx:
-                    continue
+            for other_face_idx in range(face_idx + 1, self.num_walkable_faces):
                 other_face = self.facelist.vertices[other_face_idx]
                 other_edges = [tuple(sorted(edge)) for edge in [(other_face[0], other_face[1]), (other_face[1], other_face[2]), (other_face[2], other_face[0])]]
+                num_adj_edges = 0
                 for i in range(3):
-                    if adj_edges[i] != -1:
+                    if self.adjacent_edges[face_idx][i] != -1:
+                        num_adj_edges += 1
                         continue
                     for j in range(3):
-                        if other_edges[j] == edges[i]:
-                            adj_edges[i] = 3 * other_face_idx + j
+                        if edges[i] == other_edges[j]:
+                            self.adjacent_edges[face_idx][i] = 3 * other_face_idx + j
+                            self.adjacent_edges[other_face_idx][j] = 3 * face_idx + i
+                            num_adj_edges += 1
                             break
-                if all(map(lambda x: x != -1, adj_edges)):
+                if num_adj_edges == 3:
                     break
-            self.adjacent_edges.append(adj_edges)
 
         # Outer Edges, Perimeters
         visited_edges = set()
