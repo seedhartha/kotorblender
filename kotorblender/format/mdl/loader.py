@@ -138,7 +138,7 @@ class MdlLoader:
         radius = self.mdl.get_float()
         scale = self.mdl.get_float()
         supermodel_name = self.mdl.get_c_string_up_to(32)
-        off_head_root_node = self.mdl.get_uint32()
+        self.off_anim_root = self.mdl.get_uint32()
         self.mdl.skip(4)  # padding
 
         mdx_size = self.mdl.get_uint32()
@@ -156,7 +156,6 @@ class MdlLoader:
         self.model.supermodel = supermodel_name
         self.model.animscale = scale
         self.model.ignorefog = affected_by_fog == 0
-        self.model.headlink = off_head_root_node != self.off_root_node
 
     def load_names(self):
         self.names = []
@@ -212,6 +211,9 @@ class MdlLoader:
         node.position = position
         node.orientation = orientation
         node.from_root = node.from_root @ Matrix.Translation(Vector(position)) @ Quaternion(orientation).to_matrix().to_4x4()
+
+        if offset == self.off_anim_root:
+            self.model.animroot = name
 
         if type_flags & NODE_LIGHT:
             flare_radius = self.mdl.get_float()

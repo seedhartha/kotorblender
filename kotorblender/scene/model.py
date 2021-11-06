@@ -18,7 +18,7 @@
 
 import re
 
-from ..defines import DummySubtype, Dummytype, Meshtype, Nodetype
+from ..defines import Dummytype, Meshtype, Nodetype
 from ..exception.malformedfile import MalformedFile
 
 from .. import defines, glob, utils
@@ -42,11 +42,11 @@ class Model:
     def __init__(self):
         self.name = "UNNAMED"
         self.supermodel = defines.NULL
-        self.animscale = 1.0
         self.classification = defines.Classification.UNKNOWN
         self.subclassification = 0
         self.ignorefog = False
-        self.headlink = False
+        self.animroot = defines.NULL
+        self.animscale = 1.0
 
         self.root_node = None
         self.animations = []
@@ -64,7 +64,7 @@ class Model:
         root_obj.kb.classification = self.classification
         root_obj.kb.subclassification = self.subclassification
         root_obj.kb.ignorefog = self.ignorefog
-        root_obj.kb.headlink = self.headlink
+        root_obj.kb.animroot = self.animroot
         root_obj.kb.animscale = self.animscale
 
         for child in self.root_node.children:
@@ -76,7 +76,7 @@ class Model:
             armature_object = None
 
         if glob.import_animations:
-            self.create_animations(root_obj, armature_object)
+            self.create_animations(root_obj)
 
         return root_obj
 
@@ -88,7 +88,7 @@ class Model:
         for child in node.children:
             self.import_nodes_to_collection(child, obj, collection)
 
-    def create_animations(self, mdl_root, armature_object):
+    def create_animations(self, mdl_root):
         for anim in self.animations:
             anim.add_to_objects(mdl_root)
 
@@ -105,7 +105,7 @@ class Model:
         model.classification = root_obj.kb.classification
         model.subclassification = root_obj.kb.subclassification
         model.ignorefog = root_obj.kb.ignorefog
-        model.headlink = root_obj.kb.headlink
+        model.animroot = root_obj.kb.animroot
         model.animscale = root_obj.kb.animscale
 
         model.root_node = cls.model_node_from_object(root_obj)

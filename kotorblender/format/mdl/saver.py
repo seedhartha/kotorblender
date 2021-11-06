@@ -24,13 +24,11 @@ from mathutils import Vector
 
 from ...defines import Nodetype
 
-from ... import aabb
+from ... import aabb, utils
 
 from ..binwriter import BinaryWriter
 
 from .types import *
-
-NECK_BONE_NAME = "neck_g"
 
 
 class MdlSaver:
@@ -709,10 +707,10 @@ class MdlSaver:
         scale = self.model.animscale
         supermodel_name = self.model.supermodel.ljust(32, '\0')
 
-        head_root_idx = 0
-        if self.model.headlink and self.node_names.count(NECK_BONE_NAME) > 0:
-            head_root_idx = self.node_names.index(NECK_BONE_NAME)
-        off_head_root_node = self.node_offsets[head_root_idx]
+        if not utils.is_null(self.model.animroot) and self.node_names.count(self.model.animroot) > 0:
+            off_anim_root = self.node_offsets[self.node_names.index(self.model.animroot)]
+        else:
+            off_anim_root = self.node_offsets[0]
 
         mdx_size = self.mdx_size
         mdx_offset = 0
@@ -729,7 +727,7 @@ class MdlSaver:
         self.mdl.put_float(radius)
         self.mdl.put_float(scale)
         self.mdl.put_string(supermodel_name)
-        self.mdl.put_uint32(off_head_root_node)
+        self.mdl.put_uint32(off_anim_root)
         self.mdl.put_uint32(0)  # unknown
         self.mdl.put_uint32(mdx_size)
         self.mdl.put_uint32(mdx_offset)
