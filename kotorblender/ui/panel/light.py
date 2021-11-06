@@ -56,6 +56,10 @@ class KB_PT_light(bpy.types.Panel):
         row.prop(obj.kb, "radius", text="Radius")
         row = box.row()
         row.prop(obj.kb, "multiplier", text="Multiplier")
+        row = box.row()
+        row.prop(obj.kb, "shadowradius", text="Shadow Radius")
+        row = box.row()
+        row.prop(obj.kb, "verticaldisplacement", text="Vertical Displacement")
 
         split = box.split()
         col = split.column(align=True)

@@ -184,6 +184,8 @@ class ObjectPropertyGroup(bpy.types.PropertyGroup):
     flareradius: bpy.props.FloatProperty(name="Flare Radius", default=0.0, min=0.0, max=1000000.0)
     flare_list: bpy.props.CollectionProperty(type=FlarePropertyGroup)
     flare_listIdx: bpy.props.IntProperty(name="Index for flare list", default=0)
+    shadowradius: bpy.props.FloatProperty(name="Shadow Radius", default=0.0, min=0.0, max=100.0)
+    verticaldisplacement: bpy.props.FloatProperty(name="Vertical Displacement", default=0.0, min=0.0, max=10.0)
 
     # Point lights in Eevee do not have equivalent for Aurora light multiplier and radius
     radius: bpy.props.FloatProperty(name="Radius", default=0.0, min=0.0, max=10000.0, update=update_light_power)

@@ -637,6 +637,30 @@ class MdlSaver:
                         out_data.append(val)
                 data_count += (1 + num_columns) * num_rows
 
+            if "shadowradius" in node.keyframes:
+                keyframes = node.keyframes["shadowradius"]
+                num_rows = len(keyframes)
+                num_columns = 1
+                out_keys.append(ControllerKey(CTRL_LIGHT_SHADOWRADIUS, num_rows, data_count, data_count + num_rows, num_columns))
+                for i in range(num_rows):
+                    out_data.append(keyframes[i][0])  # timekey
+                for i in range(num_rows):
+                    for val in keyframes[i][1:1+num_columns]:
+                        out_data.append(val)
+                data_count += (1 + num_columns) * num_rows
+
+            if "verticaldisplacement" in node.keyframes:
+                keyframes = node.keyframes["verticaldisplacement"]
+                num_rows = len(keyframes)
+                num_columns = 1
+                out_keys.append(ControllerKey(CTRL_LIGHT_VERTICALDISPLACEMENT, num_rows, data_count, data_count + num_rows, num_columns))
+                for i in range(num_rows):
+                    out_data.append(keyframes[i][0])  # timekey
+                for i in range(num_rows):
+                    for val in keyframes[i][1:1+num_columns]:
+                        out_data.append(val)
+                data_count += (1 + num_columns) * num_rows
+
             if "multiplier" in node.keyframes:
                 keyframes = node.keyframes["multiplier"]
                 num_rows = len(keyframes)
