@@ -36,7 +36,6 @@ def create_image(name, path):
         ncase_cmp=True)
 
     if image is None:
-        print("KotorBlender: WARNING - could not load image '{}' from '{}'".format(name, path))
         image = bpy.data.images.new(name, 512, 512)
     else:
         image.name = name
