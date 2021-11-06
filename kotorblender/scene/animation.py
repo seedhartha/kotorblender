@@ -37,7 +37,7 @@ class Animation:
 
         self.events = []
 
-    def add_to_objects(self, mdl_root):
+    def add_to_objects(self, mdl_root, armature):
         list_anim = Animation.append_to_object(mdl_root, self.name, self.length, self.transtime, self.animroot)
         for time, name in self.events:
             Animation.append_event_to_object_anim(list_anim, name, time)

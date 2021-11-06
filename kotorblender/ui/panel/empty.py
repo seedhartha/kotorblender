@@ -66,7 +66,6 @@ class KB_PT_empty(bpy.types.Panel):
             col.prop(obj.kb, "ignorefog", text="")
             col.prop(obj.kb, "animroot", text="")
             col.prop(obj.kb, "animscale", text="")
-            box.operator("kb.recreate_armature")
             layout.separator()
 
         elif (obj.kb.dummytype == defines.Dummytype.PWKROOT):
