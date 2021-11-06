@@ -23,6 +23,7 @@ from .ops.anim.delete import KB_OT_anim_delete
 from .ops.anim.event.delete import KB_OT_anim_event_delete
 from .ops.anim.event.move import KB_OT_anim_event_move
 from .ops.anim.event.new import KB_OT_anim_event_new
+from .ops.anim.focus import KB_OT_anim_focus
 from .ops.anim.move import KB_OT_anim_move
 from .ops.anim.new import KB_OT_anim_new
 from .ops.lightflare.delete import KB_OT_delete_lightflare
@@ -117,6 +118,7 @@ classes = (
     KB_OT_rebuild_material_nodes,
     KB_OT_recreate_armature,
     KB_OT_anim_event_move,
+    KB_OT_anim_focus,
     KB_OT_anim_move,
     KB_OT_move_lightflare,
     KB_OT_anim_event_new,
