@@ -266,7 +266,7 @@ class MdlSaver:
                     self.mdl_pos += 4 * len(node.flare_list.positions)
 
                     self.flare_colorshifts_offsets[node_idx] = self.mdl_pos
-                    self.mdl_pos += 4 * 3 * len(node.flare_light.colorshifts)
+                    self.mdl_pos += 4 * 3 * len(node.flare_list.colorshifts)
 
                     self.flare_texture_offset_offsets[node_idx] = self.mdl_pos
                     self.mdl_pos += 4 * len(node.flare_list.textures)
