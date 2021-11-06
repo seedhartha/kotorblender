@@ -32,8 +32,6 @@ DATA_PATH_BY_LABEL = {
     # Lights
     "color": "color",
     "radius": "kb.radius",
-    "shadowradius": "kb.shadowradius",
-    "verticaldisplacement": "kb.verticaldisplacement",
     "multiplier": "kb.multiplier",
 
     # Emitters
@@ -41,13 +39,13 @@ DATA_PATH_BY_LABEL = {
     "alphamid": "kb.alphamid",
     "alphaend": "kb.alphaend",
     "birthrate": "kb.birthrate",
-    "random_birth_rate": "kb.random_birth_rate",
+    "randombirthrate": "kb.randombirthrate",
     "bounce_co": "kb.bounce_co",
     "combinetime": "kb.combinetime",
     "drag": "kb.drag",
     "fps": "kb.fps",
-    "frame_end": "kb.frame_end",
-    "frame_start": "kb.frame_start",
+    "frameend": "kb.frameend",
+    "framestart": "kb.framestart",
     "grav": "kb.grav",
     "lifeexp": "kb.lifeexp",
     "mass": "kb.mass",

@@ -184,8 +184,6 @@ class ObjectPropertyGroup(bpy.types.PropertyGroup):
     flareradius: bpy.props.FloatProperty(name="Flare Radius", default=0.0, min=0.0, max=1000000.0)
     flare_list: bpy.props.CollectionProperty(type=FlarePropertyGroup)
     flare_listIdx: bpy.props.IntProperty(name="Index for flare list", default=0)
-    shadowradius: bpy.props.FloatProperty(name="Shadow Radius", default=0.0, min=0.0, max=100.0)
-    verticaldisplacement: bpy.props.FloatProperty(name="Vertical Displacement", default=0.0, min=0.0, max=10.0)
 
     # Point lights in Eevee do not have equivalent for Aurora light multiplier and radius
     radius: bpy.props.FloatProperty(name="Radius", default=0.0, min=0.0, max=10000.0, update=update_light_power)
@@ -237,7 +235,7 @@ class ObjectPropertyGroup(bpy.types.PropertyGroup):
     percentend: bpy.props.FloatProperty(name="Percent end", description="Percent end", default=1.0, min=0.0, max=1.0)
     sizemid: bpy.props.FloatProperty(name="sizeMid", description="x size mid", default=1.0, min=0.0)
     sizemid_y: bpy.props.FloatProperty(name="sizeMid_y", description="y size mid", default=0.0, min=0.0)
-    random_birth_rate: bpy.props.FloatProperty(name="Random Birthrate", description="Random Birthrate", default=10.0, min=0.0)
+    randombirthrate: bpy.props.FloatProperty(name="Random Birthrate", description="Random Birthrate", default=10.0, min=0.0)
     targetsize: bpy.props.IntProperty(name="Target Size", description="Target Size", default=1, min=0)
     numcontrolpts: bpy.props.IntProperty(name="# of Control Points", description="Number of Control Points", default=0, min=0)
     controlptradius: bpy.props.FloatProperty(name="Control Point Radius", description="Control Point Radius", default=0.0, min=0.0)

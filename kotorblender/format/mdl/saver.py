@@ -536,6 +536,23 @@ class MdlSaver:
                 data_count += 1 + dim
 
     def peek_anim_controllers(self, model_node, node, type_flags, out_keys, out_data):
+
+        def append_keyframes(key, ctrl_type, num_columns, data_count, converter=None):
+            if key not in node.keyframes:
+                return data_count
+            keyframes = node.keyframes[key]
+            num_rows = len(keyframes)
+            out_keys.append(ControllerKey(ctrl_type, num_rows, data_count, data_count + num_rows, num_columns))
+            for i in range(num_rows):
+                out_data.append(keyframes[i][0])  # timekey
+            for i in range(num_rows):
+                values = keyframes[i][1:1+num_columns]
+                if converter:
+                    values = converter(values)
+                for val in values:
+                    out_data.append(val)
+            return data_count + (1 + num_columns) * num_rows
+
         if not node.parent:
             return
 
@@ -543,152 +560,28 @@ class MdlSaver:
 
         # Base Controllers
 
-        if "position" in node.keyframes:
-            keyframes = node.keyframes["position"]
-            num_rows = len(keyframes)
-            num_columns = 3
-            out_keys.append(ControllerKey(CTRL_BASE_POSITION, num_rows, data_count, data_count + num_rows, num_columns))
-            for i in range(num_rows):
-                out_data.append(keyframes[i][0])  # timekey
-            for i in range(num_rows):
-                values = keyframes[i][1:1+num_columns]
-                position = Vector(values) - model_node.position
-                for val in position:
-                    out_data.append(val)
-            data_count += (1 + num_columns) * num_rows
-
-        if "orientation" in node.keyframes:
-            keyframes = node.keyframes["orientation"]
-            num_rows = len(keyframes)
-            num_columns = 4
-            out_keys.append(ControllerKey(CTRL_BASE_ORIENTATION, num_rows, data_count, data_count + num_rows, num_columns))
-            for i in range(num_rows):
-                out_data.append(keyframes[i][0])  # timekey
-            for i in range(num_rows):
-                values = keyframes[i][1:1+num_columns]
-                for val in values[1:4]:
-                    out_data.append(val)
-                out_data.append(values[0])
-            data_count += (1 + num_columns) * num_rows
-
-        if "scale" in node.keyframes:
-            keyframes = node.keyframes["scale"]
-            num_rows = len(keyframes)
-            num_columns = 1
-            out_keys.append(ControllerKey(CTRL_BASE_SCALE, num_rows, data_count, data_count + num_rows, num_columns))
-            for i in range(num_rows):
-                out_data.append(keyframes[i][0])  # timekey
-            for i in range(num_rows):
-                for val in keyframes[i][1:1+num_columns]:
-                    out_data.append(val)
-            data_count += (1 + num_columns) * num_rows
+        data_count = append_keyframes("position", CTRL_BASE_POSITION, 3, data_count, lambda values: (Vector(values) - model_node.position)[:3])
+        data_count = append_keyframes("orientation", CTRL_BASE_ORIENTATION, 4, data_count, lambda values: [*values[1:4], values[0]])
+        data_count = append_keyframes("scale", CTRL_BASE_SCALE, 1, data_count)
 
         # Mesh Controllers
 
         if type_flags & NODE_MESH:
-            if "selfillumcolor" in node.keyframes:
-                keyframes = node.keyframes["selfillumcolor"]
-                num_rows = len(keyframes)
-                num_columns = 3
-                out_keys.append(ControllerKey(CTRL_MESH_SELFILLUMCOLOR, num_rows, data_count, data_count + num_rows, num_columns))
-                for i in range(num_rows):
-                    out_data.append(keyframes[i][0])  # timekey
-                for i in range(num_rows):
-                    for val in keyframes[i][1:1+num_columns]:
-                        out_data.append(val)
-                data_count += (1 + num_columns) * num_rows
-
-            if "alpha" in node.keyframes:
-                keyframes = node.keyframes["alpha"]
-                num_rows = len(keyframes)
-                num_columns = 1
-                out_keys.append(ControllerKey(CTRL_MESH_ALPHA, num_rows, data_count, data_count + num_rows, num_columns))
-                for i in range(num_rows):
-                    out_data.append(keyframes[i][0])  # timekey
-                for i in range(num_rows):
-                    for val in keyframes[i][1:1+num_columns]:
-                        out_data.append(val)
-                data_count += (1 + num_columns) * num_rows
+            data_count = append_keyframes("selfillumcolor", CTRL_MESH_SELFILLUMCOLOR, 3, data_count)
+            data_count = append_keyframes("alpha", CTRL_MESH_ALPHA, 1, data_count)
 
         # Light Controllers
 
         if type_flags & NODE_LIGHT:
-            if "color" in node.keyframes:
-                keyframes = node.keyframes["color"]
-                num_rows = len(keyframes)
-                num_columns = 3
-                out_keys.append(ControllerKey(CTRL_LIGHT_COLOR, num_rows, data_count, data_count + num_rows, num_columns))
-                for i in range(num_rows):
-                    out_data.append(keyframes[i][0])  # timekey
-                for i in range(num_rows):
-                    for val in keyframes[i][1:1+num_columns]:
-                        out_data.append(val)
-                data_count += (1 + num_columns) * num_rows
-
-            if "radius" in node.keyframes:
-                keyframes = node.keyframes["radius"]
-                num_rows = len(keyframes)
-                num_columns = 1
-                out_keys.append(ControllerKey(CTRL_LIGHT_RADIUS, num_rows, data_count, data_count + num_rows, num_columns))
-                for i in range(num_rows):
-                    out_data.append(keyframes[i][0])  # timekey
-                for i in range(num_rows):
-                    for val in keyframes[i][1:1+num_columns]:
-                        out_data.append(val)
-                data_count += (1 + num_columns) * num_rows
-
-            if "shadowradius" in node.keyframes:
-                keyframes = node.keyframes["shadowradius"]
-                num_rows = len(keyframes)
-                num_columns = 1
-                out_keys.append(ControllerKey(CTRL_LIGHT_SHADOWRADIUS, num_rows, data_count, data_count + num_rows, num_columns))
-                for i in range(num_rows):
-                    out_data.append(keyframes[i][0])  # timekey
-                for i in range(num_rows):
-                    for val in keyframes[i][1:1+num_columns]:
-                        out_data.append(val)
-                data_count += (1 + num_columns) * num_rows
-
-            if "verticaldisplacement" in node.keyframes:
-                keyframes = node.keyframes["verticaldisplacement"]
-                num_rows = len(keyframes)
-                num_columns = 1
-                out_keys.append(ControllerKey(CTRL_LIGHT_VERTICALDISPLACEMENT, num_rows, data_count, data_count + num_rows, num_columns))
-                for i in range(num_rows):
-                    out_data.append(keyframes[i][0])  # timekey
-                for i in range(num_rows):
-                    for val in keyframes[i][1:1+num_columns]:
-                        out_data.append(val)
-                data_count += (1 + num_columns) * num_rows
-
-            if "multiplier" in node.keyframes:
-                keyframes = node.keyframes["multiplier"]
-                num_rows = len(keyframes)
-                num_columns = 1
-                out_keys.append(ControllerKey(CTRL_LIGHT_MULTIPLIER, num_rows, data_count, data_count + num_rows, num_columns))
-                for i in range(num_rows):
-                    out_data.append(keyframes[i][0])  # timekey
-                for i in range(num_rows):
-                    for val in keyframes[i][1:1+num_columns]:
-                        out_data.append(val)
-                data_count += (1 + num_columns) * num_rows
+            data_count = append_keyframes("color", CTRL_LIGHT_COLOR, 3, data_count)
+            data_count = append_keyframes("radius", CTRL_LIGHT_RADIUS, 1, data_count)
+            data_count = append_keyframes("multiplier", CTRL_LIGHT_MULTIPLIER, 1, data_count)
 
         # Emitter Controllers
 
         if type_flags & NODE_EMITTER:
-            for ctrl_val, key, dim in EMITTER_CONTROLLER_KEYS:
-                if key not in node.keyframes:
-                    continue
-                keyframes = node.keyframes[key]
-                num_rows = len(keyframes)
-                num_columns = dim
-                out_keys.append(ControllerKey(ctrl_val, num_rows, data_count, data_count + num_rows, num_columns))
-                for i in range(num_rows):
-                    out_data.append(keyframes[i][0])  # timekey
-                for i in range(num_rows):
-                    for val in keyframes[i][1:1+num_columns]:
-                        out_data.append(val)
-                data_count += (1 + num_columns) * num_rows
+            for ctrl_type, key, dim in EMITTER_CONTROLLER_KEYS:
+                data_count = append_keyframes(key, ctrl_type, dim, data_count)
 
     def save_file_header(self):
         self.mdl.put_uint32(0)  # pseudo signature

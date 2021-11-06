@@ -62,7 +62,7 @@ class EmitterNode(GeometryNode):
         "alphamid",
         "alphaend",
         "birthrate",
-        "random_birth_rate",
+        "randombirthrate",
         "bounce_co",
         "combinetime",
         "drag",
@@ -148,7 +148,7 @@ class EmitterNode(GeometryNode):
         self.alphamid = 0.0
         self.alphaend = 0.0
         self.birthrate = 0.0
-        self.random_birth_rate = 0.0
+        self.randombirthrate = 0.0
         self.bounce_co = 0.0
         self.combinetime = 0.0
         self.drag = 0.0
