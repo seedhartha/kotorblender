@@ -147,12 +147,12 @@ class ObjectPropertyGroup(bpy.types.PropertyGroup):
                                                   soft_min=0.0, soft_max=1.0)
     diffuse: bpy.props.FloatVectorProperty(name="Diffuse color",
                                            subtype='COLOR_GAMMA',
-                                           default=(1.0, 1.0, 1.0),
+                                           default=(0.8, 0.8, 0.8),
                                            min=0.0, max=1.0,
                                            soft_min=0.0, soft_max=1.0)
     ambient: bpy.props.FloatVectorProperty(name="Ambient color",
                                            subtype='COLOR_GAMMA',
-                                           default=(1.0, 1.0, 1.0),
+                                           default=(0.2, 0.2, 0.2),
                                            min=0.0, max=1.0,
                                            soft_min=0.0, soft_max=1.0)
     bwmposition: bpy.props.FloatVectorProperty(name="BWM Position",

@@ -65,8 +65,8 @@ class TrimeshNode(GeometryNode):
         self.alpha = 1.0
         self.transparencyhint = 0
         self.selfillumcolor = (0.0, 0.0, 0.0)
-        self.ambient = (0.0, 0.0, 0.0)
-        self.diffuse = (0.0, 0.0, 0.0)
+        self.ambient = (0.2, 0.2, 0.2)
+        self.diffuse = (0.8, 0.8, 0.8)
         self.bitmap = defines.NULL
         self.bitmap2 = defines.NULL
         self.tangentspace = 0
