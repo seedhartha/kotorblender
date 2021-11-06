@@ -22,6 +22,7 @@ import_walkmeshes = True
 import_materials = True
 import_armatures = True
 
+export_animations = True
 export_custom_normals = True
 
 texture_path = ""

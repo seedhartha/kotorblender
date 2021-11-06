@@ -34,15 +34,24 @@ class KB_OT_export_mdl(bpy.types.Operator, bpy_extras.io_utils.ExportHelper):
         default="*.mdl",
         options={'HIDDEN'})
 
-    export_custom_normals: bpy.props.BoolProperty(
-        name="Export Custom Normals",
-        description="Export previously imported normals, if any",
-        default=True)
-
     export_for_tsl: bpy.props.BoolProperty(
         name="Export for TSL",
         description="Use The Sith Lords MDL format",
         default=False)
+
+    export_animations: bpy.props.BoolProperty(
+        name="Export Animations",
+        default=True)
+
+    export_walkmeshes: bpy.props.BoolProperty(
+        name="Export Walkmeshes",
+        description="Import area, door and placeable walkmeshes",
+        default=True)
+
+    export_custom_normals: bpy.props.BoolProperty(
+        name="Export Custom Normals",
+        description="Export previously imported normals, if any",
+        default=True)
 
     def execute(self, context):
         io.save_mdl(**self.as_keywords(ignore=("filter_glob", "check_existing")))
