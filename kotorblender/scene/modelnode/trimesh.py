@@ -248,7 +248,7 @@ class TrimeshNode(GeometryNode):
             return []
         layer_data = mesh.uv_layers[layer_name].data
         tverts = dict()
-        for polygon_idx, polygon in enumerate(mesh.polygons):
-            for i in range(3):
-                tverts[polygon.vertices[i]] = layer_data[3 * polygon_idx + i].uv[:2]
+        for tri in mesh.loop_triangles:
+            for vert_idx, loop_idx in zip(tri.vertices, tri.loops):
+                tverts[vert_idx] = layer_data[loop_idx].uv[:2]
         return [v for _, v in sorted(tverts.items())]
