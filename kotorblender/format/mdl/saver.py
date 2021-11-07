@@ -1261,11 +1261,10 @@ class MdlSaver:
                 num_bones = len(bonemap)
 
                 # QBones, TBones
-                skin_trans_inv = node.from_root.inverted()
                 qbones = [None] * num_bones
                 tbones = [None] * num_bones
                 for i in range(num_bones):
-                    bone_trans = (skin_trans_inv @ self.nodes[i].from_root).inverted()
+                    bone_trans = self.nodes[i].from_root.inverted() @ node.from_root
                     tbones[i], qbones[i], _ = bone_trans.decompose()
                 for i in range(num_bones):
                     qbone = qbones[i]
