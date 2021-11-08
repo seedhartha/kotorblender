@@ -126,11 +126,11 @@ classes = (
 
     # Panels
 
-    KB_PT_animlist,
-    KB_PT_emitter,
     KB_PT_empty,
-    KB_PT_light,
     KB_PT_mesh,
+    KB_PT_light,
+    KB_PT_emitter,
+    KB_PT_animlist,
     KB_PT_path_point,
 
     # UI Lists
