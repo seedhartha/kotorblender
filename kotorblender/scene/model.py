@@ -20,7 +20,7 @@ import re
 
 import bpy
 
-from mathutils import Vector
+from mathutils import Matrix, Vector
 
 from ..defines import Dummytype, Meshtype, Nodetype
 from ..exception.malformedfile import MalformedFile
@@ -213,11 +213,14 @@ class Model:
             name = name[:-4]
 
         node = switch[node_type](name)
-        if parent:
-            node.parent = parent
-            node.from_root = parent.from_root
+        node.parent = parent
         node.load_object_data(obj)
-        node.from_root = node.from_root @ obj.matrix_local
+
+        # Ignore transformations up to MDL root
+        if not parent:
+            node.position = (0.0, 0.0, 0.0)
+            node.orientation = (1.0, 0.0, 0.0, 0.0)
+            node.from_root = Matrix()
 
         for child_obj in sorted(obj.children, key=lambda o: o.kb.export_order):
             child = cls.model_node_from_object(child_obj, node, exclude_xwk)

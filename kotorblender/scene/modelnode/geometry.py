@@ -59,6 +59,10 @@ class GeometryNode:
         self.orientation = obj.rotation_quaternion
         self.scale = obj.scale[0]
 
+        self.from_root = obj.matrix_local
+        if self.parent:
+            self.from_root = self.parent.from_root @ self.from_root
+
     def find_node(self, test):
         if test(self):
             return self
