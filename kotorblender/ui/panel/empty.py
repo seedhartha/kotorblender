@@ -64,7 +64,7 @@ class KB_PT_empty(bpy.types.Panel):
             col.prop(obj.kb, "classification", text="")
             col.prop(obj.kb, "supermodel", text="")
             col.prop(obj.kb, "affected_by_fog", text="")
-            col.prop(obj.kb, "animroot", text="")
+            col.prop_search(obj.kb, "animroot", context.collection, "objects", text="")
             col.prop(obj.kb, "animscale", text="")
             layout.separator()
 
