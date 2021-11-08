@@ -72,12 +72,12 @@ class ObjectPropertyGroup(bpy.types.PropertyGroup):
     # For all emptys
     dummytype: bpy.props.EnumProperty(name="Type",
                                       items=[(defines.Dummytype.NONE,      "None",                "Simple dummy object",                                        0),
-                                             (defines.Dummytype.DWKROOT,   "DWK Rootdummy",       "All children are considered part of a door walkmesh",        1),
-                                             (defines.Dummytype.MDLROOT,   "MDL Rootdummy",       "All children are considered part of a mdl",                  2),
+                                             (defines.Dummytype.MDLROOT,   "MDL Rootdummy",       "All children are considered part of a mdl",                  1),
+                                             (defines.Dummytype.DWKROOT,   "DWK Rootdummy",       "All children are considered part of a door walkmesh",        2),
                                              (defines.Dummytype.PWKROOT,   "PWK Rootdummy",       "All children are considered part of a placeable walkmesh",   3),
-                                             (defines.Dummytype.REFERENCE, "Reference node",      "Used in spells. Points to 'fx_ref' by default",              4),
-                                             (defines.Dummytype.PATHPOINT, "Path point",          "Used when exporting paths",                                  6),
-                                             (defines.Dummytype.PTHROOT,   "PTH Rootdummy",       "All children are considered path points",                    7)],
+                                             (defines.Dummytype.PTHROOT,   "PTH Rootdummy",       "All children are considered path points",                    4),
+                                             (defines.Dummytype.REFERENCE, "Reference node",      "Used in spells. Points to 'fx_ref' by default",              5),
+                                             (defines.Dummytype.PATHPOINT, "Path point",          "Used when exporting paths",                                  6)],
                                       default=defines.Dummytype.NONE)
     # For MDL Rootdummy
     supermodel: bpy.props.StringProperty(name="Supermodel", description="Name of the model to inherit animations from", default=defines.NULL)
