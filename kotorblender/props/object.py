@@ -71,13 +71,15 @@ class ObjectPropertyGroup(bpy.types.PropertyGroup):
 
     # For all emptys
     dummytype: bpy.props.EnumProperty(name="Type",
-                                      items=[(defines.Dummytype.NONE,      "None",                "Simple dummy object",                                        0),
-                                             (defines.Dummytype.MDLROOT,   "MDL Rootdummy",       "All children are considered part of a mdl",                  1),
-                                             (defines.Dummytype.DWKROOT,   "DWK Rootdummy",       "All children are considered part of a door walkmesh",        2),
-                                             (defines.Dummytype.PWKROOT,   "PWK Rootdummy",       "All children are considered part of a placeable walkmesh",   3),
-                                             (defines.Dummytype.PTHROOT,   "PTH Rootdummy",       "All children are considered path points",                    4),
-                                             (defines.Dummytype.REFERENCE, "Reference node",      "Used in spells. Points to 'fx_ref' by default",              5),
-                                             (defines.Dummytype.PATHPOINT, "Path point",          "Used when exporting paths",                                  6)],
+                                      items=[(defines.Dummytype.NONE,      "None",           "Simple dummy object",                                      0),
+                                             (defines.Dummytype.MDLROOT,   "MDL Root",       "All children are considered part of a mdl",                1),
+                                             (defines.Dummytype.DWKROOT,   "DWK Root",       "All children are considered part of a door walkmesh",      2),
+                                             (defines.Dummytype.PWKROOT,   "PWK Root",       "All children are considered part of a placeable walkmesh", 3),
+                                             (defines.Dummytype.PTHROOT,   "PTH Root",       "All children are considered path points",                  4),
+                                             (defines.Dummytype.REFERENCE, "Reference",      "Used in spells. Points to 'fx_ref' by default",            5),
+                                             (defines.Dummytype.PATHPOINT, "Path Point",     "Used when exporting paths",                                6),
+                                             (defines.Dummytype.USE1,      "Walkmesh Use 1", "1st node for 'Use' animation",                             7),
+                                             (defines.Dummytype.USE2,      "Walkmesh Use 2", "2nd node for 'Use' animation",                             8)],
                                       default=defines.Dummytype.NONE)
     # For MDL Rootdummy
     supermodel: bpy.props.StringProperty(name="Supermodel", description="Name of the model to inherit animations from", default=defines.NULL)
@@ -93,11 +95,6 @@ class ObjectPropertyGroup(bpy.types.PropertyGroup):
                                            default=defines.Classification.UNKNOWN)
     subclassification: bpy.props.IntProperty(name="Unknown", description="Unknown byte-2 in the classification bytes section of the model header", default=0)
     affected_by_fog: bpy.props.BoolProperty(name="Affected by Fog", description="If true, model will be occluded by area fog in-game", default=True)
-    dummysubtype: bpy.props.EnumProperty(name="Subtype",
-                                         items=[("NONE", "None", "Simple dummy object", 0),
-                                                ("USE1", "Use 1", "1st node for 'Use' animation", 1),
-                                                ("USE2", "Use 2", "2nd node for 'Use' animation", 2)],
-                                         default="NONE")
     animroot: bpy.props.StringProperty(name="Animation Root", description="Root node to apply animations from", default=defines.NULL)
     animscale: bpy.props.FloatProperty(name="Animation Scale", description="Animation scale for all animations", default=1.00, min=0.0)
     # Animation Data (for separation)

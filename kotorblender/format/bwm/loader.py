@@ -16,7 +16,7 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-from ...defines import Dummytype, DummySubtype
+from ...defines import Dummytype
 from ...exception.malformedfile import MalformedFile
 from ...scene.modelnode.aabb import AabbNode
 from ...scene.modelnode.dummy import DummyNode
@@ -195,12 +195,12 @@ class BwmLoader:
         geom_node.bwmposition = self.position
 
         use_node1 = DummyNode(use_name1)
-        use_node1.dummysubtype = DummySubtype.USE1
+        use_node1.dummytype = Dummytype.USE1
         use_node1.position = self.rel_use_vec1
         use_node1.parent = root_node
 
         use_node2 = DummyNode(use_name2)
-        use_node2.dummysubtype = DummySubtype.USE2
+        use_node2.dummytype = Dummytype.USE2
         use_node2.position = self.rel_use_vec2
         use_node2.parent = root_node
 

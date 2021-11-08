@@ -78,12 +78,6 @@ class WkmMaterial:
     NONWALKABLE = [NONWALK, OBSCURING, SNOW, TRANSPARENT, DEEPWATER, LAVA]
 
 
-class DummySubtype:
-    NONE = "NONE"
-    USE1 = "USE1"
-    USE2 = "USE2"
-
-
 class Meshtype:
     TRIMESH = "TRI"
     DANGLYMESH = "DAN"
@@ -103,8 +97,10 @@ class Dummytype:
     PTHROOT = "PTH"
     REFERENCE = "REF"
     PATHPOINT = "PPT"
+    USE1 = "USE1"
+    USE2 = "USE2"
 
-    ALL = {NONE, MDLROOT, PWKROOT, DWKROOT, PTHROOT, REFERENCE, PATHPOINT}
+    ALL = {NONE, MDLROOT, PWKROOT, DWKROOT, PTHROOT, REFERENCE, PATHPOINT, USE1, USE2}
 
 
 class Classification:
