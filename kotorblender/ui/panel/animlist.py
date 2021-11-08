@@ -65,7 +65,7 @@ class KB_PT_animlist(bpy.types.Panel):
             row = layout.row()
             row.prop(anim, "name")
             row = layout.row()
-            row.prop(anim, "root_obj")
+            row.prop_search(anim, "root", context.collection, "objects")
             row = layout.row()
             row.prop(anim, "transtime")
             row = layout.row()

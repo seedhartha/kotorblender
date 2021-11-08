@@ -31,7 +31,7 @@ class AnimPropertyGroup(bpy.types.PropertyGroup):
         name="Transition Time", subtype='TIME', options=set(),
         description="Blending time between animations in frames",
         default=7.5, min=0.0, soft_max=60.0)
-    root_obj: bpy.props.StringProperty(
+    root: bpy.props.StringProperty(
         name="Root", description="Entry point of the animation",
         default="unnamed", options=set())
     frame_start: bpy.props.IntProperty(name="Start", default=0, options=set(),

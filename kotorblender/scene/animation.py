@@ -76,7 +76,7 @@ class Animation:
     def append_to_object(cls, mdl_root, name, length=0.0, transtime=0.25, animroot=defines.NULL):
         anim = mdl_root.kb.anim_list.add()
         anim.name = name
-        anim.root_obj = animroot
+        anim.root = animroot
         anim.transtime = Animation.time_to_frame(transtime)
         anim.frame_start = Animation.get_next_frame(mdl_root)
         anim.frame_end = anim.frame_start + Animation.time_to_frame(length)
@@ -102,7 +102,7 @@ class Animation:
         anim = Animation(list_anim.name)
         anim.length = Animation.frame_to_time(list_anim.frame_end - list_anim.frame_start)
         anim.transtime = Animation.frame_to_time(list_anim.transtime)
-        anim.animroot = list_anim.root_obj
+        anim.animroot = list_anim.root
         anim.root_node = Animation.animation_node_from_object(list_anim, mdl_root)
 
         for event in list_anim.event_list:
