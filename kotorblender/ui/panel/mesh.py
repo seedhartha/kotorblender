@@ -122,18 +122,6 @@ class KB_PT_mesh(bpy.types.Panel):
             row = box.row()
             row.prop(obj.kb, "displacement", text="Displacement")
 
-        # Additional props for skins
-        elif obj.kb.meshtype == defines.Meshtype.SKIN:
-            layout.separator()
-
-            row = layout.row()
-            box = row.box()
-            row = box.row()
-            row.label(text="Create vertex group: ")
-            row = box.row(align=True)
-            row.prop_search(obj.kb, "skingroup_obj", context.scene, "objects")
-            row.operator("kb.skingroup_add", text="", icon='ADD')
-
         # Additional props for aabb walkmeshes
         elif obj.kb.meshtype == defines.Meshtype.AABB:
             layout.separator()
