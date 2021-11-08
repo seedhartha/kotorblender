@@ -94,8 +94,8 @@ class Animation:
 
     @classmethod
     def get_next_frame(cls, mdl_root):
-        last_frame = max([defines.ANIM_GLOBSTART] + [a.frame_end for a in mdl_root.kb.anim_list])
-        return int(math.ceil((last_frame + defines.ANIM_OFFSET) / 10.0)) * 10
+        last_frame = max([a.frame_end for a in mdl_root.kb.anim_list])
+        return int(math.ceil((last_frame + defines.ANIM_PADDING) / 10.0)) * 10
 
     @classmethod
     def from_list_anim(cls, list_anim, mdl_root):

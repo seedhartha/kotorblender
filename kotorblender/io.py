@@ -124,7 +124,7 @@ def save_mdl(
     glob.export_custom_normals = export_custom_normals
 
     # Reset Pose
-    bpy.context.scene.frame_set(defines.ANIM_GLOBSTART)
+    bpy.context.scene.frame_set(0)
 
     mdl_root = next(iter(obj for obj in bpy.context.selected_objects if utils.is_mdl_root(obj)), None)
     if not mdl_root:
@@ -298,7 +298,7 @@ def do_load_mdl(filepath, position=(0.0, 0.0, 0.0)):
         dwk_walkmesh3.import_to_collection(model_root, collection)
 
     # reset pose
-    bpy.context.scene.frame_set(defines.ANIM_GLOBSTART)
+    bpy.context.scene.frame_set(0)
 
 
 def do_load_lyt(filepath):
