@@ -97,14 +97,14 @@ class Meshtype:
 
 class Dummytype:
     NONE = "NON"
-    DWKROOT = "DWK"
     MDLROOT = "MDL"
     PWKROOT = "PWK"
+    DWKROOT = "DWK"
+    PTHROOT = "PTH"
     REFERENCE = "REF"
     PATHPOINT = "PPT"
-    PTHROOT = "PTH"
 
-    ALL = {NONE, DWKROOT, MDLROOT, PWKROOT, REFERENCE, PATHPOINT, PTHROOT}
+    ALL = {NONE, MDLROOT, PWKROOT, DWKROOT, PTHROOT, REFERENCE, PATHPOINT}
 
 
 class Classification:
