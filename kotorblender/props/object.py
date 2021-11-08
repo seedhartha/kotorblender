@@ -170,9 +170,6 @@ class ObjectPropertyGroup(bpy.types.PropertyGroup):
     displacement: bpy.props.FloatProperty(name="Displacement", default=0.5, min=0.0, max=32.0)
     constraints: bpy.props.StringProperty(name="Danglegroup", description="Name of the vertex group to use for the danglymesh", default="")
 
-    # For skingroups
-    skingroup_obj: bpy.props.StringProperty(name="Bone", description="Name of the bone to create the skingroup for", default="")
-
     # For lights
     ambientonly: bpy.props.BoolProperty(name="Ambient Only", default=False)
     lightpriority: bpy.props.IntProperty(name="Lightpriority", default=3, min=1, max=5)

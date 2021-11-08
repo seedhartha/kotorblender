@@ -18,7 +18,6 @@
 
 import bpy
 
-from .ops.addskingroup import KB_OT_add_skingroup
 from .ops.anim.delete import KB_OT_anim_delete
 from .ops.anim.event.delete import KB_OT_anim_event_delete
 from .ops.anim.event.move import KB_OT_anim_event_move
@@ -112,7 +111,6 @@ classes = (
     KB_OT_import_lyt,
     KB_OT_import_mdl,
     KB_OT_import_pth,
-    KB_OT_add_skingroup,
     KB_OT_load_wok_materials,
     KB_OT_rebuild_material_nodes,
     KB_OT_anim_event_move,
