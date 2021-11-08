@@ -19,11 +19,11 @@
 # Null value for parents, textures, etc.
 NULL = "NULL"
 
-# Frame at which to start all animations
-ANIM_GLOBSTART = 1
+# Number of frames to the left of an animation to create a rest pose
+ANIM_REST_POSE_OFFSET = 5
 
-# Offset between two imported animations (minimum)
-ANIM_OFFSET = 60
+# Number of frames between two consecutive animations
+ANIM_PADDING = 60
 
 FPS = 30
 

@@ -148,17 +148,15 @@ class AnimationNode:
 
             # Rest Pose Keyframes
 
-            rest_pose_empty = all([fcurve.is_empty for fcurve in fcurves])
-            if rest_pose_empty:
-                if data_path.startswith("kb."):
-                    rest_values = getattr(target.kb, data_path[3:])
-                else:
-                    rest_values = getattr(target, data_path)
-                if dim == 1:
-                    keyframe_points[0].insert(defines.ANIM_GLOBSTART, rest_values, options={'FAST'})
-                else:
-                    for i in range(dim):
-                        keyframe_points[i].insert(defines.ANIM_GLOBSTART, rest_values[i], options={'FAST'})
+            if data_path.startswith("kb."):
+                rest_values = getattr(target.kb, data_path[3:])
+            else:
+                rest_values = getattr(target, data_path)
+            if dim == 1:
+                keyframe_points[0].insert(anim.frame_start - defines.ANIM_REST_POSE_OFFSET, rest_values, options={'FAST'})
+            else:
+                for i in range(dim):
+                    keyframe_points[i].insert(anim.frame_start - defines.ANIM_REST_POSE_OFFSET, rest_values[i], options={'FAST'})
 
             # Animation Keyframes
 
