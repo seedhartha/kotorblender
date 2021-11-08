@@ -29,7 +29,7 @@ class KB_PT_mesh(bpy.types.Panel):
     for MESH objects.
     It is located under the object data panel in the properties window
     """
-    bl_label = "Odyssey Mesh Properties"
+    bl_label = "Odyssey Mesh"
     bl_space_type = 'PROPERTIES'
     bl_region_type = 'WINDOW'
     bl_context = "object"

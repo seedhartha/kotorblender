@@ -27,7 +27,7 @@ class KB_PT_light(bpy.types.Panel):
     for LIGHT objects.
     It is located under the object data panel in the properties window
     """
-    bl_label = "Odyssey Light Properties"
+    bl_label = "Odyssey Light"
     bl_space_type = 'PROPERTIES'
     bl_region_type = 'WINDOW'
     bl_context = "object"

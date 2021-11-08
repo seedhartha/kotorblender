@@ -27,7 +27,7 @@ class KB_PT_emitter(bpy.types.Panel):
     format. This is only available for particle systems.
     It is located under the particle panel in the properties window
     """
-    bl_label = "Odyssey Emitter Properties"
+    bl_label = "Odyssey Emitter"
     bl_space_type = 'PROPERTIES'
     bl_region_type = 'WINDOW'
     bl_context = "object"
