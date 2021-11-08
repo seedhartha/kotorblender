@@ -33,7 +33,7 @@ class Animation:
     def __init__(self, name="UNNAMED"):
         self.name = name
         self.length = 1.0
-        self.transtime = 1.0
+        self.transtime = 0.25
         self.animroot = defines.NULL
         self.root_node = None
 
@@ -77,7 +77,7 @@ class Animation:
         anim = mdl_root.kb.anim_list.add()
         anim.name = name
         anim.root = animroot
-        anim.transtime = Animation.time_to_frame(transtime)
+        anim.transtime = transtime
         anim.frame_start = Animation.get_next_frame(mdl_root)
         anim.frame_end = anim.frame_start + Animation.time_to_frame(length)
         return anim
@@ -101,7 +101,7 @@ class Animation:
     def from_list_anim(cls, list_anim, mdl_root):
         anim = Animation(list_anim.name)
         anim.length = Animation.frame_to_time(list_anim.frame_end - list_anim.frame_start)
-        anim.transtime = Animation.frame_to_time(list_anim.transtime)
+        anim.transtime = list_anim.transtime
         anim.animroot = list_anim.root
         anim.root_node = Animation.animation_node_from_object(list_anim, mdl_root)
 
