@@ -82,10 +82,3 @@ class KB_PT_empty(bpy.types.Panel):
             row.prop(obj.kb, "refmodel")
             row = box.row()
             row.prop(obj.kb, "reattachable")
-
-        else:
-            row = layout.row()
-            box = row.box()
-
-            row = box.row()
-            row.prop(obj.kb, "dummysubtype")

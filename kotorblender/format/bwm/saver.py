@@ -18,7 +18,7 @@
 
 from mathutils import Vector
 
-from ...defines import DummySubtype, WkmMaterial
+from ...defines import Dummytype, WkmMaterial
 from ...scene.modelnode.aabb import AabbNode
 from ...scene.modelnode.dummy import DummyNode
 from ...scene.modelnode.trimesh import FaceList
@@ -80,8 +80,8 @@ class BwmSaver:
     def peek_walkmesh(self):
         self.walkmesh_type = WALKMESH_TYPE_AREA if self.walkmesh.walkmesh_type == "wok" else WALKMESH_TYPE_PLACEABLE
         self.geom_node = self.walkmesh.root_node.find_node(lambda node: isinstance(node, AabbNode))
-        self.use_node1 = self.walkmesh.root_node.find_node(lambda node: isinstance(node, DummyNode) and node.dummysubtype == DummySubtype.USE1)
-        self.use_node2 = self.walkmesh.root_node.find_node(lambda node: isinstance(node, DummyNode) and node.dummysubtype == DummySubtype.USE2)
+        self.use_node1 = self.walkmesh.root_node.find_node(lambda node: isinstance(node, DummyNode) and node.dummytype == Dummytype.USE1)
+        self.use_node2 = self.walkmesh.root_node.find_node(lambda node: isinstance(node, DummyNode) and node.dummytype == Dummytype.USE2)
 
         self.peek_vertices()
         self.peek_faces()
