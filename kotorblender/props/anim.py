@@ -29,8 +29,8 @@ class AnimPropertyGroup(bpy.types.PropertyGroup):
                                    default="unnamed", options=set())
     transtime: bpy.props.FloatProperty(
         name="Transition Time", subtype='TIME', options=set(),
-        description="Blending time between animations in frames",
-        default=7.5, min=0.0, soft_max=60.0)
+        description="Blending time between animations in seconds",
+        default=0.25, min=0.0, soft_max=2.0)
     root: bpy.props.StringProperty(
         name="Root", description="Entry point of the animation",
         default="unnamed", options=set())
