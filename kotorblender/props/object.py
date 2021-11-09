@@ -71,15 +71,15 @@ class ObjectPropertyGroup(bpy.types.PropertyGroup):
 
     # For all emptys
     dummytype: bpy.props.EnumProperty(name="Type",
-                                      items=[(defines.Dummytype.NONE,      "None",           "Simple dummy object",                                      0),
-                                             (defines.Dummytype.MDLROOT,   "MDL Root",       "All children are considered part of a mdl",                1),
-                                             (defines.Dummytype.DWKROOT,   "DWK Root",       "All children are considered part of a door walkmesh",      2),
-                                             (defines.Dummytype.PWKROOT,   "PWK Root",       "All children are considered part of a placeable walkmesh", 3),
-                                             (defines.Dummytype.PTHROOT,   "PTH Root",       "All children are considered path points",                  4),
-                                             (defines.Dummytype.REFERENCE, "Reference",      "Used in spells. Points to 'fx_ref' by default",            5),
-                                             (defines.Dummytype.PATHPOINT, "Path Point",     "Used when exporting paths",                                6),
-                                             (defines.Dummytype.USE1,      "Walkmesh Use 1", "1st node for 'Use' animation",                             7),
-                                             (defines.Dummytype.USE2,      "Walkmesh Use 2", "2nd node for 'Use' animation",                             8)],
+                                      items=[(defines.Dummytype.NONE,      "None",           "Simple dummy object",                                       0),
+                                             (defines.Dummytype.MDLROOT,   "MDL Root",       "All children are considered part of a mdl",                 1),
+                                             (defines.Dummytype.DWKROOT,   "DWK Root",       "All children are considered part of a door walkmesh",       2),
+                                             (defines.Dummytype.PWKROOT,   "PWK Root",       "All children are considered part of a placeable walkmesh",  3),
+                                             (defines.Dummytype.PTHROOT,   "PTH Root",       "All children are considered path points",                   4),
+                                             (defines.Dummytype.REFERENCE, "Reference",      "Used in spells. Points to 'fx_ref' by default",             5),
+                                             (defines.Dummytype.PATHPOINT, "Path Point",     "Used when exporting paths",                                 6),
+                                             (defines.Dummytype.USE1,      "Walkmesh: Use 1", "1st node for 'Use' animation",                             7),
+                                             (defines.Dummytype.USE2,      "Walkmesh: Use 2", "2nd node for 'Use' animation",                             8)],
                                       default=defines.Dummytype.NONE)
     # For MDL Rootdummy
     supermodel: bpy.props.StringProperty(name="Supermodel", description="Name of the model to inherit animations from", default=defines.NULL)
