@@ -21,6 +21,7 @@ import_animations = True
 import_walkmeshes = True
 import_materials = True
 import_armatures = False
+merge_vertices = False
 
 export_animations = True
 export_custom_normals = True

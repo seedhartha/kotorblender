@@ -57,6 +57,11 @@ class KB_OT_import_mdl(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
         description="Create armature from bone nodes",
         default=False)
 
+    merge_vertices: bpy.props.BoolProperty(
+        name="Merge Vertices",
+        description="Merge similar vertices, marking edges as sharp",
+        default=False)
+
     texture_search_recursive: bpy.props.BoolProperty(
         name="Recursive Texture Search",
         description="Search for textures in subdirectories",
