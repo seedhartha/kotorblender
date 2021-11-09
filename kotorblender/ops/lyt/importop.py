@@ -52,6 +52,11 @@ class KB_OT_import_lyt(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
         name="Import Materials",
         default=True)
 
+    merge_vertices: bpy.props.BoolProperty(
+        name="Merge Vertices",
+        description="Merge similar vertices, marking edges as sharp",
+        default=False)
+
     texture_search_recursive: bpy.props.BoolProperty(
         name="Recursive Texture Search",
         description="Search for textures in subdirectories",

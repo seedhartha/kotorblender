@@ -80,11 +80,15 @@ def is_null(s):
     return not s or s.lower() == NULL.lower()
 
 
-def is_close(a, b, rel_tol=1e-9, abs_tol=0.0):
+def is_close(a, b, rel_tol, abs_tol=0.0):
     return abs(a-b) <= max(rel_tol * max(abs(a), abs(b)), abs_tol)
 
 
-def is_close_3(a, b, rel_tol=0.1):
+def is_close_2(a, b, rel_tol):
+    return is_close(a[0], b[0], rel_tol) and is_close(a[1], b[1], rel_tol)
+
+
+def is_close_3(a, b, rel_tol):
     return (is_close(a[0], b[0], rel_tol) and
             is_close(a[1], b[1], rel_tol) and
             is_close(a[2], b[2], rel_tol))

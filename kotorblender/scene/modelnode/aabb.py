@@ -57,15 +57,11 @@ class AabbNode(TrimeshNode):
         self.apply_room_links(mesh)
         collection.objects.link(obj)
 
-        # Merge Vertices By Distance
-        bpy.context.view_layer.objects.active = obj
-        bpy.ops.object.mode_set(mode='EDIT')
-        bpy.ops.mesh.remove_doubles()
-        bpy.ops.object.mode_set(mode='OBJECT')
-
         return obj
 
     def create_mesh(self, name):
+        self.merge_similar_vertices()
+
         # Create the mesh itself
         mesh = bpy.data.meshes.new(name)
         mesh.vertices.add(len(self.verts))

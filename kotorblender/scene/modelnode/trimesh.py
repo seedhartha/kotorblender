@@ -16,6 +16,8 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+from math import sqrt
+
 import bpy
 
 from bpy_extras.io_utils import unpack_list
@@ -26,6 +28,9 @@ from ... import defines, glob, utils
 from .. import material
 
 from .geometry import GeometryNode
+
+MERGE_DISTANCE = 1e-4
+MERGE_DISTANCE_UV = 1e-4
 
 UV_MAP_DIFFUSE = "UVMap"
 UV_MAP_LIGHTMAP = "UVMap_lm"
@@ -94,6 +99,8 @@ class TrimeshNode(GeometryNode):
         return obj
 
     def create_mesh(self, name):
+        self.merge_similar_vertices()
+
         # Create the mesh itself
         mesh = bpy.data.meshes.new(name)
         mesh.vertices.add(len(self.verts))
@@ -126,6 +133,68 @@ class TrimeshNode(GeometryNode):
             mesh.use_auto_smooth = True
 
         return mesh
+
+    def merge_similar_vertices(self):
+        def cos_angle_between(a, b):
+            len2_a = sum([a[i] * a[i] for i in range(3)])
+            len2_b = sum([b[i] * b[i] for i in range(3)])
+            dot = sum([a[i] * b[i] for i in range(3)])
+            return dot / sqrt(len2_a * len2_b)
+
+        new_idx_by_old_idx = dict()
+        unique_indices = []
+        split_normals = []
+        for vert_idx, vert in enumerate(self.verts):
+            if vert_idx in new_idx_by_old_idx:
+                continue
+            num_unique = len(unique_indices)
+            normal = self.normals[vert_idx]
+            normals = [normal]
+            if self.uv1:
+                uv = self.uv1[vert_idx]
+            for other_vert_idx in range(vert_idx+1, len(self.verts)):
+                if other_vert_idx in new_idx_by_old_idx:
+                    continue
+                other_vert = self.verts[other_vert_idx]
+                other_normal = self.normals[other_vert_idx]
+                if self.uv1:
+                    other_uv = self.uv1[vert_idx]
+                # Vertices are similar if their coords and UV are very close, and angle between their normals is acute
+                if (utils.is_close_3(vert, other_vert, MERGE_DISTANCE) and
+                        (not self.uv1 or utils.is_close_2(uv, other_uv, MERGE_DISTANCE_UV) and
+                         cos_angle_between(normal, other_normal) > 0.5)):
+                    new_idx_by_old_idx[other_vert_idx] = num_unique
+                    normals.append(other_normal)
+            new_idx_by_old_idx[vert_idx] = num_unique
+            unique_indices.append(vert_idx)
+            split_normals.append(normals)
+
+        for new_idx, old_idx in enumerate(unique_indices):
+            normal = Vector()
+            for n in split_normals[new_idx]:
+                for i in range(3):
+                    normal[i] += n[i]
+            normal.normalize()
+
+            self.verts[new_idx] = self.verts[old_idx]
+            self.normals[new_idx] = tuple(normal[:3])
+            if self.uv1:
+                self.uv1[new_idx] = self.uv1[old_idx]
+            if self.uv2:
+                self.uv2[new_idx] = self.uv2[old_idx]
+
+        num_unique = len(unique_indices)
+        self.verts = self.verts[:num_unique]
+        self.normals = self.normals[:num_unique]
+        if self.uv1:
+            self.uv1 = self.uv1[:num_unique]
+        if self.uv2:
+            self.uv2 = self.uv2[:num_unique]
+
+        for face_idx, old_face in enumerate(self.facelist.vertices):
+            new_face = [new_idx_by_old_idx[old_face[i]] for i in range(3)]
+            self.facelist.vertices[face_idx] = new_face
+            self.facelist.uv[face_idx] = new_face
 
     def set_object_data(self, obj):
         GeometryNode.set_object_data(self, obj)

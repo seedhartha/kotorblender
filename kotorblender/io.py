@@ -32,7 +32,7 @@ from .scene.walkmesh import Walkmesh
 
 from .defines import Dummytype
 
-from . import defines, glob, utils
+from . import glob, utils
 
 
 def load_mdl(
@@ -42,6 +42,7 @@ def load_mdl(
     import_walkmeshes=True,
     import_materials=True,
     import_armatures=False,
+    merge_vertices=False,
     texture_search_recursive=False
 ):
     glob.import_normals = import_normals
@@ -49,6 +50,7 @@ def load_mdl(
     glob.import_walkmeshes = import_walkmeshes
     glob.import_materials = import_materials
     glob.import_armatures = import_armatures
+    glob.merge_vertices = merge_vertices
     glob.texture_path = os.path.dirname(filepath)
     glob.texture_search_recursive = texture_search_recursive
 
@@ -61,6 +63,7 @@ def load_lyt(
     import_animations=True,
     import_walkmeshes=True,
     import_materials=True,
+    merge_vertices=False,
     texture_search_recursive=False
 ):
     glob.import_normals = import_normals
@@ -68,6 +71,7 @@ def load_lyt(
     glob.import_walkmeshes = import_walkmeshes
     glob.import_materials = import_materials
     glob.import_armatures = False
+    glob.merge_vertices = merge_vertices
     glob.texture_path = os.path.dirname(filepath)
     glob.texture_search_recursive = texture_search_recursive
 
