@@ -135,8 +135,8 @@ class AabbNode(TrimeshNode):
         if ROOM_LINKS_COLORS not in mesh.vertex_colors:
             return
         colors = mesh.vertex_colors[ROOM_LINKS_COLORS]
-        for walkable_idx, polygon in enumerate([p for p in mesh.polygons if p.material_index not in defines.WkmMaterial.NONWALKABLE]):
-            for edge, loop_idx in enumerate(polygon.loop_indices):
+        for walkable_idx, tri in enumerate([p for p in mesh.loop_triangles if p.material_index not in defines.WkmMaterial.NONWALKABLE]):
+            for edge, loop_idx in enumerate(tri.loops):
                 color = colors.data[loop_idx].color
                 if color[0] > 0.0 or color[2] > 0.0 and (255.0 * color[1]) < 200.0:
                     continue
