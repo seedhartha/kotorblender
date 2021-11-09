@@ -185,7 +185,8 @@ class TrimeshNode(GeometryNode):
         self.diffuse = obj.kb.diffuse
         self.ambient = obj.kb.ambient
 
-        mesh = obj.data
+        depsgraph = bpy.context.evaluated_depsgraph_get()
+        mesh = obj.evaluated_get(depsgraph).data
         mesh.calc_loop_triangles()
 
         for vert in mesh.vertices:
