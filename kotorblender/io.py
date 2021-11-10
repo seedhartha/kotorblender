@@ -30,27 +30,27 @@ from .scene.model import Model
 from .scene.modelnode.aabb import AabbNode
 from .scene.walkmesh import Walkmesh
 
-from .defines import Dummytype
+from .defines import Dummytype, NormalsAlgorithm
 
 from . import glob, utils
 
 
 def load_mdl(
     filepath="",
-    import_normals=True,
     import_animations=True,
     import_walkmeshes=True,
     import_materials=True,
     import_armatures=False,
-    merge_vertices=False,
+    normals_algorithm=NormalsAlgorithm.NONE,
+    sharp_edge_angle=30.0,
     texture_search_recursive=False
 ):
-    glob.import_normals = import_normals
     glob.import_animations = import_animations
     glob.import_walkmeshes = import_walkmeshes
     glob.import_materials = import_materials
     glob.import_armatures = import_armatures
-    glob.merge_vertices = merge_vertices
+    glob.normals_algorithm = normals_algorithm
+    glob.sharp_edge_angle = sharp_edge_angle
     glob.texture_path = os.path.dirname(filepath)
     glob.texture_search_recursive = texture_search_recursive
 
@@ -59,19 +59,19 @@ def load_mdl(
 
 def load_lyt(
     filepath="",
-    import_normals=True,
     import_animations=True,
     import_walkmeshes=True,
     import_materials=True,
-    merge_vertices=False,
+    normals_algorithm=NormalsAlgorithm.NONE,
+    sharp_edge_angle=30.0,
     texture_search_recursive=False
 ):
-    glob.import_normals = import_normals
     glob.import_animations = import_animations
     glob.import_walkmeshes = import_walkmeshes
     glob.import_materials = import_materials
     glob.import_armatures = False
-    glob.merge_vertices = merge_vertices
+    glob.normals_algorithm = normals_algorithm
+    glob.sharp_edge_angle = sharp_edge_angle
     glob.texture_path = os.path.dirname(filepath)
     glob.texture_search_recursive = texture_search_recursive
 

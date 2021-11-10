@@ -21,7 +21,7 @@ import bpy
 from bpy_extras.io_utils import unpack_list
 from mathutils import Vector
 
-from ... import defines, utils
+from ... import defines
 
 from .trimesh import TrimeshNode, UV_MAP_DIFFUSE, UV_MAP_LIGHTMAP
 
@@ -104,6 +104,9 @@ class AabbNode(TrimeshNode):
             uv_layer.data.foreach_set("uv", uv)
 
         mesh.update()
+
+        self.post_process_mesh(mesh)
+
         return mesh
 
     def apply_room_links(self, mesh):
