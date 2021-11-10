@@ -16,12 +16,14 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-import_normals = True
+from .defines import NormalsAlgorithm
+
 import_animations = True
 import_walkmeshes = True
 import_materials = True
 import_armatures = False
-merge_vertices = False
+normals_algorithm = NormalsAlgorithm.CUSTOM
+sharp_edge_angle = 30.0
 
 export_animations = True
 export_custom_normals = True

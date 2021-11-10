@@ -19,6 +19,8 @@
 import bpy
 import bpy_extras
 
+from ...defines import NormalsAlgorithm
+
 from ... import io
 
 
@@ -35,10 +37,6 @@ class KB_OT_import_lyt(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
         default="*.lyt",
         options={'HIDDEN'})
 
-    import_normals: bpy.props.BoolProperty(
-        name="Import Normals",
-        default=True)
-
     import_animations: bpy.props.BoolProperty(
         name="Import Animations",
         default=True)
@@ -52,10 +50,22 @@ class KB_OT_import_lyt(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
         name="Import Materials",
         default=True)
 
-    merge_vertices: bpy.props.BoolProperty(
-        name="Merge Vertices",
-        description="Merge similar vertices, marking edges as sharp",
-        default=False)
+    normals_algorithm: bpy.props.EnumProperty(
+        items=[
+            (NormalsAlgorithm.NONE, "None", "Ignore normals", 0),
+            (NormalsAlgorithm.CUSTOM, "Custom", "Import as Custom Split Normals and enable Auto Smooth", 1),
+            (NormalsAlgorithm.SHARP_EDGES, "Sharp Edges", "Merge similar vertices, mark sharp edges and add Edge Split modifier", 2)
+        ],
+        name="Normals Algorithm",
+        description="How to import vertex normals and/or sharp edges",
+        default=NormalsAlgorithm.CUSTOM)
+
+    sharp_edge_angle: bpy.props.FloatProperty(
+        name="Sharp Edge Angle",
+        description="When merging similar vertices, mark edges with an angle higher than this as sharp",
+        default=30.0,
+        min=0.0,
+        max=90.0)
 
     texture_search_recursive: bpy.props.BoolProperty(
         name="Recursive Texture Search",

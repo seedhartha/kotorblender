@@ -16,12 +16,14 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-from math import sqrt
+from math import cos, radians, sqrt
 
 import bpy
 
 from bpy_extras.io_utils import unpack_list
 from mathutils import Vector
+
+from ...defines import NormalsAlgorithm
 
 from ... import defines, glob, utils
 
@@ -50,6 +52,7 @@ class TrimeshNode(GeometryNode):
         GeometryNode.__init__(self, name)
         self.nodetype = "trimesh"
 
+        # Properties
         self.meshtype = defines.Meshtype.TRIMESH
         self.center = (0.0, 0.0, 0.0)  # Unused ?
         self.lightmapped = 0
@@ -77,6 +80,7 @@ class TrimeshNode(GeometryNode):
         self.tangentspace = 0
         self.rotatetexture = 0
 
+        # Vertices
         self.verts = []
         self.normals = []
         self.uv1 = []
@@ -85,7 +89,11 @@ class TrimeshNode(GeometryNode):
         self.bitangents = []
         self.tangentspacenormals = []
 
+        # Faces
         self.facelist = FaceList()
+
+        # Internal
+        self.sharp_edges = set()
 
     def add_to_collection(self, collection):
         mesh = self.create_mesh(self.name)
@@ -99,7 +107,8 @@ class TrimeshNode(GeometryNode):
         return obj
 
     def create_mesh(self, name):
-        self.merge_similar_vertices()
+        if glob.normals_algorithm == NormalsAlgorithm.SHARP_EDGES:
+            self.merge_similar_vertices()
 
         # Create the mesh itself
         mesh = bpy.data.meshes.new(name)
@@ -127,19 +136,22 @@ class TrimeshNode(GeometryNode):
 
         mesh.update()
 
-        # Set custom normals
-        if glob.import_normals:
-            mesh.normals_split_custom_set_from_vertices(self.normals)
-            mesh.use_auto_smooth = True
+        self.post_process_mesh(mesh)
 
         return mesh
 
     def merge_similar_vertices(self):
         def cos_angle_between(a, b):
             len2_a = sum([a[i] * a[i] for i in range(3)])
+            if len2_a == 0.0:
+                return -1.0
             len2_b = sum([b[i] * b[i] for i in range(3)])
+            if len2_b == 0.0:
+                return -1.0
             dot = sum([a[i] * b[i] for i in range(3)])
             return dot / sqrt(len2_a * len2_b)
+
+        # Sort vertices into unique and duplicate
 
         new_idx_by_old_idx = dict()
         unique_indices = []
@@ -151,23 +163,30 @@ class TrimeshNode(GeometryNode):
             normal = self.normals[vert_idx]
             normals = [normal]
             if self.uv1:
-                uv = self.uv1[vert_idx]
+                uv1 = self.uv1[vert_idx]
+            if self.uv2:
+                uv2 = self.uv2[vert_idx]
             for other_vert_idx in range(vert_idx+1, len(self.verts)):
                 if other_vert_idx in new_idx_by_old_idx:
                     continue
                 other_vert = self.verts[other_vert_idx]
                 other_normal = self.normals[other_vert_idx]
                 if self.uv1:
-                    other_uv = self.uv1[vert_idx]
+                    other_uv1 = self.uv1[other_vert_idx]
+                if self.uv2:
+                    other_uv2 = self.uv2[other_vert_idx]
                 # Vertices are similar if their coords and UV are very close, and angle between their normals is acute
                 if (utils.is_close_3(vert, other_vert, MERGE_DISTANCE) and
-                        (not self.uv1 or utils.is_close_2(uv, other_uv, MERGE_DISTANCE_UV) and
-                         cos_angle_between(normal, other_normal) > 0.5)):
+                        ((not self.uv1) or utils.is_close_2(uv1, other_uv1, MERGE_DISTANCE_UV)) and
+                        ((not self.uv2) or utils.is_close_2(uv2, other_uv2, MERGE_DISTANCE_UV)) and
+                        cos_angle_between(normal, other_normal) > 0.5):
                     new_idx_by_old_idx[other_vert_idx] = num_unique
                     normals.append(other_normal)
             new_idx_by_old_idx[vert_idx] = num_unique
             unique_indices.append(vert_idx)
             split_normals.append(normals)
+
+        # Compact vertices
 
         for new_idx, old_idx in enumerate(unique_indices):
             normal = Vector()
@@ -191,10 +210,45 @@ class TrimeshNode(GeometryNode):
         if self.uv2:
             self.uv2 = self.uv2[:num_unique]
 
+        # Determine sharp vertices
+
+        sharp_verts = [False] * len(self.verts)
+        cos_angle_sharp = cos(radians(glob.sharp_edge_angle))
+        for vert_idx, normals in enumerate(split_normals):
+            # Vertex is sharp if an angle between at least two of its split normals exceeds threshold
+            for normal_idx, normal in enumerate(normals):
+                if sharp_verts[vert_idx]:
+                    break
+                for other_normal_idx in range(normal_idx+1, len(normals)):
+                    other_normal = normals[other_normal_idx]
+                    if cos_angle_between(normal, other_normal) < cos_angle_sharp:
+                        sharp_verts[vert_idx] = True
+                        break
+
+        # Fix face vertex indices, determine sharp edges
+
         for face_idx, old_face in enumerate(self.facelist.vertices):
             new_face = [new_idx_by_old_idx[old_face[i]] for i in range(3)]
             self.facelist.vertices[face_idx] = new_face
             self.facelist.uv[face_idx] = new_face
+
+            # Edge is sharp if both of its vertices are sharp
+
+            edges = [tuple(sorted(pair)) for pair in [(new_face[0], new_face[1]), (new_face[1], new_face[2]), (new_face[2], new_face[0])]]
+            for edge in edges:
+                if sharp_verts[edge[0]] and sharp_verts[edge[1]]:
+                    self.sharp_edges.add(edge)
+
+    def post_process_mesh(self, mesh):
+        if glob.normals_algorithm == NormalsAlgorithm.SHARP_EDGES:
+            # Mark sharp edges
+            for edge in mesh.edges:
+                if tuple(sorted(edge.vertices)) in self.sharp_edges:
+                    edge.use_edge_sharp = True
+        elif glob.normals_algorithm == NormalsAlgorithm.CUSTOM:
+            # Set custom normals
+            mesh.normals_split_custom_set_from_vertices(self.normals)
+            mesh.use_auto_smooth = True
 
     def set_object_data(self, obj):
         GeometryNode.set_object_data(self, obj)
@@ -224,6 +278,10 @@ class TrimeshNode(GeometryNode):
         obj.kb.selfillumcolor = self.selfillumcolor
         obj.kb.diffuse = self.diffuse
         obj.kb.ambient = self.ambient
+
+        if glob.normals_algorithm == NormalsAlgorithm.SHARP_EDGES:
+            modifier = obj.modifiers.new(name="EdgeSplit", type='EDGE_SPLIT')
+            modifier.use_edge_angle = False
 
     def load_object_data(self, obj):
         GeometryNode.load_object_data(self, obj)

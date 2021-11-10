@@ -127,3 +127,9 @@ class Nodetype:
     LIGHT = "light"
     AABB = "aabb"
     LIGHTSABER = "lightsaber"
+
+
+class NormalsAlgorithm:
+    NONE = "NONE"
+    CUSTOM = "CUSTOM"
+    SHARP_EDGES = "SHARP_EDGES"
