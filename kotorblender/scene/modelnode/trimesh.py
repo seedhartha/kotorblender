@@ -100,8 +100,8 @@ class TrimeshNode(GeometryNode):
         obj = bpy.data.objects.new(self.name, mesh)
         self.set_object_data(obj)
 
-        if glob.import_materials and self.roottype == "mdl":
-            material.rebuild_material(obj)
+        if glob.build_materials and self.roottype == "mdl":
+            material.rebuild_object_material(obj)
 
         collection.objects.link(obj)
         return obj

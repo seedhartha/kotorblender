@@ -26,7 +26,7 @@ class KB_OT_anim_focus(bpy.types.Operator):
     bl_label = "Set start and end frame of the timeline to the animation"
 
     @classmethod
-    def poll(self, context):
+    def poll(cls, context):
         if not utils.is_mdl_root(context.object):
             return False
 

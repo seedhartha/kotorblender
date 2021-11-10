@@ -46,13 +46,14 @@ class KB_OT_import_mdl(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
         description="Import area, door and placeable walkmeshes",
         default=True)
 
-    import_materials: bpy.props.BoolProperty(
-        name="Import Materials",
+    build_materials: bpy.props.BoolProperty(
+        name="Build Materials",
+        description="Build object materials",
         default=True)
 
-    import_armatures: bpy.props.BoolProperty(
-        name="Import Armatures",
-        description="Create armature from bone nodes",
+    build_armature: bpy.props.BoolProperty(
+        name="Build Armature",
+        description="Build armature from MDL root",
         default=False)
 
     normals_algorithm: bpy.props.EnumProperty(

@@ -18,8 +18,6 @@
 
 import bpy
 
-from mathutils import Matrix, Quaternion, Vector
-
 from .. import defines
 
 DATA_PATH_BY_LABEL = {
@@ -109,10 +107,8 @@ class AnimationNode:
 
         self.animated = False  # this node or its children contain keyframes
 
-    def add_keyframes_to_object(self, anim, obj, root_name, exclude_spatial):
+    def add_keyframes_to_object(self, anim, obj, root_name):
         for label, data in self.keyframes.items():
-            if label in ["position", "orientation"] and exclude_spatial:
-                continue
             if label not in DATA_PATH_BY_LABEL or not data:
                 continue
 
@@ -152,11 +148,12 @@ class AnimationNode:
                 rest_values = getattr(target.kb, data_path[3:])
             else:
                 rest_values = getattr(target, data_path)
+            rest_frame = anim.frame_start - defines.ANIM_REST_POSE_OFFSET
             if dim == 1:
-                keyframe_points[0].insert(anim.frame_start - defines.ANIM_REST_POSE_OFFSET, rest_values, options={'FAST'})
+                keyframe_points[0].insert(rest_frame, rest_values, options={'FAST'})
             else:
                 for i in range(dim):
-                    keyframe_points[i].insert(anim.frame_start - defines.ANIM_REST_POSE_OFFSET, rest_values[i], options={'FAST'})
+                    keyframe_points[i].insert(rest_frame, rest_values[i], options={'FAST'})
 
             # Animation Keyframes
 
@@ -165,100 +162,6 @@ class AnimationNode:
                     keyframe_points[i].insert(frame, val[i], options={'FAST'})
             for kfp in keyframe_points:
                 kfp.update()
-
-    def add_keyframes_to_armature_bone(self, anim, armature_obj, bone):
-        positions = []
-        orientations = []
-
-        for label, data in self.keyframes.items():
-            if label == "position":
-                positions = [(anim.frame_start + defines.FPS * d[0], Vector(d[1:])) for d in data]
-            elif label == "orientation":
-                orientations = [(anim.frame_start + defines.FPS * d[0], Quaternion(d[1:])) for d in data]
-            else:
-                continue
-
-        restmat = bone.bone.matrix_local
-        if bone.parent:
-            restmat = bone.parent.bone.matrix_local.inverted() @ restmat
-        restmat_inv = restmat.inverted()
-
-        for frame, position in positions:
-            bonemat = Matrix.Translation(position) @ restmat.to_quaternion().to_matrix().to_4x4()
-            bone.matrix_basis = restmat_inv @ bonemat
-            bone.keyframe_insert("location", frame=frame)
-
-        for frame, orientation in orientations:
-            bonemat = Matrix.Translation(restmat.to_translation()) @ orientation.to_matrix().to_4x4()
-            bone.matrix_basis = restmat_inv @ bonemat
-            bone.keyframe_insert("rotation_quaternion", frame=frame)
-
-    def load_keyframes_from_object(self, anim, obj):
-        anim_data = obj.animation_data
-        if not anim_data:
-            return
-
-        action = anim_data.action
-        if not action:
-            return
-
-        # Extract keyframes
-
-        fcurve_frames = dict()
-        fcurve_values = dict()
-        for fcurve in action.fcurves:
-            data_path = fcurve.data_path
-            if data_path not in LABEL_BY_DATA_PATH:
-                continue
-
-            frames = []
-            values = []
-            keyframe_points = fcurve.keyframe_points
-            for kfp in keyframe_points:
-                frame = round(kfp.co[0])
-                if frame < anim.frame_start or frame > anim.frame_end:
-                    continue
-                frames.append(kfp.co[0])
-                values.append(kfp.co[1])
-
-            if data_path not in fcurve_frames:
-                fcurve_frames[data_path] = []
-            fcurve_frames[data_path].append(frames)
-
-            if data_path not in fcurve_values:
-                fcurve_values[data_path] = []
-            fcurve_values[data_path].append(values)
-
-        if not fcurve_frames:
-            return
-
-        # Flatten Keyframes
-
-        flat_fcurve_frames = dict()
-        for label, frames in fcurve_frames.items():
-            flat_fcurve_frames[label] = frames[0]
-
-        flat_fcurve_values = dict()
-        for label, values in fcurve_values.items():
-            flat_fcurve_values[label] = list(zip(*values))
-
-        # Convert to animation node keyframes
-
-        for data_path in flat_fcurve_frames.keys():
-            frames = flat_fcurve_frames[data_path]
-            if not frames:
-                continue
-
-            timekeys = [(frame-anim.frame_start)/defines.FPS for frame in frames]
-
-            if data_path in CONVERTER_BY_DATA_PATH:
-                converter = CONVERTER_BY_DATA_PATH[data_path]
-                values = [converter(val) for val in flat_fcurve_values[data_path]]
-            else:
-                values = flat_fcurve_values[data_path]
-
-            label = LABEL_BY_DATA_PATH[data_path]
-            self.keyframes[label] = [[time] + list(values[i]) for i, time in enumerate(timekeys)]
 
     def get_or_create_action(self, name):
         if name in bpy.data.actions:
@@ -278,3 +181,66 @@ class AnimationNode:
         if not fcurve:
             fcurve = action.fcurves.new(data_path=data_path, index=index)
         return fcurve
+
+    def load_keyframes_from_object(self, anim, obj):
+        anim_data = obj.animation_data
+        if not anim_data:
+            return
+
+        action = anim_data.action
+        if not action:
+            return
+
+        keyframes = self.get_keyframes_in_range(action, anim.frame_start, anim.frame_end)
+        flat_keyframes = self.flatten_keyframes(keyframes)
+
+        for data_path, dp_keyframes in flat_keyframes.items():
+            if data_path not in LABEL_BY_DATA_PATH:
+                continue
+
+            label = LABEL_BY_DATA_PATH[data_path]
+            self.keyframes[label] = []
+
+            for point in dp_keyframes:
+                timekey = (point[0] - anim.frame_start) / defines.FPS
+                if data_path in CONVERTER_BY_DATA_PATH:
+                    converter = CONVERTER_BY_DATA_PATH[data_path]
+                    values = converter(point[1:])
+                else:
+                    values = point[1:]
+                self.keyframes[label].append([timekey] + values)
+
+    @classmethod
+    def get_keyframes_in_range(cls, action, start, end):
+        keyframes = dict()
+        for fcurve in action.fcurves:
+            data_path = fcurve.data_path
+            array_index = fcurve.array_index
+            keyframe_points = fcurve.keyframe_points
+            for kp in keyframe_points:
+                frame = round(kp.co[0])
+                if frame < start or frame > end:
+                    continue
+                if data_path not in keyframes:
+                    keyframes[data_path] = []
+                dim = len(keyframes[data_path])
+                while dim <= array_index:
+                    keyframes[data_path].append([])
+                    dim += 1
+                keyframes[data_path][array_index].append((frame, kp.co[1]))
+
+        return keyframes
+
+    @classmethod
+    def flatten_keyframes(cls, keyframes):
+        flat_keyframes = dict()
+        for data_path, dp_keyframes in keyframes.items():
+            dim = len(dp_keyframes)
+            assert dim > 0
+            num_points = len(dp_keyframes[0])
+            assert all([len(x) == num_points for x in dp_keyframes[1:]])
+            flat_keyframes[data_path] = []
+            for i in range(num_points):
+                flat_keyframes[data_path].append([dp_keyframes[0][i][0]] + [dp_keyframes[j][i][1] for j in range(dim)])
+
+        return flat_keyframes

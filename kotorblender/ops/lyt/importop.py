@@ -46,8 +46,9 @@ class KB_OT_import_lyt(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
         description="Import area, placeable and door walkmeshes",
         default=True)
 
-    import_materials: bpy.props.BoolProperty(
-        name="Import Materials",
+    build_materials: bpy.props.BoolProperty(
+        name="Build Materials",
+        description="Build object materials",
         default=True)
 
     normals_algorithm: bpy.props.EnumProperty(

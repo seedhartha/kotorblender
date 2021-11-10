@@ -18,9 +18,7 @@
 
 import re
 
-import bpy
-
-from mathutils import Matrix, Vector
+from mathutils import Matrix
 
 from ..defines import Dummytype, Meshtype, Nodetype
 from ..exception.malformedfile import MalformedFile
@@ -37,6 +35,8 @@ from .modelnode.lightsaber import LightsaberNode
 from .modelnode.reference import ReferenceNode
 from .modelnode.skinmesh import SkinmeshNode
 from .modelnode.trimesh import TrimeshNode
+
+from . import armature
 
 
 class Model:
@@ -72,13 +72,11 @@ class Model:
         for child in self.root_node.children:
             self.import_nodes_to_collection(child, root_obj, collection)
 
-        if glob.import_armatures:
-            armature_obj = self.create_armature(root_obj)
-        else:
-            armature_obj = None
-
         if glob.import_animations:
-            self.create_animations(root_obj, armature_obj)
+            self.create_animations(root_obj)
+
+        if glob.build_armature:
+            armature.rebuild_armature(root_obj)
 
         return root_obj
 
@@ -89,63 +87,9 @@ class Model:
         for child in node.children:
             self.import_nodes_to_collection(child, obj, collection)
 
-    def create_armature(self, mdl_root):
-        # MDL root must have at least one skinmesh
-        skinmeshes = utils.find_objects(mdl_root, utils.is_skin_mesh)
-        if not skinmeshes:
-            return None
-
-        # Create an armature and make it active
-        name = "Armature_" + mdl_root.name
-        armature = bpy.data.armatures.new(name)
-        armature.display_type = 'STICK'
-        armature_obj = bpy.data.objects.new(name, armature)
-        armature_obj.show_in_front = True
-        bpy.context.collection.objects.link(armature_obj)
-        bpy.context.view_layer.objects.active = armature_obj
-
-        # Enter Edit Mode
-        bpy.ops.object.mode_set(mode='EDIT')
-
-        # Recursively create armature bones from model bones
-        self.create_bones_recursive(armature, mdl_root)
-
-        # Enter Object Mode
-        bpy.ops.object.mode_set(mode='OBJECT')
-
-        # Add Armature modifier to all bone objects
-        for bone in armature.bones:
-            bone_obj = bpy.context.collection.objects[bone.name]
-            if utils.is_mesh_type(bone_obj, Meshtype.TRIMESH):
-                group = bone_obj.vertex_groups.new(name=bone.name)
-                group.add(range(len(bone_obj.data.vertices)), 1.0, 'REPLACE')
-                modifier = bone_obj.modifiers.new(name="Armature", type="ARMATURE")
-                modifier.object = armature_obj
-
-        # Add Armature modifier to all skinmeshes
-        for mesh in skinmeshes:
-            modifier = mesh.modifiers.new(name="Armature", type="ARMATURE")
-            modifier.object = armature_obj
-
-        return armature_obj
-
-    def create_bones_recursive(self, armature, obj, parent=None):
-        bone = armature.edit_bones.new(obj.name)
-        bone.parent = parent
-        bone.head = [0.0] * 3
-        bone.tail = Vector((0.0, 1e-3, 0.0))
-        bone.matrix = obj.matrix_world
-
-        for child in obj.children:
-            if child.type == 'EMPTY' and child.kb.dummytype != Dummytype.NONE:
-                continue
-            if child.type == 'MESH' and child.kb.meshtype != Meshtype.TRIMESH:
-                continue
-            self.create_bones_recursive(armature, child, bone)
-
-    def create_animations(self, mdl_root, armature_obj):
+    def create_animations(self, mdl_root):
         for anim in self.animations:
-            anim.add_to_objects(mdl_root, armature_obj)
+            anim.add_to_objects(mdl_root)
 
     def find_node(self, test):
         return self.root_node.find_node(test)

@@ -16,17 +16,21 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-from .defines import NormalsAlgorithm
+import bpy
 
-import_animations = True
-import_walkmeshes = True
-build_materials = True
-build_armature = False
-normals_algorithm = NormalsAlgorithm.CUSTOM
-sharp_edge_angle = 10.0
+from ..scene import armature
 
-export_animations = True
-export_custom_normals = True
+from .. import utils
 
-texture_path = ""
-texture_search_recursive = False
+
+class KB_OT_rebuild_armature(bpy.types.Operator):
+    bl_idname = "kb.rebuild_armature"
+    bl_label = "Rebuild Armature"
+
+    @classmethod
+    def poll(cls, context):
+        return utils.is_mdl_root(context.object)
+
+    def execute(self, context):
+        armature.rebuild_armature(context.object)
+        return {'FINISHED'}
