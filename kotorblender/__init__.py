@@ -59,7 +59,7 @@ from .ui.panel.pathpoint import KB_PT_path_point
 bl_info = {
     "name": "KotorBlender",
     "author": "Attila Gyoerkoes & J.W. Brandon & Vsevolod Kremianskii",
-    "version": (3, 2, 0),
+    "version": (3, 2, 1),
     "blender": (2, 80, 0),
     "location": "File > Import-Export, Object Properties",
     "description": "Import, export and edit Odyssey Engine models (KotOR)",
