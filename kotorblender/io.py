@@ -42,7 +42,7 @@ def load_mdl(
     import_materials=True,
     import_armatures=False,
     normals_algorithm=NormalsAlgorithm.NONE,
-    sharp_edge_angle=30.0,
+    sharp_edge_angle=10.0,
     texture_search_recursive=False
 ):
     glob.import_animations = import_animations
@@ -63,7 +63,7 @@ def load_lyt(
     import_walkmeshes=True,
     import_materials=True,
     normals_algorithm=NormalsAlgorithm.NONE,
-    sharp_edge_angle=30.0,
+    sharp_edge_angle=10.0,
     texture_search_recursive=False
 ):
     glob.import_animations = import_animations

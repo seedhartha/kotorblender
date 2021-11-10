@@ -63,7 +63,7 @@ class KB_OT_import_lyt(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
     sharp_edge_angle: bpy.props.FloatProperty(
         name="Sharp Edge Angle",
         description="When merging similar vertices, mark edges with an angle higher than this as sharp",
-        default=30.0,
+        default=10.0,
         min=0.0,
         max=90.0)
 

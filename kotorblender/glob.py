@@ -23,7 +23,7 @@ import_walkmeshes = True
 import_materials = True
 import_armatures = False
 normals_algorithm = NormalsAlgorithm.CUSTOM
-sharp_edge_angle = 30.0
+sharp_edge_angle = 10.0
 
 export_animations = True
 export_custom_normals = True
