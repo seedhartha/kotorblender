@@ -112,19 +112,19 @@ class AnimationNode:
             if label not in DATA_PATH_BY_LABEL or not data:
                 continue
 
-            # Action
+            # Action, Animation Data
 
-            action_name = "{}.{}".format(root_name, obj.name)
-            action = self.get_or_create_action(action_name)
-
-            # Animation Data
-
-            target = obj
             if obj.type == 'LIGHT' and label == "color":
                 target = obj.data
+                action_name = "{}.{}.data".format(root_name, obj.name)
+            else:
+                target = obj
+                action_name = "{}.{}".format(root_name, obj.name)
+
+            action = self.get_or_create_action(action_name)
             self.get_or_create_animation_data(target, action)
 
-            # Convert to frames, values
+            # Convert keyframes to frames/values
 
             frames = [anim.frame_start + defines.FPS * d[0] for d in data]
 
@@ -182,8 +182,8 @@ class AnimationNode:
             fcurve = action.fcurves.new(data_path=data_path, index=index)
         return fcurve
 
-    def load_keyframes_from_object(self, anim, obj):
-        anim_data = obj.animation_data
+    def load_keyframes_from_object(self, anim, target):
+        anim_data = target.animation_data
         if not anim_data:
             return
 
