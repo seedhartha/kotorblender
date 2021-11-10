@@ -155,4 +155,4 @@ class AabbNode(TrimeshNode):
         self.bwmposition = obj.kb.bwmposition
         self.lytposition = obj.kb.lytposition
 
-        self.unapply_room_links(obj.data)
+        self.unapply_room_links(self.eval_mesh)

@@ -94,6 +94,7 @@ class TrimeshNode(GeometryNode):
 
         # Internal
         self.sharp_edges = set()
+        self.eval_mesh = None
 
     def add_to_collection(self, collection):
         mesh = self.create_mesh(self.name)
@@ -313,7 +314,7 @@ class TrimeshNode(GeometryNode):
         self.ambient = obj.kb.ambient
 
         depsgraph = bpy.context.evaluated_depsgraph_get()
-        mesh = obj.evaluated_get(depsgraph).data
+        mesh = self.eval_mesh = obj.evaluated_get(depsgraph).data
         mesh.calc_loop_triangles()
 
         for vert in mesh.vertices:
