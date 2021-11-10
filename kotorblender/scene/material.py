@@ -25,14 +25,18 @@ import bpy
 from .. import teximage, utils
 
 
-def get_material_name(obj):
+def rebuild_object_material(obj):
+    material = get_or_create_material(obj)
+
+    mesh = obj.data
+    mesh.materials.clear()
+    mesh.materials.append(material)
+
+    # Only use nodes when object has at least one texture
     if utils.is_null(obj.kb.bitmap) and utils.is_null(obj.kb.bitmap2):
-        diffuse = utils.color_to_hex(obj.kb.diffuse)
-        alpha = utils.int_to_hex(utils.float_to_byte(obj.kb.alpha))
-        name = "D{}__A{}".format(diffuse, alpha)
+        rebuild_material_simple(material, obj)
     else:
-        name = obj.name
-    return name
+        rebuild_material_nodes(material, obj)
 
 
 def get_or_create_material(obj):
@@ -42,6 +46,16 @@ def get_or_create_material(obj):
     else:
         material = bpy.data.materials.new(name)
     return material
+
+
+def get_material_name(obj):
+    if utils.is_null(obj.kb.bitmap) and utils.is_null(obj.kb.bitmap2):
+        diffuse = utils.color_to_hex(obj.kb.diffuse)
+        alpha = utils.int_to_hex(utils.float_to_byte(obj.kb.alpha))
+        name = "D{}__A{}".format(diffuse, alpha)
+    else:
+        name = obj.name
+    return name
 
 
 def rebuild_material_simple(material, obj):
@@ -111,20 +125,3 @@ def rebuild_material_nodes(material, obj):
         links.new(shader.inputs["Alpha"], mul_alpha.outputs[0])
 
     links.new(output.inputs[0], shader.outputs[0])
-
-
-def rebuild_material(obj):
-    """
-    :param obj: object for which to rebuild the material
-    """
-    material = get_or_create_material(obj)
-
-    mesh = obj.data
-    mesh.materials.clear()
-    mesh.materials.append(material)
-
-    # Only use nodes when object has at least one texture
-    if (not utils.is_null(obj.kb.bitmap)) or (not utils.is_null(obj.kb.bitmap2)):
-        rebuild_material_nodes(material, obj)
-    else:
-        rebuild_material_simple(material, obj)

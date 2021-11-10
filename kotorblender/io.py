@@ -39,16 +39,16 @@ def load_mdl(
     filepath="",
     import_animations=True,
     import_walkmeshes=True,
-    import_materials=True,
-    import_armatures=False,
-    normals_algorithm=NormalsAlgorithm.NONE,
+    build_materials=True,
+    build_armature=False,
+    normals_algorithm=NormalsAlgorithm.CUSTOM,
     sharp_edge_angle=10.0,
     texture_search_recursive=False
 ):
     glob.import_animations = import_animations
     glob.import_walkmeshes = import_walkmeshes
-    glob.import_materials = import_materials
-    glob.import_armatures = import_armatures
+    glob.build_materials = build_materials
+    glob.build_armature = build_armature
     glob.normals_algorithm = normals_algorithm
     glob.sharp_edge_angle = sharp_edge_angle
     glob.texture_path = os.path.dirname(filepath)
@@ -61,15 +61,15 @@ def load_lyt(
     filepath="",
     import_animations=True,
     import_walkmeshes=True,
-    import_materials=True,
-    normals_algorithm=NormalsAlgorithm.NONE,
+    build_materials=True,
+    normals_algorithm=NormalsAlgorithm.CUSTOM,
     sharp_edge_angle=10.0,
     texture_search_recursive=False
 ):
     glob.import_animations = import_animations
     glob.import_walkmeshes = import_walkmeshes
-    glob.import_materials = import_materials
-    glob.import_armatures = False
+    glob.build_materials = build_materials
+    glob.build_armature = False
     glob.normals_algorithm = normals_algorithm
     glob.sharp_edge_angle = sharp_edge_angle
     glob.texture_path = os.path.dirname(filepath)
@@ -301,7 +301,7 @@ def do_load_mdl(filepath, position=(0.0, 0.0, 0.0)):
         dwk_walkmesh2.import_to_collection(model_root, collection)
         dwk_walkmesh3.import_to_collection(model_root, collection)
 
-    # reset pose
+    # Reset Pose
     bpy.context.scene.frame_set(0)
 
 

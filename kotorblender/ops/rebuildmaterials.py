@@ -18,20 +18,19 @@
 
 import bpy
 
+from ..defines import Meshtype
 from ..scene import material
 
-from .. import defines
 
+class KB_OT_rebuild_materials(bpy.types.Operator):
+    bl_idname = "kb.rebuild_materials"
+    bl_label = "Rebuild Materials"
 
-class KB_OT_rebuild_material_nodes(bpy.types.Operator):
-    """Rebuild material node tree of this object."""
-
-    bl_idname = "kb.rebuild_material_nodes"
-    bl_label = "Rebuild Material Nodes"
+    @classmethod
+    def poll(cls, context):
+        obj = context.object
+        return obj and obj.type == 'MESH' and obj.kb.meshtype != Meshtype.EMITTER
 
     def execute(self, context):
-        obj = context.object
-        if obj and (obj.type == 'MESH') and (obj.kb.meshtype != defines.Meshtype.EMITTER):
-            material.rebuild_material(obj)
-
+        material.rebuild_object_material(context.object)
         return {'FINISHED'}

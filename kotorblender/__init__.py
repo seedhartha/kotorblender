@@ -37,7 +37,8 @@ from .ops.pth.addconnection import KB_OT_add_connection
 from .ops.pth.export import KB_OT_export_pth
 from .ops.pth.importop import KB_OT_import_pth
 from .ops.pth.removeconnection import KB_OT_remove_connection
-from .ops.rebuildmaterialnodes import KB_OT_rebuild_material_nodes
+from .ops.rebuildarmature import KB_OT_rebuild_armature
+from .ops.rebuildmaterials import KB_OT_rebuild_materials
 from .props.anim import AnimPropertyGroup
 from .props.animevent import AnimEventPropertyGroup
 from .props.flare import FlarePropertyGroup
@@ -112,7 +113,8 @@ classes = (
     KB_OT_import_mdl,
     KB_OT_import_pth,
     KB_OT_load_wok_materials,
-    KB_OT_rebuild_material_nodes,
+    KB_OT_rebuild_armature,
+    KB_OT_rebuild_materials,
     KB_OT_anim_event_move,
     KB_OT_anim_focus,
     KB_OT_anim_move,

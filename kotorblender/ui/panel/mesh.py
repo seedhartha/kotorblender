@@ -68,7 +68,7 @@ class KB_PT_mesh(bpy.types.Panel):
         row = box.row()
         row.prop(obj.kb, "alpha")
         row = box.row()
-        row.operator("kb.rebuild_material_nodes")
+        row.operator("kb.rebuild_materials")
 
         row = layout.row()
         box = row.box()

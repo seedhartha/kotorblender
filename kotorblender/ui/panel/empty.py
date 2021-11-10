@@ -46,7 +46,6 @@ class KB_PT_empty(bpy.types.Panel):
         row.prop(obj.kb, "node_number")
         row = layout.row()
         row.prop(obj.kb, "export_order")
-
         layout.separator()
 
         # Display properties depending on type of the empty
@@ -67,17 +66,12 @@ class KB_PT_empty(bpy.types.Panel):
             col.prop_search(obj.kb, "animroot", context.collection, "objects", text="")
             col.prop(obj.kb, "animscale", text="")
             layout.separator()
-
-        elif (obj.kb.dummytype == defines.Dummytype.PWKROOT):
-            pass
-
-        elif (obj.kb.dummytype == defines.Dummytype.DWKROOT):
-            pass
+            row = box.row()
+            row.operator("kb.rebuild_armature")
 
         elif (obj.kb.dummytype == defines.Dummytype.REFERENCE):
             row = layout.row()
             box = row.box()
-
             row = box.row()
             row.prop(obj.kb, "refmodel")
             row = box.row()
