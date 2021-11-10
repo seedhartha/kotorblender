@@ -23,12 +23,14 @@ from ...scene.modelnode.aabb import AabbNode
 from ...scene.modelnode.dummy import DummyNode
 from ...scene.modelnode.trimesh import FaceList
 
-from ... import aabb
+from ... import aabb, utils
 
 from ..binwriter import BinaryWriter
 from ..mdl.types import *
 
 from .types import *
+
+MERGE_DISTANCE = 1e-4
 
 
 class BwmSaver:
@@ -58,6 +60,7 @@ class BwmSaver:
         self.use_node2 = None
 
         self.verts = []
+        self.new_vert_by_old_vert = dict()
         self.facelist = FaceList()
         self.aabbs = []
         self.adjacent_edges = []
@@ -133,8 +136,25 @@ class BwmSaver:
         self.bwm_size = self.bwm_pos
 
     def peek_vertices(self):
-        for vert in self.geom_node.verts:
-            self.verts.append([vert[i] + self.geom_node.lytposition[i] + self.geom_node.bwmposition[i] for i in range(3)])
+        # Merge duplicates (fixes collision detection)
+        num_verts = len(self.geom_node.verts)
+        num_unique = 0
+        for vert_idx, vert in enumerate(self.geom_node.verts):
+            if vert_idx in self.new_vert_by_old_vert:
+                continue
+            for other_vert_idx in range(vert_idx+1, num_verts):
+                if other_vert_idx in self.new_vert_by_old_vert:
+                    continue
+                other_vert = self.geom_node.verts[other_vert_idx]
+                if utils.is_close_3(vert, other_vert, MERGE_DISTANCE):
+                    self.new_vert_by_old_vert[other_vert_idx] = num_unique
+            self.verts.append(vert)
+            self.new_vert_by_old_vert[vert_idx] = num_unique
+            num_unique += 1
+
+        # Offset by BWM and LYT position
+        for vert_idx, vert in enumerate(self.verts):
+            self.verts[vert_idx] = [vert[i] + self.geom_node.lytposition[i] + self.geom_node.bwmposition[i] for i in range(3)]
 
     def peek_faces(self):
         walkable_face_indices = []
@@ -148,7 +168,7 @@ class BwmSaver:
                 self.num_walkable_faces += 1
         face_indices = walkable_face_indices + non_walkable_face_indices
         for face_idx in face_indices:
-            self.facelist.vertices.append(self.geom_node.facelist.vertices[face_idx])
+            self.facelist.vertices.append([self.new_vert_by_old_vert[vert_idx] for vert_idx in self.geom_node.facelist.vertices[face_idx]])
             self.facelist.materials.append(self.geom_node.facelist.materials[face_idx])
             self.facelist.normals.append(self.geom_node.facelist.normals[face_idx])
 

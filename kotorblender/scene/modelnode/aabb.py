@@ -21,7 +21,9 @@ import bpy
 from bpy_extras.io_utils import unpack_list
 from mathutils import Vector
 
-from ... import defines
+from ...defines import NormalsAlgorithm
+
+from ... import defines, glob
 
 from .trimesh import TrimeshNode, UV_MAP_DIFFUSE, UV_MAP_LIGHTMAP
 
@@ -60,7 +62,8 @@ class AabbNode(TrimeshNode):
         return obj
 
     def create_mesh(self, name):
-        self.merge_similar_vertices()
+        if glob.normals_algorithm == NormalsAlgorithm.SHARP_EDGES:
+            self.merge_similar_vertices()
 
         # Create the mesh itself
         mesh = bpy.data.meshes.new(name)
