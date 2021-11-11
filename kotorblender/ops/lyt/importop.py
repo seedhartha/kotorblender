@@ -25,8 +25,6 @@ from ... import io
 
 
 class KB_OT_import_lyt(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
-    """Import Odyssey Engine layout (.lyt)"""
-
     bl_idname = "kb.lytimport"
     bl_label = "Import Odyssey LYT"
     bl_options = {'UNDO'}

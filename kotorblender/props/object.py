@@ -33,9 +33,6 @@ def update_light_power(self, context):
 
 
 def update_shadow_prop(self, context):
-    """
-    Set the lights shadow to match the Aurora shadow property
-    """
     if context.object and context.object.type == 'LIGHT':
         context.object.data.use_shadow = self.shadow != 0
 
@@ -60,11 +57,6 @@ def update_emitter_prop(self, context):
 
 
 class ObjectPropertyGroup(bpy.types.PropertyGroup):
-    """
-    This class defines all additional properties needed by the mdl file
-    format. It hold the properties for meshes, lights and empties.
-    """
-
     # For all objects
     node_number: bpy.props.IntProperty(name="Node Number", description="Node number must be equal to this nodes number in supermodel", default=0, min=0, max=1000)
     export_order: bpy.props.IntProperty(name="Export Order", description="Export order relative to parent", default=0, min=0, max=1000)

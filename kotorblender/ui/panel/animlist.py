@@ -22,13 +22,6 @@ from ... import utils
 
 
 class KB_PT_animlist(bpy.types.Panel):
-    """Property panel for animationslist.
-
-    Property panel for additional properties needed for the mdl file
-    format. This is only available for EMPTY objects.
-    It is located under the object data panel in the properties window
-    """
-
     bl_label = "Odyssey Animations"
     bl_space_type = 'PROPERTIES'
     bl_region_type = 'WINDOW'
@@ -36,11 +29,9 @@ class KB_PT_animlist(bpy.types.Panel):
 
     @classmethod
     def poll(cls, context):
-        """Draw only if part of a valid mdl is selected."""
         return utils.is_mdl_root(context.object)
 
     def draw(self, context):
-        """Draw the panel."""
         layout = self.layout
         mdl_root = context.object
 

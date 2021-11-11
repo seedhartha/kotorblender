@@ -22,8 +22,6 @@ from .... import utils
 
 
 class KB_OT_anim_event_delete(bpy.types.Operator):
-    """Delete the selected item from the event list"""
-
     bl_idname = "kb.anim_event_delete"
     bl_label = "Deletes an event from an animation"
     bl_options = {'UNDO'}

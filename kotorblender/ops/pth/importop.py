@@ -23,8 +23,6 @@ from ... import io
 
 
 class KB_OT_import_pth(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
-    """Import Odyssey Engine path (.pth)"""
-
     bl_idname = "kb.pthimport"
     bl_label = "Import Odyssey PTH"
 

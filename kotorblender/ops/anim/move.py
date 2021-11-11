@@ -22,8 +22,6 @@ from ... import utils
 
 
 class KB_OT_anim_move(bpy.types.Operator):
-    """Move an item in the animation list, without affecting keyframes"""
-
     bl_idname = "kb.anim_move"
     bl_label = "Move an animation in the list, without affecting keyframes"
     bl_options = {'UNDO'}

@@ -20,8 +20,6 @@ import bpy
 
 
 class KB_OT_delete_lightflare(bpy.types.Operator):
-    """ Delete the selected item from the flare list """
-
     bl_idname = "kb.lightflare_delete"
     bl_label = "Deletes a flare from the light"
 

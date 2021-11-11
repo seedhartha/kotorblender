@@ -22,11 +22,6 @@ from ... import defines, utils
 
 
 class KB_PT_emitter(bpy.types.Panel):
-    """
-    Property panel for additional properties needed for the mdl file
-    format. This is only available for particle systems.
-    It is located under the particle panel in the properties window
-    """
     bl_label = "Odyssey Emitter"
     bl_space_type = 'PROPERTIES'
     bl_region_type = 'WINDOW'

@@ -16,10 +16,6 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-"""
-Functions related to material building.
-"""
-
 import bpy
 
 from .. import teximage, utils

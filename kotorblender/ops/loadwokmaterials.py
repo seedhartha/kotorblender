@@ -22,18 +22,10 @@ from .. import defines
 
 
 class KB_OT_load_wok_materials(bpy.types.Operator):
-    """
-    Load all materials for aabb walkmeshes for the selected object. Current
-    material slots will be deleted.
-    """
     bl_idname = "kb.load_wok_mats"
     bl_label = "Load walkmesh materials"
 
     def execute(self, context):
-        """
-        - Deletes all current materials
-        - adds walkmesh materials
-        """
         selected_object = context.object
         if (selected_object) and (selected_object.type == 'MESH'):
             object_mesh = selected_object.data

@@ -22,8 +22,6 @@ from .animevent import AnimEventPropertyGroup
 
 
 class AnimPropertyGroup(bpy.types.PropertyGroup):
-    """Properties for a single animation in the animation list."""
-
     name: bpy.props.StringProperty(name="Name",
                                    description="Name of this animation",
                                    default="unnamed", options=set())

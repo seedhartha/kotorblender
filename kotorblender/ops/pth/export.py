@@ -23,8 +23,6 @@ from ... import io
 
 
 class KB_OT_export_pth(bpy.types.Operator, bpy_extras.io_utils.ExportHelper):
-    """Export Odyssey Engine path (.pth)"""
-
     bl_idname = "kb.pthexport"
     bl_label = "Export Odyssey PTH"
 
