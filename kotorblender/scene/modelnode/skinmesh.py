@@ -58,7 +58,7 @@ class SkinmeshNode(TrimeshNode):
     def load_object_data(self, obj):
         TrimeshNode.load_object_data(self, obj)
 
-        for vert in obj.data.vertices:
+        for vert in self.eval_mesh.vertices:
             vert_weights = []
             for group_weight in vert.groups:
                 group = obj.vertex_groups[group_weight.group]
