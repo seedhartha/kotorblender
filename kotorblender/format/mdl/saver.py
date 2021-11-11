@@ -231,7 +231,7 @@ class MdlSaver:
                 # Controllers
                 ctrl_keys = []
                 ctrl_data = []
-                self.peek_anim_controllers(model_node, node, type_flags, ctrl_keys, ctrl_data)
+                self.peek_anim_controllers(node, type_flags, ctrl_keys, ctrl_data)
                 ctrl_count = len(ctrl_keys)
                 ctrl_data_count = len(ctrl_data)
                 self.anim_controller_keys[anim_idx].append(ctrl_keys)
@@ -535,7 +535,7 @@ class MdlSaver:
                         out_data.append(val)
                 data_count += 1 + dim
 
-    def peek_anim_controllers(self, model_node, node, type_flags, out_keys, out_data):
+    def peek_anim_controllers(self, node, type_flags, out_keys, out_data):
 
         def append_keyframes(key, ctrl_type, num_columns, data_count, converter=None):
             if key not in node.keyframes:
@@ -560,7 +560,7 @@ class MdlSaver:
 
         # Base Controllers
 
-        data_count = append_keyframes("position", CTRL_BASE_POSITION, 3, data_count, lambda values: (Vector(values) - model_node.position)[:3])
+        data_count = append_keyframes("position", CTRL_BASE_POSITION, 3, data_count)
         data_count = append_keyframes("orientation", CTRL_BASE_ORIENTATION, 4, data_count, lambda values: [*values[1:4], values[0]])
         data_count = append_keyframes("scale", CTRL_BASE_SCALE, 1, data_count)
 
