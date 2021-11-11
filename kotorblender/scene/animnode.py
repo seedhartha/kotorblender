@@ -88,12 +88,12 @@ LABEL_BY_DATA_PATH = {value: key for key, value in DATA_PATH_BY_LABEL.items()}
 
 CONVERTER_BY_LABEL = {
     "position": lambda val, obj, animscale: [obj.location[i] + animscale * val[i] for i in range(3)],
-    "scale": lambda val, _: [val[0], val[0], val[0]]
+    "scale": lambda val, obj, animscale: [val[0], val[0], val[0]]
 }
 
 CONVERTER_BY_DATA_PATH = {
     "location": lambda val, obj: [val[i] - obj.location[i] for i in range(3)],
-    "scale": lambda val: [val[0]]
+    "scale": lambda val, obj: [val[0]]
 }
 
 
