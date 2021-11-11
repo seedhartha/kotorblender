@@ -22,13 +22,6 @@ from ... import defines
 
 
 class KB_PT_mesh(bpy.types.Panel):
-    """
-    Property panel for additional mesh properties. This
-    holds all properties not supported by blender at the moment,
-    but used by OpenGL and the aurora engine. This is only available
-    for MESH objects.
-    It is located under the object data panel in the properties window
-    """
     bl_label = "Odyssey Mesh"
     bl_space_type = 'PROPERTIES'
     bl_region_type = 'WINDOW'

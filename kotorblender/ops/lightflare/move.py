@@ -20,8 +20,6 @@ import bpy
 
 
 class KB_OT_move_lightflare(bpy.types.Operator):
-    """ Move an item in the flare list """
-
     bl_idname = "kb.lightflare_move"
     bl_label = "Move an item in the flare list"
 

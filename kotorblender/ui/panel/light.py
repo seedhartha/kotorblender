@@ -20,13 +20,6 @@ import bpy
 
 
 class KB_PT_light(bpy.types.Panel):
-    """
-    Property panel for additional light properties. This
-    holds all properties not supported by blender at the moment,
-    but used by OpenGL and the aurora engine. This is only available
-    for LIGHT objects.
-    It is located under the object data panel in the properties window
-    """
     bl_label = "Odyssey Light"
     bl_space_type = 'PROPERTIES'
     bl_region_type = 'WINDOW'

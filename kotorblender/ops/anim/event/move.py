@@ -22,8 +22,6 @@ from .... import utils
 
 
 class KB_OT_anim_event_move(bpy.types.Operator):
-    """Move an item in the event list"""
-
     bl_idname = "kb.anim_event_move"
     bl_label = "Move an item in the event list"
     bl_options = {'UNDO'}

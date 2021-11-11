@@ -22,10 +22,6 @@ from .. import defines
 
 
 class FlarePropertyGroup(bpy.types.PropertyGroup):
-    """
-    Properties for a single flare in the flare list
-    """
-
     texture: bpy.props.StringProperty(name="Texture",
                                       description="Texture name",
                                       default=defines.NULL)

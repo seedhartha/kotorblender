@@ -22,8 +22,6 @@ from ... import utils
 
 
 class KB_OT_anim_delete(bpy.types.Operator):
-    """Delete the selected animation and its keyframes"""
-
     bl_idname = "kb.anim_delete"
     bl_label = "Delete an animation"
 

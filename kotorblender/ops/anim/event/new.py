@@ -24,8 +24,6 @@ from .... import utils
 
 
 class KB_OT_anim_event_new(bpy.types.Operator):
-    """Add a new item to the event list"""
-
     bl_idname = "kb.anim_event_new"
     bl_label = "Add a new event to an animation"
     bl_options = {'UNDO'}

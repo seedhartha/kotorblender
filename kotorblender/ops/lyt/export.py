@@ -23,8 +23,6 @@ from ... import io
 
 
 class KB_OT_export_lyt(bpy.types.Operator, bpy_extras.io_utils.ExportHelper):
-    """Export Odyssey Engine layout (.lyt)"""
-
     bl_idname = "kb.lytexport"
     bl_label = "Export Odyssey LYT"
 

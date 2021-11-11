@@ -22,11 +22,6 @@ from ... import defines
 
 
 class KB_PT_empty(bpy.types.Panel):
-    """
-    Property panel for additional properties needed for the mdl file
-    format. This is only available for EMPTY objects.
-    It is located under the object data panel in the properties window
-    """
     bl_label = "Odyssey Dummy"
     bl_space_type = 'PROPERTIES'
     bl_region_type = 'WINDOW'

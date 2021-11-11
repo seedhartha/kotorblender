@@ -15,11 +15,6 @@
 #  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 #
 # ##### END GPL LICENSE BLOCK #####
-
-"""
-Image/texture helper functions.
-"""
-
 import bpy
 
 from bpy_extras import image_utils
@@ -44,11 +39,6 @@ def create_image(name, path):
 
 
 def load_texture_image(name):
-    """
-    Get or create a texture data-block by name.
-
-    :returns: textures image
-    """
     if name in bpy.data.textures:
         texture = bpy.data.textures[name]
     else:
