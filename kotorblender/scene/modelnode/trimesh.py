@@ -94,6 +94,7 @@ class TrimeshNode(GeometryNode):
 
         # Internal
         self.sharp_edges = set()
+        self.eval_obj = None
         self.eval_mesh = None
 
     def add_to_collection(self, collection):
@@ -317,47 +318,48 @@ class TrimeshNode(GeometryNode):
         self.ambient = obj.kb.ambient
 
         depsgraph = bpy.context.evaluated_depsgraph_get()
-        mesh = self.eval_mesh = obj.evaluated_get(depsgraph).data
-        mesh.calc_loop_triangles()
+        self.eval_obj = obj.evaluated_get(depsgraph)
+        self.eval_mesh = self.eval_obj.data
+        self.eval_mesh.calc_loop_triangles()
 
-        for vert in mesh.vertices:
+        for vert in self.eval_mesh.vertices:
             self.verts.append(vert.co[:3])
 
-        if glob.export_custom_normals and mesh.has_custom_normals:
-            mesh.calc_normals_split()
+        if glob.export_custom_normals and self.eval_mesh.has_custom_normals:
+            self.eval_mesh.calc_normals_split()
             normals = dict()
-            for loop in mesh.loops:
+            for loop in self.eval_mesh.loops:
                 vert_idx = loop.vertex_index
                 if loop.vertex_index not in normals:
                     normals[vert_idx] = loop.normal
                 else:
                     normals[vert_idx] += loop.normal
-            for vert_idx in range(len(mesh.vertices)):
+            for vert_idx in range(len(self.eval_mesh.vertices)):
                 normal = normals[vert_idx].normalized()
                 self.normals.append(normal)
         else:
-            for vert in mesh.vertices:
+            for vert in self.eval_mesh.vertices:
                 self.normals.append(vert.normal[:3])
 
-        self.uv1 = self.get_uv_from_uv_layer(mesh, UV_MAP_DIFFUSE)
-        self.uv2 = self.get_uv_from_uv_layer(mesh, UV_MAP_LIGHTMAP)
+        self.uv1 = self.get_uv_from_uv_layer(self.eval_mesh, UV_MAP_DIFFUSE)
+        self.uv2 = self.get_uv_from_uv_layer(self.eval_mesh, UV_MAP_LIGHTMAP)
 
         if self.tangentspace:
-            num_verts = len(mesh.vertices)
+            num_verts = len(self.eval_mesh.vertices)
             self.tangents = [Vector() for _ in range(num_verts)]
             self.bitangents = [Vector() for _ in range(num_verts)]
             self.tangentspacenormals = [Vector() for _ in range(num_verts)]
             if self.uv1:
-                mesh.calc_tangents(uvmap=UV_MAP_DIFFUSE)
+                self.eval_mesh.calc_tangents(uvmap=UV_MAP_DIFFUSE)
 
-        for tri in mesh.loop_triangles:
+        for tri in self.eval_mesh.loop_triangles:
             self.facelist.vertices.append(tri.vertices[:3])
             self.facelist.uv.append(tri.vertices[:3])
             self.facelist.materials.append(tri.material_index)
             self.facelist.normals.append(tri.normal)
 
             if self.tangentspace and self.uv1:
-                for loop in [mesh.loops[i] for i in tri.loops]:
+                for loop in [self.eval_mesh.loops[i] for i in tri.loops]:
                     vert_idx = loop.vertex_index
                     self.tangents[vert_idx] += loop.tangent
                     self.bitangents[vert_idx] += loop.bitangent

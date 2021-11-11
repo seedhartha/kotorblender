@@ -66,7 +66,7 @@ class DanglymeshNode(TrimeshNode):
         self.tightness = obj.kb.tightness
         self.displacement = obj.kb.displacement
 
-        if CONSTRAINTS not in obj.vertex_groups:
+        if CONSTRAINTS not in self.eval_obj.vertex_groups:
             return
-        group = obj.vertex_groups[CONSTRAINTS]
+        group = self.eval_obj.vertex_groups[CONSTRAINTS]
         self.constraints = [255.0 * group.weight(i) for i in range(len(self.verts))]
