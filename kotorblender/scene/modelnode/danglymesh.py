@@ -43,6 +43,15 @@ class DanglymeshNode(TrimeshNode):
         obj.kb.displacement = self.displacement
         self.add_constraints_to_object(obj)
 
+    def compact_vertices(self, unique_indices, split_normals):
+        TrimeshNode.compact_vertices(self, unique_indices, split_normals)
+
+        for new_idx, old_idx in enumerate(unique_indices):
+            self.constraints[new_idx] = self.constraints[old_idx]
+
+        num_unique = len(unique_indices)
+        self.constraints = self.constraints[:num_unique]
+
     def add_constraints_to_object(self, obj):
         group = obj.vertex_groups.new(name=CONSTRAINTS)
         for vert_idx, constraint in enumerate(self.constraints):

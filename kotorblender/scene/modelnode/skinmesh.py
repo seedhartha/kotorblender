@@ -35,6 +35,15 @@ class SkinmeshNode(TrimeshNode):
 
         self.add_skin_groups_to_object(obj)
 
+    def compact_vertices(self, unique_indices, split_normals):
+        TrimeshNode.compact_vertices(self, unique_indices, split_normals)
+
+        for new_idx, old_idx in enumerate(unique_indices):
+            self.weights[new_idx] = self.weights[old_idx]
+
+        num_unique = len(unique_indices)
+        self.weights = self.weights[:num_unique]
+
     def add_skin_groups_to_object(self, obj):
         groups = dict()
         for vert_idx, vert_weights in enumerate(self.weights):
