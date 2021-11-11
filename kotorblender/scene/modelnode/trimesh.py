@@ -109,7 +109,7 @@ class TrimeshNode(GeometryNode):
         return obj
 
     def create_mesh(self, name):
-        if glob.normals_algorithm == NormalsAlgorithm.SHARP_EDGES:
+        if glob.normals_algorithm == NormalsAlgorithm.SHARP_EDGES and self.roottype == "mdl":
             self.merge_similar_vertices()
 
         # Create the mesh itself
@@ -138,7 +138,8 @@ class TrimeshNode(GeometryNode):
 
         mesh.update()
 
-        self.post_process_mesh(mesh)
+        if self.roottype == "mdl":
+            self.post_process_mesh(mesh)
 
         return mesh
 

@@ -62,7 +62,7 @@ class AabbNode(TrimeshNode):
         return obj
 
     def create_mesh(self, name):
-        if glob.normals_algorithm == NormalsAlgorithm.SHARP_EDGES:
+        if glob.normals_algorithm == NormalsAlgorithm.SHARP_EDGES and self.roottype == "mdl":
             self.merge_similar_vertices()
 
         # Create the mesh itself
@@ -79,8 +79,7 @@ class AabbNode(TrimeshNode):
         # Create materials
         for wok_mat in defines.WOK_MATERIALS:
             mat_name = wok_mat[0]
-            # Walkmesh materials will be shared across multiple walkmesh
-            # objects
+            # Walkmesh materials will be shared across multiple walkmesh objects
             if mat_name in bpy.data.materials:
                 material = bpy.data.materials[mat_name]
             else:
@@ -108,7 +107,8 @@ class AabbNode(TrimeshNode):
 
         mesh.update()
 
-        self.post_process_mesh(mesh)
+        if self.roottype == "mdl":
+            self.post_process_mesh(mesh)
 
         return mesh
 
