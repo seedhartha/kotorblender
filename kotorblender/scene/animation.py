@@ -44,13 +44,16 @@ class Animation:
 
         self.add_nodes_to_objects(list_anim, self.root_node, mdl_root, animscale)
 
-    def add_nodes_to_objects(self, anim, node, mdl_root, animscale):
+    def add_nodes_to_objects(self, anim, node, mdl_root, animscale, below_animroot=False):
         obj = utils.find_object(mdl_root, lambda o: o.kb.node_number == node.supernode_number)
         if obj:
-            node.add_keyframes_to_object(anim, obj, mdl_root.name, animscale)
+            if not below_animroot and obj.name.lower() == mdl_root.kb.animroot.lower():
+                below_animroot = True
+            if below_animroot:
+                node.add_keyframes_to_object(anim, obj, mdl_root.name, animscale)
 
         for child in node.children:
-            self.add_nodes_to_objects(anim, child, mdl_root, animscale)
+            self.add_nodes_to_objects(anim, child, mdl_root, animscale, below_animroot)
 
     @classmethod
     def append_to_object(cls, mdl_root, name, length=0.0, transtime=0.25, animroot=defines.NULL):

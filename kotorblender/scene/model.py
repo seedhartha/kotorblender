@@ -83,6 +83,7 @@ class Model:
             if not root_obj:
                 print("Could not found MDL root to add animations to")
                 return
+
             animscale = root_obj.kb.animscale
 
         if glob.import_animations:
