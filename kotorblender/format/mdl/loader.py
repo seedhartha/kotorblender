@@ -646,8 +646,7 @@ class MdlLoader:
             supernode = self.node_by_number[supernode_number]
             controllers = self.load_controllers(controller_arr, controller_data_arr)
             if CTRL_BASE_POSITION in controllers:
-                positions = [self.add_vectors(row[1:4], supernode.position) for row in controllers[CTRL_BASE_POSITION]]
-                node.keyframes["position"] = [[row[0]] + positions[i] for i, row in enumerate(controllers[CTRL_BASE_POSITION])]
+                node.keyframes["position"] = [row[:4] for row in controllers[CTRL_BASE_POSITION]]
             if CTRL_BASE_ORIENTATION in controllers:
                 orientations = [self.orientation_controller_to_quaternion(row[1:]) for row in controllers[CTRL_BASE_ORIENTATION]]
                 node.keyframes["orientation"] = [[row[0]] + orientations[i] for i, row in enumerate(controllers[CTRL_BASE_ORIENTATION])]
@@ -745,9 +744,6 @@ class MdlLoader:
             return switch[node_type](name)
         except KeyError:
             raise MalformedFile("Invalid node type")
-
-    def add_vectors(self, a, b):
-        return [a[i] + b[i] for i in range(3)]
 
     def orientation_controller_to_quaternion(self, values):
         num_columns = len(values)

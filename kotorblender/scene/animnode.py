@@ -87,11 +87,12 @@ DATA_PATH_BY_LABEL = {
 LABEL_BY_DATA_PATH = {value: key for key, value in DATA_PATH_BY_LABEL.items()}
 
 CONVERTER_BY_LABEL = {
-    "position": lambda val, animscale: [val[i] * animscale for i in range(3)],
+    "position": lambda val, obj, animscale: [obj.location[i] + animscale * val[i] for i in range(3)],
     "scale": lambda val, _: [val[0], val[0], val[0]]
 }
 
 CONVERTER_BY_DATA_PATH = {
+    "location": lambda val, obj: [val[i] - obj.location[i] for i in range(3)],
     "scale": lambda val: [val[0]]
 }
 
@@ -131,7 +132,7 @@ class AnimationNode:
 
             if label in CONVERTER_BY_LABEL:
                 converter = CONVERTER_BY_LABEL[label]
-                values = [converter(d[1:], animscale) for d in data]
+                values = [converter(d[1:], obj, animscale) for d in data]
             else:
                 values = [d[1:] for d in data]
 
@@ -206,7 +207,7 @@ class AnimationNode:
                 timekey = (point[0] - anim.frame_start) / defines.FPS
                 if data_path in CONVERTER_BY_DATA_PATH:
                     converter = CONVERTER_BY_DATA_PATH[data_path]
-                    values = converter(point[1:])
+                    values = converter(point[1:], target)
                 else:
                     values = point[1:]
                 self.keyframes[label].append([timekey] + values)
