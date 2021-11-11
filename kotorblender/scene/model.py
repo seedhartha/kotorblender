@@ -18,6 +18,8 @@
 
 import re
 
+import bpy
+
 from mathutils import Matrix
 
 from ..defines import Dummytype, Meshtype, Nodetype
@@ -59,21 +61,32 @@ class Model:
 
         print("Importing model '{}' to collection".format(self.name))
 
-        root_obj = self.root_node.add_to_collection(collection)
-        root_obj.location = position
-        root_obj.kb.dummytype = defines.Dummytype.MDLROOT
-        root_obj.kb.supermodel = self.supermodel
-        root_obj.kb.classification = self.classification
-        root_obj.kb.subclassification = self.subclassification
-        root_obj.kb.affected_by_fog = self.affected_by_fog
-        root_obj.kb.animroot = self.animroot
-        root_obj.kb.animscale = self.animscale
+        if glob.import_geometry:
+            root_obj = self.root_node.add_to_collection(collection)
+            root_obj.location = position
+            root_obj.kb.dummytype = defines.Dummytype.MDLROOT
+            root_obj.kb.supermodel = self.supermodel
+            root_obj.kb.classification = self.classification
+            root_obj.kb.subclassification = self.subclassification
+            root_obj.kb.affected_by_fog = self.affected_by_fog
+            root_obj.kb.animroot = self.animroot
+            root_obj.kb.animscale = self.animscale
 
-        for child in self.root_node.children:
-            self.import_nodes_to_collection(child, root_obj, collection)
+            for child in self.root_node.children:
+                self.import_nodes_to_collection(child, root_obj, collection)
+
+            animscale = 1.0  # animation scale must only be applied to supermodel animations
+        else:
+            root_obj = next(iter(obj for obj in bpy.context.selected_objects if utils.is_mdl_root(obj)), None)
+            if not root_obj:
+                root_obj = next(iter(obj for obj in bpy.context.collection.objects if utils.is_mdl_root(obj)), None)
+            if not root_obj:
+                print("Could not found MDL root to add animations to")
+                return
+            animscale = root_obj.kb.animscale
 
         if glob.import_animations:
-            self.create_animations(root_obj)
+            self.create_animations(root_obj, animscale)
 
         if glob.build_armature:
             armature.rebuild_armature(root_obj)
@@ -87,9 +100,9 @@ class Model:
         for child in node.children:
             self.import_nodes_to_collection(child, obj, collection)
 
-    def create_animations(self, mdl_root):
+    def create_animations(self, mdl_root, animscale):
         for anim in self.animations:
-            anim.add_to_objects(mdl_root)
+            anim.add_to_objects(mdl_root, animscale)
 
     def find_node(self, test):
         return self.root_node.find_node(test)

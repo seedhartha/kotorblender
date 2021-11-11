@@ -18,6 +18,7 @@
 
 from .defines import NormalsAlgorithm
 
+import_geometry = True
 import_animations = True
 import_walkmeshes = True
 build_materials = True
