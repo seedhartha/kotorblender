@@ -328,12 +328,12 @@ class TrimeshNode(GeometryNode):
         if glob.export_custom_normals and self.eval_mesh.has_custom_normals:
             self.eval_mesh.calc_normals_split()
             normals = dict()
-            for loop in self.eval_mesh.loops:
-                vert_idx = loop.vertex_index
-                if loop.vertex_index not in normals:
-                    normals[vert_idx] = loop.normal
-                else:
-                    normals[vert_idx] += loop.normal
+            for tri in self.eval_mesh.loop_triangles:
+                for vert_idx, normal in zip(tri.vertices, tri.split_normals):
+                    if vert_idx not in normals:
+                        normals[vert_idx] = Vector(normal)
+                    else:
+                        normals[vert_idx] += Vector(normal)
             for vert_idx in range(len(self.eval_mesh.vertices)):
                 normal = normals[vert_idx].normalized()
                 self.normals.append(normal)
