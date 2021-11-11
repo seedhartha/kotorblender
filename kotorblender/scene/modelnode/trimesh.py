@@ -189,27 +189,7 @@ class TrimeshNode(GeometryNode):
 
         # Compact vertices
 
-        for new_idx, old_idx in enumerate(unique_indices):
-            normal = Vector()
-            for n in split_normals[new_idx]:
-                for i in range(3):
-                    normal[i] += n[i]
-            normal.normalize()
-
-            self.verts[new_idx] = self.verts[old_idx]
-            self.normals[new_idx] = tuple(normal[:3])
-            if self.uv1:
-                self.uv1[new_idx] = self.uv1[old_idx]
-            if self.uv2:
-                self.uv2[new_idx] = self.uv2[old_idx]
-
-        num_unique = len(unique_indices)
-        self.verts = self.verts[:num_unique]
-        self.normals = self.normals[:num_unique]
-        if self.uv1:
-            self.uv1 = self.uv1[:num_unique]
-        if self.uv2:
-            self.uv2 = self.uv2[:num_unique]
+        self.compact_vertices(unique_indices, split_normals)
 
         # Determine sharp vertices
 
@@ -239,6 +219,29 @@ class TrimeshNode(GeometryNode):
             for edge in edges:
                 if sharp_verts[edge[0]] and sharp_verts[edge[1]]:
                     self.sharp_edges.add(edge)
+
+    def compact_vertices(self, unique_indices, split_normals):
+        for new_idx, old_idx in enumerate(unique_indices):
+            normal = Vector()
+            for n in split_normals[new_idx]:
+                for i in range(3):
+                    normal[i] += n[i]
+            normal.normalize()
+
+            self.verts[new_idx] = self.verts[old_idx]
+            self.normals[new_idx] = tuple(normal[:3])
+            if self.uv1:
+                self.uv1[new_idx] = self.uv1[old_idx]
+            if self.uv2:
+                self.uv2[new_idx] = self.uv2[old_idx]
+
+        num_unique = len(unique_indices)
+        self.verts = self.verts[:num_unique]
+        self.normals = self.normals[:num_unique]
+        if self.uv1:
+            self.uv1 = self.uv1[:num_unique]
+        if self.uv2:
+            self.uv2 = self.uv2[:num_unique]
 
     def post_process_mesh(self, mesh):
         if glob.normals_algorithm == NormalsAlgorithm.SHARP_EDGES:
