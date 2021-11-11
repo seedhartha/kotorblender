@@ -28,6 +28,9 @@ from .animnode import AnimationNode
 
 
 def rebuild_armature(mdl_root):
+    # Reset Pose
+    bpy.context.scene.frame_set(0)
+
     # MDL root must have at least one skinmesh
     skinmeshes = utils.find_objects(mdl_root, utils.is_skin_mesh)
     if not skinmeshes:
@@ -67,6 +70,9 @@ def rebuild_armature(mdl_root):
         modifier.object = armature_obj
 
     bpy.context.view_layer.objects.active = mdl_root
+
+    # Reset Pose
+    bpy.context.scene.frame_set(0)
 
     return armature_obj
 
