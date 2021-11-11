@@ -37,6 +37,7 @@ from . import glob, utils
 
 def load_mdl(
     filepath="",
+    import_geometry=True,
     import_animations=True,
     import_walkmeshes=True,
     build_materials=True,
@@ -45,6 +46,7 @@ def load_mdl(
     sharp_edge_angle=10.0,
     texture_search_recursive=False
 ):
+    glob.import_geometry = import_geometry
     glob.import_animations = import_animations
     glob.import_walkmeshes = import_walkmeshes
     glob.build_materials = build_materials
@@ -264,7 +266,7 @@ def do_load_mdl(filepath, position=(0.0, 0.0, 0.0)):
     dwk_walkmesh2 = None
     dwk_walkmesh3 = None
 
-    if glob.import_walkmeshes:
+    if glob.import_geometry and glob.import_walkmeshes:
         wok_path = filepath[:-4] + ".wok"
         if os.path.exists(wok_path):
             wok = BwmLoader(wok_path, model.name)

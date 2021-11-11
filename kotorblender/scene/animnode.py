@@ -87,7 +87,8 @@ DATA_PATH_BY_LABEL = {
 LABEL_BY_DATA_PATH = {value: key for key, value in DATA_PATH_BY_LABEL.items()}
 
 CONVERTER_BY_LABEL = {
-    "scale": lambda val: [val[0], val[0], val[0]]
+    "position": lambda val, animscale: [val[i] * animscale for i in range(3)],
+    "scale": lambda val, _: [val[0], val[0], val[0]]
 }
 
 CONVERTER_BY_DATA_PATH = {
@@ -107,7 +108,7 @@ class AnimationNode:
 
         self.animated = False  # this node or its children contain keyframes
 
-    def add_keyframes_to_object(self, anim, obj, root_name):
+    def add_keyframes_to_object(self, anim, obj, root_name, animscale):
         for label, data in self.keyframes.items():
             if label not in DATA_PATH_BY_LABEL or not data:
                 continue
@@ -130,7 +131,7 @@ class AnimationNode:
 
             if label in CONVERTER_BY_LABEL:
                 converter = CONVERTER_BY_LABEL[label]
-                values = [converter(d[1:]) for d in data]
+                values = [converter(d[1:], animscale) for d in data]
             else:
                 values = [d[1:] for d in data]
 

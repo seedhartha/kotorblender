@@ -35,6 +35,11 @@ class KB_OT_import_mdl(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
         default="*.mdl",
         options={'HIDDEN'})
 
+    import_geometry: bpy.props.BoolProperty(
+        name="Import Geometry",
+        description="Untick to import animations from supermodel",
+        default=True)
+
     import_animations: bpy.props.BoolProperty(
         name="Import Animations",
         default=True)

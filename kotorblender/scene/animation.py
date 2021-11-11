@@ -37,20 +37,20 @@ class Animation:
 
         self.events = []
 
-    def add_to_objects(self, mdl_root):
+    def add_to_objects(self, mdl_root, animscale):
         list_anim = Animation.append_to_object(mdl_root, self.name, self.length, self.transtime, self.animroot)
         for time, name in self.events:
             Animation.append_event_to_object_anim(list_anim, name, time)
 
-        self.add_nodes_to_objects(list_anim, self.root_node, mdl_root)
+        self.add_nodes_to_objects(list_anim, self.root_node, mdl_root, animscale)
 
-    def add_nodes_to_objects(self, anim, node, mdl_root):
+    def add_nodes_to_objects(self, anim, node, mdl_root, animscale):
         obj = utils.find_object(mdl_root, lambda o: o.kb.node_number == node.supernode_number)
         if obj:
-            node.add_keyframes_to_object(anim, obj, mdl_root.name)
+            node.add_keyframes_to_object(anim, obj, mdl_root.name, animscale)
 
         for child in node.children:
-            self.add_nodes_to_objects(anim, child, mdl_root)
+            self.add_nodes_to_objects(anim, child, mdl_root, animscale)
 
     @classmethod
     def append_to_object(cls, mdl_root, name, length=0.0, transtime=0.25, animroot=defines.NULL):
