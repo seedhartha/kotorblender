@@ -61,8 +61,8 @@ CLASS_BY_VALUE = {
     CLASS_TILE: Classification.TILE,
     CLASS_CHARACTER: Classification.CHARACTER,
     CLASS_DOOR: Classification.DOOR,
-    CLASS_LIGHTSABER: Classification.SABER,
-    CLASS_PLACEABLE: Classification.DOOR,
+    CLASS_LIGHTSABER: Classification.LIGHTSABER,
+    CLASS_PLACEABLE: Classification.PLACEABLE,
     CLASS_FLYER: Classification.FLYER
 }
 

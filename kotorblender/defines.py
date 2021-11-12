@@ -110,11 +110,11 @@ class Classification:
     DOOR = "Door"
     EFFECT = "Effect"
     GUI = "Gui"
-    SABER = "Lightsaber"
-    ITEM = "Placeable"
+    LIGHTSABER = "Lightsaber"
+    PLACEABLE = "Placeable"
     FLYER = "Flyer"
 
-    ALL = {UNKNOWN, TILE, CHARACTER, DOOR, EFFECT, GUI, SABER, ITEM, FLYER}
+    ALL = {UNKNOWN, TILE, CHARACTER, DOOR, EFFECT, GUI, LIGHTSABER, PLACEABLE, FLYER}
 
 
 class Nodetype:
