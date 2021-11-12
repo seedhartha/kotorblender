@@ -76,14 +76,14 @@ class ObjectPropertyGroup(bpy.types.PropertyGroup):
     # For MDL Rootdummy
     supermodel: bpy.props.StringProperty(name="Supermodel", description="Name of the model to inherit animations from", default=defines.NULL)
     classification: bpy.props.EnumProperty(name="Classification",
-                                           items=[(defines.Classification.UNKNOWN,   "Other",     "Unknown classification",              0),
-                                                  (defines.Classification.EFFECT,    "Effect",    "Effects",                             1),
-                                                  (defines.Classification.TILE,      "Tile",      "Tiles for a tileset",                 2),
-                                                  (defines.Classification.CHARACTER, "Character", "Creatures, characters or placeables", 4),
-                                                  (defines.Classification.DOOR,      "Door",      "Doors",                               8),
-                                                  (defines.Classification.SABER,     "Lightsaber", "Lightsaber weapon",                   16),
-                                                  (defines.Classification.ITEM,      "Placeable", "Items or placeables",                 32),
-                                                  (defines.Classification.FLYER,     "Flyer",     "Non-interactive scene elements",      64)],
+                                           items=[(defines.Classification.UNKNOWN,    "Other",      "Unknown classification",              0),
+                                                  (defines.Classification.EFFECT,     "Effect",     "Effects",                             1),
+                                                  (defines.Classification.TILE,       "Tile",       "Tiles for a tileset",                 2),
+                                                  (defines.Classification.CHARACTER,  "Character",  "Creatures, characters or placeables", 4),
+                                                  (defines.Classification.DOOR,       "Door",       "Doors",                               8),
+                                                  (defines.Classification.LIGHTSABER, "Lightsaber", "Lightsaber weapon",                   16),
+                                                  (defines.Classification.PLACEABLE,  "Placeable",  "Items or placeables",                 32),
+                                                  (defines.Classification.FLYER,      "Flyer",      "Non-interactive scene elements",      64)],
                                            default=defines.Classification.UNKNOWN)
     subclassification: bpy.props.IntProperty(name="Unknown", description="Unknown byte-2 in the classification bytes section of the model header", default=0)
     affected_by_fog: bpy.props.BoolProperty(name="Affected by Fog", description="If true, model will be occluded by area fog in-game", default=True)
