@@ -93,7 +93,7 @@ def create_armature_bones(armature, obj, parent_bone=None):
 
 
 def copy_object_keyframes_to_armature(anim, obj, armature_obj):
-    if obj.name in armature_obj.pose.bones and obj.animation_data:
+    if obj.name in armature_obj.pose.bones and obj.animation_data and obj.animation_data.action:
         bone = armature_obj.pose.bones[obj.name]
         action = obj.animation_data.action
 
