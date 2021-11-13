@@ -16,6 +16,8 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+import traceback
+
 import bpy
 
 from bpy_extras.io_utils import ExportHelper
@@ -35,8 +37,9 @@ class KB_OT_export_lyt(bpy.types.Operator, ExportHelper):
 
     def execute(self, context):
         try:
-            lyt.save_lyt(self.filepath)
+            lyt.save_lyt(self, self.filepath)
         except Exception as e:
+            print(traceback.format_exc())
             self.report({'ERROR'}, str(e))
 
         return {'FINISHED'}

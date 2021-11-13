@@ -31,7 +31,7 @@ from ..scene.walkmesh import Walkmesh
 from .. import utils
 
 
-def load_mdl(filepath, options, position=(0.0, 0.0, 0.0)):
+def load_mdl(operator, filepath, options, position=(0.0, 0.0, 0.0)):
     mdl = MdlLoader(filepath)
     model = mdl.load()
 
@@ -82,7 +82,7 @@ def load_mdl(filepath, options, position=(0.0, 0.0, 0.0)):
     bpy.context.scene.frame_set(0)
 
 
-def save_mdl(filepath, options):
+def save_mdl(operator, filepath, options):
     # Reset Pose
     bpy.context.scene.frame_set(0)
 

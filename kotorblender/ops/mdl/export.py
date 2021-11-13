@@ -16,6 +16,8 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+import traceback
+
 import bpy
 
 from bpy_extras.io_utils import ExportHelper
@@ -61,8 +63,9 @@ class KB_OT_export_mdl(bpy.types.Operator, ExportHelper):
         options.export_custom_normals = self.export_custom_normals
 
         try:
-            mdl.save_mdl(self.filepath, options)
+            mdl.save_mdl(self, self.filepath, options)
         except Exception as e:
+            print(traceback.format_exc())
             self.report({'ERROR'}, str(e))
 
         return {'FINISHED'}
