@@ -16,7 +16,7 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-from ...defines import Dummytype
+from ...defines import DummyType, NodeType
 
 from .geometry import GeometryNode
 
@@ -26,8 +26,8 @@ class DummyNode(GeometryNode):
     def __init__(self, name="UNNAMED"):
         GeometryNode.__init__(self, name)
 
-        self.nodetype = "dummy"
-        self.dummytype = Dummytype.NONE
+        self.nodetype = NodeType.DUMMY
+        self.dummytype = DummyType.NONE
 
     def set_object_data(self, obj, options):
         GeometryNode.set_object_data(self, obj, options)

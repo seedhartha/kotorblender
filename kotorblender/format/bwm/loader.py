@@ -16,7 +16,7 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-from ...defines import Dummytype
+from ...defines import DummyType, RootType, WalkmeshType
 from ...scene.modelnode.aabb import AabbNode
 from ...scene.modelnode.dummy import DummyNode
 from ...scene.modelnode.trimesh import FaceList
@@ -55,7 +55,7 @@ class BwmLoader:
             raise RuntimeError("BWM file type is invalid: expected='BWM ', actual='{}'".format(file_type))
 
         version = self.bwm.get_string(4)
-        self.walkmesh_type = self.bwm.get_uint32()
+        self.bwm_type = self.bwm.get_uint32()
         self.rel_use_vec1 = [self.bwm.get_float() for _ in range(3)]
         self.rel_use_vec2 = [self.bwm.get_float() for _ in range(3)]
         abs_use_vec1 = [self.bwm.get_float() for _ in range(3)]
@@ -137,19 +137,19 @@ class BwmLoader:
         self.perimeters = [self.bwm.get_uint32() for _ in range(self.num_perimeters)]
 
     def new_walkmesh(self):
-        if self.walkmesh_type == WALKMESH_TYPE_AREA:
+        if self.bwm_type == BWM_TYPE_WOK:
             return self.new_area_walkmesh()
-        elif self.walkmesh_type == WALKMESH_TYPE_PLACEABLE:
+        elif self.bwm_type == BWM_TYPE_PWK_DWK:
             return self.new_placeable_walkmesh()
         else:
-            raise RuntimeError("Unsupported walkmesh type: " + str(self.walkmesh_type))
+            raise RuntimeError("Unsupported walkmesh type: " + str(self.bwm_type))
 
     def new_area_walkmesh(self):
         root_node = DummyNode("{}_wok".format(self.model_name))
 
         geom_node = AabbNode("{}_wok_wg".format(self.model_name))
         geom_node.parent = root_node
-        geom_node.roottype = "wok"
+        geom_node.roottype = RootType.WALKMESH
         geom_node.verts = self.verts
         geom_node.facelist = self.facelist
         geom_node.bwmposition = self.position
@@ -157,14 +157,14 @@ class BwmLoader:
 
         root_node.children.append(geom_node)
 
-        walkmesh = Walkmesh("wok")
+        walkmesh = Walkmesh(WalkmeshType.WOK)
         walkmesh.root_node = root_node
 
         return walkmesh
 
     def new_placeable_walkmesh(self):
-        type_name = "dwk" if self.path.endswith("dwk") else "pwk"
-        if type_name == "dwk":
+        walkmesh_type = WalkmeshType.DWK if self.path.endswith("dwk") else WalkmeshType.PWK
+        if walkmesh_type == WalkmeshType.DWK:
             if self.path.endswith("0.dwk"):
                 dwk_state = "open1"
             elif self.path.endswith("1.dwk"):
@@ -182,22 +182,22 @@ class BwmLoader:
             use_name2 = "{}_pwk_use02".format(geom_name)
 
         root_node = DummyNode(root_name)
-        root_node.dummytype = Dummytype.DWKROOT if type_name == "dwk" else Dummytype.PWKROOT
+        root_node.dummytype = DummyType.DWKROOT if walkmesh_type == WalkmeshType.DWK else DummyType.PWKROOT
 
         geom_node = AabbNode(geom_name)
-        geom_node.roottype = type_name
+        geom_node.roottype = RootType.WALKMESH
         geom_node.parent = root_node
         geom_node.verts = self.verts
         geom_node.facelist = self.facelist
         geom_node.bwmposition = self.position
 
         use_node1 = DummyNode(use_name1)
-        use_node1.dummytype = Dummytype.USE1
+        use_node1.dummytype = DummyType.USE1
         use_node1.position = self.rel_use_vec1
         use_node1.parent = root_node
 
         use_node2 = DummyNode(use_name2)
-        use_node2.dummytype = Dummytype.USE2
+        use_node2.dummytype = DummyType.USE2
         use_node2.position = self.rel_use_vec2
         use_node2.parent = root_node
 
@@ -205,7 +205,7 @@ class BwmLoader:
         root_node.children.append(use_node1)
         root_node.children.append(use_node2)
 
-        walkmesh = Walkmesh(type_name)
+        walkmesh = Walkmesh(walkmesh_type)
         walkmesh.root_node = root_node
 
         return walkmesh

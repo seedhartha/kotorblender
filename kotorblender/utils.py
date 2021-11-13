@@ -20,23 +20,23 @@ from .defines import *
 
 
 def is_mdl_root(obj):
-    return is_dummy_type(obj, Dummytype.MDLROOT)
+    return is_dummy_type(obj, DummyType.MDLROOT)
 
 
 def is_pwk_root(obj):
-    return is_dummy_type(obj, Dummytype.PWKROOT)
+    return is_dummy_type(obj, DummyType.PWKROOT)
 
 
 def is_dwk_root(obj):
-    return is_dummy_type(obj, Dummytype.DWKROOT)
+    return is_dummy_type(obj, DummyType.DWKROOT)
 
 
 def is_path_point(obj):
-    return is_dummy_type(obj, Dummytype.PATHPOINT)
+    return is_dummy_type(obj, DummyType.PATHPOINT)
 
 
 def is_skin_mesh(obj):
-    return is_mesh_type(obj, Meshtype.SKIN)
+    return is_mesh_type(obj, MeshType.SKIN)
 
 
 def is_dummy_type(obj, dummytype):

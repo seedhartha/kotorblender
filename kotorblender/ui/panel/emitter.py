@@ -32,7 +32,7 @@ class KB_PT_emitter(bpy.types.Panel):
         try:
             return context.object and \
                 context.object.type == 'MESH' and \
-                context.object.kb.meshtype == defines.Meshtype.EMITTER
+                context.object.kb.meshtype == defines.MeshType.EMITTER
         except:
             return False
 

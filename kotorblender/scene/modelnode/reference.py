@@ -16,6 +16,8 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+from ...defines import DummyType, NodeType
+
 from ... import defines
 
 from .geometry import GeometryNode
@@ -25,9 +27,8 @@ class ReferenceNode(GeometryNode):
 
     def __init__(self, name="UNNAMED"):
         GeometryNode.__init__(self, name)
-        self.nodetype = "reference"
-
-        self.dummytype = defines.Dummytype.REFERENCE
+        self.nodetype = NodeType.REFERENCE
+        self.dummytype = DummyType.REFERENCE
         self.refmodel = defines.NULL
         self.reattachable = 0
 

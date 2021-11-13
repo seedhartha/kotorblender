@@ -72,11 +72,11 @@ def load_mdl(operator, filepath, options, position=(0.0, 0.0, 0.0)):
     model_root = model.import_to_collection(collection, options, position)
 
     if pwk_walkmesh:
-        pwk_walkmesh.import_to_collection(model_root, collection)
+        pwk_walkmesh.import_to_collection(model_root, collection, options)
     if dwk_walkmesh1 and dwk_walkmesh2 and dwk_walkmesh3:
-        dwk_walkmesh1.import_to_collection(model_root, collection)
-        dwk_walkmesh2.import_to_collection(model_root, collection)
-        dwk_walkmesh3.import_to_collection(model_root, collection)
+        dwk_walkmesh1.import_to_collection(model_root, collection, options)
+        dwk_walkmesh2.import_to_collection(model_root, collection, options)
+        dwk_walkmesh3.import_to_collection(model_root, collection, options)
 
     # Reset Pose
     bpy.context.scene.frame_set(0)
@@ -121,6 +121,6 @@ def save_mdl(operator, filepath, options):
                 elif xwk_root.name.endswith("closed"):
                     dwk_state = 2
                 xwk_path = "{}{}.dwk".format(base_path, dwk_state)
-            walkmesh = Walkmesh.from_root_object(xwk_root)
+            walkmesh = Walkmesh.from_root_object(xwk_root, options)
             bwm = BwmSaver(xwk_path, walkmesh)
             bwm.save()

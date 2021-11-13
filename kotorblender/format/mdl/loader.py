@@ -22,7 +22,7 @@ from math import sqrt
 
 from mathutils import Matrix, Quaternion, Vector
 
-from ...defines import Nodetype
+from ...defines import NodeType
 from ...scene.animation import Animation
 from ...scene.animnode import AnimationNode
 from ...scene.model import Model
@@ -707,34 +707,34 @@ class MdlLoader:
 
     def get_node_type(self, flags):
         if flags & NODE_SABER:
-            return Nodetype.LIGHTSABER
+            return NodeType.LIGHTSABER
         if flags & NODE_AABB:
-            return Nodetype.AABB
+            return NodeType.AABB
         if flags & NODE_DANGLY:
-            return Nodetype.DANGLYMESH
+            return NodeType.DANGLYMESH
         if flags & NODE_SKIN:
-            return Nodetype.SKIN
+            return NodeType.SKIN
         if flags & NODE_MESH:
-            return Nodetype.TRIMESH
+            return NodeType.TRIMESH
         if flags & NODE_REFERENCE:
-            return Nodetype.REFERENCE
+            return NodeType.REFERENCE
         if flags & NODE_EMITTER:
-            return Nodetype.EMITTER
+            return NodeType.EMITTER
         if flags & NODE_LIGHT:
-            return Nodetype.LIGHT
-        return Nodetype.DUMMY
+            return NodeType.LIGHT
+        return NodeType.DUMMY
 
     def new_node(self, name, node_type):
         switch = {
-            Nodetype.DUMMY: DummyNode,
-            Nodetype.REFERENCE: ReferenceNode,
-            Nodetype.TRIMESH: TrimeshNode,
-            Nodetype.DANGLYMESH: DanglymeshNode,
-            Nodetype.LIGHTSABER: LightsaberNode,
-            Nodetype.SKIN: SkinmeshNode,
-            Nodetype.EMITTER: EmitterNode,
-            Nodetype.LIGHT: LightNode,
-            Nodetype.AABB: AabbNode
+            NodeType.DUMMY: DummyNode,
+            NodeType.REFERENCE: ReferenceNode,
+            NodeType.TRIMESH: TrimeshNode,
+            NodeType.DANGLYMESH: DanglymeshNode,
+            NodeType.LIGHTSABER: LightsaberNode,
+            NodeType.SKIN: SkinmeshNode,
+            NodeType.EMITTER: EmitterNode,
+            NodeType.LIGHT: LightNode,
+            NodeType.AABB: AabbNode
         }
         try:
             return switch[node_type](name)

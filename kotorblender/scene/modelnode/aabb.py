@@ -21,7 +21,7 @@ import bpy
 from bpy_extras.io_utils import unpack_list
 from mathutils import Vector
 
-from ...defines import NormalsAlgorithm
+from ...defines import MeshType, NodeType, NormalsAlgorithm, RootType, WalkmeshMaterial
 
 from ... import defines
 
@@ -34,8 +34,8 @@ class AabbNode(TrimeshNode):
 
     def __init__(self, name="UNNAMED"):
         TrimeshNode.__init__(self, name)
-        self.nodetype = "aabb"
-        self.meshtype = defines.Meshtype.AABB
+        self.nodetype = NodeType.AABB
+        self.meshtype = MeshType.AABB
 
         self.bwmposition = (0.0, 0.0, 0.0)
         self.lytposition = (0.0, 0.0, 0.0)
@@ -62,7 +62,7 @@ class AabbNode(TrimeshNode):
         return obj
 
     def create_mesh(self, name, options):
-        if options.normals_algorithm == NormalsAlgorithm.SHARP_EDGES and self.roottype == "mdl":
+        if options.normals_algorithm == NormalsAlgorithm.SHARP_EDGES and self.roottype == RootType.MODEL:
             self.merge_similar_vertices(options.sharp_edge_angle)
 
         # Create the mesh itself
@@ -107,7 +107,7 @@ class AabbNode(TrimeshNode):
 
         mesh.update()
 
-        if self.roottype == "mdl":
+        if self.roottype == RootType.MODEL:
             self.post_process_mesh(mesh, options)
 
         return mesh
@@ -121,7 +121,7 @@ class AabbNode(TrimeshNode):
         for wok_edge_idx, transition in self.roomlinks.items():
             wok_face_idx = wok_edge_idx // 3
             aabb_face = None
-            for walkable_idx, polygon in enumerate([p for p in mesh.polygons if p.material_index not in defines.WkmMaterial.NONWALKABLE]):
+            for walkable_idx, polygon in enumerate([p for p in mesh.polygons if p.material_index not in WalkmeshMaterial.NONWALKABLE]):
                 if walkable_idx == wok_face_idx:
                     aabb_face = polygon
                     break
@@ -137,7 +137,7 @@ class AabbNode(TrimeshNode):
         if ROOM_LINKS_COLORS not in self.eval_mesh.vertex_colors:
             return
         colors = self.eval_mesh.vertex_colors[ROOM_LINKS_COLORS]
-        for walkable_idx, tri in enumerate([p for p in self.eval_mesh.loop_triangles if p.material_index not in defines.WkmMaterial.NONWALKABLE]):
+        for walkable_idx, tri in enumerate([p for p in self.eval_mesh.loop_triangles if p.material_index not in WalkmeshMaterial.NONWALKABLE]):
             for edge, loop_idx in enumerate(tri.loops):
                 color = colors.data[loop_idx].color
                 if color[0] > 0.0 or color[2] > 0.0 and (255.0 * color[1]) < 200.0:

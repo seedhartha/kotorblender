@@ -16,6 +16,8 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+from ..defines import WalkmeshType
+
 from .. import utils
 
 from .model import Model
@@ -28,32 +30,32 @@ class Walkmesh(Model):
         Model.__init__(self)
         self.walkmesh_type = walkmesh_type
 
-    def import_to_collection(self, parent_obj, collection):
+    def import_to_collection(self, parent_obj, collection, options):
         if type(self.root_node) != DummyNode or self.root_node.parent:
             raise RuntimeError("Root node has to be a dummy without a parent")
 
-        self.import_nodes_to_collection(self.root_node, parent_obj, collection)
+        self.import_nodes_to_collection(self.root_node, parent_obj, collection, options)
 
     @classmethod
     def from_aabb_node(cls, aabb):
         root_node = DummyNode("wok")
         root_node.children.append(aabb)
 
-        walkmesh = Walkmesh("wok")
+        walkmesh = Walkmesh(WalkmeshType.WOK)
         walkmesh.root_node = root_node
 
         return walkmesh
 
     @classmethod
-    def from_root_object(cls, obj):
+    def from_root_object(cls, obj, options):
         if utils.is_pwk_root(obj):
-            walkmesh_type = "pwk"
+            walkmesh_type = WalkmeshType.PWK
         elif utils.is_dwk_root(obj):
-            walkmesh_type = "dwk"
+            walkmesh_type = WalkmeshType.DWK
         else:
             raise ValueError("Cannot create walkmesh from root object '{}'".format(obj.name))
 
         walkmesh = Walkmesh(walkmesh_type)
-        walkmesh.root_node = cls.model_node_from_object(obj, exclude_xwk=False)
+        walkmesh.root_node = cls.model_node_from_object(obj, options, exclude_xwk=False)
 
         return walkmesh

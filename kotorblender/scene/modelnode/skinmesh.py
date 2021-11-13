@@ -16,7 +16,7 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-from ... import defines
+from ...defines import MeshType, NodeType
 
 from .trimesh import TrimeshNode
 
@@ -25,9 +25,8 @@ class SkinmeshNode(TrimeshNode):
 
     def __init__(self, name="UNNAMED"):
         TrimeshNode.__init__(self, name)
-        self.nodetype = "skin"
-
-        self.meshtype = defines.Meshtype.SKIN
+        self.nodetype = NodeType.SKIN
+        self.meshtype = MeshType.SKIN
         self.weights = []
 
     def set_object_data(self, obj, options):

@@ -20,7 +20,7 @@ import os
 
 import bpy
 
-from ..defines import Dummytype
+from ..defines import DummyType
 
 from .. import utils
 
@@ -76,11 +76,11 @@ def save_lyt(operator, filepath):
         objects = bpy.context.selected_objects if len(bpy.context.selected_objects) > 0 else bpy.context.collection.objects
         for obj in objects:
             if obj.type == 'EMPTY':
-                if obj.kb.dummytype == Dummytype.MDLROOT:
+                if obj.kb.dummytype == DummyType.MDLROOT:
                     rooms.append(obj)
                 elif obj.name.lower().startswith("door"):
                     doors.append(obj)
-                elif obj.kb.dummytype not in [Dummytype.PTHROOT, Dummytype.PATHPOINT]:
+                elif obj.kb.dummytype not in [DummyType.PTHROOT, DummyType.PATHPOINT]:
                     others.append(obj)
 
         f.write("beginlayout\n")

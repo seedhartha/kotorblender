@@ -16,7 +16,7 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-from ... import defines
+from ...defines import MeshType, NodeType
 
 from .trimesh import TrimeshNode
 
@@ -27,9 +27,8 @@ class DanglymeshNode(TrimeshNode):
 
     def __init__(self, name="UNNAMED"):
         TrimeshNode.__init__(self, name)
-        self.nodetype = "danglymesh"
-
-        self.meshtype = defines.Meshtype.DANGLYMESH
+        self.nodetype = NodeType.DANGLYMESH
+        self.meshtype = MeshType.DANGLYMESH
         self.period = 1.0
         self.tightness = 1.0
         self.displacement = 1.0

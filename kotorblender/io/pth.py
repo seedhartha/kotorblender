@@ -20,7 +20,7 @@ import os
 
 import bpy
 
-from ..defines import Dummytype
+from ..defines import DummyType
 from ..format.gff.loader import GffLoader
 from ..format.gff.saver import GffSaver
 
@@ -38,7 +38,7 @@ def load_pth(operator, filepath):
         path_object = bpy.data.objects[pathname]
     else:
         path_object = bpy.data.objects.new(pathname, None)
-        path_object.kb.dummytype = Dummytype.PTHROOT
+        path_object.kb.dummytype = DummyType.PTHROOT
         bpy.context.collection.objects.link(path_object)
 
     loader = GffLoader(filepath, "PTH")
@@ -50,7 +50,7 @@ def load_pth(operator, filepath):
         object = bpy.data.objects.new(name, None)
         object.parent = path_object
         object.location = [point["X"], point["Y"], 0.0]
-        object.kb.dummytype = Dummytype.PATHPOINT
+        object.kb.dummytype = DummyType.PATHPOINT
         bpy.context.collection.objects.link(object)
         points.append((point, object))
 

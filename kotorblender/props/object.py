@@ -63,16 +63,16 @@ class ObjectPropertyGroup(bpy.types.PropertyGroup):
 
     # For all emptys
     dummytype: bpy.props.EnumProperty(name="Type",
-                                      items=[(defines.Dummytype.NONE,      "None",           "Simple dummy object",                                       0),
-                                             (defines.Dummytype.MDLROOT,   "MDL Root",       "All children are considered part of a mdl",                 1),
-                                             (defines.Dummytype.DWKROOT,   "DWK Root",       "All children are considered part of a door walkmesh",       2),
-                                             (defines.Dummytype.PWKROOT,   "PWK Root",       "All children are considered part of a placeable walkmesh",  3),
-                                             (defines.Dummytype.PTHROOT,   "PTH Root",       "All children are considered path points",                   4),
-                                             (defines.Dummytype.REFERENCE, "Reference",      "Used in spells. Points to 'fx_ref' by default",             5),
-                                             (defines.Dummytype.PATHPOINT, "Path Point",     "Used when exporting paths",                                 6),
-                                             (defines.Dummytype.USE1,      "Walkmesh: Use 1", "1st node for 'Use' animation",                             7),
-                                             (defines.Dummytype.USE2,      "Walkmesh: Use 2", "2nd node for 'Use' animation",                             8)],
-                                      default=defines.Dummytype.NONE)
+                                      items=[(defines.DummyType.NONE,      "None",           "Simple dummy object",                                       0),
+                                             (defines.DummyType.MDLROOT,   "MDL Root",       "All children are considered part of a mdl",                 1),
+                                             (defines.DummyType.DWKROOT,   "DWK Root",       "All children are considered part of a door walkmesh",       2),
+                                             (defines.DummyType.PWKROOT,   "PWK Root",       "All children are considered part of a placeable walkmesh",  3),
+                                             (defines.DummyType.PTHROOT,   "PTH Root",       "All children are considered path points",                   4),
+                                             (defines.DummyType.REFERENCE, "Reference",      "Used in spells. Points to 'fx_ref' by default",             5),
+                                             (defines.DummyType.PATHPOINT, "Path Point",     "Used when exporting paths",                                 6),
+                                             (defines.DummyType.USE1,      "Walkmesh: Use 1", "1st node for 'Use' animation",                             7),
+                                             (defines.DummyType.USE2,      "Walkmesh: Use 2", "2nd node for 'Use' animation",                             8)],
+                                      default=defines.DummyType.NONE)
     # For MDL Rootdummy
     supermodel: bpy.props.StringProperty(name="Supermodel", description="Name of the model to inherit animations from", default=defines.NULL)
     classification: bpy.props.EnumProperty(name="Classification",
@@ -99,13 +99,13 @@ class ObjectPropertyGroup(bpy.types.PropertyGroup):
 
     # For mesh objects
     meshtype: bpy.props.EnumProperty(name="Type",
-                                     items=[(defines.Meshtype.TRIMESH, "Trimesh", "Triangle mesh", 0),
-                                            (defines.Meshtype.DANGLYMESH, "Danglymesh", "Triangle mesh with dangly parts", 1),
-                                            (defines.Meshtype.SKIN, "Skinmesh", "Triangle mesh with weighted deformation", 2),
-                                            (defines.Meshtype.AABB, "AABB Walkmesh", "Axis Aligned Bounding Box Walkmesh, for collision detection", 3),
-                                            (defines.Meshtype.EMITTER, "Emitter", "Particle emitter", 4),
-                                            (defines.Meshtype.LIGHTSABER, "Lightsaber", "Saber mesh (blade plane)", 5)],
-                                     default=defines.Meshtype.TRIMESH)
+                                     items=[(defines.MeshType.TRIMESH, "Trimesh", "Triangle mesh", 0),
+                                            (defines.MeshType.DANGLYMESH, "Danglymesh", "Triangle mesh with dangly parts", 1),
+                                            (defines.MeshType.SKIN, "Skinmesh", "Triangle mesh with weighted deformation", 2),
+                                            (defines.MeshType.AABB, "AABB Walkmesh", "Axis Aligned Bounding Box Walkmesh, for collision detection", 3),
+                                            (defines.MeshType.EMITTER, "Emitter", "Particle emitter", 4),
+                                            (defines.MeshType.LIGHTSABER, "Lightsaber", "Saber mesh (blade plane)", 5)],
+                                     default=defines.MeshType.TRIMESH)
 
     bitmap: bpy.props.StringProperty(name="Diffuse map")
     bitmap2: bpy.props.StringProperty(name="Lightmap")
