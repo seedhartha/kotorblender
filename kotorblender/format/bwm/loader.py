@@ -39,8 +39,6 @@ class BwmLoader:
         self.outer_edges = []
 
     def load(self):
-        print("Loading BWM '{}'".format(self.path))
-
         self.load_header()
         self.load_vertices()
         self.load_faces()

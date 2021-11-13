@@ -125,8 +125,6 @@ class MdlSaver:
         self.anim_controller_data_counts = []
 
     def save(self):
-        print("Saving MDL {}".format(self.path))
-
         self.peek_model()
 
         self.save_file_header()

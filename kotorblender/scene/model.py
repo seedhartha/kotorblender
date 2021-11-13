@@ -58,8 +58,6 @@ class Model:
         if type(self.root_node) != DummyNode or self.root_node.parent:
             raise RuntimeError("Root node has to be a dummy without a parent")
 
-        print("Importing model '{}' to collection".format(self.name))
-
         if glob.import_geometry:
             root_obj = self.root_node.add_to_collection(collection)
             root_obj.location = position
@@ -80,7 +78,6 @@ class Model:
             if not root_obj:
                 root_obj = next(iter(obj for obj in bpy.context.collection.objects if utils.is_mdl_root(obj)), None)
             if not root_obj:
-                print("Could not found MDL root to add animations to")
                 return
 
             animscale = root_obj.kb.animscale
@@ -109,8 +106,6 @@ class Model:
 
     @classmethod
     def from_mdl_root(cls, root_obj):
-        print("Constructing model from object '{}'".format(root_obj.name))
-
         model = Model()
         model.name = root_obj.name
         model.supermodel = root_obj.kb.supermodel

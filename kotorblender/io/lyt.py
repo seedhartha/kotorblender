@@ -73,7 +73,7 @@ def load_lyt(
     for room in rooms:
         mdl_path = os.path.join(path, room[0] + ".mdl")
         if not os.path.exists(mdl_path):
-            print("KotorBlender: WARNING - room model not found: " + mdl_path)
+            continue
         mdl.do_load_mdl(mdl_path, room[1:])
 
 

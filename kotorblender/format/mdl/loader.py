@@ -82,8 +82,6 @@ class MdlLoader:
         self.node_by_number = dict()
 
     def load(self):
-        print("Loading MDL '{}'".format(self.path))
-
         self.model = Model()
 
         self.load_file_header()
