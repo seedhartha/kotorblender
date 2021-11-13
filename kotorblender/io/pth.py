@@ -27,7 +27,7 @@ from ..format.gff.saver import GffSaver
 from .. import utils
 
 
-def load_pth(filepath):
+def load_pth(operator, filepath):
 
     def get_point_name(idx):
         return "PathPoint{0:0>3}".format(idx)
@@ -65,7 +65,7 @@ def load_pth(filepath):
                 connection.point = name
 
 
-def save_pth(filepath):
+def save_pth(operator, filepath):
     point_objects = [obj for obj in bpy.data.objects if utils.is_path_point(obj)]
 
     point_idx_by_name = dict()

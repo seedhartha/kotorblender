@@ -27,16 +27,16 @@ from .. import utils
 from . import mdl
 
 
-def load_lyt(filepath, options):
-    # Read lines from LYT
+def load_lyt(operator, filepath, options):
+    # Read lines
     fp = os.fsencode(filepath)
     f = open(fp, "r")
     lines = [line.strip() for line in f.read().splitlines()]
     f.close()
 
+    # Parse room models
     rooms = []
     rooms_to_read = 0
-
     for line in lines:
         tokens = line.split()
         if rooms_to_read > 0:
@@ -51,16 +51,17 @@ def load_lyt(filepath, options):
         elif tokens[0].startswith("roomcount"):
             rooms_to_read = int(tokens[1])
 
-    (path, _) = os.path.split(filepath)
-
+    # Load room models
+    path, _ = os.path.split(filepath)
     for room in rooms:
         mdl_path = os.path.join(path, room[0] + ".mdl")
         if not os.path.exists(mdl_path):
+            operator.report({'WARNING'}, "Room model '{}' not found".format(mdl_path))
             continue
-        mdl.load_mdl(mdl_path, options, room[1:])
+        mdl.load_mdl(operator, mdl_path, options, room[1:])
 
 
-def save_lyt(filepath):
+def save_lyt(operator, filepath):
 
     def describe_object(obj):
         parent = utils.get_object_root(obj)

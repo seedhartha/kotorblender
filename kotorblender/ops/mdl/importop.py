@@ -17,6 +17,7 @@
 # ##### END GPL LICENSE BLOCK #####
 
 import os
+import traceback
 
 import bpy
 
@@ -97,8 +98,9 @@ class KB_OT_import_mdl(bpy.types.Operator, ImportHelper):
         options.texture_search_recursive = self.texture_search_recursive
 
         try:
-            mdl.load_mdl(self.filepath, options)
+            mdl.load_mdl(self, self.filepath, options)
         except Exception as e:
+            print(traceback.format_exc())
             self.report({'ERROR'}, str(e))
 
         return {'FINISHED'}

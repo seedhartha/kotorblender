@@ -16,6 +16,8 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+import traceback
+
 import bpy
 
 from bpy_extras.io_utils import ImportHelper
@@ -35,8 +37,9 @@ class KB_OT_import_pth(bpy.types.Operator, ImportHelper):
 
     def execute(self, context):
         try:
-            pth.load_pth(self.filepath)
+            pth.load_pth(self, self.filepath)
         except Exception as e:
+            print(traceback.format_exc())
             self.report({'ERROR'}, str(e))
 
         return {'FINISHED'}
