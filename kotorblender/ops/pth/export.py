@@ -17,12 +17,13 @@
 # ##### END GPL LICENSE BLOCK #####
 
 import bpy
-import bpy_extras
 
-from ... import io
+from bpy_extras.io_utils import ExportHelper
+
+from ...io import pth
 
 
-class KB_OT_export_pth(bpy.types.Operator, bpy_extras.io_utils.ExportHelper):
+class KB_OT_export_pth(bpy.types.Operator, ExportHelper):
     bl_idname = "kb.pthexport"
     bl_label = "Export Odyssey PTH"
 
@@ -33,5 +34,5 @@ class KB_OT_export_pth(bpy.types.Operator, bpy_extras.io_utils.ExportHelper):
         options={'HIDDEN'})
 
     def execute(self, context):
-        io.save_pth(**self.as_keywords(ignore=("filter_glob", "check_existing")))
+        pth.save_pth(**self.as_keywords(ignore=("filter_glob", "check_existing")))
         return {'FINISHED'}

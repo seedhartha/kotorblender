@@ -17,12 +17,13 @@
 # ##### END GPL LICENSE BLOCK #####
 
 import bpy
-import bpy_extras
 
-from ... import io
+from bpy_extras.io_utils import ExportHelper
+
+from ...io import lyt
 
 
-class KB_OT_export_lyt(bpy.types.Operator, bpy_extras.io_utils.ExportHelper):
+class KB_OT_export_lyt(bpy.types.Operator, ExportHelper):
     bl_idname = "kb.lytexport"
     bl_label = "Export Odyssey LYT"
 
@@ -33,5 +34,5 @@ class KB_OT_export_lyt(bpy.types.Operator, bpy_extras.io_utils.ExportHelper):
         options={'HIDDEN'})
 
     def execute(self, context):
-        io.save_lyt(**self.as_keywords(ignore=("filter_glob", "check_existing")))
+        lyt.save_lyt(**self.as_keywords(ignore=("filter_glob", "check_existing")))
         return {'FINISHED'}

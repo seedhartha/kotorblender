@@ -18,7 +18,9 @@
 
 import bpy
 
-from .. import teximage, utils
+from bpy_extras import image_utils
+
+from .. import glob, utils
 
 
 def rebuild_object_material(obj):
@@ -96,7 +98,7 @@ def rebuild_material_nodes(material, obj):
     if not utils.is_null(obj.kb.bitmap):
         diffuse = nodes.new("ShaderNodeTexImage")
         diffuse.location = (300, 0)
-        diffuse.image = teximage.load_texture_image(obj.kb.bitmap)
+        diffuse.image = load_texture_image(obj.kb.bitmap)
         links.new(mul_diffuse_by_lightmap.inputs[0], diffuse.outputs[0])
         links.new(mul_alpha.inputs[0], diffuse.outputs[1])
 
@@ -108,7 +110,7 @@ def rebuild_material_nodes(material, obj):
 
         lightmap = nodes.new("ShaderNodeTexImage")
         lightmap.location = (300, -300)
-        lightmap.image = teximage.load_texture_image(obj.kb.bitmap2)
+        lightmap.image = load_texture_image(obj.kb.bitmap2)
 
         material.shadow_method = 'NONE'
         links.new(lightmap.inputs[0], lightmap_uv.outputs[0])
@@ -121,3 +123,35 @@ def rebuild_material_nodes(material, obj):
         links.new(shader.inputs["Alpha"], mul_alpha.outputs[0])
 
     links.new(output.inputs[0], shader.outputs[0])
+
+
+def load_texture_image(name):
+    if name in bpy.data.textures:
+        texture = bpy.data.textures[name]
+    else:
+        if name in bpy.data.images:
+            image = bpy.data.images[name]
+        else:
+            image = create_image(name, glob.texture_path)
+
+        texture = bpy.data.textures.new(name, type='IMAGE')
+        texture.image = image
+        texture.use_fake_user = True
+
+    return texture.image
+
+
+def create_image(name, path):
+    image = image_utils.load_image(
+        name + ".tga",
+        path,
+        recursive=glob.texture_search_recursive,
+        place_holder=False,
+        ncase_cmp=True)
+
+    if image is None:
+        image = bpy.data.images.new(name, 512, 512)
+    else:
+        image.name = name
+
+    return image

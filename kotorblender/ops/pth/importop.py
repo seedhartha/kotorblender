@@ -17,12 +17,13 @@
 # ##### END GPL LICENSE BLOCK #####
 
 import bpy
-import bpy_extras
 
-from ... import io
+from bpy_extras.io_utils import ImportHelper
+
+from ...io import pth
 
 
-class KB_OT_import_pth(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
+class KB_OT_import_pth(bpy.types.Operator, ImportHelper):
     bl_idname = "kb.pthimport"
     bl_label = "Import Odyssey PTH"
 
@@ -33,5 +34,5 @@ class KB_OT_import_pth(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
         options={'HIDDEN'})
 
     def execute(self, context):
-        io.load_pth(**self.as_keywords(ignore=("filter_glob",)))
+        pth.load_pth(**self.as_keywords(ignore=("filter_glob",)))
         return {'FINISHED'}
