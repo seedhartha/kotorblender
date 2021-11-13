@@ -17,14 +17,15 @@
 # ##### END GPL LICENSE BLOCK #####
 
 import bpy
-import bpy_extras
+
+from bpy_extras.io_utils import ImportHelper
 
 from ...defines import NormalsAlgorithm
 
-from ... import io
+from ...io import lyt
 
 
-class KB_OT_import_lyt(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
+class KB_OT_import_lyt(bpy.types.Operator, ImportHelper):
     bl_idname = "kb.lytimport"
     bl_label = "Import Odyssey LYT"
     bl_options = {'UNDO'}
@@ -72,5 +73,5 @@ class KB_OT_import_lyt(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
         default=False)
 
     def execute(self, context):
-        io.load_lyt(**self.as_keywords(ignore=("filter_glob",)))
+        lyt.load_lyt(**self.as_keywords(ignore=("filter_glob",)))
         return {'FINISHED'}

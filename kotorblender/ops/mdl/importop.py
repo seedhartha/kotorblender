@@ -17,14 +17,15 @@
 # ##### END GPL LICENSE BLOCK #####
 
 import bpy
-import bpy_extras
+
+from bpy_extras.io_utils import ImportHelper
 
 from ...defines import NormalsAlgorithm
 
-from ... import io
+from ...io import mdl
 
 
-class KB_OT_import_mdl(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
+class KB_OT_import_mdl(bpy.types.Operator, ImportHelper):
     bl_idname = "kb.mdlimport"
     bl_label = "Import Odyssey MDL"
     bl_options = {'UNDO'}
@@ -82,5 +83,5 @@ class KB_OT_import_mdl(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
         default=False)
 
     def execute(self, context):
-        io.load_mdl(**self.as_keywords(ignore=("filter_glob",)))
+        mdl.load_mdl(**self.as_keywords(ignore=("filter_glob",)))
         return {'FINISHED'}
