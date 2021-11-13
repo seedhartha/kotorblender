@@ -18,8 +18,6 @@
 
 from mathutils import Vector
 
-from .exception.aabbgenerror import AabbGenerationError
-
 
 def generate_tree(aabb_tree, face_list, rlevel=0):
     if rlevel > 128:
@@ -94,7 +92,7 @@ def generate_tree(aabb_tree, face_list, rlevel=0):
             split_axis = 0
         tested_axes += 1
         if tested_axes == 3:
-            raise AabbGenerationError("Generated tree is degenerate")
+            raise RuntimeError("Generated tree is degenerate")
 
     node = [*bb_min[:3], *bb_max[:3], 0, 0, -1, 1 + split_axis]
     aabb_tree.append(node)

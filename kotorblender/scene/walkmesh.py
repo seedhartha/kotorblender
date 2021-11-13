@@ -16,8 +16,6 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-from ..exception.malformedfile import MalformedFile
-
 from .. import utils
 
 from .model import Model
@@ -32,7 +30,7 @@ class Walkmesh(Model):
 
     def import_to_collection(self, parent_obj, collection):
         if type(self.root_node) != DummyNode or self.root_node.parent:
-            raise MalformedFile("Root node has to be a dummy without a parent")
+            raise RuntimeError("Root node has to be a dummy without a parent")
 
         print("Importing walkmesh {} to collection".format(self.name))
 

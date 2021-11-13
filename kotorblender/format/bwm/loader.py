@@ -17,7 +17,6 @@
 # ##### END GPL LICENSE BLOCK #####
 
 from ...defines import Dummytype
-from ...exception.malformedfile import MalformedFile
 from ...scene.modelnode.aabb import AabbNode
 from ...scene.modelnode.dummy import DummyNode
 from ...scene.modelnode.trimesh import FaceList
@@ -55,7 +54,7 @@ class BwmLoader:
     def load_header(self):
         file_type = self.bwm.get_string(4)
         if file_type != "BWM ":
-            raise MalformedFile("BWM file type is invalid: expected='BWM ', actual='{}'".format(file_type))
+            raise RuntimeError("BWM file type is invalid: expected='BWM ', actual='{}'".format(file_type))
 
         version = self.bwm.get_string(4)
         self.walkmesh_type = self.bwm.get_uint32()
@@ -145,7 +144,7 @@ class BwmLoader:
         elif self.walkmesh_type == WALKMESH_TYPE_PLACEABLE:
             return self.new_placeable_walkmesh()
         else:
-            raise MalformedFile("Unsupported walkmesh type: " + str(self.walkmesh_type))
+            raise RuntimeError("Unsupported walkmesh type: " + str(self.walkmesh_type))
 
     def new_area_walkmesh(self):
         root_node = DummyNode("{}_wok".format(self.model_name))
