@@ -184,7 +184,7 @@ class MdlLoader:
         self.mdl.seek(MDL_OFFSET + offset)
 
         type_flags = self.mdl.get_uint16()
-        supernode_number = self.mdl.get_uint16()
+        node_number = self.mdl.get_uint16()
         name_index = self.mdl.get_uint16()
         self.mdl.skip(2)  # padding
         off_root = self.mdl.get_uint32()
@@ -199,13 +199,13 @@ class MdlLoader:
         node_type = self.get_node_type(type_flags)
         node = self.new_node(name, node_type)
 
-        self.node_by_number[supernode_number] = node
+        self.node_by_number[node_number] = node
 
         if parent:
             node.parent = parent
             node.from_root = parent.from_root
 
-        node.supernode_number = supernode_number
+        node.node_number = node_number
         node.export_order = export_order
         node.position = position
         node.orientation = orientation
@@ -623,7 +623,7 @@ class MdlLoader:
         self.mdl.seek(MDL_OFFSET + offset)
 
         type_flags = self.mdl.get_uint16()
-        supernode_number = self.mdl.get_uint16()
+        node_number = self.mdl.get_uint16()
         name_index = self.mdl.get_uint16()
         self.mdl.skip(2)  # padding
         off_root = self.mdl.get_uint32()
@@ -636,14 +636,14 @@ class MdlLoader:
 
         name = self.names[name_index]
         node = AnimationNode(name)
-        node.supernode_number = supernode_number
+        node.node_number = node_number
         node.nodetype = self.get_node_type(type_flags)
         node.parent = parent
 
         if controller_arr.count > 0:
-            if not supernode_number in self.node_by_number:
+            if not node_number in self.node_by_number:
                 raise MalformedFile("Model node not found for animation node: " + str(name))
-            supernode = self.node_by_number[supernode_number]
+            supernode = self.node_by_number[node_number]
             controllers = self.load_controllers(controller_arr, controller_data_arr)
             if CTRL_BASE_POSITION in controllers:
                 node.keyframes["position"] = [row[:4] for row in controllers[CTRL_BASE_POSITION]]

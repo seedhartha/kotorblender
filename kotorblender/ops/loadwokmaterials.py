@@ -38,8 +38,7 @@ class KB_OT_load_wok_materials(bpy.types.Operator):
             for matDef in defines.WOK_MATERIALS:
                 mat_name = matDef[0]
 
-                # Walkmesh materials should be shared across multiple
-                # walkmeshes, as they always identical
+                # Walkmesh materials should be shared across multiple walkmeshes, as they always identical
                 if mat_name in bpy.data.materials.keys():
                     mat = bpy.data.materials[mat_name]
                 else:

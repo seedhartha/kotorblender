@@ -102,7 +102,7 @@ class AnimationNode:
     def __init__(self, name="UNNAMED"):
         self.nodetype = defines.Nodetype.DUMMY
         self.name = name
-        self.supernode_number = 0
+        self.node_number = 0
         self.parent = None
         self.children = []
         self.keyframes = dict()

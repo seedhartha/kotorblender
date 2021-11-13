@@ -45,7 +45,7 @@ class Animation:
         self.add_nodes_to_objects(list_anim, self.root_node, mdl_root, animscale)
 
     def add_nodes_to_objects(self, anim, node, mdl_root, animscale, below_animroot=False):
-        obj = utils.find_object(mdl_root, lambda o: o.kb.node_number == node.supernode_number)
+        obj = utils.find_object(mdl_root, lambda o: o.kb.node_number == node.node_number)
         if obj:
             if not below_animroot and obj.name.lower() == mdl_root.kb.animroot.lower():
                 below_animroot = True
@@ -102,7 +102,7 @@ class Animation:
             name = name[:-4]
 
         node = AnimationNode(name)
-        node.supernode_number = obj.kb.node_number
+        node.node_number = obj.kb.node_number
         node.parent = parent
 
         node.load_keyframes_from_object(anim, obj)
