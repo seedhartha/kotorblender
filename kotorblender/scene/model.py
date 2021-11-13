@@ -22,7 +22,7 @@ import bpy
 
 from mathutils import Matrix
 
-from ..defines import Dummytype, Meshtype, Nodetype
+from ..defines import DummyType, MeshType, NodeType
 
 from .. import defines, utils
 
@@ -61,7 +61,7 @@ class Model:
         if options.import_geometry:
             root_obj = self.root_node.add_to_collection(collection, options)
             root_obj.location = position
-            root_obj.kb.dummytype = defines.Dummytype.MDLROOT
+            root_obj.kb.dummytype = defines.DummyType.MDLROOT
             root_obj.kb.supermodel = self.supermodel
             root_obj.kb.classification = self.classification
             root_obj.kb.subclassification = self.subclassification
@@ -128,36 +128,36 @@ class Model:
             return None
 
         if obj.type == 'EMPTY':
-            if obj.kb.dummytype == Dummytype.REFERENCE:
-                node_type = Nodetype.REFERENCE
+            if obj.kb.dummytype == DummyType.REFERENCE:
+                node_type = NodeType.REFERENCE
             else:
-                node_type = Nodetype.DUMMY
+                node_type = NodeType.DUMMY
         elif obj.type == 'MESH':
-            if obj.kb.meshtype == Meshtype.EMITTER:
-                node_type = Nodetype.EMITTER
-            elif obj.kb.meshtype == Meshtype.AABB:
-                node_type = Nodetype.AABB
-            elif obj.kb.meshtype == Meshtype.SKIN:
-                node_type = Nodetype.SKIN
-            elif obj.kb.meshtype == Meshtype.LIGHTSABER:
-                node_type = Nodetype.LIGHTSABER
-            elif obj.kb.meshtype == Meshtype.DANGLYMESH:
-                node_type = Nodetype.DANGLYMESH
+            if obj.kb.meshtype == MeshType.EMITTER:
+                node_type = NodeType.EMITTER
+            elif obj.kb.meshtype == MeshType.AABB:
+                node_type = NodeType.AABB
+            elif obj.kb.meshtype == MeshType.SKIN:
+                node_type = NodeType.SKIN
+            elif obj.kb.meshtype == MeshType.LIGHTSABER:
+                node_type = NodeType.LIGHTSABER
+            elif obj.kb.meshtype == MeshType.DANGLYMESH:
+                node_type = NodeType.DANGLYMESH
             else:
-                node_type = Nodetype.TRIMESH
+                node_type = NodeType.TRIMESH
         elif obj.type == 'LIGHT':
-            node_type = Nodetype.LIGHT
+            node_type = NodeType.LIGHT
 
         switch = {
-            Nodetype.DUMMY: DummyNode,
-            Nodetype.REFERENCE: ReferenceNode,
-            Nodetype.TRIMESH: TrimeshNode,
-            Nodetype.DANGLYMESH: DanglymeshNode,
-            Nodetype.SKIN: SkinmeshNode,
-            Nodetype.EMITTER: EmitterNode,
-            Nodetype.LIGHT: LightNode,
-            Nodetype.AABB: AabbNode,
-            Nodetype.LIGHTSABER: LightsaberNode
+            NodeType.DUMMY: DummyNode,
+            NodeType.REFERENCE: ReferenceNode,
+            NodeType.TRIMESH: TrimeshNode,
+            NodeType.DANGLYMESH: DanglymeshNode,
+            NodeType.SKIN: SkinmeshNode,
+            NodeType.EMITTER: EmitterNode,
+            NodeType.LIGHT: LightNode,
+            NodeType.AABB: AabbNode,
+            NodeType.LIGHTSABER: LightsaberNode
         }
 
         name = obj.name

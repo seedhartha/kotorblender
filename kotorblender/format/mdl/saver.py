@@ -22,7 +22,7 @@ from math import sqrt
 
 from mathutils import Vector
 
-from ...defines import Nodetype
+from ...defines import NodeType
 
 from ... import aabb, utils
 
@@ -1365,15 +1365,15 @@ class MdlSaver:
 
     def get_node_flags(self, node):
         switch = {
-            Nodetype.DUMMY: NODE_BASE,
-            Nodetype.REFERENCE: NODE_BASE | NODE_REFERENCE,
-            Nodetype.TRIMESH: NODE_BASE | NODE_MESH,
-            Nodetype.DANGLYMESH: NODE_BASE | NODE_MESH | NODE_DANGLY,
-            Nodetype.SKIN: NODE_BASE | NODE_MESH | NODE_SKIN,
-            Nodetype.EMITTER: NODE_BASE | NODE_EMITTER,
-            Nodetype.LIGHT: NODE_BASE | NODE_LIGHT,
-            Nodetype.AABB: NODE_BASE | NODE_MESH | NODE_AABB,
-            Nodetype.LIGHTSABER: NODE_BASE | NODE_MESH | NODE_SABER
+            NodeType.DUMMY: NODE_BASE,
+            NodeType.REFERENCE: NODE_BASE | NODE_REFERENCE,
+            NodeType.TRIMESH: NODE_BASE | NODE_MESH,
+            NodeType.DANGLYMESH: NODE_BASE | NODE_MESH | NODE_DANGLY,
+            NodeType.SKIN: NODE_BASE | NODE_MESH | NODE_SKIN,
+            NodeType.EMITTER: NODE_BASE | NODE_EMITTER,
+            NodeType.LIGHT: NODE_BASE | NODE_LIGHT,
+            NodeType.AABB: NODE_BASE | NODE_MESH | NODE_AABB,
+            NodeType.LIGHTSABER: NODE_BASE | NODE_MESH | NODE_SABER
         }
         return switch[node.nodetype]
 

@@ -16,10 +16,9 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-# Null value for parents, textures, etc.
 NULL = "NULL"
 
-# Number of frames to the left of an animation to create a rest pose
+# Number of frames to the left of animation, where to create a rest pose
 ANIM_REST_POSE_OFFSET = 5
 
 # Number of frames between two consecutive animations
@@ -53,7 +52,63 @@ WOK_MATERIALS = [["wok_NotDefined", (0.400, 0.400, 0.400), 0.0],
                  ]
 
 
-class WkmMaterial:
+class Classification:
+    OTHER = "OTHER"
+    TILE = "TILE"
+    CHARACTER = "CHARACTER"
+    DOOR = "DOOR"
+    EFFECT = "EFFECT"
+    GUI = "GUI"
+    LIGHTSABER = "LIGHTSABER"
+    PLACEABLE = "PLACEABLE"
+    FLYER = "FLYER"
+
+
+class RootType:
+    MODEL = "MODEL"
+    WALKMESH = "WALKMESH"
+
+
+class NodeType:
+    DUMMY = "DUMMY"
+    REFERENCE = "REFERENCE"
+    TRIMESH = "TRIMESH"
+    DANGLYMESH = "DANGLYMESH"
+    SKIN = "SKIN"
+    EMITTER = "EMITTER"
+    LIGHT = "LIGHT"
+    AABB = "AABB"
+    LIGHTSABER = "LIGHTSABER"
+
+
+class DummyType:
+    NONE = "NONE"
+    MDLROOT = "MDLROOT"
+    PWKROOT = "PWKROOT"
+    DWKROOT = "DWKROOT"
+    PTHROOT = "PTHROOT"
+    REFERENCE = "REFERENCE"
+    PATHPOINT = "PATHPOINT"
+    USE1 = "USE1"
+    USE2 = "USE2"
+
+
+class MeshType:
+    TRIMESH = "TRIMESH"
+    DANGLYMESH = "DANGLYMESH"
+    LIGHTSABER = "LIGHTSABER"
+    SKIN = "SKIN"
+    AABB = "AABB"
+    EMITTER = "EMITTER"
+
+
+class WalkmeshType:
+    WOK = "WOK"
+    PWK = "PWK"
+    DWK = "DWK"
+
+
+class WalkmeshMaterial:
     DIRT = 1
     OBSCURING = 2
     GRASS = 3
@@ -76,57 +131,6 @@ class WkmMaterial:
     SAND = 20
 
     NONWALKABLE = [NONWALK, OBSCURING, SNOW, TRANSPARENT, DEEPWATER, LAVA]
-
-
-class Meshtype:
-    TRIMESH = "TRIMESH"
-    DANGLYMESH = "DANGLYMESH"
-    LIGHTSABER = "LIGHTSABER"
-    SKIN = "SKIN"
-    AABB = "AABB"
-    EMITTER = "EMITTER"
-
-    ALL = {TRIMESH, DANGLYMESH, LIGHTSABER, SKIN, AABB, EMITTER}
-
-
-class Dummytype:
-    NONE = "NONE"
-    MDLROOT = "MDLROOT"
-    PWKROOT = "PWKROOT"
-    DWKROOT = "DWKROOT"
-    PTHROOT = "PTHROOT"
-    REFERENCE = "REFERENCE"
-    PATHPOINT = "PATHPOINT"
-    USE1 = "USE1"
-    USE2 = "USE2"
-
-    ALL = {NONE, MDLROOT, PWKROOT, DWKROOT, PTHROOT, REFERENCE, PATHPOINT, USE1, USE2}
-
-
-class Classification:
-    OTHER = "OTHER"
-    TILE = "TILE"
-    CHARACTER = "CHARACTER"
-    DOOR = "DOOR"
-    EFFECT = "EFFECT"
-    GUI = "GUI"
-    LIGHTSABER = "LIGHTSABER"
-    PLACEABLE = "PLACEABLE"
-    FLYER = "FLYER"
-
-    ALL = {OTHER, TILE, CHARACTER, DOOR, EFFECT, GUI, LIGHTSABER, PLACEABLE, FLYER}
-
-
-class Nodetype:
-    DUMMY = "DUMMY"
-    REFERENCE = "REFERENCE"
-    TRIMESH = "TRIMESH"
-    DANGLYMESH = "DANGLYMESH"
-    SKIN = "SKIN"
-    EMITTER = "EMITTER"
-    LIGHT = "LIGHT"
-    AABB = "AABB"
-    LIGHTSABER = "LIGHTSABER"
 
 
 class NormalsAlgorithm:

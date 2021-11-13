@@ -18,7 +18,7 @@
 
 import bpy
 
-from ... import defines
+from ...defines import MeshType
 
 
 class KB_PT_mesh(bpy.types.Panel):
@@ -31,7 +31,7 @@ class KB_PT_mesh(bpy.types.Panel):
     def poll(cls, context):
         return (context.object and
                 context.object.type == 'MESH' and
-                context.object.kb.meshtype != defines.Meshtype.EMITTER)
+                context.object.kb.meshtype != MeshType.EMITTER)
 
     def draw(self, context):
         obj = context.object
@@ -99,7 +99,7 @@ class KB_PT_mesh(bpy.types.Panel):
             row.prop(obj.kb, "dirt_worldspace")
 
         # Additional props for danglymeshes
-        if obj.kb.meshtype == defines.Meshtype.DANGLYMESH:
+        if obj.kb.meshtype == MeshType.DANGLYMESH:
             layout.separator()
 
             row = layout.row()
@@ -116,7 +116,7 @@ class KB_PT_mesh(bpy.types.Panel):
             row.prop(obj.kb, "displacement", text="Displacement")
 
         # Additional props for aabb walkmeshes
-        elif obj.kb.meshtype == defines.Meshtype.AABB:
+        elif obj.kb.meshtype == MeshType.AABB:
             layout.separator()
 
             row = layout.row()

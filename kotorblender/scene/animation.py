@@ -19,7 +19,7 @@
 import math
 import re
 
-from ..defines import Dummytype
+from ..defines import DummyType
 
 from .. import defines, utils
 
@@ -111,7 +111,7 @@ class Animation:
         node.animated = bool(node.keyframes)
 
         for child_obj in sorted(obj.children, key=lambda o: o.kb.export_order):
-            if child_obj.type == 'EMPTY' and child_obj.kb.dummytype in [Dummytype.PWKROOT, Dummytype.DWKROOT]:
+            if child_obj.type == 'EMPTY' and child_obj.kb.dummytype in [DummyType.PWKROOT, DummyType.DWKROOT]:
                 continue
             child = Animation.animation_node_from_object(anim, child_obj, node)
             if not node.animated and child.animated:

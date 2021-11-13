@@ -20,7 +20,7 @@ import bpy
 
 from mathutils import Matrix, Quaternion, Vector
 
-from ..defines import Dummytype, Meshtype
+from ..defines import DummyType, MeshType
 
 from .. import defines, utils
 
@@ -85,9 +85,9 @@ def create_armature_bones(armature, obj, parent_bone=None):
     bone.matrix = obj.matrix_world
 
     for child in obj.children:
-        if child.type == 'EMPTY' and child.kb.dummytype != Dummytype.NONE:
+        if child.type == 'EMPTY' and child.kb.dummytype != DummyType.NONE:
             continue
-        if child.type == 'MESH' and child.kb.meshtype != Meshtype.TRIMESH:
+        if child.type == 'MESH' and child.kb.meshtype != MeshType.TRIMESH:
             continue
         create_armature_bones(armature, child, bone)
 

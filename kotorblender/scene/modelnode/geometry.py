@@ -20,12 +20,14 @@ import bpy
 
 from mathutils import Matrix, Quaternion
 
+from ...defines import RootType
+
 
 class GeometryNode:
 
     def __init__(self, name="UNNAMED"):
         self.nodetype = "undefined"
-        self.roottype = "mdl"
+        self.roottype = RootType.MODEL
 
         self.node_number = 0
         self.export_order = 0

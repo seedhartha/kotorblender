@@ -23,7 +23,7 @@ import bpy
 from bpy_extras.io_utils import unpack_list
 from mathutils import Vector
 
-from ...defines import NormalsAlgorithm
+from ...defines import NodeType, NormalsAlgorithm, RootType
 
 from ... import defines, utils
 
@@ -50,10 +50,10 @@ class TrimeshNode(GeometryNode):
 
     def __init__(self, name="UNNAMED"):
         GeometryNode.__init__(self, name)
-        self.nodetype = "trimesh"
+        self.nodetype = NodeType.TRIMESH
 
         # Properties
-        self.meshtype = defines.Meshtype.TRIMESH
+        self.meshtype = defines.MeshType.TRIMESH
         self.center = (0.0, 0.0, 0.0)  # Unused ?
         self.lightmapped = 0
         self.render = 1
@@ -102,14 +102,14 @@ class TrimeshNode(GeometryNode):
         obj = bpy.data.objects.new(self.name, mesh)
         self.set_object_data(obj, options)
 
-        if options.build_materials and self.roottype == "mdl":
+        if options.build_materials and self.roottype == RootType.MODEL:
             material.rebuild_object_material(obj, options.texture_path, options.texture_search_recursive)
 
         collection.objects.link(obj)
         return obj
 
     def create_mesh(self, name, options):
-        if options.normals_algorithm == NormalsAlgorithm.SHARP_EDGES and self.roottype == "mdl":
+        if options.normals_algorithm == NormalsAlgorithm.SHARP_EDGES and self.roottype == RootType.MODEL:
             self.merge_similar_vertices(options.sharp_edge_angle)
 
         # Create the mesh itself
@@ -138,7 +138,7 @@ class TrimeshNode(GeometryNode):
 
         mesh.update()
 
-        if self.roottype == "mdl":
+        if self.roottype == RootType.MODEL:
             self.post_process_mesh(mesh, options)
 
         return mesh

@@ -18,7 +18,7 @@
 
 from mathutils import Vector
 
-from ...defines import Dummytype, WkmMaterial
+from ...defines import DummyType, WalkmeshMaterial, WalkmeshType
 from ...scene.modelnode.aabb import AabbNode
 from ...scene.modelnode.dummy import DummyNode
 from ...scene.modelnode.trimesh import FaceList
@@ -79,10 +79,10 @@ class BwmSaver:
         self.save_perimeters()
 
     def peek_walkmesh(self):
-        self.walkmesh_type = WALKMESH_TYPE_AREA if self.walkmesh.walkmesh_type == "wok" else WALKMESH_TYPE_PLACEABLE
+        self.bwm_type = BWM_TYPE_WOK if self.walkmesh.walkmesh_type == WalkmeshType.WOK else BWM_TYPE_PWK_DWK
         self.geom_node = self.walkmesh.root_node.find_node(lambda node: isinstance(node, AabbNode))
-        self.use_node1 = self.walkmesh.root_node.find_node(lambda node: isinstance(node, DummyNode) and node.dummytype == Dummytype.USE1)
-        self.use_node2 = self.walkmesh.root_node.find_node(lambda node: isinstance(node, DummyNode) and node.dummytype == Dummytype.USE2)
+        self.use_node1 = self.walkmesh.root_node.find_node(lambda node: isinstance(node, DummyNode) and node.dummytype == DummyType.USE1)
+        self.use_node2 = self.walkmesh.root_node.find_node(lambda node: isinstance(node, DummyNode) and node.dummytype == DummyType.USE2)
 
         self.peek_vertices()
         self.peek_faces()
@@ -159,7 +159,7 @@ class BwmSaver:
         non_walkable_face_indices = []
         for face_idx, _ in enumerate(self.geom_node.facelist.vertices):
             mat_id = self.geom_node.facelist.materials[face_idx]
-            if mat_id in WkmMaterial.NONWALKABLE:
+            if mat_id in WalkmeshMaterial.NONWALKABLE:
                 non_walkable_face_indices.append(face_idx)
             else:
                 walkable_face_indices.append(face_idx)
@@ -171,7 +171,7 @@ class BwmSaver:
             self.facelist.normals.append(self.geom_node.facelist.normals[face_idx])
 
     def peek_aabbs(self):
-        if self.walkmesh_type == WALKMESH_TYPE_PLACEABLE:
+        if self.bwm_type == BWM_TYPE_PWK_DWK:
             return
 
         face_list = []
@@ -265,7 +265,7 @@ class BwmSaver:
         rel_use_vec2 = self.use_node2.position if self.use_node2 else [0.0] * 3
         position = self.geom_node.bwmposition
 
-        if self.walkmesh.walkmesh_type == "dwk":
+        if self.walkmesh.walkmesh_type == WalkmeshType.DWK:
             abs_use_vec1 = [position[i] + rel_use_vec1[i] for i in range(3)]
             abs_use_vec2 = [position[i] + rel_use_vec2[i] for i in range(3)]
         else:
@@ -275,7 +275,7 @@ class BwmSaver:
         num_verts = len(self.verts)
         num_faces = len(self.facelist.vertices)
 
-        if self.walkmesh_type == WALKMESH_TYPE_AREA:
+        if self.bwm_type == BWM_TYPE_WOK:
             num_aabbs = len(self.aabbs)
             off_aabbs = self.off_aabbs
             num_adj_edges = self.num_walkable_faces
@@ -295,7 +295,7 @@ class BwmSaver:
             off_perimeters = 0
 
         self.bwm.put_string("BWM V1.0")
-        self.bwm.put_uint32(self.walkmesh_type)
+        self.bwm.put_uint32(self.bwm_type)
         for val in rel_use_vec1:
             self.bwm.put_float(val)
         for val in rel_use_vec2:

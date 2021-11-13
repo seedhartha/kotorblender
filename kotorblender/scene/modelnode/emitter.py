@@ -20,6 +20,8 @@ import bpy
 
 from bpy_extras.io_utils import unpack_list
 
+from ...defines import MeshType, NodeType
+
 from ... import defines
 
 from .geometry import GeometryNode
@@ -27,7 +29,7 @@ from .geometry import GeometryNode
 
 class EmitterNode(GeometryNode):
 
-    emitter_attrs = [
+    EMITTER_ATTRS = [
         "deadspace",
         "blastradius",
         "blastlength",
@@ -108,9 +110,8 @@ class EmitterNode(GeometryNode):
 
     def __init__(self, name="UNNAMED"):
         GeometryNode.__init__(self, name)
-        self.nodetype = "emitter"
-
-        self.meshtype = defines.Meshtype.EMITTER
+        self.nodetype = NodeType.EMITTER
+        self.meshtype = MeshType.EMITTER
         # object data
         self.deadspace = 0.0
         self.blastradius = 0.0
@@ -229,7 +230,7 @@ class EmitterNode(GeometryNode):
 
         obj.kb.meshtype = self.meshtype
 
-        for attrname in self.emitter_attrs:
+        for attrname in self.EMITTER_ATTRS:
             value = getattr(self, attrname)
             # Enum translation is not pretty...
             if attrname == "spawntype":
@@ -268,7 +269,7 @@ class EmitterNode(GeometryNode):
     def load_object_data(self, obj, options):
         GeometryNode.load_object_data(self, obj, options)
 
-        for attrname in self.emitter_attrs:
+        for attrname in self.EMITTER_ATTRS:
             value = getattr(obj.kb, attrname)
 
             if attrname == "spawntype":

@@ -18,6 +18,8 @@
 
 import bpy
 
+from ...defines import NodeType
+
 from .geometry import GeometryNode
 
 
@@ -33,7 +35,7 @@ class LightNode(GeometryNode):
 
     def __init__(self, name="UNNAMED"):
         GeometryNode.__init__(self, name)
-        self.nodetype = "light"
+        self.nodetype = NodeType.LIGHT
 
         self.shadow = 1
         self.radius = 5.0

@@ -44,7 +44,7 @@ class KB_PT_empty(bpy.types.Panel):
         layout.separator()
 
         # Display properties depending on type of the empty
-        if obj.kb.dummytype == defines.Dummytype.MDLROOT:
+        if obj.kb.dummytype == defines.DummyType.MDLROOT:
             row = layout.row()
             box = row.box()
             split = box.split()
@@ -66,7 +66,7 @@ class KB_PT_empty(bpy.types.Panel):
             row = box.row()
             row.operator("kb.rebuild_armature")
 
-        elif (obj.kb.dummytype == defines.Dummytype.REFERENCE):
+        elif (obj.kb.dummytype == defines.DummyType.REFERENCE):
             row = layout.row()
             box = row.box()
             row = box.row()

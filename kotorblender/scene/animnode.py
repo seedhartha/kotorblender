@@ -18,6 +18,8 @@
 
 import bpy
 
+from ..defines import NodeType
+
 from .. import defines
 
 DATA_PATH_BY_LABEL = {
@@ -100,7 +102,7 @@ CONVERTER_BY_DATA_PATH = {
 class AnimationNode:
 
     def __init__(self, name="UNNAMED"):
-        self.nodetype = defines.Nodetype.DUMMY
+        self.nodetype = NodeType.DUMMY
         self.name = name
         self.node_number = 0
         self.parent = None
