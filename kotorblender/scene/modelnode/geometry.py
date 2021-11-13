@@ -53,10 +53,12 @@ class GeometryNode:
         obj.scale = (self.scale, self.scale, self.scale)
 
     def load_object_data(self, obj):
+        location, orientation, _ = obj.matrix_local.decompose()
+
         self.supernode_number = obj.kb.node_number
         self.export_order = obj.kb.export_order
-        self.position = obj.location
-        self.orientation = obj.rotation_quaternion
+        self.position = location
+        self.orientation = orientation
         self.scale = obj.scale[0]
 
         self.from_root = obj.matrix_local
