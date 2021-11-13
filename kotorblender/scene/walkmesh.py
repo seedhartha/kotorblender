@@ -32,8 +32,6 @@ class Walkmesh(Model):
         if type(self.root_node) != DummyNode or self.root_node.parent:
             raise RuntimeError("Root node has to be a dummy without a parent")
 
-        print("Importing walkmesh {} to collection".format(self.name))
-
         self.import_nodes_to_collection(self.root_node, parent_obj, collection)
 
     @classmethod
@@ -54,8 +52,6 @@ class Walkmesh(Model):
             walkmesh_type = "dwk"
         else:
             raise ValueError("Cannot create walkmesh from root object '{}'".format(obj.name))
-
-        print("Constructing walkmesh from object '{}'".format(obj.name))
 
         walkmesh = Walkmesh(walkmesh_type)
         walkmesh.root_node = cls.model_node_from_object(obj, exclude_xwk=False)

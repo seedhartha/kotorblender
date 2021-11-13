@@ -68,8 +68,6 @@ class BwmSaver:
         self.perimeters = []
 
     def save(self):
-        print("Saving BWM '{}'".format(self.path))
-
         self.peek_walkmesh()
 
         self.save_header()
