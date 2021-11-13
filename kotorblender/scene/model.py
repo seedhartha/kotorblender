@@ -45,7 +45,7 @@ class Model:
     def __init__(self):
         self.name = "UNNAMED"
         self.supermodel = defines.NULL
-        self.classification = defines.Classification.UNKNOWN
+        self.classification = defines.Classification.OTHER
         self.subclassification = 0
         self.affected_by_fog = True
         self.animroot = defines.NULL

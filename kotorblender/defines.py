@@ -79,24 +79,24 @@ class WkmMaterial:
 
 
 class Meshtype:
-    TRIMESH = "TRI"
-    DANGLYMESH = "DAN"
-    LIGHTSABER = "SAB"
-    SKIN = "SKI"
-    AABB = "AAB"
-    EMITTER = "EMT"
+    TRIMESH = "TRIMESH"
+    DANGLYMESH = "DANGLYMESH"
+    LIGHTSABER = "LIGHTSABER"
+    SKIN = "SKIN"
+    AABB = "AABB"
+    EMITTER = "EMITTER"
 
     ALL = {TRIMESH, DANGLYMESH, LIGHTSABER, SKIN, AABB, EMITTER}
 
 
 class Dummytype:
-    NONE = "NON"
-    MDLROOT = "MDL"
-    PWKROOT = "PWK"
-    DWKROOT = "DWK"
-    PTHROOT = "PTH"
-    REFERENCE = "REF"
-    PATHPOINT = "PPT"
+    NONE = "NONE"
+    MDLROOT = "MDLROOT"
+    PWKROOT = "PWKROOT"
+    DWKROOT = "DWKROOT"
+    PTHROOT = "PTHROOT"
+    REFERENCE = "REFERENCE"
+    PATHPOINT = "PATHPOINT"
     USE1 = "USE1"
     USE2 = "USE2"
 
@@ -104,29 +104,29 @@ class Dummytype:
 
 
 class Classification:
-    UNKNOWN = "Other"
-    TILE = "Tile"
-    CHARACTER = "Character"
-    DOOR = "Door"
-    EFFECT = "Effect"
-    GUI = "Gui"
-    LIGHTSABER = "Lightsaber"
-    PLACEABLE = "Placeable"
-    FLYER = "Flyer"
+    OTHER = "OTHER"
+    TILE = "TILE"
+    CHARACTER = "CHARACTER"
+    DOOR = "DOOR"
+    EFFECT = "EFFECT"
+    GUI = "GUI"
+    LIGHTSABER = "LIGHTSABER"
+    PLACEABLE = "PLACEABLE"
+    FLYER = "FLYER"
 
-    ALL = {UNKNOWN, TILE, CHARACTER, DOOR, EFFECT, GUI, LIGHTSABER, PLACEABLE, FLYER}
+    ALL = {OTHER, TILE, CHARACTER, DOOR, EFFECT, GUI, LIGHTSABER, PLACEABLE, FLYER}
 
 
 class Nodetype:
-    DUMMY = "dummy"
-    REFERENCE = "reference"
-    TRIMESH = "trimesh"
-    DANGLYMESH = "danglymesh"
-    SKIN = "skin"
-    EMITTER = "emitter"
-    LIGHT = "light"
-    AABB = "aabb"
-    LIGHTSABER = "lightsaber"
+    DUMMY = "DUMMY"
+    REFERENCE = "REFERENCE"
+    TRIMESH = "TRIMESH"
+    DANGLYMESH = "DANGLYMESH"
+    SKIN = "SKIN"
+    EMITTER = "EMITTER"
+    LIGHT = "LIGHT"
+    AABB = "AABB"
+    LIGHTSABER = "LIGHTSABER"
 
 
 class NormalsAlgorithm:
