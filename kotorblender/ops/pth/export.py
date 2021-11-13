@@ -34,5 +34,9 @@ class KB_OT_export_pth(bpy.types.Operator, ExportHelper):
         options={'HIDDEN'})
 
     def execute(self, context):
-        pth.save_pth(**self.as_keywords(ignore=("filter_glob", "check_existing")))
+        try:
+            pth.save_pth(**self.as_keywords(ignore=("filter_glob", "check_existing")))
+        except Exception as e:
+            self.report({'ERROR'}, str(e))
+
         return {'FINISHED'}

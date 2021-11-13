@@ -83,5 +83,9 @@ class KB_OT_import_mdl(bpy.types.Operator, ImportHelper):
         default=False)
 
     def execute(self, context):
-        mdl.load_mdl(**self.as_keywords(ignore=("filter_glob",)))
+        try:
+            mdl.load_mdl(**self.as_keywords(ignore=("filter_glob",)))
+        except Exception as e:
+            self.report({'ERROR'}, str(e))
+
         return {'FINISHED'}

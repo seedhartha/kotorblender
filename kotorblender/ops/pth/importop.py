@@ -34,5 +34,9 @@ class KB_OT_import_pth(bpy.types.Operator, ImportHelper):
         options={'HIDDEN'})
 
     def execute(self, context):
-        pth.load_pth(**self.as_keywords(ignore=("filter_glob",)))
+        try:
+            pth.load_pth(**self.as_keywords(ignore=("filter_glob",)))
+        except Exception as e:
+            self.report({'ERROR'}, str(e))
+
         return {'FINISHED'}
