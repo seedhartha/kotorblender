@@ -53,5 +53,9 @@ class KB_OT_export_mdl(bpy.types.Operator, ExportHelper):
         default=True)
 
     def execute(self, context):
-        mdl.save_mdl(**self.as_keywords(ignore=("filter_glob", "check_existing")))
+        try:
+            mdl.save_mdl(**self.as_keywords(ignore=("filter_glob", "check_existing")))
+        except Exception as e:
+            self.report({'ERROR'}, str(e))
+
         return {'FINISHED'}

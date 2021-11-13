@@ -73,5 +73,9 @@ class KB_OT_import_lyt(bpy.types.Operator, ImportHelper):
         default=False)
 
     def execute(self, context):
-        lyt.load_lyt(**self.as_keywords(ignore=("filter_glob",)))
+        try:
+            lyt.load_lyt(**self.as_keywords(ignore=("filter_glob",)))
+        except Exception as e:
+            self.report({'ERROR'}, str(e))
+
         return {'FINISHED'}

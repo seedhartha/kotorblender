@@ -34,5 +34,9 @@ class KB_OT_export_lyt(bpy.types.Operator, ExportHelper):
         options={'HIDDEN'})
 
     def execute(self, context):
-        lyt.save_lyt(**self.as_keywords(ignore=("filter_glob", "check_existing")))
+        try:
+            lyt.save_lyt(**self.as_keywords(ignore=("filter_glob", "check_existing")))
+        except Exception as e:
+            self.report({'ERROR'}, str(e))
+
         return {'FINISHED'}
