@@ -35,7 +35,7 @@ class KB_OT_export_lyt(bpy.types.Operator, ExportHelper):
 
     def execute(self, context):
         try:
-            lyt.save_lyt(**self.as_keywords(ignore=("filter_glob", "check_existing")))
+            lyt.save_lyt(self.filepath)
         except Exception as e:
             self.report({'ERROR'}, str(e))
 

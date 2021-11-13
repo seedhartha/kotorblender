@@ -192,11 +192,11 @@ class EmitterNode(GeometryNode):
         self.colormid = (1.0, 1.0, 1.0)
         self.colorend = (1.0, 1.0, 1.0)
 
-    def add_to_collection(self, collection):
+    def add_to_collection(self, collection, options):
         mesh = self.create_mesh(self.name)
         obj = bpy.data.objects.new(self.name, mesh)
 
-        self.set_object_data(obj)
+        self.set_object_data(obj, options)
         collection.objects.link(obj)
         return obj
 
@@ -224,8 +224,8 @@ class EmitterNode(GeometryNode):
         mesh.update()
         return mesh
 
-    def set_object_data(self, obj):
-        GeometryNode.set_object_data(self, obj)
+    def set_object_data(self, obj, options):
+        GeometryNode.set_object_data(self, obj, options)
 
         obj.kb.meshtype = self.meshtype
 
@@ -265,8 +265,8 @@ class EmitterNode(GeometryNode):
                 continue
             setattr(obj.kb, attrname, value)
 
-    def load_object_data(self, obj):
-        GeometryNode.load_object_data(self, obj)
+    def load_object_data(self, obj, options):
+        GeometryNode.load_object_data(self, obj, options)
 
         for attrname in self.emitter_attrs:
             value = getattr(obj.kb, attrname)

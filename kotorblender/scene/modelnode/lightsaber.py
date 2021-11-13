@@ -29,5 +29,5 @@ class LightsaberNode(TrimeshNode):
         self.nodetype = "lightsaber"
         self.meshtype = defines.Meshtype.LIGHTSABER
 
-    def create_mesh(self, name):
-        return TrimeshNode.create_mesh(self, name)
+    def create_mesh(self, name, options):
+        return TrimeshNode.create_mesh(self, name, options)

@@ -27,9 +27,8 @@ from ..format.gff.saver import GffSaver
 from .. import utils
 
 
-def load_pth(
-    filepath=""
-):
+def load_pth(filepath):
+
     def get_point_name(idx):
         return "PathPoint{0:0>3}".format(idx)
 

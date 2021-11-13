@@ -37,8 +37,8 @@ class ReferenceNode(GeometryNode):
         obj.kb.refmodel = self.refmodel
         obj.kb.reattachable = (self.reattachable == 1)
 
-    def load_object_data(self, obj):
-        GeometryNode.load_object_data(self, obj)
+    def load_object_data(self, obj, options):
+        GeometryNode.load_object_data(self, obj, options)
 
         self.refmodel = obj.kb.refmodel
         self.reattachable = 1 if obj.kb.reattachable else 0

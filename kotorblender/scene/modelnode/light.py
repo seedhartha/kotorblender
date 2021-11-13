@@ -50,10 +50,10 @@ class LightNode(GeometryNode):
 
         self.flare_list = FlareList()
 
-    def add_to_collection(self, collection):
+    def add_to_collection(self, collection, options):
         light = self.create_light(self.name)
         obj = bpy.data.objects.new(self.name, light)
-        self.set_object_data(obj)
+        self.set_object_data(obj, options)
         collection.objects.link(obj)
         return obj
 
@@ -63,8 +63,8 @@ class LightNode(GeometryNode):
         light.use_shadow = self.shadow != 0
         return light
 
-    def set_object_data(self, obj):
-        GeometryNode.set_object_data(self, obj)
+    def set_object_data(self, obj, options):
+        GeometryNode.set_object_data(self, obj, options)
 
         obj.kb.multiplier = self.multiplier
         obj.kb.radius = self.radius
@@ -88,8 +88,8 @@ class LightNode(GeometryNode):
 
         LightNode.calc_light_power(obj)
 
-    def load_object_data(self, obj):
-        GeometryNode.load_object_data(self, obj)
+    def load_object_data(self, obj, options):
+        GeometryNode.load_object_data(self, obj, options)
 
         self.color = obj.data.color
         self.multiplier = obj.kb.multiplier

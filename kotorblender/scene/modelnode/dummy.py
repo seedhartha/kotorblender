@@ -29,12 +29,12 @@ class DummyNode(GeometryNode):
         self.nodetype = "dummy"
         self.dummytype = Dummytype.NONE
 
-    def set_object_data(self, obj):
-        GeometryNode.set_object_data(self, obj)
+    def set_object_data(self, obj, options):
+        GeometryNode.set_object_data(self, obj, options)
 
         obj.kb.dummytype = self.dummytype
 
-    def load_object_data(self, obj):
-        GeometryNode.load_object_data(self, obj)
+    def load_object_data(self, obj, options):
+        GeometryNode.load_object_data(self, obj, options)
 
         self.dummytype = obj.kb.dummytype

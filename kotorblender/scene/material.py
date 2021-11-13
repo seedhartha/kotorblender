@@ -20,10 +20,10 @@ import bpy
 
 from bpy_extras import image_utils
 
-from .. import glob, utils
+from .. import utils
 
 
-def rebuild_object_material(obj):
+def rebuild_object_material(obj, texture_path="", texture_search_recursive=False):
     material = get_or_create_material(obj)
 
     mesh = obj.data
@@ -34,16 +34,15 @@ def rebuild_object_material(obj):
     if utils.is_null(obj.kb.bitmap) and utils.is_null(obj.kb.bitmap2):
         rebuild_material_simple(material, obj)
     else:
-        rebuild_material_nodes(material, obj)
+        rebuild_material_nodes(material, obj, texture_path, texture_search_recursive)
 
 
 def get_or_create_material(obj):
     name = get_material_name(obj)
     if name in bpy.data.materials:
-        material = bpy.data.materials[name]
+        return bpy.data.materials[name]
     else:
-        material = bpy.data.materials.new(name)
-    return material
+        return bpy.data.materials.new(name)
 
 
 def get_material_name(obj):
@@ -61,7 +60,7 @@ def rebuild_material_simple(material, obj):
     material.diffuse_color = [*obj.kb.diffuse, 1.0]
 
 
-def rebuild_material_nodes(material, obj):
+def rebuild_material_nodes(material, obj, texture_path, texture_search_recursive):
     material.use_nodes = True
     links = material.node_tree.links
     links.clear()
@@ -98,7 +97,7 @@ def rebuild_material_nodes(material, obj):
     if not utils.is_null(obj.kb.bitmap):
         diffuse = nodes.new("ShaderNodeTexImage")
         diffuse.location = (300, 0)
-        diffuse.image = load_texture_image(obj.kb.bitmap)
+        diffuse.image = get_or_create_texture(obj.kb.bitmap, texture_path, texture_search_recursive).image
         links.new(mul_diffuse_by_lightmap.inputs[0], diffuse.outputs[0])
         links.new(mul_alpha.inputs[0], diffuse.outputs[1])
 
@@ -110,7 +109,7 @@ def rebuild_material_nodes(material, obj):
 
         lightmap = nodes.new("ShaderNodeTexImage")
         lightmap.location = (300, -300)
-        lightmap.image = load_texture_image(obj.kb.bitmap2)
+        lightmap.image = get_or_create_texture(obj.kb.bitmap2, texture_path, texture_search_recursive).image
 
         material.shadow_method = 'NONE'
         links.new(lightmap.inputs[0], lightmap_uv.outputs[0])
@@ -125,33 +124,32 @@ def rebuild_material_nodes(material, obj):
     links.new(output.inputs[0], shader.outputs[0])
 
 
-def load_texture_image(name):
+def get_or_create_texture(name, texture_path, texture_search_recursive):
     if name in bpy.data.textures:
-        texture = bpy.data.textures[name]
+        return bpy.data.textures[name]
+
+    if name in bpy.data.images:
+        image = bpy.data.images[name]
     else:
-        if name in bpy.data.images:
-            image = bpy.data.images[name]
-        else:
-            image = create_image(name, glob.texture_path)
+        image = create_image(name, texture_path, texture_search_recursive)
 
-        texture = bpy.data.textures.new(name, type='IMAGE')
-        texture.image = image
-        texture.use_fake_user = True
+    texture = bpy.data.textures.new(name, type='IMAGE')
+    texture.image = image
+    texture.use_fake_user = True
 
-    return texture.image
+    return texture
 
 
-def create_image(name, path):
+def create_image(name, texture_path, texture_search_recursive):
     image = image_utils.load_image(
         name + ".tga",
-        path,
-        recursive=glob.texture_search_recursive,
+        texture_path,
+        recursive=texture_search_recursive,
         place_holder=False,
         ncase_cmp=True)
 
-    if image is None:
-        image = bpy.data.images.new(name, 512, 512)
-    else:
+    if image:
         image.name = name
+        return image
 
-    return image
+    return bpy.data.images.new(name, 512, 512)

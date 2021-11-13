@@ -16,11 +16,13 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+import os
+
 import bpy
 
 from bpy_extras.io_utils import ImportHelper
 
-from ...defines import NormalsAlgorithm
+from ...defines import ImportOptions, NormalsAlgorithm
 
 from ...io import mdl
 
@@ -83,8 +85,19 @@ class KB_OT_import_mdl(bpy.types.Operator, ImportHelper):
         default=False)
 
     def execute(self, context):
+        options = ImportOptions()
+        options.import_geometry = self.import_geometry
+        options.import_animations = self.import_animations
+        options.import_walkmeshes = self.import_walkmeshes
+        options.build_materials = self.build_materials
+        options.build_armature = self.build_armature
+        options.normals_algorithm = self.normals_algorithm
+        options.sharp_edge_angle = self.sharp_edge_angle
+        options.texture_path = os.path.dirname(self.filepath)
+        options.texture_search_recursive = self.texture_search_recursive
+
         try:
-            mdl.load_mdl(**self.as_keywords(ignore=("filter_glob",)))
+            mdl.load_mdl(self.filepath, options)
         except Exception as e:
             self.report({'ERROR'}, str(e))
 

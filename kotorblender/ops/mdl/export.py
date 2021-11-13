@@ -20,6 +20,7 @@ import bpy
 
 from bpy_extras.io_utils import ExportHelper
 
+from ...defines import ExportOptions
 from ...io import mdl
 
 
@@ -53,8 +54,14 @@ class KB_OT_export_mdl(bpy.types.Operator, ExportHelper):
         default=True)
 
     def execute(self, context):
+        options = ExportOptions()
+        options.export_for_tsl = self.export_for_tsl
+        options.export_animations = self.export_animations
+        options.export_walkmeshes = self.export_walkmeshes
+        options.export_custom_normals = self.export_custom_normals
+
         try:
-            mdl.save_mdl(**self.as_keywords(ignore=("filter_glob", "check_existing")))
+            mdl.save_mdl(self.filepath, options)
         except Exception as e:
             self.report({'ERROR'}, str(e))
 
