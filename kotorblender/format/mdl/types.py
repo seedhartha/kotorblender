@@ -56,7 +56,7 @@ CLASS_PLACEABLE = 0x20
 CLASS_FLYER = 0x40
 
 CLASS_BY_VALUE = {
-    CLASS_OTHER: Classification.UNKNOWN,
+    CLASS_OTHER: Classification.OTHER,
     CLASS_EFFECT: Classification.EFFECT,
     CLASS_TILE: Classification.TILE,
     CLASS_CHARACTER: Classification.CHARACTER,
