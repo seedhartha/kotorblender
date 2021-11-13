@@ -35,8 +35,8 @@ class DanglymeshNode(TrimeshNode):
         self.displacement = 1.0
         self.constraints = []
 
-    def set_object_data(self, obj):
-        TrimeshNode.set_object_data(self, obj)
+    def set_object_data(self, obj, options):
+        TrimeshNode.set_object_data(self, obj, options)
 
         obj.kb.period = self.period
         obj.kb.tightness = self.tightness
@@ -59,8 +59,8 @@ class DanglymeshNode(TrimeshNode):
             group.add([vert_idx], weight, 'REPLACE')
         obj.kb.constraints = group.name
 
-    def load_object_data(self, obj):
-        TrimeshNode.load_object_data(self, obj)
+    def load_object_data(self, obj, options):
+        TrimeshNode.load_object_data(self, obj, options)
 
         self.period = obj.kb.period
         self.tightness = obj.kb.tightness

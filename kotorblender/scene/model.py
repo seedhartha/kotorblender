@@ -24,7 +24,7 @@ from mathutils import Matrix
 
 from ..defines import Dummytype, Meshtype, Nodetype
 
-from .. import defines, glob, utils
+from .. import defines, utils
 
 from .animation import Animation
 from .modelnode.aabb import AabbNode
@@ -54,12 +54,12 @@ class Model:
         self.root_node = None
         self.animations = []
 
-    def import_to_collection(self, collection, position=(0.0, 0.0, 0.0)):
+    def import_to_collection(self, collection, options, position=(0.0, 0.0, 0.0)):
         if type(self.root_node) != DummyNode or self.root_node.parent:
             raise RuntimeError("Root node has to be a dummy without a parent")
 
-        if glob.import_geometry:
-            root_obj = self.root_node.add_to_collection(collection)
+        if options.import_geometry:
+            root_obj = self.root_node.add_to_collection(collection, options)
             root_obj.location = position
             root_obj.kb.dummytype = defines.Dummytype.MDLROOT
             root_obj.kb.supermodel = self.supermodel
@@ -70,7 +70,7 @@ class Model:
             root_obj.kb.animscale = self.animscale
 
             for child in self.root_node.children:
-                self.import_nodes_to_collection(child, root_obj, collection)
+                self.import_nodes_to_collection(child, root_obj, collection, options)
 
             animscale = 1.0  # animation scale must only be applied to supermodel animations
         else:
@@ -82,20 +82,20 @@ class Model:
 
             animscale = root_obj.kb.animscale
 
-        if glob.import_animations:
+        if options.import_animations:
             self.create_animations(root_obj, animscale)
 
-        if glob.build_armature:
+        if options.build_armature:
             armature.rebuild_armature(root_obj)
 
         return root_obj
 
-    def import_nodes_to_collection(self, node, parent_obj, collection):
-        obj = node.add_to_collection(collection)
+    def import_nodes_to_collection(self, node, parent_obj, collection, options):
+        obj = node.add_to_collection(collection, options)
         obj.parent = parent_obj
 
         for child in node.children:
-            self.import_nodes_to_collection(child, obj, collection)
+            self.import_nodes_to_collection(child, obj, collection, options)
 
     def create_animations(self, mdl_root, animscale):
         for anim in self.animations:
@@ -105,7 +105,7 @@ class Model:
         return self.root_node.find_node(test)
 
     @classmethod
-    def from_mdl_root(cls, root_obj):
+    def from_mdl_root(cls, root_obj, options):
         model = Model()
         model.name = root_obj.name
         model.supermodel = root_obj.kb.supermodel
@@ -115,15 +115,15 @@ class Model:
         model.animroot = root_obj.kb.animroot
         model.animscale = root_obj.kb.animscale
 
-        model.root_node = cls.model_node_from_object(root_obj)
+        model.root_node = cls.model_node_from_object(root_obj, options)
 
-        if glob.export_animations:
+        if options.export_animations:
             model.animations = [Animation.from_list_anim(anim, root_obj) for anim in root_obj.kb.anim_list]
 
         return model
 
     @classmethod
-    def model_node_from_object(cls, obj, parent=None, exclude_xwk=True):
+    def model_node_from_object(cls, obj, options, parent=None, exclude_xwk=True):
         if exclude_xwk and (utils.is_pwk_root(obj) or utils.is_dwk_root(obj)):
             return None
 
@@ -166,7 +166,7 @@ class Model:
 
         node = switch[node_type](name)
         node.parent = parent
-        node.load_object_data(obj)
+        node.load_object_data(obj, options)
 
         # Ignore transformations up to MDL root
         if not parent:
@@ -175,7 +175,7 @@ class Model:
             node.from_root = Matrix()
 
         for child_obj in sorted(obj.children, key=lambda o: o.kb.export_order):
-            child = cls.model_node_from_object(child_obj, node, exclude_xwk)
+            child = cls.model_node_from_object(child_obj, options, node, exclude_xwk)
             if child:
                 node.children.append(child)
 

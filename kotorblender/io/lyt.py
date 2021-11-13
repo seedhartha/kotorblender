@@ -20,31 +20,14 @@ import os
 
 import bpy
 
-from ..defines import Dummytype, NormalsAlgorithm
+from ..defines import Dummytype
 
-from .. import glob, utils
+from .. import utils
 
 from . import mdl
 
 
-def load_lyt(
-    filepath="",
-    import_animations=True,
-    import_walkmeshes=True,
-    build_materials=True,
-    normals_algorithm=NormalsAlgorithm.CUSTOM,
-    sharp_edge_angle=10.0,
-    texture_search_recursive=False
-):
-    glob.import_animations = import_animations
-    glob.import_walkmeshes = import_walkmeshes
-    glob.build_materials = build_materials
-    glob.build_armature = False
-    glob.normals_algorithm = normals_algorithm
-    glob.sharp_edge_angle = sharp_edge_angle
-    glob.texture_path = os.path.dirname(filepath)
-    glob.texture_search_recursive = texture_search_recursive
-
+def load_lyt(filepath, options):
     # Read lines from LYT
     fp = os.fsencode(filepath)
     f = open(fp, "r")
@@ -74,10 +57,11 @@ def load_lyt(
         mdl_path = os.path.join(path, room[0] + ".mdl")
         if not os.path.exists(mdl_path):
             continue
-        mdl.do_load_mdl(mdl_path, room[1:])
+        mdl.load_mdl(mdl_path, options, room[1:])
 
 
 def save_lyt(filepath):
+
     def describe_object(obj):
         parent = utils.get_object_root(obj)
         orientation = obj.rotation_euler.to_quaternion()

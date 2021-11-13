@@ -38,13 +38,13 @@ class GeometryNode:
         self.children = []
         self.from_root = Matrix()
 
-    def add_to_collection(self, collection):
+    def add_to_collection(self, collection, options):
         obj = bpy.data.objects.new(self.name, None)
-        self.set_object_data(obj)
+        self.set_object_data(obj, options)
         collection.objects.link(obj)
         return obj
 
-    def set_object_data(self, obj):
+    def set_object_data(self, obj, options):
         obj.kb.node_number = self.node_number
         obj.kb.export_order = self.export_order
         obj.location = self.position
@@ -52,7 +52,7 @@ class GeometryNode:
         obj.rotation_quaternion = Quaternion(self.orientation)
         obj.scale = (self.scale, self.scale, self.scale)
 
-    def load_object_data(self, obj):
+    def load_object_data(self, obj, options):
         location, orientation, _ = obj.matrix_local.decompose()
 
         self.node_number = obj.kb.node_number

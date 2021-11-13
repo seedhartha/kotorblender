@@ -25,7 +25,7 @@ from mathutils import Vector
 
 from ...defines import NormalsAlgorithm
 
-from ... import defines, glob, utils
+from ... import defines, utils
 
 from .. import material
 
@@ -97,20 +97,20 @@ class TrimeshNode(GeometryNode):
         self.eval_obj = None
         self.eval_mesh = None
 
-    def add_to_collection(self, collection):
-        mesh = self.create_mesh(self.name)
+    def add_to_collection(self, collection, options):
+        mesh = self.create_mesh(self.name, options)
         obj = bpy.data.objects.new(self.name, mesh)
-        self.set_object_data(obj)
+        self.set_object_data(obj, options)
 
-        if glob.build_materials and self.roottype == "mdl":
-            material.rebuild_object_material(obj)
+        if options.build_materials and self.roottype == "mdl":
+            material.rebuild_object_material(obj, options.texture_path, options.texture_search_recursive)
 
         collection.objects.link(obj)
         return obj
 
-    def create_mesh(self, name):
-        if glob.normals_algorithm == NormalsAlgorithm.SHARP_EDGES and self.roottype == "mdl":
-            self.merge_similar_vertices()
+    def create_mesh(self, name, options):
+        if options.normals_algorithm == NormalsAlgorithm.SHARP_EDGES and self.roottype == "mdl":
+            self.merge_similar_vertices(options.sharp_edge_angle)
 
         # Create the mesh itself
         mesh = bpy.data.meshes.new(name)
@@ -139,11 +139,12 @@ class TrimeshNode(GeometryNode):
         mesh.update()
 
         if self.roottype == "mdl":
-            self.post_process_mesh(mesh)
+            self.post_process_mesh(mesh, options)
 
         return mesh
 
-    def merge_similar_vertices(self):
+    def merge_similar_vertices(self, sharp_edge_angle):
+
         def cos_angle_between(a, b):
             len2_a = sum([a[i] * a[i] for i in range(3)])
             if len2_a == 0.0:
@@ -196,7 +197,7 @@ class TrimeshNode(GeometryNode):
         # Determine sharp vertices
 
         sharp_verts = [False] * len(self.verts)
-        cos_angle_sharp = cos(radians(glob.sharp_edge_angle))
+        cos_angle_sharp = cos(radians(sharp_edge_angle))
         for vert_idx, normals in enumerate(split_normals):
             # Vertex is sharp if an angle between at least two of its split normals exceeds threshold
             for normal_idx, normal in enumerate(normals):
@@ -245,19 +246,19 @@ class TrimeshNode(GeometryNode):
         if self.uv2:
             self.uv2 = self.uv2[:num_unique]
 
-    def post_process_mesh(self, mesh):
-        if glob.normals_algorithm == NormalsAlgorithm.SHARP_EDGES:
+    def post_process_mesh(self, mesh, options):
+        if options.normals_algorithm == NormalsAlgorithm.SHARP_EDGES:
             # Mark sharp edges
             for edge in mesh.edges:
                 if tuple(sorted(edge.vertices)) in self.sharp_edges:
                     edge.use_edge_sharp = True
-        elif glob.normals_algorithm == NormalsAlgorithm.CUSTOM:
+        elif options.normals_algorithm == NormalsAlgorithm.CUSTOM:
             # Set custom normals
             mesh.normals_split_custom_set_from_vertices(self.normals)
             mesh.use_auto_smooth = True
 
-    def set_object_data(self, obj):
-        GeometryNode.set_object_data(self, obj)
+    def set_object_data(self, obj, options):
+        GeometryNode.set_object_data(self, obj, options)
 
         obj.kb.meshtype = self.meshtype
         obj.kb.bitmap = self.bitmap if not utils.is_null(self.bitmap) else ""
@@ -285,12 +286,12 @@ class TrimeshNode(GeometryNode):
         obj.kb.diffuse = self.diffuse
         obj.kb.ambient = self.ambient
 
-        if glob.normals_algorithm == NormalsAlgorithm.SHARP_EDGES:
+        if options.normals_algorithm == NormalsAlgorithm.SHARP_EDGES:
             modifier = obj.modifiers.new(name="EdgeSplit", type='EDGE_SPLIT')
             modifier.use_edge_angle = False
 
-    def load_object_data(self, obj):
-        GeometryNode.load_object_data(self, obj)
+    def load_object_data(self, obj, options):
+        GeometryNode.load_object_data(self, obj, options)
 
         self.meshtype = obj.kb.meshtype
         self.bitmap = obj.kb.bitmap if obj.kb.bitmap else defines.NULL
@@ -326,7 +327,7 @@ class TrimeshNode(GeometryNode):
         for vert in self.eval_mesh.vertices:
             self.verts.append(vert.co[:3])
 
-        if glob.export_custom_normals and self.eval_mesh.has_custom_normals:
+        if options.export_custom_normals and self.eval_mesh.has_custom_normals:
             self.eval_mesh.calc_normals_split()
             normals = dict()
             for tri in self.eval_mesh.loop_triangles:

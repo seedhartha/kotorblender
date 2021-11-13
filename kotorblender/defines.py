@@ -133,3 +133,24 @@ class NormalsAlgorithm:
     NONE = "NONE"
     CUSTOM = "CUSTOM"
     SHARP_EDGES = "SHARP_EDGES"
+
+
+class ImportOptions:
+    def __init__(self):
+        self.import_geometry = True
+        self.import_animations = True
+        self.import_walkmeshes = True
+        self.build_materials = True
+        self.build_armature = False
+        self.normals_algorithm = NormalsAlgorithm.CUSTOM
+        self.sharp_edge_angle = 10.0
+        self.texture_path = ""
+        self.texture_search_recursive = False
+
+
+class ExportOptions:
+    def __init__(self):
+        self.export_for_tsl = False
+        self.export_animations = True
+        self.export_walkmeshes = True
+        self.export_custom_normals = True

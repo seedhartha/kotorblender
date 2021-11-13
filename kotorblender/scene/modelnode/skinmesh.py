@@ -30,8 +30,8 @@ class SkinmeshNode(TrimeshNode):
         self.meshtype = defines.Meshtype.SKIN
         self.weights = []
 
-    def set_object_data(self, obj):
-        TrimeshNode.set_object_data(self, obj)
+    def set_object_data(self, obj, options):
+        TrimeshNode.set_object_data(self, obj, options)
 
         self.add_skin_groups_to_object(obj)
 
@@ -55,8 +55,8 @@ class SkinmeshNode(TrimeshNode):
                     group.add([vert_idx], weight, 'REPLACE')
                     groups[bone_name] = group
 
-    def load_object_data(self, obj):
-        TrimeshNode.load_object_data(self, obj)
+    def load_object_data(self, obj, options):
+        TrimeshNode.load_object_data(self, obj, options)
 
         for vert in self.eval_mesh.vertices:
             vert_weights = []

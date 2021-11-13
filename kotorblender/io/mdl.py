@@ -20,7 +20,6 @@ import os
 
 import bpy
 
-from ..defines import NormalsAlgorithm
 from ..format.bwm.loader import BwmLoader
 from ..format.bwm.saver import BwmSaver
 from ..format.mdl.loader import MdlLoader
@@ -29,36 +28,10 @@ from ..scene.modelnode.aabb import AabbNode
 from ..scene.model import Model
 from ..scene.walkmesh import Walkmesh
 
-from .. import glob, utils
+from .. import utils
 
 
-def load_mdl(
-    filepath="",
-    import_geometry=True,
-    import_animations=True,
-    import_walkmeshes=True,
-    build_materials=True,
-    build_armature=False,
-    normals_algorithm=NormalsAlgorithm.CUSTOM,
-    sharp_edge_angle=10.0,
-    texture_search_recursive=False
-):
-    glob.import_geometry = import_geometry
-    glob.import_animations = import_animations
-    glob.import_walkmeshes = import_walkmeshes
-    glob.build_materials = build_materials
-    glob.build_armature = build_armature
-    glob.normals_algorithm = normals_algorithm
-    glob.sharp_edge_angle = sharp_edge_angle
-    glob.texture_path = os.path.dirname(filepath)
-    glob.texture_search_recursive = texture_search_recursive
-
-    do_load_mdl(filepath)
-
-
-def do_load_mdl(filepath, position=(0.0, 0.0, 0.0)):
-    collection = bpy.context.collection
-
+def load_mdl(filepath, options, position=(0.0, 0.0, 0.0)):
     mdl = MdlLoader(filepath)
     model = mdl.load()
 
@@ -67,7 +40,7 @@ def do_load_mdl(filepath, position=(0.0, 0.0, 0.0)):
     dwk_walkmesh2 = None
     dwk_walkmesh3 = None
 
-    if glob.import_geometry and glob.import_walkmeshes:
+    if options.import_geometry and options.import_walkmeshes:
         wok_path = filepath[:-4] + ".wok"
         if os.path.exists(wok_path):
             wok = BwmLoader(wok_path, model.name)
@@ -95,7 +68,8 @@ def do_load_mdl(filepath, position=(0.0, 0.0, 0.0)):
             dwk_walkmesh2 = dwk2.load()
             dwk_walkmesh3 = dwk3.load()
 
-    model_root = model.import_to_collection(collection, position)
+    collection = bpy.context.collection
+    model_root = model.import_to_collection(collection, options, position)
 
     if pwk_walkmesh:
         pwk_walkmesh.import_to_collection(model_root, collection)
@@ -108,16 +82,7 @@ def do_load_mdl(filepath, position=(0.0, 0.0, 0.0)):
     bpy.context.scene.frame_set(0)
 
 
-def save_mdl(
-    filepath,
-    export_for_tsl=False,
-    export_animations=True,
-    export_walkmeshes=True,
-    export_custom_normals=True
-):
-    glob.export_animations = export_animations
-    glob.export_custom_normals = export_custom_normals
-
+def save_mdl(filepath, options):
     # Reset Pose
     bpy.context.scene.frame_set(0)
 
@@ -128,11 +93,11 @@ def save_mdl(
         return
 
     # Export MDL
-    model = Model.from_mdl_root(mdl_root)
-    mdl = MdlSaver(filepath, model, export_for_tsl)
+    model = Model.from_mdl_root(mdl_root, options)
+    mdl = MdlSaver(filepath, model, options.export_for_tsl)
     mdl.save()
 
-    if export_walkmeshes:
+    if options.export_walkmeshes:
         # Export WOK
         aabb_node = model.find_node(lambda node: isinstance(node, AabbNode))
         if aabb_node:

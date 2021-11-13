@@ -23,7 +23,7 @@ from mathutils import Vector
 
 from ...defines import NormalsAlgorithm
 
-from ... import defines, glob
+from ... import defines
 
 from .trimesh import TrimeshNode, UV_MAP_DIFFUSE, UV_MAP_LIGHTMAP
 
@@ -52,18 +52,18 @@ class AabbNode(TrimeshNode):
                 self.lytposition = wok_vert - mdl_vert_from_root + Vector(self.bwmposition)
                 break
 
-    def add_to_collection(self, collection):
-        mesh = self.create_mesh(self.name)
+    def add_to_collection(self, collection, options):
+        mesh = self.create_mesh(self.name, options)
         obj = bpy.data.objects.new(self.name, mesh)
-        self.set_object_data(obj)
+        self.set_object_data(obj, options)
         self.apply_room_links(mesh)
         collection.objects.link(obj)
 
         return obj
 
-    def create_mesh(self, name):
-        if glob.normals_algorithm == NormalsAlgorithm.SHARP_EDGES and self.roottype == "mdl":
-            self.merge_similar_vertices()
+    def create_mesh(self, name, options):
+        if options.normals_algorithm == NormalsAlgorithm.SHARP_EDGES and self.roottype == "mdl":
+            self.merge_similar_vertices(options.sharp_edge_angle)
 
         # Create the mesh itself
         mesh = bpy.data.meshes.new(name)
@@ -108,7 +108,7 @@ class AabbNode(TrimeshNode):
         mesh.update()
 
         if self.roottype == "mdl":
-            self.post_process_mesh(mesh)
+            self.post_process_mesh(mesh, options)
 
         return mesh
 
@@ -146,14 +146,14 @@ class AabbNode(TrimeshNode):
                 transition = int((255.0 * color[1]) - 200.0)
                 self.roomlinks[edge_idx] = transition
 
-    def set_object_data(self, obj):
-        TrimeshNode.set_object_data(self, obj)
+    def set_object_data(self, obj, options):
+        TrimeshNode.set_object_data(self, obj, options)
 
         obj.kb.bwmposition = self.bwmposition
         obj.kb.lytposition = self.lytposition
 
-    def load_object_data(self, obj):
-        TrimeshNode.load_object_data(self, obj)
+    def load_object_data(self, obj, options):
+        TrimeshNode.load_object_data(self, obj, options)
 
         self.bwmposition = obj.kb.bwmposition
         self.lytposition = obj.kb.lytposition

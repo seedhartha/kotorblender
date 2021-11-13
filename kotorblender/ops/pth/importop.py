@@ -35,7 +35,7 @@ class KB_OT_import_pth(bpy.types.Operator, ImportHelper):
 
     def execute(self, context):
         try:
-            pth.load_pth(**self.as_keywords(ignore=("filter_glob",)))
+            pth.load_pth(self.filepath)
         except Exception as e:
             self.report({'ERROR'}, str(e))
 
