@@ -58,7 +58,7 @@ def update_emitter_prop(self, context):
 
 class ObjectPropertyGroup(bpy.types.PropertyGroup):
     # For all objects
-    node_number: bpy.props.IntProperty(name="Node Number", description="Node number must be equal to this nodes number in supermodel", default=0, min=0, max=1000)
+    node_number: bpy.props.IntProperty(name="Node Number", description="Must be unique per model and equal to node number in supermodel", default=0, min=0, max=1000)
     export_order: bpy.props.IntProperty(name="Export Order", description="Export order relative to parent", default=0, min=0, max=1000)
 
     # For all emptys

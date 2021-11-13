@@ -27,7 +27,7 @@ class GeometryNode:
         self.nodetype = "undefined"
         self.roottype = "mdl"
 
-        self.supernode_number = 0
+        self.node_number = 0
         self.export_order = 0
         self.name = name
         self.position = (0.0, 0.0, 0.0)
@@ -45,7 +45,7 @@ class GeometryNode:
         return obj
 
     def set_object_data(self, obj):
-        obj.kb.node_number = self.supernode_number
+        obj.kb.node_number = self.node_number
         obj.kb.export_order = self.export_order
         obj.location = self.position
         obj.rotation_mode = 'QUATERNION'
@@ -55,7 +55,7 @@ class GeometryNode:
     def load_object_data(self, obj):
         location, orientation, _ = obj.matrix_local.decompose()
 
-        self.supernode_number = obj.kb.node_number
+        self.node_number = obj.kb.node_number
         self.export_order = obj.kb.export_order
         self.position = location
         self.orientation = orientation

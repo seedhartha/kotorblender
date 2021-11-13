@@ -146,7 +146,7 @@ class MdlSaver:
         for node_idx, node in enumerate(self.nodes):
             self.node_names.append(node.name)
             self.node_idx_by_name[node.name] = node_idx
-            self.node_idx_by_number[node.supernode_number] = node_idx
+            self.node_idx_by_number[node.node_number] = node_idx
 
         # Animation Nodes
         for anim_idx, anim in enumerate(self.model.animations):
@@ -217,7 +217,7 @@ class MdlSaver:
 
             # Animation Nodes
             for node_idx, node in enumerate(self.anim_nodes[anim_idx]):
-                model_node = self.nodes[self.node_idx_by_number[node.supernode_number]]
+                model_node = self.nodes[self.node_idx_by_number[node.node_number]]
                 type_flags = self.get_node_flags(model_node)
 
                 # Geometry Header
@@ -711,7 +711,7 @@ class MdlSaver:
             child_indices = self.anim_child_indices[anim_idx][node_idx]
 
             self.mdl.put_uint16(type_flags)
-            self.mdl.put_uint16(node.supernode_number)
+            self.mdl.put_uint16(node.node_number)
             self.mdl.put_uint16(name_index)
             self.mdl.put_uint16(0)  # padding
             self.mdl.put_uint32(off_root)
@@ -759,7 +759,7 @@ class MdlSaver:
             # Geometry Header
 
             type_flags = self.get_node_flags(node)
-            supernode_number = node.supernode_number
+            node_number = node.node_number
             name_index = node_idx
             off_root = 0
             parent_idx = self.parent_indices[node_idx]
@@ -769,7 +769,7 @@ class MdlSaver:
             child_indices = self.child_indices[node_idx]
 
             self.mdl.put_uint16(type_flags)
-            self.mdl.put_uint16(supernode_number)
+            self.mdl.put_uint16(node_number)
             self.mdl.put_uint16(name_index)
             self.mdl.put_uint16(0)  # padding
             self.mdl.put_uint32(off_root)
