@@ -23,7 +23,6 @@ import bpy
 from mathutils import Matrix
 
 from ..defines import Dummytype, Meshtype, Nodetype
-from ..exception.malformedfile import MalformedFile
 
 from .. import defines, glob, utils
 
@@ -57,7 +56,7 @@ class Model:
 
     def import_to_collection(self, collection, position=(0.0, 0.0, 0.0)):
         if type(self.root_node) != DummyNode or self.root_node.parent:
-            raise MalformedFile("Root node has to be a dummy without a parent")
+            raise RuntimeError("Root node has to be a dummy without a parent")
 
         print("Importing model '{}' to collection".format(self.name))
 
