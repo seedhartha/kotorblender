@@ -62,6 +62,8 @@ class KB_PT_empty(bpy.types.Panel):
             col.prop(obj.kb, "animscale", text="")
             layout.separator()
             row = box.row()
+            row.operator("kb.assign_node_numbers")
+            row = box.row()
             row.operator("kb.rebuild_armature")
 
         elif (obj.kb.dummytype == defines.Dummytype.REFERENCE):

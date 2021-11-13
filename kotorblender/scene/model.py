@@ -186,3 +186,10 @@ class Model:
                 node.children.append(child)
 
         return node
+
+    @classmethod
+    def assign_node_numbers(cls, obj, number):
+        obj.kb.node_number = number[0]
+        number[0] += 1
+        for child in obj.children:
+            cls.assign_node_numbers(child, number)

@@ -25,6 +25,7 @@ from .ops.anim.event.new import KB_OT_anim_event_new
 from .ops.anim.focus import KB_OT_anim_focus
 from .ops.anim.move import KB_OT_anim_move
 from .ops.anim.new import KB_OT_anim_new
+from .ops.assignnodenumbers import KB_OT_assign_node_numbers
 from .ops.lightflare.delete import KB_OT_delete_lightflare
 from .ops.lightflare.move import KB_OT_move_lightflare
 from .ops.lightflare.new import KB_OT_new_lightflare
@@ -105,6 +106,7 @@ classes = (
     KB_OT_add_connection,
     KB_OT_anim_event_delete,
     KB_OT_anim_delete,
+    KB_OT_assign_node_numbers,
     KB_OT_delete_lightflare,
     KB_OT_export_lyt,
     KB_OT_export_mdl,
