@@ -32,9 +32,10 @@ class ReferenceNode(GeometryNode):
         self.refmodel = defines.NULL
         self.reattachable = 0
 
-    def set_object_data(self, obj):
-        GeometryNode.set_object_data(self, obj)
+    def set_object_data(self, obj, options):
+        GeometryNode.set_object_data(self, obj, options)
 
+        obj.kb.dummytype = DummyType.REFERENCE
         obj.kb.refmodel = self.refmodel
         obj.kb.reattachable = (self.reattachable == 1)
 
