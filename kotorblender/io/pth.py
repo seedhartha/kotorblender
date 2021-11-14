@@ -41,6 +41,7 @@ def load_pth(operator, filepath):
         path_object.kb.dummytype = DummyType.PTHROOT
         bpy.context.collection.objects.link(path_object)
 
+    operator.report({'INFO'}, "Loading path from '{}'".format(filepath))
     loader = GffLoader(filepath, "PTH")
     tree = loader.load()
     points = []
@@ -61,7 +62,7 @@ def load_pth(operator, filepath):
         for conection in conections:
             name = get_point_name(conection["Destination"])
             if name in bpy.data.objects:
-                connection = object.kb.path_connections.add()
+                connection = object.kb.path_connection_list.add()
                 connection.point = name
 
 
@@ -76,7 +77,7 @@ def save_pth(operator, filepath):
     conections = []
     for obj in point_objects:
         first_conection = len(conections)
-        for object_connection in obj.kb.path_connections:
+        for object_connection in obj.kb.path_connection_list:
             conection = dict()
             conection["_type"] = 3
             conection["_fields"] = {
@@ -93,7 +94,7 @@ def save_pth(operator, filepath):
             "X": 8,
             "Y": 8
         }
-        point["Conections"] = len(obj.kb.path_connections)
+        point["Conections"] = len(obj.kb.path_connection_list)
         point["First_Conection"] = first_conection
         point["X"] = obj.location[0]
         point["Y"] = obj.location[1]
@@ -108,5 +109,6 @@ def save_pth(operator, filepath):
     tree["Path_Points"] = points
     tree["Path_Conections"] = conections
 
+    operator.report({'INFO'}, "Saving path to '{}'".format(filepath))
     saver = GffSaver(tree, filepath, "PTH")
     saver.save()

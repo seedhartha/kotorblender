@@ -18,15 +18,29 @@
 
 import bpy
 
+from ....scene.animation import Animation
 
-class KB_UL_anim_events(bpy.types.UIList):
+from .... import utils
 
-    def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
-        if self.layout_type in {'DEFAULT', 'COMPACT'}:
-            split = layout.split(factor=0.7, align=False)
-            split.prop(item, "name", text="", emboss=False)
-            row = split.row(align=True)
-            row.prop(item, "frame", text="", emboss=False)
-        elif self.layout_type in {'GRID'}:
-            layout.alignment = 'CENTER'
-            layout.label("", icon='LIGHT')
+
+class KB_OT_add_anim_event(bpy.types.Operator):
+    bl_idname = "kb.add_anim_event"
+    bl_label = "Add event to the animation"
+    bl_options = {'UNDO'}
+
+    @classmethod
+    def poll(cls, context):
+        return utils.is_mdl_root(context.object)
+
+    def execute(self, context):
+        obj = context.object
+        anim_list = obj.kb.anim_list
+        anim_list_idx = obj.kb.anim_list_idx
+
+        if anim_list_idx < 0 or anim_list_idx > len(anim_list):
+            return {'CANCELLED'}
+
+        anim = anim_list[anim_list_idx]
+        Animation.append_event_to_object_anim(anim, "newevent", 0)
+
+        return {'FINISHED'}

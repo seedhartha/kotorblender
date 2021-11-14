@@ -94,7 +94,7 @@ def rebuild_material_nodes(material, obj, texture_path, texture_search_recursive
     mul_alpha.inputs[1].default_value = obj.kb.alpha
 
     # Diffuse map node
-    if not utils.is_null(obj.kb.bitmap):
+    if utils.is_not_null(obj.kb.bitmap):
         diffuse = nodes.new("ShaderNodeTexImage")
         diffuse.location = (300, 0)
         diffuse.image = get_or_create_texture(obj.kb.bitmap, texture_path, texture_search_recursive).image
@@ -102,7 +102,7 @@ def rebuild_material_nodes(material, obj, texture_path, texture_search_recursive
         links.new(mul_alpha.inputs[0], diffuse.outputs[1])
 
     # Lightmap node
-    if not utils.is_null(obj.kb.bitmap2):
+    if utils.is_not_null(obj.kb.bitmap2):
         lightmap_uv = nodes.new("ShaderNodeUVMap")
         lightmap_uv.location = (0, -300)
         lightmap_uv.uv_map = "UVMap_lm"

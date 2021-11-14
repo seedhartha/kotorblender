@@ -16,6 +16,8 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+from math import radians
+
 NULL = "NULL"
 
 # Number of frames to the left of animation, where to create a rest pose
@@ -147,7 +149,7 @@ class ImportOptions:
         self.build_materials = True
         self.build_armature = False
         self.normals_algorithm = NormalsAlgorithm.CUSTOM
-        self.sharp_edge_angle = 10.0
+        self.sharp_edge_angle = radians(10.0)
         self.texture_path = ""
         self.texture_search_recursive = False
 

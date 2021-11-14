@@ -22,7 +22,7 @@ from ... import utils
 
 
 class KB_PT_path_point(bpy.types.Panel):
-    bl_label = "Odyssey Path Point"
+    bl_label = "KotOR Path Point"
     bl_space_type = 'PROPERTIES'
     bl_region_type = 'WINDOW'
     bl_context = "object"
@@ -32,11 +32,14 @@ class KB_PT_path_point(bpy.types.Panel):
         return utils.is_path_point(context.object)
 
     def draw(self, context):
-        row = self.layout.row()
+        layout = self.layout
+        layout.use_property_split = True
+
+        row = layout.row()
         box = row.box()
         box.label(text="Connections")
         row = box.row()
-        row.template_list("KB_UL_path_points", "", context.object.kb, "path_connections", context.object.kb, "active_path_connection")
+        row.template_list("KB_UL_path_points", "path_points", context.object.kb, "path_connection_list", context.object.kb, "path_connection_idx")
         col = row.column(align=True)
         col.operator("kb.add_path_connection", icon='ADD', text="")
         col.operator("kb.remove_path_connection", icon='REMOVE', text="")

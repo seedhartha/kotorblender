@@ -16,7 +16,7 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-from math import cos, radians, sqrt
+from math import cos, sqrt
 
 import bpy
 
@@ -59,7 +59,6 @@ class TrimeshNode(GeometryNode):
         self.render = 1
         self.shadow = 1
         self.beaming = 0
-        self.inheritcolor = 0  # Unused ?
         self.background_geometry = 0
         self.dirt_enabled = 0
         self.dirt_texture = 1
@@ -197,7 +196,7 @@ class TrimeshNode(GeometryNode):
         # Determine sharp vertices
 
         sharp_verts = [False] * len(self.verts)
-        cos_angle_sharp = cos(radians(sharp_edge_angle))
+        cos_angle_sharp = cos(sharp_edge_angle)
         for vert_idx, normals in enumerate(split_normals):
             # Vertex is sharp if an angle between at least two of its split normals exceeds threshold
             for normal_idx, normal in enumerate(normals):
@@ -261,15 +260,14 @@ class TrimeshNode(GeometryNode):
         GeometryNode.set_object_data(self, obj, options)
 
         obj.kb.meshtype = self.meshtype
-        obj.kb.bitmap = self.bitmap if not utils.is_null(self.bitmap) else ""
-        obj.kb.bitmap2 = self.bitmap2 if not utils.is_null(self.bitmap2) else ""
+        obj.kb.bitmap = self.bitmap if utils.is_not_null(self.bitmap) else ""
+        obj.kb.bitmap2 = self.bitmap2 if utils.is_not_null(self.bitmap2) else ""
         obj.kb.alpha = self.alpha
         obj.kb.lightmapped = (self.lightmapped == 1)
         obj.kb.render = (self.render == 1)
         obj.kb.shadow = (self.shadow == 1)
         obj.kb.beaming = (self.beaming == 1)
         obj.kb.tangentspace = (self.tangentspace == 1)
-        obj.kb.inheritcolor = (self.inheritcolor == 1)
         obj.kb.rotatetexture = (self.rotatetexture == 1)
         obj.kb.background_geometry = (self.background_geometry == 1)
         obj.kb.dirt_enabled = (self.dirt_enabled == 1)
@@ -302,7 +300,6 @@ class TrimeshNode(GeometryNode):
         self.shadow = 1 if obj.kb.shadow else 0
         self.beaming = 1 if obj.kb.beaming else 0
         self.tangentspace = 1 if obj.kb.tangentspace else 0
-        self.inheritcolor = 1 if obj.kb.inheritcolor else 0
         self.rotatetexture = 1 if obj.kb.rotatetexture else 0
         self.background_geometry = 1 if obj.kb.background_geometry else 0
         self.dirt_enabled = 1 if obj.kb.dirt_enabled else 0

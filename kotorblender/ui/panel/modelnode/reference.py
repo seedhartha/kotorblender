@@ -16,30 +16,30 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-import traceback
-
 import bpy
 
-from bpy_extras.io_utils import ImportHelper
+from ....defines import DummyType
 
-from ...io import pth
+from .... import utils
 
 
-class KB_OT_import_pth(bpy.types.Operator, ImportHelper):
-    bl_idname = "kb.pthimport"
-    bl_label = "Import KotOR PTH"
+class KB_PT_reference(bpy.types.Panel):
+    bl_label = "Reference"
+    bl_parent_id = "KB_PT_modelnode"
+    bl_space_type = 'PROPERTIES'
+    bl_region_type = 'WINDOW'
+    bl_context = "object"
 
-    filename_ext = ".pth"
+    @classmethod
+    def poll(cls, context):
+        return utils.is_dummy_type(context.object, DummyType.REFERENCE)
 
-    filter_glob: bpy.props.StringProperty(
-        default="*.pth",
-        options={'HIDDEN'})
+    def draw(self, context):
+        obj = context.object
+        layout = self.layout
+        layout.use_property_split = True
 
-    def execute(self, context):
-        try:
-            pth.load_pth(self, self.filepath)
-        except Exception as e:
-            print(traceback.format_exc())
-            self.report({'ERROR'}, str(e))
-
-        return {'FINISHED'}
+        row = layout.row()
+        row.prop(obj.kb, "refmodel")
+        row = layout.row()
+        row.prop(obj.kb, "reattachable")

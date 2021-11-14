@@ -39,7 +39,7 @@ class EmitterNode(GeometryNode):
         "ygrid",
         "spawntype",
         "update",
-        "render_emitter",
+        "emitter_render",
         "blend",
         "texture",
         "chunk_name",
@@ -122,7 +122,7 @@ class EmitterNode(GeometryNode):
         self.ygrid = 0
         self.spawntype = 0
         self.update = ""
-        self.render_emitter = ""
+        self.emitter_render = ""
         self.blend = ""
         self.texture = ""
         self.chunk_name = ""
@@ -232,37 +232,29 @@ class EmitterNode(GeometryNode):
 
         for attrname in self.EMITTER_ATTRS:
             value = getattr(self, attrname)
-            # Enum translation is not pretty...
             if attrname == "spawntype":
                 if value == 0:
                     value = "Normal"
                 elif value == 1:
                     value = "Trail"
-                else:
-                    value = "NONE"
             elif attrname == "update":
                 if value.title() not in ["Fountain", "Single", "Explosion", "Lightning"]:
                     value = "NONE"
                 else:
                     value = value.title()
-            elif attrname == "render_emitter":
-                if value not in ["Normal", "Billboard_to_Local_Z", "Billboard_to_World_Z",
-                                 "Aligned_to_World_Z", "Aligned_to_Particle_Dir", "Motion_Blur"]:
+            elif attrname == "emitter_render":
+                if value not in ["Normal", "Linked", "Billboard_to_Local_Z", "Billboard_to_World_Z", "Aligned_to_World_Z", "Aligned_to_Particle_Dir", "Motion_Blur"]:
                     value = "NONE"
             elif attrname == "blend":
                 if value.lower() == "punchthrough":
                     value = "Punch-Through"
                 elif value.title() not in ["Lighten", "Normal", "Punch-Through"]:
                     value = "NONE"
-            # translate p2p_sel to metaproperty p2p_type
             elif attrname == "p2p_sel":
                 if self.p2p_sel:
                     obj.kb.p2p_type = "Bezier"
                 else:
                     obj.kb.p2p_type = "Gravity"
-                # p2p_type has update method, sets p2p_sel
-                # except it doesn't seem to initially
-                obj.kb.p2p_sel = self.p2p_sel
                 continue
             setattr(obj.kb, attrname, value)
 
@@ -270,7 +262,7 @@ class EmitterNode(GeometryNode):
         GeometryNode.load_object_data(self, obj, options)
 
         for attrname in self.EMITTER_ATTRS:
-            value = getattr(obj.kb, attrname)
+            value = getattr(obj.kb, attrname, None)
 
             if attrname == "spawntype":
                 if value == "Normal":
@@ -282,8 +274,8 @@ class EmitterNode(GeometryNode):
             elif attrname == "update":
                 if value not in ["Fountain", "Single", "Explosion", "Lightning"]:
                     continue
-            elif attrname == "render_emitter":
-                if value not in ["Normal", "Billboard_to_Local_Z", "Billboard_to_World_Z", "Aligned_to_World_Z", "Aligned_to_Particle_Dir", "Motion_Blur"]:
+            elif attrname == "emitter_render":
+                if value not in ["Normal", "Linked", "Billboard_to_Local_Z", "Billboard_to_World_Z", "Aligned_to_World_Z", "Aligned_to_Particle_Dir", "Motion_Blur"]:
                     continue
             elif attrname == "blend":
                 if value == "Punch-Through":

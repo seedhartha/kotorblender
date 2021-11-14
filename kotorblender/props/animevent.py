@@ -20,10 +20,7 @@ import bpy
 
 
 class AnimEventPropertyGroup(bpy.types.PropertyGroup):
-    name: bpy.props.StringProperty(name="Name", default="unnamed",
-                                   description="Name for this event",
-                                   options=set())
-    frame: bpy.props.IntProperty(
-        name="Frame", default=1,
-        description="Frame at which the event should fire",
-        options=set())
+    name: bpy.props.StringProperty(name="Name")
+    frame: bpy.props.IntProperty(name="Frame",
+                                 description="Frame at which this event should fire",
+                                 default=1)

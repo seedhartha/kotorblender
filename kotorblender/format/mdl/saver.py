@@ -479,34 +479,28 @@ class MdlSaver:
         out_data.append(node.orientation[0])
         data_count += 5
 
-        out_keys.append(ControllerKey(CTRL_BASE_SCALE, 1, data_count, data_count + 1, 1))
-        out_data.append(0.0)  # timekey
-        out_data.append(node.scale)
-        data_count += 2
-
         # Mesh Controllers
 
         if type_flags & NODE_MESH:
+            out_keys.append(ControllerKey(CTRL_MESH_ALPHA, 1, data_count, data_count + 1, 1))
+            out_data.append(0.0)  # timekey
+            out_data.append(node.alpha)
+            data_count += 2
+
+            out_keys.append(ControllerKey(CTRL_MESH_SCALE, 1, data_count, data_count + 1, 1))
+            out_data.append(0.0)  # timekey
+            out_data.append(node.scale)
+            data_count += 2
+
             out_keys.append(ControllerKey(CTRL_MESH_SELFILLUMCOLOR, 1, data_count, data_count + 1, 3))
             out_data.append(0.0)  # timekey
             for val in node.selfillumcolor:
                 out_data.append(val)
             data_count += 4
 
-            out_keys.append(ControllerKey(CTRL_MESH_ALPHA, 1, data_count, data_count + 1, 1))
-            out_data.append(0.0)  # timekey
-            out_data.append(node.alpha)
-            data_count += 2
-
         # Light Controllers
 
         if type_flags & NODE_LIGHT:
-            out_keys.append(ControllerKey(CTRL_LIGHT_COLOR, 1, data_count, data_count + 1, 3))
-            out_data.append(0.0)  # timekey
-            for val in node.color:
-                out_data.append(val)
-            data_count += 4
-
             out_keys.append(ControllerKey(CTRL_LIGHT_RADIUS, 1, data_count, data_count + 1, 1))
             out_data.append(0.0)  # timekey
             out_data.append(node.radius)
@@ -516,6 +510,12 @@ class MdlSaver:
             out_data.append(0.0)  # timekey
             out_data.append(node.multiplier)
             data_count += 2
+
+            out_keys.append(ControllerKey(CTRL_LIGHT_COLOR, 1, data_count, data_count + 1, 3))
+            out_data.append(0.0)  # timekey
+            for val in node.color:
+                out_data.append(val)
+            data_count += 4
 
         # Emitter Controllers
 
@@ -560,20 +560,20 @@ class MdlSaver:
 
         data_count = append_keyframes("position", CTRL_BASE_POSITION, 3, data_count)
         data_count = append_keyframes("orientation", CTRL_BASE_ORIENTATION, 4, data_count, lambda values: [*values[1:4], values[0]])
-        data_count = append_keyframes("scale", CTRL_BASE_SCALE, 1, data_count)
 
         # Mesh Controllers
 
         if type_flags & NODE_MESH:
-            data_count = append_keyframes("selfillumcolor", CTRL_MESH_SELFILLUMCOLOR, 3, data_count)
             data_count = append_keyframes("alpha", CTRL_MESH_ALPHA, 1, data_count)
+            data_count = append_keyframes("scale", CTRL_MESH_SCALE, 1, data_count)
+            data_count = append_keyframes("selfillumcolor", CTRL_MESH_SELFILLUMCOLOR, 3, data_count)
 
         # Light Controllers
 
         if type_flags & NODE_LIGHT:
-            data_count = append_keyframes("color", CTRL_LIGHT_COLOR, 3, data_count)
             data_count = append_keyframes("radius", CTRL_LIGHT_RADIUS, 1, data_count)
             data_count = append_keyframes("multiplier", CTRL_LIGHT_MULTIPLIER, 1, data_count)
+            data_count = append_keyframes("color", CTRL_LIGHT_COLOR, 3, data_count)
 
         # Emitter Controllers
 
@@ -622,7 +622,7 @@ class MdlSaver:
         scale = self.model.animscale
         supermodel_name = self.model.supermodel.ljust(32, '\0')
 
-        if not utils.is_null(self.model.animroot) and self.node_names.count(self.model.animroot) > 0:
+        if utils.is_not_null(self.model.animroot) and self.node_names.count(self.model.animroot) > 0:
             off_anim_root = self.node_offsets[self.node_names.index(self.model.animroot)]
         else:
             off_anim_root = self.node_offsets[0]
@@ -786,10 +786,10 @@ class MdlSaver:
                 shadow = node.shadow
                 light_priority = node.lightpriority
                 ambient_only = node.ambientonly
-                dynamic_type = node.ndynamictype
+                dynamic_type = node.dynamictype
                 affect_dynamic = node.affectdynamic
                 fading_light = node.fadinglight
-                flare = node.lensflares
+                flare = 0  # always 0
                 flare_radius = node.flareradius
 
                 self.mdl.put_float(flare_radius)
@@ -798,7 +798,7 @@ class MdlSaver:
                 self.put_array_def(self.flare_positions_offsets[node_idx] if node.lensflares else 0, len(node.flare_list.positions))
                 self.put_array_def(self.flare_colorshifts_offsets[node_idx] if node.lensflares else 0, len(node.flare_list.colorshifts))
                 self.put_array_def(self.flare_texture_offset_offsets[node_idx] if node.lensflares else 0, len(node.flare_list.textures))
-                self.mdl.put_uint32(light_priority)
+                self.mdl.put_int32(light_priority)
                 self.mdl.put_uint32(ambient_only)
                 self.mdl.put_uint32(dynamic_type)
                 self.mdl.put_uint32(affect_dynamic)
@@ -825,7 +825,7 @@ class MdlSaver:
 
             if type_flags & NODE_EMITTER:
                 update = node.update.ljust(32, '\0')
-                render = node.render_emitter.ljust(32, '\0')
+                render = node.emitter_render.ljust(32, '\0')
                 blend = node.blend.ljust(32, '\0')
                 texture = node.texture.ljust(32, '\0')
                 chunk_name = node.chunk_name.ljust(16, '\0')
@@ -1232,7 +1232,7 @@ class MdlSaver:
                                     self.mdx.put_float(-1.0)
                     # Extra MDX data
                     for _ in range(3):
-                        self.mdx.put_float(1000000.0)
+                        self.mdx.put_float(1e+7)
                     for _ in range(3):
                         self.mdx.put_float(0.0)
                     if node.uv1:

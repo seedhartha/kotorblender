@@ -28,7 +28,7 @@ from ...io import mdl
 
 class KB_OT_export_mdl(bpy.types.Operator, ExportHelper):
     bl_idname = "kb.mdlexport"
-    bl_label = "Export Odyssey MDL"
+    bl_label = "Export KotOR MDL"
 
     filename_ext = ".mdl"
 
@@ -38,8 +38,7 @@ class KB_OT_export_mdl(bpy.types.Operator, ExportHelper):
 
     export_for_tsl: bpy.props.BoolProperty(
         name="Export for TSL",
-        description="Use The Sith Lords MDL format",
-        default=False)
+        description="Use The Sith Lords MDL format")
 
     export_animations: bpy.props.BoolProperty(
         name="Export Animations",

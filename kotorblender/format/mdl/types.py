@@ -78,7 +78,7 @@ NODE_SABER = 0x0800
 
 CTRL_BASE_POSITION = 8
 CTRL_BASE_ORIENTATION = 20
-CTRL_BASE_SCALE = 36
+CTRL_MESH_SCALE = 36
 CTRL_MESH_SELFILLUMCOLOR = 100
 CTRL_MESH_ALPHA = 132
 CTRL_LIGHT_COLOR = 76
@@ -173,53 +173,53 @@ NUM_SABER_VERTS = 176
 CTRL_FLAG_BEZIER = 0x10
 
 EMITTER_CONTROLLER_KEYS = [
+    (CTRL_EMITTER_FPS, "fps", 1),
+    (CTRL_EMITTER_BIRTHRATE, "birthrate", 1),
+    (CTRL_EMITTER_RANDOMBIRTHRATE, "randombirthrate", 1),
+    (CTRL_EMITTER_VELOCITY, "velocity", 1),
+    (CTRL_EMITTER_RANDVEL, "randvel", 1),
+    (CTRL_EMITTER_MASS, "mass", 1),
+    (CTRL_EMITTER_PARTICLEROT, "particlerot", 1),
+    (CTRL_EMITTER_SPREAD, "spread", 1),
+    (CTRL_EMITTER_LIFEEXP, "lifeexp", 1),
+    (CTRL_EMITTER_XSIZE, "xsize", 1),
+    (CTRL_EMITTER_YSIZE, "ysize", 1),
+    (CTRL_EMITTER_COLORSTART, "colorstart", 3),
+    (CTRL_EMITTER_COLORMID, "colormid", 3),
+    (CTRL_EMITTER_COLOREND, "colorend", 3),
+    (CTRL_EMITTER_PERCENTSTART, "percentstart", 1),
+    (CTRL_EMITTER_PERCENTMID, "percentmid", 1),
+    (CTRL_EMITTER_PERCENTEND, "percentend", 1),
     (CTRL_EMITTER_ALPHASTART, "alphastart", 1),
     (CTRL_EMITTER_ALPHAMID, "alphamid", 1),
     (CTRL_EMITTER_ALPHAEND, "alphaend", 1),
-    (CTRL_EMITTER_BIRTHRATE, "birthrate", 1),
-    (CTRL_EMITTER_RANDOMBIRTHRATE, "randombirthrate", 1),
-    (CTRL_EMITTER_BOUNCE_CO, "bounce_co", 1),
-    (CTRL_EMITTER_COMBINETIME, "combinetime", 1),
-    (CTRL_EMITTER_DRAG, "drag", 1),
-    (CTRL_EMITTER_FPS, "fps", 1),
-    (CTRL_EMITTER_FRAMEEND, "frameend", 1),
-    (CTRL_EMITTER_FRAMESTART, "framestart", 1),
-    (CTRL_EMITTER_GRAV, "grav", 1),
-    (CTRL_EMITTER_LIFEEXP, "lifeexp", 1),
-    (CTRL_EMITTER_MASS, "mass", 1),
-    (CTRL_EMITTER_P2P_BEZIER2, "p2p_bezier2", 1),
-    (CTRL_EMITTER_P2P_BEZIER3, "p2p_bezier3", 1),
-    (CTRL_EMITTER_PARTICLEROT, "particlerot", 1),
-    (CTRL_EMITTER_RANDVEL, "randvel", 1),
     (CTRL_EMITTER_SIZESTART, "sizestart", 1),
     (CTRL_EMITTER_SIZEMID, "sizemid", 1),
     (CTRL_EMITTER_SIZEEND, "sizeend", 1),
     (CTRL_EMITTER_SIZESTART_Y, "sizestart_y", 1),
     (CTRL_EMITTER_SIZEMID_Y, "sizemid_y", 1),
     (CTRL_EMITTER_SIZEEND_Y, "sizeend_y", 1),
-    (CTRL_EMITTER_SPREAD, "spread", 1),
-    (CTRL_EMITTER_THRESHOLD, "threshold", 1),
-    (CTRL_EMITTER_VELOCITY, "velocity", 1),
-    (CTRL_EMITTER_XSIZE, "xsize", 1),
-    (CTRL_EMITTER_YSIZE, "ysize", 1),
-    (CTRL_EMITTER_BLURLENGTH, "blurlength", 1),
+    (CTRL_EMITTER_FRAMESTART, "framestart", 1),
+    (CTRL_EMITTER_FRAMEEND, "frameend", 1),
+    (CTRL_EMITTER_BOUNCE_CO, "bounce_co", 1),
     (CTRL_EMITTER_LIGHTNINGDELAY, "lightningdelay", 1),
     (CTRL_EMITTER_LIGHTNINGRADIUS, "lightningradius", 1),
     (CTRL_EMITTER_LIGHTNINGSUBDIV, "lightningsubdiv", 1),
     (CTRL_EMITTER_LIGHTNINGSCALE, "lightningscale", 1),
     (CTRL_EMITTER_LIGHTNINGZIGZAG, "lightningzigzag", 1),
-    (CTRL_EMITTER_PERCENTSTART, "percentstart", 1),
-    (CTRL_EMITTER_PERCENTMID, "percentmid", 1),
-    (CTRL_EMITTER_PERCENTEND, "percentend", 1),
     (CTRL_EMITTER_TARGETSIZE, "targetsize", 1),
+    (CTRL_EMITTER_COMBINETIME, "combinetime", 1),
+    (CTRL_EMITTER_P2P_BEZIER2, "p2p_bezier2", 1),
+    (CTRL_EMITTER_P2P_BEZIER3, "p2p_bezier3", 1),
     (CTRL_EMITTER_NUMCONTROLPTS, "numcontrolpts", 1),
     (CTRL_EMITTER_CONTROLPTRADIUS, "controlptradius", 1),
     (CTRL_EMITTER_CONTROLPTDELAY, "controlptdelay", 1),
     (CTRL_EMITTER_TANGENTSPREAD, "tangentspread", 1),
     (CTRL_EMITTER_TANGENTLENGTH, "tangentlength", 1),
-    (CTRL_EMITTER_COLORSTART, "colorstart", 3),
-    (CTRL_EMITTER_COLORMID, "colormid", 3),
-    (CTRL_EMITTER_COLOREND, "colorend", 3)
+    (CTRL_EMITTER_DRAG, "drag", 1),
+    (CTRL_EMITTER_GRAV, "grav", 1),
+    (CTRL_EMITTER_THRESHOLD, "threshold", 1),
+    (CTRL_EMITTER_BLURLENGTH, "blurlength", 1)
 ]
 
 

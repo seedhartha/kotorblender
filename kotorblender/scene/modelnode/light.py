@@ -43,9 +43,8 @@ class LightNode(GeometryNode):
         self.lightpriority = 5
         self.color = (0.0, 0.0, 0.0)
         self.ambientonly = 1
-        self.ndynamictype = 0
+        self.dynamictype = 0
         self.affectdynamic = 1
-        self.negativelight = 0
         self.fadinglight = 1
         self.lensflares = 0
         self.flareradius = 1.0
@@ -74,7 +73,7 @@ class LightNode(GeometryNode):
         obj.kb.shadow = (self.shadow >= 1)
         obj.kb.lightpriority = self.lightpriority
         obj.kb.fadinglight = (self.fadinglight >= 1)
-        obj.kb.isdynamic = self.ndynamictype
+        obj.kb.dynamictype = self.dynamictype
         obj.kb.affectdynamic = (self.affectdynamic >= 1)
         obj.kb.flareradius = self.flareradius
 
@@ -100,7 +99,7 @@ class LightNode(GeometryNode):
         self.shadow = 1 if obj.kb.shadow else 0
         self.lightpriority = obj.kb.lightpriority
         self.fadinglight = 1 if obj.kb.fadinglight else 0
-        self.ndynamictype = obj.kb.isdynamic
+        self.dynamictype = obj.kb.dynamictype
         self.affectdynamic = 1 if obj.kb.affectdynamic else 0
         self.flareradius = obj.kb.flareradius
 

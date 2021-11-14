@@ -28,6 +28,8 @@ from . import mdl
 
 
 def load_lyt(operator, filepath, options):
+    operator.report({'INFO'}, "Loading area layout from '{}'".format(filepath))
+
     # Read lines
     fp = os.fsencode(filepath)
     f = open(fp, "r")
@@ -67,6 +69,8 @@ def save_lyt(operator, filepath):
         parent = utils.get_object_root(obj)
         orientation = obj.rotation_euler.to_quaternion()
         return "{} {} {:.7g} {:.7g} {:.7g} {:.7g} {:.7g} {:.7g} {:.7g}".format(parent.name if parent else "NULL", obj.name, *obj.matrix_world.translation, *orientation)
+
+    operator.report({'INFO'}, "Saving area layout to '{}'".format(filepath))
 
     with open(filepath, "w") as f:
         rooms = []

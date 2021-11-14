@@ -18,303 +18,250 @@
 
 import bpy
 
+from ..defines import Classification, DummyType, MeshType
 from ..scene.modelnode.light import LightNode
 
-from .. import defines, utils
+from .. import defines
 
 from .anim import AnimPropertyGroup
-from .flare import FlarePropertyGroup
+from .lensflare import LensFlarePropertyGroup
 from .pathconnection import PathConnectionPropertyGroup
 
 
-def update_light_power(self, context):
-    if context.object and context.object.type == 'LIGHT':
-        LightNode.calc_light_power(context.object)
-
-
-def update_shadow_prop(self, context):
-    if context.object and context.object.type == 'LIGHT':
-        context.object.data.use_shadow = self.shadow != 0
-
-
-def update_emitter_prop(self, context):
+def on_update_light_power(self, context):
     obj = context.object
-    if not obj:
-        return
-    if obj.kb.update == "Lightning":
-        obj.kb.birthrate = pow(2, obj.kb.lightningsubdiv) + 1
-        obj.kb.lifeexp = 1
-        obj.kb.render_emitter = "Linked"
-    if obj.kb.update != "Explosion":
-        obj.kb.loop = False
-    if not utils.is_null(obj.kb.chunk_name):
-        obj.kb.render_emitter = "Normal"
-        obj.kb.blend = "Normal"
-    if obj.kb.p2p_type == "Bezier":
-        obj.kb.p2p_sel = 1
-    elif obj.kb.p2p_type == "Gravity":
-        obj.kb.p2p_sel = 0
+    if obj and obj.type == 'LIGHT':
+        LightNode.calc_light_power(obj)
 
 
 class ObjectPropertyGroup(bpy.types.PropertyGroup):
-    # For all objects
-    node_number: bpy.props.IntProperty(name="Node Number", description="Must be unique per model and equal to node number in supermodel", default=0, min=0, max=1000)
-    export_order: bpy.props.IntProperty(name="Export Order", description="Export order relative to parent", default=0, min=0, max=1000)
+    # Model Node
+    node_number: bpy.props.IntProperty(name="Node Number", description="Must be unique per model and equal to this node number in supermodel", min=0, max=1000)
+    export_order: bpy.props.IntProperty(name="Export Order", description="Export order relative to parent", min=0, max=1000)
 
-    # For all emptys
-    dummytype: bpy.props.EnumProperty(name="Type",
-                                      items=[(defines.DummyType.NONE,      "None",           "Simple dummy object",                                       0),
-                                             (defines.DummyType.MDLROOT,   "MDL Root",       "All children are considered part of a mdl",                 1),
-                                             (defines.DummyType.DWKROOT,   "DWK Root",       "All children are considered part of a door walkmesh",       2),
-                                             (defines.DummyType.PWKROOT,   "PWK Root",       "All children are considered part of a placeable walkmesh",  3),
-                                             (defines.DummyType.PTHROOT,   "PTH Root",       "All children are considered path points",                   4),
-                                             (defines.DummyType.REFERENCE, "Reference",      "Used in spells. Points to 'fx_ref' by default",             5),
-                                             (defines.DummyType.PATHPOINT, "Path Point",     "Used when exporting paths",                                 6),
-                                             (defines.DummyType.USE1,      "Walkmesh: Use 1", "1st node for 'Use' animation",                             7),
-                                             (defines.DummyType.USE2,      "Walkmesh: Use 2", "2nd node for 'Use' animation",                             8)],
-                                      default=defines.DummyType.NONE)
-    # For MDL Rootdummy
+    # Model
     supermodel: bpy.props.StringProperty(name="Supermodel", description="Name of the model to inherit animations from", default=defines.NULL)
     classification: bpy.props.EnumProperty(name="Classification",
-                                           items=[(defines.Classification.OTHER,    "Other",      "Unknown classification",              0),
-                                                  (defines.Classification.EFFECT,     "Effect",     "Effects",                             1),
-                                                  (defines.Classification.TILE,       "Tile",       "Tiles for a tileset",                 2),
-                                                  (defines.Classification.CHARACTER,  "Character",  "Creatures, characters or placeables", 4),
-                                                  (defines.Classification.DOOR,       "Door",       "Doors",                               8),
-                                                  (defines.Classification.LIGHTSABER, "Lightsaber", "Lightsaber weapon",                   16),
-                                                  (defines.Classification.PLACEABLE,  "Placeable",  "Items or placeables",                 32),
-                                                  (defines.Classification.FLYER,      "Flyer",      "Non-interactive scene elements",      64)],
-                                           default=defines.Classification.OTHER)
-    subclassification: bpy.props.IntProperty(name="Unknown", description="Unknown byte-2 in the classification bytes section of the model header", default=0)
-    affected_by_fog: bpy.props.BoolProperty(name="Affected by Fog", description="If true, model will be occluded by area fog in-game", default=True)
-    animroot: bpy.props.StringProperty(name="Animation Root", description="Root node to apply animations from", default=defines.NULL)
-    animscale: bpy.props.FloatProperty(name="Animation Scale", description="Animation scale for all animations", default=1.00, min=0.0)
-    # Animation Data (for separation)
+                                           items=[(Classification.OTHER,      "Other",      "Unknown",                        0),
+                                                  (Classification.EFFECT,     "Effect",     "",                               1),
+                                                  (Classification.TILE,       "Tile",       "",                               2),
+                                                  (Classification.CHARACTER,  "Character",  "Creatures and placeables",       3),
+                                                  (Classification.DOOR,       "Door",       "",                               4),
+                                                  (Classification.LIGHTSABER, "Lightsaber", "",                               5),
+                                                  (Classification.PLACEABLE,  "Placeable",  "Placeables and items",           6),
+                                                  (Classification.FLYER,      "Flyer",      "Non-interactive scene elements", 7)],
+                                           default=Classification.OTHER)
+    subclassification: bpy.props.IntProperty(name="Subclassification")
+    affected_by_fog: bpy.props.BoolProperty(name="Affected by Fog", description="This model should be affected by area fog", default=True)
+    animroot: bpy.props.StringProperty(name="Animation Root", description="Animations should only affect children of selected object", default=defines.NULL)
+    animscale: bpy.props.FloatProperty(name="Animation Scale", description="Scale of this model relative to its supermodel", default=1.0, min=0.0)
+
+    # Animations
     anim_list: bpy.props.CollectionProperty(type=AnimPropertyGroup)
-    anim_list_idx: bpy.props.IntProperty(name="Index for anim List",
-                                         default=0, options=set())
-    # For reference emptys
-    refmodel: bpy.props.StringProperty(name="Reference Model", description="Name of another mdl file", default="fx_ref")
-    reattachable: bpy.props.BoolProperty(name="Reattachable", default=False)
+    anim_list_idx: bpy.props.IntProperty()
 
-    # For mesh objects
+    # Dummy Node
+    dummytype: bpy.props.EnumProperty(name="Type",
+                                      items=[(DummyType.NONE,      "None",           "",                            0),
+                                             (DummyType.MDLROOT,   "MDL Root",       "Root of MDL model",           1),
+                                             (DummyType.DWKROOT,   "DWK Root",       "Root of door walkmesh",       2),
+                                             (DummyType.PWKROOT,   "PWK Root",       "Root of placeable walkmesh",  3),
+                                             (DummyType.PTHROOT,   "PTH Root",       "",                            4),
+                                             (DummyType.REFERENCE, "Reference",      "",                            5),
+                                             (DummyType.PATHPOINT, "Path Point",     "",                            6),
+                                             (DummyType.USE1,      "Walkmesh: Use 1", "'Use 1' animation position", 7),
+                                             (DummyType.USE2,      "Walkmesh: Use 2", "'Use 2' animation position", 8)],
+                                      default=DummyType.NONE)
+
+    # Reference Node
+    refmodel: bpy.props.StringProperty(name="Reference Model", description="Name of another model", default="fx_ref")
+    reattachable: bpy.props.BoolProperty(name="Reattachable")
+
+    # Mesh Node
     meshtype: bpy.props.EnumProperty(name="Type",
-                                     items=[(defines.MeshType.TRIMESH, "Trimesh", "Triangle mesh", 0),
-                                            (defines.MeshType.DANGLYMESH, "Danglymesh", "Triangle mesh with dangly parts", 1),
-                                            (defines.MeshType.SKIN, "Skinmesh", "Triangle mesh with weighted deformation", 2),
-                                            (defines.MeshType.AABB, "AABB Walkmesh", "Axis Aligned Bounding Box Walkmesh, for collision detection", 3),
-                                            (defines.MeshType.EMITTER, "Emitter", "Particle emitter", 4),
-                                            (defines.MeshType.LIGHTSABER, "Lightsaber", "Saber mesh (blade plane)", 5)],
-                                     default=defines.MeshType.TRIMESH)
-
-    bitmap: bpy.props.StringProperty(name="Diffuse map")
+                                     items=[(MeshType.TRIMESH,    "Trimesh",    "", 0),
+                                            (MeshType.DANGLYMESH, "Danglymesh", "", 1),
+                                            (MeshType.SKIN,       "Skinmesh",   "", 2),
+                                            (MeshType.AABB,       "AABB",       "", 3),
+                                            (MeshType.EMITTER,    "Emitter",    "", 4),
+                                            (MeshType.LIGHTSABER, "Lightsaber", "", 5)],
+                                     default=MeshType.TRIMESH)
+    bitmap: bpy.props.StringProperty(name="Diffuse Map")
     bitmap2: bpy.props.StringProperty(name="Lightmap")
     alpha: bpy.props.FloatProperty(name="Alpha", default=1.0, min=0.0, max=1.0)
-    shadow: bpy.props.BoolProperty(name="Shadow", description="Whether to cast shadows", default=True, update=update_shadow_prop)
-    render: bpy.props.BoolProperty(name="Render", description="Whether to render this object in the scene", default=True)
-    lightmapped: bpy.props.BoolProperty(name="Lightmapped", description="Whether this object has shading baked into a lightmap", default=False)
-    beaming: bpy.props.BoolProperty(name="beaming", description="Object casts beams (?)", default=False)
-    tangentspace: bpy.props.BoolProperty(name="tangentspace", description="Allow Normal Mapping", default=False)
-    inheritcolor: bpy.props.BoolProperty(name="Inheritcolor", description="Unused (?)", default=False)
-    rotatetexture: bpy.props.BoolProperty(name="Rotatetexture", description="Automatically rotates texture to prevent seams", default=False)
-    background_geometry: bpy.props.BoolProperty(name="Background Geometry", description="Lower detail or fewer mipmaps (?)", default=False, options=set())
-    dirt_enabled: bpy.props.BoolProperty(name="Dirt", description="Dirt enabled (KotOR 2:TSL ONLY)", default=False, options=set())
-    dirt_texture: bpy.props.IntProperty(name="Dirt Texture", description="Dirt texture, values from walkmesh materials?", default=1, options=set())
-    dirt_worldspace: bpy.props.IntProperty(name="Dirt Worldspace", description="Dirt world space, some kind of mapping?", default=1, options=set())
-    hologram_donotdraw: bpy.props.BoolProperty(name="Hologram Hide", description="Prevent node from being drawn in hologram mode, useful for tongues and other internal parts (KotOR 2:TSL ONLY)", default=False, options=set())
-    animateuv: bpy.props.BoolProperty(name="Animate UVs", description="Enable UV animation for texture-only/surface animation", default=False, options=set())
-    uvdirectionx: bpy.props.FloatProperty(name="X Direction", description="UV animation vector X component", default=1.0, options=set())
-    uvdirectiony: bpy.props.FloatProperty(name="Y Direction", description="UV animation vector Y component", default=1.0, options=set())
-    uvjitter: bpy.props.FloatProperty(name="Jitter Amount", description="UV animation jitter quantity", default=0.0, options=set())
-    uvjitterspeed: bpy.props.FloatProperty(name="Jitter Speed", description="UV animation jitter speed", default=0.0, options=set())
-    transparencyhint: bpy.props.IntProperty(name="Transparency Hint", default=0, min=0, max=32)
-    selfillumcolor: bpy.props.FloatVectorProperty(name="Self-illum. color",
-                                                  description="Makes the object seem to glow but does not emit light",
+    render: bpy.props.BoolProperty(name="Render", description="This object should be rendered", default=True)
+    shadow: bpy.props.BoolProperty(name="Shadow", description="This object should cast shadows", default=True)
+    lightmapped: bpy.props.BoolProperty(name="Lightmapped", description="This object is lightmapped")
+    beaming: bpy.props.BoolProperty(name="Beaming", description="This object should cast beams")
+    tangentspace: bpy.props.BoolProperty(name="Tangent Space", description="This object is normal mapped")
+    rotatetexture: bpy.props.BoolProperty(name="Rotate Texture", description="Texture should be automatically rotated to prevent seams")
+    background_geometry: bpy.props.BoolProperty(name="Background Geometry", description="This object is part of background geometry")
+    dirt_enabled: bpy.props.BoolProperty(name="Dirt", description="Enable dirt (TSL only)")
+    dirt_texture: bpy.props.IntProperty(name="Dirt Texture", default=1)
+    dirt_worldspace: bpy.props.IntProperty(name="Dirt World Space", default=1)
+    hologram_donotdraw: bpy.props.BoolProperty(name="Hide in Hologram", description="This object should be hidden in hologram mode (e.g., tongue)")
+    animateuv: bpy.props.BoolProperty(name="Animate UV", description="Animate texture coordinates")
+    uvdirectionx: bpy.props.FloatProperty(name="X Direction", default=1.0)
+    uvdirectiony: bpy.props.FloatProperty(name="Y Direction")
+    uvjitter: bpy.props.FloatProperty(name="Jitter Amount")
+    uvjitterspeed: bpy.props.FloatProperty(name="Jitter Speed")
+    transparencyhint: bpy.props.IntProperty(name="Transparency Hint", min=0, max=32)
+    selfillumcolor: bpy.props.FloatVectorProperty(name="Self-illum. Color",
+                                                  description="This object should glow, but not emit light",
                                                   subtype='COLOR_GAMMA',
-                                                  default=(0.0, 0.0, 0.0),
-                                                  min=0.0, max=1.0,
-                                                  soft_min=0.0, soft_max=1.0)
-    diffuse: bpy.props.FloatVectorProperty(name="Diffuse color",
+                                                  min=0.0, max=1.0)
+    diffuse: bpy.props.FloatVectorProperty(name="Diffuse Color",
                                            subtype='COLOR_GAMMA',
                                            default=(0.8, 0.8, 0.8),
-                                           min=0.0, max=1.0,
-                                           soft_min=0.0, soft_max=1.0)
-    ambient: bpy.props.FloatVectorProperty(name="Ambient color",
+                                           min=0.0, max=1.0)
+    ambient: bpy.props.FloatVectorProperty(name="Ambient Color",
                                            subtype='COLOR_GAMMA',
                                            default=(0.2, 0.2, 0.2),
-                                           min=0.0, max=1.0,
-                                           soft_min=0.0, soft_max=1.0)
+                                           min=0.0, max=1.0)
+
     bwmposition: bpy.props.FloatVectorProperty(name="BWM Position",
                                                description="Walkmesh position in BWM file",
-                                               subtype='XYZ',
-                                               default=(0.0, 0.0, 0.0))
+                                               subtype='XYZ')
     lytposition: bpy.props.FloatVectorProperty(name="LYT Position",
                                                description="Room position in LYT file",
-                                               subtype='XYZ',
-                                               default=(0.0, 0.0, 0.0))
+                                               subtype='XYZ')
 
-    # For danglymeshes
+    # Danglymesh
     period: bpy.props.FloatProperty(name="Period", default=1.0, min=0.0, max=32.0)
     tightness: bpy.props.FloatProperty(name="Tightness", default=1.0, min=0.0, max=32.0)
     displacement: bpy.props.FloatProperty(name="Displacement", default=0.5, min=0.0, max=32.0)
-    constraints: bpy.props.StringProperty(name="Danglegroup", description="Name of the vertex group to use for the danglymesh", default="")
+    constraints: bpy.props.StringProperty(name="Constraints", description="Name of the vertex group to store constraints in")
 
-    # For lights
-    ambientonly: bpy.props.BoolProperty(name="Ambient Only", default=False)
-    lightpriority: bpy.props.IntProperty(name="Lightpriority", default=3, min=1, max=5)
-    fadinglight: bpy.props.BoolProperty(name="Fading light", default=False)
-    isdynamic: bpy.props.IntProperty(name="Dynamic Type", description="0 - ???\n1 - Light affects area geometry AND dynamic objects\n2 - Light affects ONLY dynamic objects", default=0, min=0, max=2)
-    affectdynamic: bpy.props.BoolProperty(name="Affect Dynamic", description="Affect dynamic objects", default=False)
-    negativelight: bpy.props.BoolProperty(name="Negative Light", default=False)
-    lensflares: bpy.props.BoolProperty(name="Lensflares", default=False)
-    flareradius: bpy.props.FloatProperty(name="Flare Radius", default=0.0, min=0.0, max=1000000.0)
-    flare_list: bpy.props.CollectionProperty(type=FlarePropertyGroup)
-    flare_listIdx: bpy.props.IntProperty(name="Index for flare list", default=0)
+    # Light
+    ambientonly: bpy.props.BoolProperty(name="Ambient Only")
+    lightpriority: bpy.props.IntProperty(name="Light Priority", default=3, soft_min=1, soft_max=5)
+    fadinglight: bpy.props.BoolProperty(name="Fading Light")
+    dynamictype: bpy.props.IntProperty(name="Dynamic Type", description="This light should affect: 0 - ???\n1 - Area geometry AND dynamic objects\n2 - Dynamic objects ONLY", min=0, max=2)
+    affectdynamic: bpy.props.BoolProperty(name="Affect Dynamic", description="This light should affect dynamic objects")
+    lensflares: bpy.props.BoolProperty(name="Lens Flares")
+    flareradius: bpy.props.FloatProperty(name="Flare Radius", min=0.0, max=1e6)
+    flare_list: bpy.props.CollectionProperty(type=LensFlarePropertyGroup)
+    flare_list_idx: bpy.props.IntProperty()
+    radius: bpy.props.FloatProperty(name="Radius", min=0.0, max=1e4, update=on_update_light_power)
+    multiplier: bpy.props.FloatProperty(name="Multiplier", default=1.0, min=0.0, max=10.0, update=on_update_light_power)
 
-    # Point lights in Eevee do not have equivalent for Aurora light multiplier and radius
-    radius: bpy.props.FloatProperty(name="Radius", default=0.0, min=0.0, max=10000.0, update=update_light_power)
-    multiplier: bpy.props.FloatProperty(name="Multiplier", default=1.0, min=0.0, max=10.0, update=update_light_power)
-
-    # For emitters
-
-    # update rules:
-    # if update == lightning, birthrate = 2^subdiv + 1, render = lightning, lifeExp = 1
-    # if chunk text != '' and text != 'null'/NULL, render = Normal, blend = Normal
-    # if p2p_type, set p2p_sel
-
-    # Controllers, in numeric order, these should ALL be animatable
-    alphaend: bpy.props.FloatProperty(name="Alpha end", description="Alpha end", default=1.0, min=0.0, max=1.0)
-    alphastart: bpy.props.FloatProperty(name="Alpha start", description="Alpha start", default=1.0, min=0.0, max=1.0)
-    birthrate: bpy.props.FloatProperty(name="Birthrate", description="Birthrate", default=10.0, min=0.0)
-    bounce_co: bpy.props.FloatProperty(name="Coefficient", description="Bounce coefficient", default=0.0, min=0.0)
-    combinetime: bpy.props.FloatProperty(name="Combinetime", description="Combinetime", default=0.0)
-    drag: bpy.props.FloatProperty(name="Drag", description="Drag (m/s²)", default=0.0, unit='ACCELERATION')
-    fps: bpy.props.FloatProperty(name="Frames/s", description="Frames per second", default=24.0, min=0.0)
-    frameend: bpy.props.FloatProperty(name="End Frame", description="Frame End", default=0.0)
-    framestart: bpy.props.FloatProperty(name="Start Frame", description="Frame Start", default=0.0)
-    grav: bpy.props.FloatProperty(name="Gravity", description="Gravity (m/s²)", default=0.0, min=0.0, unit='ACCELERATION')
-    lifeexp: bpy.props.FloatProperty(name="Lifetime", description="Life Expectancy", default=1.0, min=-1.0)
-    mass: bpy.props.FloatProperty(name="Mass", description="Mass", default=1.0, min=0.0)
-    p2p_bezier2: bpy.props.FloatProperty(name="Bezier 2", description="???", default=0.0)
-    p2p_bezier3: bpy.props.FloatProperty(name="Bezier 3", description="???", default=0.0)
-    particlerot: bpy.props.FloatProperty(name="Rotation", description="Particle Rotation (degrees)", default=0.0, min=-360.0, max=360.0)
-    randvel:  bpy.props.FloatProperty(name="Random Velocity", description="Random Velocity", default=0.0)
-    sizestart: bpy.props.FloatProperty(name="Size start", description="x size start", default=1.0, min=0.0)
-    sizeend: bpy.props.FloatProperty(name="Size end", description="x size end", default=1.0, min=0.0)
-    sizestart_y: bpy.props.FloatProperty(name="Sizestart_y", description="y size start", default=0.0, min=0.0)
-    sizeend_y: bpy.props.FloatProperty(name="Sizeend_y", description="y size end", default=0.0, min=0.0)
-    spread: bpy.props.FloatProperty(name="Spread", description="Spread", default=0.0, min=0.0)
-    threshold: bpy.props.FloatProperty(name="Threshold", description="Threshold", default=0.0)
-    velocity:  bpy.props.FloatProperty(name="Velocity", description="Particle Velocity", default=0.0)
-    xsize: bpy.props.FloatProperty(name="Size X", description="Size X", default=0.0)
-    ysize: bpy.props.FloatProperty(name="Size Y", description="Size Y", default=0.0)
-    blurlength: bpy.props.FloatProperty(name="Blur Length", description="Blur Length", default=10.0)
-    # Lighting props
-    lightningdelay: bpy.props.FloatProperty(name="Delay", description="Lightning Delay (seconds)", default=0.0, min=0.0, max=1000.0)
-    lightningradius: bpy.props.FloatProperty(name="Radius", description="Lightning Radius (meters)", default=0.0, min=0.0, max=1000.0)
-    lightningsubdiv: bpy.props.FloatProperty(name="Subdivisions", description="Lightning Subdivisions", default=0.0, min=0.0, max=12.0, update=update_emitter_prop)
-    lightningscale: bpy.props.FloatProperty(name="Scale", description="Lightning Scale", default=1.0, min=0.0, max=1.0)
-    lightningzigzag: bpy.props.FloatProperty(name="ZigZag", description="Lightning Zig-Zag", default=0.0, min=0.0, max=30)
-    alphamid: bpy.props.FloatProperty(name="Alpha mid", description="Alpha mid", default=1.0, min=-1.0, max=1.0)
-    percentstart: bpy.props.FloatProperty(name="Percent start", description="Percent start", default=1.0, min=0.0, max=1.0)
-    percentmid: bpy.props.FloatProperty(name="Percent mid", description="Percent mid", default=1.0, min=0.0, max=1.0)
-    percentend: bpy.props.FloatProperty(name="Percent end", description="Percent end", default=1.0, min=0.0, max=1.0)
-    sizemid: bpy.props.FloatProperty(name="sizeMid", description="x size mid", default=1.0, min=0.0)
-    sizemid_y: bpy.props.FloatProperty(name="sizeMid_y", description="y size mid", default=0.0, min=0.0)
-    randombirthrate: bpy.props.FloatProperty(name="Random Birthrate", description="Random Birthrate", default=10.0, min=0.0)
-    targetsize: bpy.props.FloatProperty(name="Target Size", description="Target Size", default=1.0, min=0.0)
-    numcontrolpts: bpy.props.FloatProperty(name="# of Control Points", description="Number of Control Points", default=0.0, min=0.0)
-    controlptradius: bpy.props.FloatProperty(name="Control Point Radius", description="Control Point Radius", default=0.0, min=0.0)
-    controlptdelay: bpy.props.FloatProperty(name="Control Point Delay", description="Control Point Delay", default=0.0, min=0.0)
-    tangentspread: bpy.props.FloatProperty(name="Tangent Spread", description="Tangent Spread (degrees)", default=0.0, min=0.0)
-    tangentlength: bpy.props.FloatProperty(name="Tangent Length", description="Tangent Length", default=0.0, min=0.0)
-    colormid: bpy.props.FloatVectorProperty(name="Color mid",
-                                            description="Color mid",
+    # Emitter
+    alphaend: bpy.props.FloatProperty(name="Alpha End", default=1.0, min=0.0, max=1.0)
+    alphastart: bpy.props.FloatProperty(name="Alpha Start", default=1.0, min=0.0, max=1.0)
+    birthrate: bpy.props.FloatProperty(name="Birthrate", default=10.0, min=0.0)
+    bounce_co: bpy.props.FloatProperty(name="Bounce Coefficient", min=0.0)
+    combinetime: bpy.props.FloatProperty(name="Combine Time")
+    drag: bpy.props.FloatProperty(name="Drag", description="Drag (m/s²)")
+    fps: bpy.props.FloatProperty(name="FPS", description="Frames Per Second", default=24.0, min=0.0)
+    frameend: bpy.props.FloatProperty(name="End Frame")
+    framestart: bpy.props.FloatProperty(name="Start Frame")
+    grav: bpy.props.FloatProperty(name="Gravity", description="Gravity (m/s²)", min=0.0)
+    lifeexp: bpy.props.FloatProperty(name="Life Expectancy", default=1.0, min=-1.0)
+    mass: bpy.props.FloatProperty(name="Mass", default=1.0, min=0.0)
+    p2p_bezier2: bpy.props.FloatProperty(name="Bezier 2")
+    p2p_bezier3: bpy.props.FloatProperty(name="Bezier 3")
+    particlerot: bpy.props.FloatProperty(name="Particle Rotation", min=-360.0, max=360.0)
+    randvel:  bpy.props.FloatProperty(name="Random Velocity")
+    sizestart: bpy.props.FloatProperty(name="Size Start", default=1.0, min=0.0)
+    sizeend: bpy.props.FloatProperty(name="Size End", default=1.0, min=0.0)
+    sizestart_y: bpy.props.FloatProperty(name="Y Size Start", min=0.0)
+    sizeend_y: bpy.props.FloatProperty(name="Y Size End", min=0.0)
+    spread: bpy.props.FloatProperty(name="Spread", min=0.0)
+    threshold: bpy.props.FloatProperty(name="Threshold")
+    velocity:  bpy.props.FloatProperty(name="Velocity")
+    xsize: bpy.props.FloatProperty(name="Size X")
+    ysize: bpy.props.FloatProperty(name="Size Y")
+    blurlength: bpy.props.FloatProperty(name="Blur Length", default=10.0)
+    lightningdelay: bpy.props.FloatProperty(name="Lightning Delay", description="Lighting delay (seconds)", min=0.0, max=1000.0)
+    lightningradius: bpy.props.FloatProperty(name="Lightning Radius", description="Lighting radius (meters)", min=0.0, max=1000.0)
+    lightningsubdiv: bpy.props.FloatProperty(name="Lightning Subdivisions", min=0.0, max=12.0)
+    lightningscale: bpy.props.FloatProperty(name="Lightning Scale", default=1.0, min=0.0, max=1.0)
+    lightningzigzag: bpy.props.FloatProperty(name="Lightning Zig-Zag", min=0.0, max=30)
+    alphamid: bpy.props.FloatProperty(name="Alpha Mid", default=1.0, min=-1.0, max=1.0)
+    percentstart: bpy.props.FloatProperty(name="Percent Start", default=1.0, min=0.0, max=1.0)
+    percentmid: bpy.props.FloatProperty(name="Percent Mid", default=1.0, min=0.0, max=1.0)
+    percentend: bpy.props.FloatProperty(name="Percent End", default=1.0, min=0.0, max=1.0)
+    sizemid: bpy.props.FloatProperty(name="sizeMid", default=1.0, min=0.0)
+    sizemid_y: bpy.props.FloatProperty(name="sizeMid_y", min=0.0)
+    randombirthrate: bpy.props.FloatProperty(name="Random Birthrate", default=10.0, min=0.0)
+    targetsize: bpy.props.FloatProperty(name="Target Size", default=1.0, min=0.0)
+    numcontrolpts: bpy.props.FloatProperty(name="Number of Control Points", min=0.0)
+    controlptradius: bpy.props.FloatProperty(name="Control Point Radius", min=0.0)
+    controlptdelay: bpy.props.FloatProperty(name="Control Point Delay", min=0.0)
+    tangentspread: bpy.props.FloatProperty(name="Tangent Spread", description="Tangent spread (degrees)", min=0.0)
+    tangentlength: bpy.props.FloatProperty(name="Tangent Length", min=0.0)
+    colormid: bpy.props.FloatVectorProperty(name="Color Mid",
                                             subtype='COLOR_GAMMA',
                                             default=(1.0, 1.0, 1.0),
                                             min=0.0, max=1.0,
                                             soft_min=0.0, soft_max=1.0)
-    colorend: bpy.props.FloatVectorProperty(name="Color end",
-                                            description="Color end",
+    colorend: bpy.props.FloatVectorProperty(name="Color End",
                                             subtype='COLOR_GAMMA',
                                             default=(1.0, 1.0, 1.0),
                                             min=0.0, max=1.0,
                                             soft_min=0.0, soft_max=1.0)
-    colorstart: bpy.props.FloatVectorProperty(name="Color start",
-                                              description="Color start",
+    colorstart: bpy.props.FloatVectorProperty(name="Color Start",
                                               subtype='COLOR_GAMMA',
                                               default=(1.0, 1.0, 1.0),
                                               min=0.0, max=1.0,
                                               soft_min=0.0, soft_max=1.0)
+    deadspace: bpy.props.FloatProperty(name="Dead Space", min=0.0)
+    blastradius: bpy.props.FloatProperty(name="Blast Radius", description="Blast radius (meters)", min=0.0)
+    blastlength: bpy.props.FloatProperty(name="Blast Length", description="Blast length (seconds)", min=0.0)
+    num_branches: bpy.props.IntProperty(name="Number of Branches")
+    controlptsmoothing: bpy.props.FloatProperty(name="Control Point Smoothing")
+    xgrid: bpy.props.IntProperty(name="X Grid")
+    ygrid: bpy.props.IntProperty(name="Y Grid")
+    spawntype: bpy.props.EnumProperty(name="Spawn", description="Spawn type",
+                                      items=[("Normal", "Normal", "", 0),
+                                             ("Trail", "Trail", "", 1)],
+                                      default="Normal")
+    update: bpy.props.EnumProperty(name="Update", description="Update type",
+                                   items=[("NONE", "", "", 0),
+                                          ("Fountain", "Fountain", "", 1),
+                                          ("Single", "Single", "", 2),
+                                          ("Explosion", "Explosion", "", 3),
+                                          ("Lightning", "Lightning", "", 4)],
+                                   default="NONE")
+    emitter_render: bpy.props.EnumProperty(name="Render",
+                                           items=[("NONE", "", "", 0),
+                                                  ("Normal", "Normal", "", 1),
+                                                  ("Linked", "Linked", "", 2),
+                                                  ("Billboard_to_Local_Z", "Billboard to local Z", "", 3),
+                                                  ("Billboard_to_World_Z", "Billboard to world Z", "", 4),
+                                                  ("Aligned_to_World_Z", "Aligned to world Z", "", 5),
+                                                  ("Aligned_to_Particle_Dir", "Aligned to particle dir.", "", 6),
+                                                  ("Motion_Blur", "Motion Blur", "", 7)],
+                                           default="NONE")
+    blend: bpy.props.EnumProperty(name="Blend",
+                                  items=[("NONE", "", "", 0),
+                                         ("Normal", "Normal", "", 1),
+                                         ("Punch-Through", "Punch-Through", "", 2),
+                                         ("Lighten", "Lighten", "", 3)],
+                                  default="NONE")
+    texture: bpy.props.StringProperty(name="Texture", maxlen=32)
+    chunk_name: bpy.props.StringProperty(name="Chunk Name", maxlen=16)
+    twosidedtex: bpy.props.BoolProperty(name="Two-Sided Texture")
+    loop: bpy.props.BoolProperty(name="Loop")
+    renderorder: bpy.props.IntProperty(name="Render Order", min=0)
+    frame_blending: bpy.props.BoolProperty(name="Frame Blending")
+    depth_texture_name: bpy.props.StringProperty(name="Depth Texture Name", default=defines.NULL, maxlen=32)
+    p2p: bpy.props.BoolProperty(name="P2P")
+    p2p_type: bpy.props.EnumProperty(name="Type",
+                                     items=[("Bezier", "Bezier", "Bezier", 0),
+                                            ("Gravity", "Gravity", "Gravity", 1)],
+                                     default="Bezier")
+    affected_by_wind: bpy.props.BoolProperty(name="Affected By Wind")
+    tinted: bpy.props.BoolProperty(name="Tinted", description="Texture should be tinted with start, mid, and end color")
+    bounce: bpy.props.BoolProperty(name="Bounce")
+    random: bpy.props.BoolProperty(name="Random")
+    inherit: bpy.props.BoolProperty(name="Inherit")
+    inheritvel: bpy.props.BoolProperty(name="Inherit Velocity")
+    inherit_local: bpy.props.BoolProperty(name="Inherit Local")
+    splat: bpy.props.BoolProperty(name="Splat")
+    inherit_part: bpy.props.BoolProperty(name="Inherit Particle")
+    depth_texture: bpy.props.BoolProperty(name="Depth Texture")
 
-    # Emitter sub-header properties
-    deadspace: bpy.props.FloatProperty(name="Dead space", description="Dead space", default=0.0, min=0.0, options=set())
-    blastradius: bpy.props.FloatProperty(name="Radius", description="Blast Radius (meters)", default=0.0, min=0.0, unit='LENGTH', options=set())
-    blastlength: bpy.props.FloatProperty(name="Length", description="Blast Length (seconds)", default=0.0, min=0.0, unit='TIME', options=set())
-    num_branches: bpy.props.IntProperty(name="# of Branches", description="Number of Branches", default=0, options=set())
-    controlptsmoothing: bpy.props.FloatProperty(name="Control Point Smoothing", description="Control Point Smoothing", default=0.0, options=set())
-    xgrid: bpy.props.IntProperty(name="X Grid", description="X Grid", default=0, options=set())
-    ygrid: bpy.props.IntProperty(name="Y Grid", description="Y Grid", default=0, options=set())
-    spawntype: bpy.props.EnumProperty(
-        name="Spawn", description="Spawn type",
-        items=[("NONE", "", "", 0),
-               ("Normal", "Normal", "Normal", 1),
-               ("Trail", "Trail", "Trail", 2)],
-        default="NONE", options=set())
-    update: bpy.props.EnumProperty(
-        name="Update", description="Update type",
-        items=[("NONE", "", "", 0),
-               ("Fountain", "Fountain", "Fountain", 1),
-               ("Single", "Single", "Single", 2),
-               ("Explosion", "Explosion", "Explosion", 3),
-               ("Lightning", "Lightning", "Lightning", 4)],
-        default="NONE", options=set(), update=update_emitter_prop)
-    render_emitter: bpy.props.EnumProperty(
-        name="Render", description="Render type",
-        items=[("NONE", "", "", 0),
-               ("Normal", "Normal", "Normal", 1),
-               ("Linked", "Linked", "Linked", 2),
-               ("Billboard_to_Local_Z", "Billboard to local Z", "Billboard to local Z", 3),
-               ("Billboard_to_World_Z", "Billboard to world Z", "Billboard to world Z", 4),
-               ("Aligned_to_World_Z", "Aligned to world Z", "Aligned  to world Z", 5),
-               ("Aligned_to_Particle_Dir", "Aligned to particle dir.", "Aligned to particle direction", 6),
-               ("Motion_Blur", "Motion Blur", "Motion Blur", 7)],
-        default="NONE", options=set())
-    blend: bpy.props.EnumProperty(
-        name="Blend", description="Blending Mode",
-        items=[("NONE", "", "", 0),
-               ("Normal", "Normal", "Normal", 1),
-               ("Punch-Through", "Punch-Through", "Punch-Through", 2),
-               ("Lighten", "Lighten", "Lighten", 3)],
-        default="NONE", options=set())
-    texture: bpy.props.StringProperty(name="Texture", description="Texture", maxlen=32, options=set())
-    chunk_name: bpy.props.StringProperty(name="Chunk Name", description="Chunk Name", maxlen=16, default="", options=set(), update=update_emitter_prop)
-    twosidedtex: bpy.props.BoolProperty(name="Two-Sided Texture", description="Textures visible from front and back", default=False, options=set())
-    loop: bpy.props.BoolProperty(name="Loop", description="Loop", default=False, options=set())
-    renderorder: bpy.props.IntProperty(name="Render order", description="Render Order", default=0, min=0, options=set())
-    frame_blending: bpy.props.BoolProperty(name="Frame Blending", default=False, options=set())
-    depth_texture_name: bpy.props.StringProperty(name="Depth Texture Name", description="Depth Texture Name", default=defines.NULL, maxlen=32, options=set())
-
-    # Emitter flags
-    p2p: bpy.props.BoolProperty(name="p2p", description="Use Point to Point settings", default=False, options=set())
-    p2p_sel: bpy.props.BoolProperty(name="p2p_sel", description="???", default=False, options=set())
-    p2p_type: bpy.props.EnumProperty(
-        name="Type", description="???",
-        items=[("NONE", "", "", 0),
-               ("Bezier", "Bezier", "Bezier", 1),
-               ("Gravity", "Gravity", "Gravity", 2)],
-        default="NONE", options=set(), update=update_emitter_prop)
-    affected_by_wind: bpy.props.BoolProperty(name="Affected By Wind", description="Particles are affected by area wind", default=False, options=set())
-    tinted: bpy.props.BoolProperty(name="Tinted", description="Tint texture with start, mid, and end color", default=False, options=set())
-    bounce: bpy.props.BoolProperty(name="Bounce", description="Bounce On/Off", default=False, options=set())
-    random: bpy.props.BoolProperty(name="Random", description="Random", default=False, options=set())
-    inherit: bpy.props.BoolProperty(name="Inherit", description="Inherit", default=False, options=set())
-    inheritvel: bpy.props.BoolProperty(name="Velocity", description="Inherit Velocity", default=False, options=set())
-    inherit_local: bpy.props.BoolProperty(name="Local", description="???", default=False, options=set())
-    splat: bpy.props.BoolProperty(name="Splat", description="Splat", default=False, options=set())
-    inherit_part: bpy.props.BoolProperty(name="Part", description="???", default=False, options=set())
-    depth_texture: bpy.props.BoolProperty(name="Use Depth Texture", description="Use Depth Texture", default=False, options=set())
-
-    # Path connections
-    path_connections: bpy.props.CollectionProperty(type=PathConnectionPropertyGroup)
-    active_path_connection: bpy.props.IntProperty()
+    # Path Points
+    path_connection_list: bpy.props.CollectionProperty(type=PathConnectionPropertyGroup)
+    path_connection_idx: bpy.props.IntProperty()

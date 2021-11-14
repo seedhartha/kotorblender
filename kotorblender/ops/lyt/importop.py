@@ -19,6 +19,8 @@
 import os
 import traceback
 
+from math import radians
+
 import bpy
 
 from bpy_extras.io_utils import ImportHelper
@@ -29,7 +31,7 @@ from ...io import lyt
 
 class KB_OT_import_lyt(bpy.types.Operator, ImportHelper):
     bl_idname = "kb.lytimport"
-    bl_label = "Import Odyssey LYT"
+    bl_label = "Import KotOR LYT"
     bl_options = {'UNDO'}
 
     filename_ext = ".lyt"
@@ -65,14 +67,12 @@ class KB_OT_import_lyt(bpy.types.Operator, ImportHelper):
     sharp_edge_angle: bpy.props.FloatProperty(
         name="Sharp Edge Angle",
         description="When merging similar vertices, mark edges with an angle higher than this as sharp",
-        default=10.0,
-        min=0.0,
-        max=90.0)
+        default=radians(10.0), min=0.0, max=radians(90.0),
+        subtype='ANGLE')
 
     texture_search_recursive: bpy.props.BoolProperty(
         name="Recursive Texture Search",
-        description="Search for textures in subdirectories",
-        default=False)
+        description="Search for textures in subdirectories")
 
     def execute(self, context):
         options = ImportOptions()

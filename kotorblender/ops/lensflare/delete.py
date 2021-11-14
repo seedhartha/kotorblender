@@ -18,32 +18,30 @@
 
 import bpy
 
-from ... import utils
 
-
-class KB_OT_anim_focus(bpy.types.Operator):
-    bl_idname = "kb.anim_focus"
-    bl_label = "Set start and end frame of the timeline to the animation"
+class KB_OT_delete_lens_flare(bpy.types.Operator):
+    bl_idname = "kb.delete_lens_flare"
+    bl_label = "Delete lens flare from the list"
 
     @classmethod
     def poll(cls, context):
-        if not utils.is_mdl_root(context.object):
+        obj = context.object
+        if not obj or obj.type != 'LIGHT' or not obj.kb.lensflares:
             return False
 
-        mdl_root = context.object
-        anim_list = mdl_root.kb.anim_list
-        anim_list_idx = mdl_root.kb.anim_list_idx
+        flare_list = obj.kb.flare_list
+        flare_list_idx = obj.kb.flare_list_idx
 
-        return anim_list_idx >= 0 and anim_list_idx < len(anim_list)
+        return flare_list_idx >= 0 and flare_list_idx < len(flare_list)
 
     def execute(self, context):
-        mdl_root = context.object
-        anim_list = mdl_root.kb.anim_list
-        anim_list_idx = mdl_root.kb.anim_list_idx
+        obj = context.object
+        flare_list = obj.kb.flare_list
+        flare_list_idx = obj.kb.flare_list_idx
 
-        scene = context.scene
-        scene.frame_current = anim_list[anim_list_idx].frame_start
-        scene.frame_start = anim_list[anim_list_idx].frame_start
-        scene.frame_end = anim_list[anim_list_idx].frame_end
+        if flare_list_idx == len(flare_list) - 1 and flare_list_idx > 0:
+            obj.kb.flare_list_idx = flare_list_idx - 1
 
-        return {'FINISHED'}
+        flare_list.remove(flare_list_idx)
+
+        return{"FINISHED"}

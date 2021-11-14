@@ -18,12 +18,13 @@
 
 import bpy
 
+from .. import defines
 
-class KB_UL_anims(bpy.types.UIList):
 
-    def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
-        if self.layout_type in {'DEFAULT', 'COMPACT'}:
-            layout.prop(item, "name", text="", emboss=False)
-        elif self.layout_type in {'GRID'}:
-            layout.alignment = 'CENTER'
-            layout.label("", icon='POSE_DATA')
+class LensFlarePropertyGroup(bpy.types.PropertyGroup):
+    texture: bpy.props.StringProperty(name="Texture", default=defines.NULL)
+    size: bpy.props.FloatProperty(name="Size", default=1)
+    position: bpy.props.FloatProperty(name="Position", default=1)
+    colorshift: bpy.props.FloatVectorProperty(name="Colorshift",
+                                              min=0.0, max=1.0,
+                                              subtype='COLOR_GAMMA')

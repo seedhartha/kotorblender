@@ -18,23 +18,32 @@
 
 import bpy
 
+from ... import utils
 
-class KB_OT_delete_lightflare(bpy.types.Operator):
-    bl_idname = "kb.lightflare_delete"
-    bl_label = "Deletes a flare from the light"
+
+class KB_OT_play_animation(bpy.types.Operator):
+    bl_idname = "kb.play_animation"
+    bl_label = "Set start and end frame of the scene to this animation"
 
     @classmethod
     def poll(cls, context):
-        return len(context.object.kb.flare_list) > 0
+        obj = context.object
+        if not utils.is_mdl_root(obj):
+            return False
+
+        anim_list = obj.kb.anim_list
+        anim_list_idx = obj.kb.anim_list_idx
+
+        return anim_list_idx >= 0 and anim_list_idx < len(anim_list)
 
     def execute(self, context):
-        obj = context.object
-        flare_list = obj.kb.flare_list
-        flare_idx = obj.kb.flare_listIdx
+        mdl_root = context.object
+        anim_list = mdl_root.kb.anim_list
+        anim_list_idx = mdl_root.kb.anim_list_idx
 
-        if flare_idx == len(flare_list) - 1 and flare_idx > 0:
-            obj.kb.flare_listIdx = flare_idx - 1
+        scene = context.scene
+        scene.frame_current = anim_list[anim_list_idx].frame_start
+        scene.frame_start = anim_list[anim_list_idx].frame_start
+        scene.frame_end = anim_list[anim_list_idx].frame_end
 
-        flare_list.remove(flare_idx)
-
-        return{"FINISHED"}
+        return {'FINISHED'}
