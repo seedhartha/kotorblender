@@ -27,7 +27,7 @@ from ...io import pth
 
 class KB_OT_export_pth(bpy.types.Operator, ExportHelper):
     bl_idname = "kb.pthexport"
-    bl_label = "Export Odyssey PTH"
+    bl_label = "Export KotOR PTH"
 
     filename_ext = ".pth"
 

@@ -18,13 +18,20 @@
 
 import bpy
 
+from ... import defines
 
-class KB_OT_new_lightflare(bpy.types.Operator):
-    bl_idname = "kb.lightflare_new"
-    bl_label = "Add a new flare to a light"
+
+class KB_OT_add_lens_flare(bpy.types.Operator):
+    bl_idname = "kb.add_lens_flare"
+    bl_label = "Add lens flare to the list"
+
+    @classmethod
+    def poll(cls, context):
+        obj = context.object
+        return obj and obj.type == 'LIGHT' and obj.kb.lensflares
 
     def execute(self, context):
-        if (context.object.type == 'LIGHT'):
-            context.object.kb.flare_list.add()
+        flare = context.object.kb.flare_list.add()
+        flare.texture = defines.NULL
 
         return{'FINISHED'}

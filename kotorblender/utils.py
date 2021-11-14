@@ -47,6 +47,14 @@ def is_mesh_type(obj, meshtype):
     return obj and obj.type == 'MESH' and obj.kb.meshtype == meshtype
 
 
+def is_exported_to_mdl(obj):
+    if not obj:
+        return False
+    if obj.type in ['MESH', 'LIGHT']:
+        return True
+    return obj.type == 'EMPTY' and obj.kb.dummytype in [DummyType.NONE, DummyType.MDLROOT, DummyType.REFERENCE]
+
+
 def get_object_root(obj):
     if is_mdl_root(obj):
         return obj
@@ -76,6 +84,10 @@ def find_objects(obj, test=lambda _: True):
 
 def is_null(s):
     return not s or s.lower() == NULL.lower()
+
+
+def is_not_null(s):
+    return not is_null(s)
 
 
 def is_close(a, b, rel_tol, abs_tol=0.0):

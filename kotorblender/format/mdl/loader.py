@@ -217,7 +217,7 @@ class MdlLoader:
             flare_position_arr = self.get_array_def()
             flare_color_shift_arr = self.get_array_def()
             flare_tex_name_arr = self.get_array_def()
-            light_priority = self.mdl.get_uint32()
+            light_priority = self.mdl.get_int32()
             ambient_only = self.mdl.get_uint32()
             dynamic_type = self.mdl.get_uint32()
             affect_dynamic = self.mdl.get_uint32()
@@ -228,7 +228,7 @@ class MdlLoader:
             node.shadow = shadow
             node.lightpriority = light_priority
             node.ambientonly = ambient_only
-            node.ndynamictype = dynamic_type
+            node.dynamictype = dynamic_type
             node.affectdynamic = affect_dynamic
             node.fadinglight = fading_light
             node.lensflares = flare
@@ -245,7 +245,7 @@ class MdlLoader:
             y_grid = self.mdl.get_uint32()
             spawn_type = self.mdl.get_uint32()
             update = self.mdl.get_c_string_up_to(32)
-            render = self.mdl.get_c_string_up_to(32)
+            emitter_render = self.mdl.get_c_string_up_to(32)
             blend = self.mdl.get_c_string_up_to(32)
             texture = self.mdl.get_c_string_up_to(32)
             chunk_name = self.mdl.get_c_string_up_to(16)
@@ -267,7 +267,7 @@ class MdlLoader:
             node.ygrid = y_grid
             node.spawntype = spawn_type
             node.update = update
-            node.render_emitter = render
+            node.emitter_render = emitter_render
             node.blend = blend
             node.texture = texture
             node.chunk_name = chunk_name
@@ -423,11 +423,12 @@ class MdlLoader:
             controllers = self.load_controllers(controller_arr, controller_data_arr)
             if type_flags & NODE_MESH:
                 node.alpha = controllers[CTRL_MESH_ALPHA][0][1] if CTRL_MESH_ALPHA in controllers else 1.0
+                node.scale = controllers[CTRL_MESH_SCALE][0][1] if CTRL_MESH_SCALE in controllers else 1.0
                 node.selfillumcolor = controllers[CTRL_MESH_SELFILLUMCOLOR][0][1:] if CTRL_MESH_SELFILLUMCOLOR in controllers else [0.0] * 3
             elif type_flags & NODE_LIGHT:
-                node.color = controllers[CTRL_LIGHT_COLOR][0][1:] if CTRL_LIGHT_COLOR in controllers else [1.0] * 3
                 node.radius = controllers[CTRL_LIGHT_RADIUS][0][1] if CTRL_LIGHT_RADIUS in controllers else 1.0
                 node.multiplier = controllers[CTRL_LIGHT_MULTIPLIER][0][1] if CTRL_LIGHT_MULTIPLIER in controllers else 1.0
+                node.color = controllers[CTRL_LIGHT_COLOR][0][1:] if CTRL_LIGHT_COLOR in controllers else [1.0] * 3
             elif type_flags & NODE_EMITTER:
                 for val, key, dim in EMITTER_CONTROLLER_KEYS:
                     if val not in controllers:
@@ -646,20 +647,20 @@ class MdlLoader:
             if CTRL_BASE_ORIENTATION in controllers:
                 orientations = [self.orientation_controller_to_quaternion(row[1:]) for row in controllers[CTRL_BASE_ORIENTATION]]
                 node.keyframes["orientation"] = [[row[0]] + orientations[i] for i, row in enumerate(controllers[CTRL_BASE_ORIENTATION])]
-            if CTRL_BASE_SCALE in controllers:
-                node.keyframes["scale"] = [row[:2] for row in controllers[CTRL_BASE_SCALE]]
             if isinstance(supernode, TrimeshNode):
                 if CTRL_MESH_ALPHA in controllers:
                     node.keyframes["alpha"] = [row[:2] for row in controllers[CTRL_MESH_ALPHA]]
+                if CTRL_MESH_SCALE in controllers:
+                    node.keyframes["scale"] = [row[:2] for row in controllers[CTRL_MESH_SCALE]]
                 if CTRL_MESH_SELFILLUMCOLOR in controllers:
                     node.keyframes["selfillumcolor"] = [row[:4] for row in controllers[CTRL_MESH_SELFILLUMCOLOR]]
             if isinstance(supernode, LightNode):
-                if CTRL_LIGHT_COLOR in controllers:
-                    node.keyframes["color"] = [row[:4] for row in controllers[CTRL_LIGHT_COLOR]]
                 if CTRL_LIGHT_RADIUS in controllers:
                     node.keyframes["radius"] = [row[:2] for row in controllers[CTRL_LIGHT_RADIUS]]
                 if CTRL_LIGHT_MULTIPLIER in controllers:
                     node.keyframes["multiplier"] = [row[:2] for row in controllers[CTRL_LIGHT_MULTIPLIER]]
+                if CTRL_LIGHT_COLOR in controllers:
+                    node.keyframes["color"] = [row[:4] for row in controllers[CTRL_LIGHT_COLOR]]
             if isinstance(supernode, EmitterNode):
                 for key in EMITTER_CONTROLLER_KEYS:
                     if not key[0] in controllers:

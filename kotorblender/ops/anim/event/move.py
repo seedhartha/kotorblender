@@ -21,9 +21,9 @@ import bpy
 from .... import utils
 
 
-class KB_OT_anim_event_move(bpy.types.Operator):
-    bl_idname = "kb.anim_event_move"
-    bl_label = "Move an item in the event list"
+class KB_OT_move_anim_event(bpy.types.Operator):
+    bl_idname = "kb.move_anim_event"
+    bl_label = "Move event within the list"
     bl_options = {'UNDO'}
 
     direction: bpy.props.EnumProperty(items=(("UP", "Up", ""),
@@ -31,13 +31,12 @@ class KB_OT_anim_event_move(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        if not utils.is_mdl_root(context.object):
+        obj = context.object
+        if not utils.is_mdl_root(obj):
             return False
 
-        mdl_root = context.object
-        anim_list = mdl_root.kb.anim_list
-        anim_list_idx = mdl_root.kb.anim_list_idx
-
+        anim_list = obj.kb.anim_list
+        anim_list_idx = obj.kb.anim_list_idx
         if anim_list_idx < 0 or anim_list_idx >= len(anim_list):
             return False
 

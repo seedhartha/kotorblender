@@ -18,29 +18,12 @@
 
 import bpy
 
-from ....scene.animation import Animation
 
-from .... import utils
+class KB_UL_lens_flares(bpy.types.UIList):
 
-
-class KB_OT_anim_event_new(bpy.types.Operator):
-    bl_idname = "kb.anim_event_new"
-    bl_label = "Add a new event to an animation"
-    bl_options = {'UNDO'}
-
-    @classmethod
-    def poll(cls, context):
-        return utils.is_mdl_root(context.object)
-
-    def execute(self, context):
-        mdl_root = context.object
-        anim_list = mdl_root.kb.anim_list
-        anim_list_idx = mdl_root.kb.anim_list_idx
-
-        if anim_list_idx < 0 or anim_list_idx > len(anim_list):
-            return {'CANCELLED'}
-
-        anim = anim_list[anim_list_idx]
-        Animation.append_event_to_object_anim(anim, "changeit", 0)
-
-        return {'FINISHED'}
+    def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
+        if self.layout_type in {'DEFAULT', 'COMPACT'}:
+            layout.prop(item, "texture", text="", emboss=False, icon_value=icon)
+        elif self.layout_type in {'GRID'}:
+            layout.alignment = 'CENTER'
+            layout.label(text="", icon_value=icon)

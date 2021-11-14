@@ -18,6 +18,31 @@
 
 import bpy
 
+from .... import utils
 
-class ListItemPropertyGroup(bpy.types.PropertyGroup):
-    name: bpy.props.StringProperty(name="Property Name")
+
+class KB_PT_modelnode(bpy.types.Panel):
+    bl_label = "KotOR Model Node"
+    bl_space_type = 'PROPERTIES'
+    bl_region_type = 'WINDOW'
+    bl_context = "object"
+
+    @classmethod
+    def poll(cls, context):
+        return context.object
+
+    def draw(self, context):
+        obj = context.object
+        layout = self.layout
+        layout.use_property_split = True
+
+        if obj.type == 'EMPTY':
+            row = layout.row()
+            row.prop(obj.kb, "dummytype")
+        elif obj.type == 'MESH':
+            row = layout.row()
+            row.prop(obj.kb, "meshtype")
+
+        if utils.is_exported_to_mdl(obj):
+            row = layout.row()
+            row.prop(obj.kb, "node_number")

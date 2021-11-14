@@ -21,18 +21,18 @@ import bpy
 from ... import utils
 
 
-class KB_OT_anim_delete(bpy.types.Operator):
-    bl_idname = "kb.anim_delete"
-    bl_label = "Delete an animation"
+class KB_OT_delete_animation(bpy.types.Operator):
+    bl_idname = "kb.delete_animation"
+    bl_label = "Delete animation from the list"
 
     @classmethod
     def poll(cls, context):
-        if not utils.is_mdl_root(context.object):
+        obj = context.object
+        if not utils.is_mdl_root(obj):
             return False
 
-        mdl_root = context.object
-        anim_list = mdl_root.kb.anim_list
-        anim_list_idx = mdl_root.kb.anim_list_idx
+        anim_list = obj.kb.anim_list
+        anim_list_idx = obj.kb.anim_list_idx
 
         return anim_list_idx >= 0 and anim_list_idx < len(anim_list)
 

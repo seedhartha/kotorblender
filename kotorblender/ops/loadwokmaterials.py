@@ -23,7 +23,7 @@ from .. import defines
 
 class KB_OT_load_wok_materials(bpy.types.Operator):
     bl_idname = "kb.load_wok_mats"
-    bl_label = "Load walkmesh materials"
+    bl_label = "Load Walkmesh Materials"
 
     def execute(self, context):
         selected_object = context.object

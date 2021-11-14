@@ -32,6 +32,7 @@ from .. import utils
 
 
 def load_mdl(operator, filepath, options, position=(0.0, 0.0, 0.0)):
+    operator.report({'INFO'}, "Loading model from '{}'".format(filepath))
     mdl = MdlLoader(filepath)
     model = mdl.load()
 
@@ -54,6 +55,7 @@ def load_mdl(operator, filepath, options, position=(0.0, 0.0, 0.0)):
 
         pwk_path = filepath[:-4] + ".pwk"
         if os.path.exists(pwk_path):
+            operator.report({'INFO'}, "Loading walkmesh from '{}'".format(pwk_path))
             pwk = BwmLoader(pwk_path, model.name)
             pwk_walkmesh = pwk.load()
 
@@ -61,8 +63,11 @@ def load_mdl(operator, filepath, options, position=(0.0, 0.0, 0.0)):
         dwk1_path = filepath[:-4] + "1.dwk"
         dwk2_path = filepath[:-4] + "2.dwk"
         if os.path.exists(dwk0_path) and os.path.exists(dwk1_path) and os.path.exists(dwk2_path):
+            operator.report({'INFO'}, "Loading walkmesh from '{}'".format(dwk0_path))
             dwk1 = BwmLoader(dwk0_path, model.name)
+            operator.report({'INFO'}, "Loading walkmesh from '{}'".format(dwk1_path))
             dwk2 = BwmLoader(dwk1_path, model.name)
+            operator.report({'INFO'}, "Loading walkmesh from '{}'".format(dwk2_path))
             dwk3 = BwmLoader(dwk2_path, model.name)
             dwk_walkmesh1 = dwk1.load()
             dwk_walkmesh2 = dwk2.load()
@@ -94,6 +99,7 @@ def save_mdl(operator, filepath, options):
 
     # Export MDL
     model = Model.from_mdl_root(mdl_root, options)
+    operator.report({'INFO'}, "Saving model to '{}'".format(filepath))
     mdl = MdlSaver(filepath, model, options.export_for_tsl)
     mdl.save()
 
@@ -104,6 +110,7 @@ def save_mdl(operator, filepath, options):
             base_path, _ = os.path.splitext(filepath)
             wok_path = base_path + ".wok"
             walkmesh = Walkmesh.from_aabb_node(aabb_node)
+            operator.report({'INFO'}, "Saving walkmesh to '{}'".format(wok_path))
             bwm = BwmSaver(wok_path, walkmesh)
             bwm.save()
 
@@ -122,5 +129,6 @@ def save_mdl(operator, filepath, options):
                     dwk_state = 2
                 xwk_path = "{}{}.dwk".format(base_path, dwk_state)
             walkmesh = Walkmesh.from_root_object(xwk_root, options)
+            operator.report({'INFO'}, "Saving walkmesh to '{}'".format(xwk_path))
             bwm = BwmSaver(xwk_path, walkmesh)
             bwm.save()

@@ -20,19 +20,34 @@ import bpy
 
 from ... import utils
 
-from ...scene.animation import Animation
 
-
-class KB_OT_anim_new(bpy.types.Operator):
-    bl_idname = "kb.anim_new"
-    bl_label = "Create new animation"
+class KB_PT_model(bpy.types.Panel):
+    bl_label = "KotOR Model"
+    bl_space_type = 'PROPERTIES'
+    bl_region_type = 'WINDOW'
+    bl_context = "object"
 
     @classmethod
     def poll(cls, context):
         return utils.is_mdl_root(context.object)
 
-    def execute(self, context):
-        mdl_root = context.object
-        Animation.append_to_object(context.object, "changeit", 0, 0.25, mdl_root.name)
+    def draw(self, context):
+        obj = context.object
+        layout = self.layout
+        layout.use_property_split = True
 
-        return {'FINISHED'}
+        row = layout.row()
+        row.prop(obj.kb, "classification")
+        row = layout.row()
+        row.prop(obj.kb, "supermodel")
+        row = layout.row()
+        row.prop(obj.kb, "animscale")
+        row = layout.row()
+        row.prop_search(obj.kb, "animroot", context.collection, "objects")
+        row = layout.row()
+        row.prop(obj.kb, "affected_by_fog")
+
+        row = layout.row()
+        row.operator("kb.assign_node_numbers")
+        row = layout.row()
+        row.operator("kb.rebuild_armature")

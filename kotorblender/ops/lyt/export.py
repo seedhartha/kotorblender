@@ -27,7 +27,7 @@ from ...io import lyt
 
 class KB_OT_export_lyt(bpy.types.Operator, ExportHelper):
     bl_idname = "kb.lytexport"
-    bl_label = "Export Odyssey LYT"
+    bl_label = "Export KotOR LYT"
 
     filename_ext = ".lyt"
 
