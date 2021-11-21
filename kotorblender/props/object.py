@@ -142,7 +142,7 @@ class ObjectPropertyGroup(bpy.types.PropertyGroup):
     flareradius: bpy.props.FloatProperty(name="Flare Radius", min=0.0, max=1e6)
     flare_list: bpy.props.CollectionProperty(type=LensFlarePropertyGroup)
     flare_list_idx: bpy.props.IntProperty()
-    radius: bpy.props.FloatProperty(name="Radius", min=0.0, max=1e4, update=on_update_light_power)
+    radius: bpy.props.FloatProperty(name="Radius", min=0.0, max=1e6, update=on_update_light_power)
     multiplier: bpy.props.FloatProperty(name="Multiplier", default=1.0, min=0.0, max=10.0, update=on_update_light_power)
 
     # Emitter
