@@ -144,6 +144,7 @@ class ObjectPropertyGroup(bpy.types.PropertyGroup):
     flare_list_idx: bpy.props.IntProperty()
     radius: bpy.props.FloatProperty(name="Radius", min=0.0, max=1e6, update=on_update_light_power)
     multiplier: bpy.props.FloatProperty(name="Multiplier", default=1.0, min=0.0, max=10.0, update=on_update_light_power)
+    negativelight: bpy.props.BoolProperty(name="Negative Light", update=on_update_light_power)
 
     # Emitter
     alphaend: bpy.props.FloatProperty(name="Alpha End", default=1.0, min=0.0, max=1.0)
