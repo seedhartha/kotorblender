@@ -51,6 +51,7 @@ class KB_PT_light(bpy.types.Panel):
         col.prop(obj.kb, "shadow")
         col.prop(obj.kb, "fadinglight")
         col.prop(obj.kb, "lensflares")
+        col.prop(obj.kb, "negativelight")
 
 
 class KB_PT_light_lens_flares(bpy.types.Panel):

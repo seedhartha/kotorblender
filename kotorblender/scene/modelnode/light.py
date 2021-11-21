@@ -60,8 +60,10 @@ class LightNode(GeometryNode):
 
     def create_light(self, name):
         light = bpy.data.lights.new(name, 'POINT')
-        light.color = self.color
-        light.use_shadow = self.shadow != 0
+        if self.color[0] >= 0.0:
+            light.color = self.color
+        else:
+            light.color = [-self.color[i] for i in range(3)]
         return light
 
     def set_object_data(self, obj, options):
@@ -76,6 +78,7 @@ class LightNode(GeometryNode):
         obj.kb.dynamictype = self.dynamictype
         obj.kb.affectdynamic = (self.affectdynamic >= 1)
         obj.kb.flareradius = self.flareradius
+        obj.kb.negativelight = self.color[0] < 0.0
 
         if (self.flareradius > 0) or (self.lensflares >= 1):
             obj.kb.lensflares = True
@@ -92,7 +95,11 @@ class LightNode(GeometryNode):
     def load_object_data(self, obj, options):
         GeometryNode.load_object_data(self, obj, options)
 
-        self.color = obj.data.color
+        if not obj.kb.negativelight:
+            self.color = obj.data.color
+        else:
+            self.color = [-obj.data.color[i] for i in range(3)]
+
         self.multiplier = obj.kb.multiplier
         self.radius = obj.kb.radius
         self.ambientonly = 1 if obj.kb.ambientonly else 0
@@ -113,4 +120,6 @@ class LightNode(GeometryNode):
 
     @classmethod
     def calc_light_power(cls, light):
+        if light.kb.negativelight:
+            return
         light.data.energy = light.kb.multiplier * light.kb.radius * light.kb.radius
