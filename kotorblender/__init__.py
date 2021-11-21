@@ -73,7 +73,7 @@ bl_info = {
     "name": "KotorBlender",
     "author": "Attila Gyoerkoes & J.W. Brandon & Vsevolod Kremianskii",
     "version": (3, 4, 0),
-    "blender": (2, 80, 0),
+    "blender": (2, 93, 0),
     "location": "File > Import-Export, Object Properties",
     "description": "Import, edit and export KotOR models",
     "category": "Import-Export"}
