@@ -78,6 +78,8 @@ class MdlLoader:
 
         self.mdx = BinaryReader(mdx_path, 'little')
 
+        self.tsl = False
+        self.xbox = False
         self.node_names = []
         self.node_by_number = dict()
 
@@ -104,7 +106,10 @@ class MdlLoader:
 
     def load_geometry_header(self):
         fn_ptr1 = self.mdl.get_uint32()
-        self.tsl = fn_ptr1 == MODEL_FN_PTR_1_K2_PC
+        if fn_ptr1 in [MODEL_FN_PTR_1_K2_PC, MODEL_FN_PTR_1_K2_XBOX]:
+            self.tsl = True
+        if fn_ptr1 in [MODEL_FN_PTR_1_K1_XBOX, MODEL_FN_PTR_1_K2_XBOX]:
+            self.xbox = True
 
         fn_ptr2 = self.mdl.get_uint32()
         model_name = self.mdl.get_c_string_up_to(32)
@@ -355,7 +360,8 @@ class MdlLoader:
             total_area = self.mdl.get_float()
             self.mdl.skip(4)  # padding
             mdx_offset = self.mdl.get_uint32()
-            off_vert_arr = self.mdl.get_uint32()
+            if not self.xbox:
+                off_vert_arr = self.mdl.get_uint32()
 
             node.render = render
             node.shadow = shadow
@@ -459,7 +465,10 @@ class MdlLoader:
         if type_flags & NODE_SKIN:
             if num_bonemap > 0:
                 self.mdl.seek(MDL_OFFSET + off_bonemap)
-                bonemap = [int(self.mdl.get_float()) for _ in range(num_bonemap)]
+                if self.xbox:
+                    bonemap = [self.mdl.get_uint16() for _ in range(num_bonemap)]
+                else:
+                    bonemap = [int(self.mdl.get_float()) for _ in range(num_bonemap)]
             else:
                 bonemap = []
             node_by_bone = dict()
@@ -527,7 +536,11 @@ class MdlLoader:
                     node.verts.append(tuple([self.mdx.get_float() for _ in range(3)]))
                     if mdx_data_bitmap & MDX_FLAG_NORMAL:
                         self.mdx.seek(mdx_offset + i * mdx_data_size + off_mdx_normals)
-                        node.normals.append(tuple([self.mdx.get_float() for _ in range(3)]))
+                        if self.xbox:
+                            comp = self.mdx.get_uint32()
+                            node.normals.append(self.decompress_vector_xbox(comp))
+                        else:
+                            node.normals.append(tuple([self.mdx.get_float() for _ in range(3)]))
                     if mdx_data_bitmap & MDX_FLAG_UV1:
                         self.mdx.seek(mdx_offset + i * mdx_data_size + off_mdx_uv1)
                         node.uv1.append(tuple([self.mdx.get_float() for _ in range(2)]))
@@ -538,10 +551,13 @@ class MdlLoader:
                         self.mdx.seek(mdx_offset + i * mdx_data_size + off_mdx_bone_weights)
                         bone_weights = [self.mdx.get_float() for _ in range(4)]
                         self.mdx.seek(mdx_offset + i * mdx_data_size + off_mdx_bone_indices)
-                        bone_indices = [self.mdx.get_float() for _ in range(4)]
+                        if self.xbox:
+                            bone_indices = [self.mdx.get_uint16() for _ in range(4)]
+                        else:
+                            bone_indices = [int(self.mdx.get_float()) for _ in range(4)]
                         vert_weights = []
                         for i in range(4):
-                            bone_idx = int(bone_indices[i])
+                            bone_idx = bone_indices[i]
                             if bone_idx == -1:
                                 continue
                             node_idx = node_by_bone[bone_idx]
@@ -768,3 +784,25 @@ class MdlLoader:
             raise RuntimeError("Array count mismatch: count1={}, count2={}".format(count1, count2))
 
         return ArrayDefinition(offset, count1)
+
+    # TODO: copied from MDLedit, this is most likely wrong
+    def decompress_vector_xbox(self, comp):
+        tmp = comp & 0x7ff
+        if tmp < 1024:
+            x = tmp / 1023.0
+        else:
+            x = (2048 - tmp) / 1023.0 * -1.0
+
+        tmp = (comp >> 11) & 0x7ff
+        if tmp < 1024:
+            y = tmp / 1023.0
+        else:
+            y = (2048 - tmp) / 1023.0 * -1.0
+
+        tmp = comp >> 22
+        if tmp < 512:
+            z = tmp / 511.0
+        else:
+            z = (1024 - tmp) / 511.0 * -1.0
+
+        return (x, y, z)
