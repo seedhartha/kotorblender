@@ -165,9 +165,9 @@ class BwmLoader:
     def new_placeable_walkmesh(self):
         walkmesh_type = WalkmeshType.DWK if self.path.endswith("dwk") else WalkmeshType.PWK
         if walkmesh_type == WalkmeshType.DWK:
-            if self.path.endswith("0.dwk"):
+            if self.path.endswith("1.dwk"):
                 dwk_state = "open1"
-            elif self.path.endswith("1.dwk"):
+            elif self.path.endswith("2.dwk"):
                 dwk_state = "open2"
             else:
                 dwk_state = "closed"
