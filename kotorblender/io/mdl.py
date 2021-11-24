@@ -122,11 +122,11 @@ def save_mdl(operator, filepath, options):
                 xwk_path = base_path + ".pwk"
             else:
                 if xwk_root.name.endswith("open1"):
-                    dwk_state = 0
-                elif xwk_root.name.endswith("open2"):
                     dwk_state = 1
-                elif xwk_root.name.endswith("closed"):
+                elif xwk_root.name.endswith("open2"):
                     dwk_state = 2
+                elif xwk_root.name.endswith("closed"):
+                    dwk_state = 0
                 xwk_path = "{}{}.dwk".format(base_path, dwk_state)
             walkmesh = Walkmesh.from_root_object(xwk_root, options)
             operator.report({'INFO'}, "Saving walkmesh to '{}'".format(xwk_path))
