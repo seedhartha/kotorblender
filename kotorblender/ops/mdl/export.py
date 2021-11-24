@@ -40,6 +40,10 @@ class KB_OT_export_mdl(bpy.types.Operator, ExportHelper):
         name="Export for TSL",
         description="Use The Sith Lords MDL format")
 
+    export_for_xbox: bpy.props.BoolProperty(
+        name="Export for Xbox",
+        description="Use Xbox MDL format")
+
     export_animations: bpy.props.BoolProperty(
         name="Export Animations",
         default=True)
@@ -57,6 +61,7 @@ class KB_OT_export_mdl(bpy.types.Operator, ExportHelper):
     def execute(self, context):
         options = ExportOptions()
         options.export_for_tsl = self.export_for_tsl
+        options.export_for_xbox = self.export_for_xbox
         options.export_animations = self.export_animations
         options.export_walkmeshes = self.export_walkmeshes
         options.export_custom_normals = self.export_custom_normals

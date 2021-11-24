@@ -32,7 +32,7 @@ from .types import *
 
 
 class MdlSaver:
-    def __init__(self, path, model, tsl):
+    def __init__(self, path, model, tsl, xbox):
         self.path = path
         self.mdl = BinaryWriter(path, 'little')
 
@@ -42,6 +42,7 @@ class MdlSaver:
 
         self.model = model
         self.tsl = tsl
+        self.xbox = xbox
 
         # Model
         self.mdl_pos = 0
@@ -287,6 +288,8 @@ class MdlSaver:
                 self.mdl_pos += 332
                 if self.tsl:
                     self.mdl_pos += 8
+                if self.xbox:
+                    self.mdl_pos -= 4
 
             # Skin Header
             if type_flags & NODE_SKIN:
@@ -319,8 +322,9 @@ class MdlSaver:
 
                 # Vertices
                 num_verts = NUM_SABER_VERTS if type_flags & NODE_SABER else len(node.verts)
-                self.verts_offsets[node_idx] = self.mdl_pos
-                self.mdl_pos += 4 * 3 * num_verts
+                if not self.xbox:
+                    self.verts_offsets[node_idx] = self.mdl_pos
+                    self.mdl_pos += 4 * 3 * num_verts
 
                 # Vertex Indices Count
                 self.index_count_offsets[node_idx] = self.mdl_pos
@@ -341,17 +345,31 @@ class MdlSaver:
                 if type_flags & NODE_SABER:
                     self.mdx_offsets[node_idx] = 0
                 else:
+                    # Vertex Coords
                     self.mdx_offsets[node_idx] = self.mdx_pos
                     self.mdx_pos += 4 * 3 * (num_verts + 1)
-                    self.mdx_pos += 4 * 3 * (num_verts + 1)
+                    # Normals
+                    if self.xbox:
+                        self.mdx_pos += 4 * (num_verts + 1)
+                    else:
+                        self.mdx_pos += 4 * 3 * (num_verts + 1)
+                    # UV1
                     if node.uv1:
                         self.mdx_pos += 4 * 2 * (num_verts + 1)
+                    # UV2
                     if node.uv2:
                         self.mdx_pos += 4 * 2 * (num_verts + 1)
+                    # Tangent Space
                     if node.tangentspace:
-                        self.mdx_pos += 4 * 9 * (num_verts + 1)
+                        if self.xbox:
+                            self.mdx_pos += 4 * 3 * (num_verts + 1)
+                        else:
+                            self.mdx_pos += 4 * 9 * (num_verts + 1)
                     if type_flags & NODE_SKIN:
-                        self.mdx_pos += 4 * 8 * (num_verts + 1)
+                        if self.xbox:
+                            self.mdx_pos += (4 * 4 + 2 * 4) * (num_verts + 1)
+                        else:
+                            self.mdx_pos += 4 * 8 * (num_verts + 1)
 
                 # Bounding Box, Average, Total Area
                 bb_min = Vector()
@@ -393,7 +411,10 @@ class MdlSaver:
 
                 # Bonemap
                 self.bonemap_offsets[node_idx] = self.mdl_pos
-                self.mdl_pos += 4 * num_bones
+                if self.xbox:
+                    self.mdl_pos += 2 * num_bones
+                else:
+                    self.mdl_pos += 4 * num_bones
 
                 # QBones
                 self.qbone_offsets[node_idx] = self.mdl_pos
@@ -588,11 +609,20 @@ class MdlSaver:
 
     def save_geometry_header(self):
         if self.tsl:
-            fn_ptr1 = MODEL_FN_PTR_1_K2_PC
-            fn_ptr2 = MODEL_FN_PTR_2_K2_PC
+            if self.xbox:
+                fn_ptr1 = MODEL_FN_PTR_1_K2_XBOX
+                fn_ptr2 = MODEL_FN_PTR_2_K2_XBOX
+            else:
+                fn_ptr1 = MODEL_FN_PTR_1_K2_PC
+                fn_ptr2 = MODEL_FN_PTR_2_K2_PC
         else:
-            fn_ptr1 = MODEL_FN_PTR_1_K1_PC
-            fn_ptr2 = MODEL_FN_PTR_2_K1_PC
+            if self.xbox:
+                fn_ptr1 = MODEL_FN_PTR_1_K1_XBOX
+                fn_ptr2 = MODEL_FN_PTR_2_K1_XBOX
+            else:
+                fn_ptr1 = MODEL_FN_PTR_1_K1_PC
+                fn_ptr2 = MODEL_FN_PTR_2_K1_PC
+
         model_name = self.model.name.ljust(32, '\0')
         off_root_node = self.node_offsets[0]
         total_num_nodes = len(self.nodes)
@@ -660,11 +690,20 @@ class MdlSaver:
 
         for anim_idx, anim in enumerate(self.model.animations):
             if self.tsl:
-                fn_ptr1 = ANIM_FN_PTR_1_K2_PC
-                fn_ptr2 = ANIM_FN_PTR_2_K2_PC
+                if self.xbox:
+                    fn_ptr1 = ANIM_FN_PTR_1_K2_XBOX
+                    fn_ptr2 = ANIM_FN_PTR_2_K2_XBOX
+                else:
+                    fn_ptr1 = ANIM_FN_PTR_1_K2_PC
+                    fn_ptr2 = ANIM_FN_PTR_2_K2_PC
             else:
-                fn_ptr1 = ANIM_FN_PTR_1_K1_PC
-                fn_ptr2 = ANIM_FN_PTR_2_K1_PC
+                if self.xbox:
+                    fn_ptr1 = ANIM_FN_PTR_1_K1_XBOX
+                    fn_ptr2 = ANIM_FN_PTR_2_K1_XBOX
+                else:
+                    fn_ptr1 = ANIM_FN_PTR_1_K1_PC
+                    fn_ptr2 = ANIM_FN_PTR_2_K1_PC
+
             name = anim.name.ljust(32, '\0')
             off_root_node = self.anim_node_offsets[anim_idx][0]
             total_num_nodes = len(self.anim_nodes[anim_idx])
@@ -925,24 +964,42 @@ class MdlSaver:
                 off_mdx_tan_space3 = 0xffffffff
                 off_mdx_tan_space4 = 0xffffffff
                 if not type_flags & NODE_SABER:
-                    mdx_data_size += 4 * (3 + 3)
-                    mdx_data_bitmap = MDX_FLAG_VERTEX | MDX_FLAG_NORMAL
+                    # Vertex Coordinates
+                    mdx_data_bitmap = MDX_FLAG_VERTEX
                     off_mdx_verts = 0
+                    mdx_data_size += 4 * 3
+                    # Normal
+                    mdx_data_bitmap |= MDX_FLAG_NORMAL
                     off_mdx_normals = 4 * 3
+                    if self.xbox:
+                        mdx_data_size += 4
+                    else:
+                        mdx_data_size += 4 * 3
+                    # UV1
                     if node.uv1:
                         mdx_data_bitmap |= MDX_FLAG_UV1
                         off_mdx_uv1 = mdx_data_size
                         mdx_data_size += 4 * 2
+                    # UV2
                     if node.uv2:
                         mdx_data_bitmap |= MDX_FLAG_UV2
                         off_mdx_uv2 = mdx_data_size
                         mdx_data_size += 4 * 2
+                    # Tangent Space
                     if node.tangentspace:
                         mdx_data_bitmap |= MDX_FLAG_TANGENT1
                         off_mdx_tan_space1 = mdx_data_size
-                        mdx_data_size += 4 * 9
+                        if self.xbox:
+                            mdx_data_size += 4 * 3
+                        else:
+                            mdx_data_size += 4 * 9
+                    # Bone Weights + Bone Indices
                     if type_flags & NODE_SKIN:
-                        mdx_data_size += 4 * 8  # bone weights + bone indices
+                        mdx_data_size += 4 * 4
+                        if self.xbox:
+                            mdx_data_size += 4 * 2
+                        else:
+                            mdx_data_size += 4 * 4
 
                 if type_flags & NODE_SABER:
                     saber_vert_indices = []
@@ -980,7 +1037,8 @@ class MdlSaver:
                 hide_in_holograms = node.hologram_donotdraw
                 total_area = self.mesh_total_areas[node_idx]
                 mdx_offset = self.mdx_offsets[node_idx]
-                off_vert_array = self.verts_offsets[node_idx]
+                if not self.xbox:
+                    off_vert_array = self.verts_offsets[node_idx]
 
                 self.mdl.put_uint32(fn_ptr1)
                 self.mdl.put_uint32(fn_ptr2)
@@ -1054,7 +1112,8 @@ class MdlSaver:
                 self.mdl.put_float(total_area)
                 self.mdl.put_uint32(0)  # padding
                 self.mdl.put_uint32(mdx_offset)
-                self.mdl.put_uint32(off_vert_array)
+                if not self.xbox:
+                    self.mdl.put_uint32(off_vert_array)
 
             # Skin Header
 
@@ -1070,8 +1129,12 @@ class MdlSaver:
                 for bone_idx, bone_node_idx in enumerate(bone_indices):
                     bonemap[bone_node_idx] = bone_idx
 
-                off_mdx_bone_weights = mdx_data_size - 4 * 8
-                off_mdx_bone_indices = mdx_data_size - 4 * 4
+                if self.xbox:
+                    off_mdx_bone_weights = mdx_data_size - 4 * 6
+                    off_mdx_bone_indices = mdx_data_size - 4 * 2
+                else:
+                    off_mdx_bone_weights = mdx_data_size - 4 * 8
+                    off_mdx_bone_indices = mdx_data_size - 4 * 4
                 off_bonemap = self.bonemap_offsets[node_idx]
                 num_bones = len(self.nodes)
 
@@ -1173,14 +1236,15 @@ class MdlSaver:
                     self.mdl.put_uint32(self.indices_offsets[node_idx])
 
                 # Vertices
-                if type_flags & NODE_SABER:
-                    for vert_idx in saber_vert_indices:
-                        for val in node.verts[vert_idx]:
-                            self.mdl.put_float(val)
-                else:
-                    for vert in node.verts:
-                        for val in vert:
-                            self.mdl.put_float(val)
+                if not self.xbox:
+                    if type_flags & NODE_SABER:
+                        for vert_idx in saber_vert_indices:
+                            for val in node.verts[vert_idx]:
+                                self.mdl.put_float(val)
+                    else:
+                        for vert in node.verts:
+                            for val in vert:
+                                self.mdl.put_float(val)
 
                 # Vertex Indices Count, Inverted Mesh Counter, Vertex Indices
                 if not type_flags & NODE_SABER:
@@ -1200,19 +1264,32 @@ class MdlSaver:
                     for vert_idx, vert in enumerate(node.verts):
                         for val in vert:
                             self.mdx.put_float(val)
-                        for val in node.normals[vert_idx]:
-                            self.mdx.put_float(val)
+                        if self.xbox:
+                            comp = self.compress_vector_xbox(node.normals[vert_idx])
+                            self.mdx.put_uint32(comp)
+                        else:
+                            for val in node.normals[vert_idx]:
+                                self.mdx.put_float(val)
                         if node.uv1:
                             for val in node.uv1[vert_idx]:
                                 self.mdx.put_float(val)
                         if node.uv2:
                             for val in node.uv2[vert_idx]:
                                 self.mdx.put_float(val)
+                        # TODO: is it (bitangent, tangent, normal) or transposed TBN matrix?
                         if node.tangentspace:
-                            for i in range(3):
-                                self.mdx.put_float(node.tangents[vert_idx][i])
-                                self.mdx.put_float(node.bitangents[vert_idx][i])
-                                self.mdx.put_float(node.tangentspacenormals[vert_idx][i])
+                            if self.xbox:
+                                comp = self.compress_vector_xbox(node.bitangents[vert_idx])
+                                self.mdx.put_uint32(comp)
+                                comp = self.compress_vector_xbox(node.tangents[vert_idx])
+                                self.mdx.put_uint32(comp)
+                                comp = self.compress_vector_xbox(node.tangentspacenormals[vert_idx])
+                                self.mdx.put_uint32(comp)
+                            else:
+                                for i in range(3):
+                                    self.mdx.put_float(node.tangents[vert_idx][i])
+                                    self.mdx.put_float(node.bitangents[vert_idx][i])
+                                    self.mdx.put_float(node.tangentspacenormals[vert_idx][i])
                         if type_flags & NODE_SKIN:
                             vert_weights = node.weights[vert_idx]
                             bone_weights = []
@@ -1225,11 +1302,18 @@ class MdlSaver:
                                     self.mdx.put_float(bone_weights[i][1])
                                 else:
                                     self.mdx.put_float(0.0)
-                            for i in range(4):
-                                if i < len(bone_weights):
-                                    self.mdx.put_float(float(bone_weights[i][0]))
-                                else:
-                                    self.mdx.put_float(-1.0)
+                            if self.xbox:
+                                for i in range(4):
+                                    if i < len(bone_weights):
+                                        self.mdx.put_uint16(bone_weights[i][0])
+                                    else:
+                                        self.mdx.put_uint16(0xffff)
+                            else:
+                                for i in range(4):
+                                    if i < len(bone_weights):
+                                        self.mdx.put_float(float(bone_weights[i][0]))
+                                    else:
+                                        self.mdx.put_float(-1.0)
                     # Extra MDX data
                     for _ in range(3):
                         self.mdx.put_float(1e+7)
@@ -1242,19 +1326,32 @@ class MdlSaver:
                         for _ in range(2):
                             self.mdx.put_float(0.0)
                     if node.tangentspace:
-                        for _ in range(9):
-                            self.mdx.put_float(0.0)
+                        if self.xbox:
+                            for _ in range(3):
+                                self.mdx.put_uint32(0)
+                        else:
+                            for _ in range(9):
+                                self.mdx.put_float(0.0)
                     if type_flags & NODE_SKIN:
-                        self.mdx.put_float(1.0)
-                        for _ in range(7):
-                            self.mdx.put_float(0.0)
+                        weights = (1.0, 0.0, 0.0, 0.0)
+                        for val in weights:
+                            self.mdx.put_float(val)
+                        if self.xbox:
+                            for _ in range(4):
+                                self.mdx.put_uint16(0)
+                        else:
+                            for _ in range(4):
+                                self.mdx.put_float(0.0)
 
             # Skin Data
 
             if type_flags & NODE_SKIN:
                 # Bonemap
                 for bone_idx in bonemap:
-                    self.mdl.put_float(float(bone_idx))
+                    if self.xbox:
+                        self.mdl.put_uint16(bone_idx if bone_idx != -1 else 0xffff)
+                    else:
+                        self.mdl.put_float(float(bone_idx))
 
                 num_bones = len(bonemap)
 
@@ -1380,25 +1477,51 @@ class MdlSaver:
     def get_mesh_fn_ptr(self, type_flags):
         if type_flags & NODE_SKIN:
             if self.tsl:
-                fn_ptr1 = SKIN_FN_PTR_1_K2_PC
-                fn_ptr2 = SKIN_FN_PTR_2_K2_PC
+                if self.xbox:
+                    fn_ptr1 = SKIN_FN_PTR_1_K2_XBOX
+                    fn_ptr2 = SKIN_FN_PTR_2_K2_XBOX
+                else:
+                    fn_ptr1 = SKIN_FN_PTR_1_K2_PC
+                    fn_ptr2 = SKIN_FN_PTR_2_K2_PC
             else:
-                fn_ptr1 = SKIN_FN_PTR_1_K1_PC
-                fn_ptr2 = SKIN_FN_PTR_2_K1_PC
+                if self.xbox:
+                    fn_ptr1 = SKIN_FN_PTR_1_K1_XBOX
+                    fn_ptr2 = SKIN_FN_PTR_2_K1_XBOX
+                else:
+                    fn_ptr1 = SKIN_FN_PTR_1_K1_PC
+                    fn_ptr2 = SKIN_FN_PTR_2_K1_PC
+
         elif type_flags & NODE_DANGLY:
             if self.tsl:
-                fn_ptr1 = DANGLY_FN_PTR_1_K2_PC
-                fn_ptr2 = DANGLY_FN_PTR_2_K2_PC
+                if self.xbox:
+                    fn_ptr1 = DANGLY_FN_PTR_1_K2_XBOX
+                    fn_ptr2 = DANGLY_FN_PTR_2_K2_XBOX
+                else:
+                    fn_ptr1 = DANGLY_FN_PTR_1_K2_PC
+                    fn_ptr2 = DANGLY_FN_PTR_2_K2_PC
             else:
-                fn_ptr1 = DANGLY_FN_PTR_1_K1_PC
-                fn_ptr2 = DANGLY_FN_PTR_2_K1_PC
+                if self.xbox:
+                    fn_ptr1 = DANGLY_FN_PTR_1_K1_XBOX
+                    fn_ptr2 = DANGLY_FN_PTR_2_K1_XBOX
+                else:
+                    fn_ptr1 = DANGLY_FN_PTR_1_K1_PC
+                    fn_ptr2 = DANGLY_FN_PTR_2_K1_PC
+
         else:
             if self.tsl:
-                fn_ptr1 = MESH_FN_PTR_1_K2_PC
-                fn_ptr2 = MESH_FN_PTR_2_K2_PC
+                if self.xbox:
+                    fn_ptr1 = MESH_FN_PTR_1_K2_XBOX
+                    fn_ptr2 = MESH_FN_PTR_2_K2_XBOX
+                else:
+                    fn_ptr1 = MESH_FN_PTR_1_K2_PC
+                    fn_ptr2 = MESH_FN_PTR_2_K2_PC
             else:
-                fn_ptr1 = MESH_FN_PTR_1_K1_PC
-                fn_ptr2 = MESH_FN_PTR_2_K1_PC
+                if self.xbox:
+                    fn_ptr1 = MESH_FN_PTR_1_K1_XBOX
+                    fn_ptr2 = MESH_FN_PTR_2_K1_XBOX
+                else:
+                    fn_ptr1 = MESH_FN_PTR_1_K1_PC
+                    fn_ptr2 = MESH_FN_PTR_2_K1_PC
 
         return (fn_ptr1, fn_ptr2)
 
@@ -1440,3 +1563,29 @@ class MdlSaver:
         self.mdl.put_uint32(offset)
         self.mdl.put_uint32(count)
         self.mdl.put_uint32(count)
+
+    # TODO: copied from MDLedit, this is most likely wrong
+    def compress_vector_xbox(self, vec):
+        x, y, z = vec
+        if abs(x) > 1.0 or abs(y) > 1.0 or abs(z) > 1.0:
+            return 0
+
+        if z >= 0.0:
+            tmp = round(z * 511.0)
+        else:
+            tmp = (1024 + round(z * 511.0)) & 0x3ff
+        comp = tmp
+
+        if y >= 0.0:
+            tmp = round(y * 1023.0)
+        else:
+            tmp = (2048 + round(y * 1023.0)) & 0x7ff
+        comp = (comp << 11) | tmp
+
+        if x >= 0.0:
+            tmp = round(x * 1023.0)
+        else:
+            tmp = (2048 + round(x * 1023.0)) & 0x7ff
+        comp = (comp << 11) | tmp
+
+        return comp

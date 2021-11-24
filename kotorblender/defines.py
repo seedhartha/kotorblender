@@ -157,6 +157,7 @@ class ImportOptions:
 class ExportOptions:
     def __init__(self):
         self.export_for_tsl = False
+        self.export_for_xbox = False
         self.export_animations = True
         self.export_walkmeshes = True
         self.export_custom_normals = True

@@ -99,7 +99,7 @@ def save_mdl(operator, filepath, options):
     # Export MDL
     model = Model.from_mdl_root(mdl_root, options)
     operator.report({'INFO'}, "Saving model to '{}'".format(filepath))
-    mdl = MdlSaver(filepath, model, options.export_for_tsl)
+    mdl = MdlSaver(filepath, model, options.export_for_tsl, options.export_for_xbox)
     mdl.save()
 
     if options.export_walkmeshes:
