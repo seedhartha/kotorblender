@@ -49,7 +49,6 @@ def load_mdl(operator, filepath, options, position=(0.0, 0.0, 0.0)):
             aabb = model.find_node(lambda n: isinstance(n, AabbNode))
             aabb_wok = walkmesh.find_node(lambda n: isinstance(n, AabbNode))
             if aabb and aabb_wok:
-                aabb.bwmposition = aabb_wok.bwmposition
                 aabb.roomlinks = aabb_wok.roomlinks
                 aabb.compute_lyt_position(aabb_wok)
 

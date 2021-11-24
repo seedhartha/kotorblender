@@ -148,11 +148,11 @@ class BwmLoader:
         root_node = DummyNode("{}_wok".format(self.model_name))
 
         geom_node = AabbNode("{}_wok_wg".format(self.model_name))
-        geom_node.parent = root_node
         geom_node.roottype = RootType.WALKMESH
+        geom_node.position = self.position
+        geom_node.parent = root_node
         geom_node.verts = self.verts
         geom_node.facelist = self.facelist
-        geom_node.bwmposition = self.position
         geom_node.roomlinks = {edge_idx: transition for edge_idx, transition in self.outer_edges if transition != -1}
 
         root_node.children.append(geom_node)
@@ -186,10 +186,10 @@ class BwmLoader:
 
         geom_node = AabbNode(geom_name)
         geom_node.roottype = RootType.WALKMESH
+        geom_node.position = self.position
         geom_node.parent = root_node
         geom_node.verts = self.verts
         geom_node.facelist = self.facelist
-        geom_node.bwmposition = self.position
 
         use_node1 = DummyNode(use_name1)
         use_node1.dummytype = DummyType.USE1
