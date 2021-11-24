@@ -118,10 +118,6 @@ class ObjectPropertyGroup(bpy.types.PropertyGroup):
                                            subtype='COLOR_GAMMA',
                                            default=(0.2, 0.2, 0.2),
                                            min=0.0, max=1.0)
-
-    bwmposition: bpy.props.FloatVectorProperty(name="BWM Position",
-                                               description="Walkmesh position in BWM file",
-                                               subtype='XYZ')
     lytposition: bpy.props.FloatVectorProperty(name="LYT Position",
                                                description="Room position in LYT file",
                                                subtype='XYZ')

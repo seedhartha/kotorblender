@@ -150,9 +150,9 @@ class BwmSaver:
             self.new_vert_by_old_vert[vert_idx] = num_unique
             num_unique += 1
 
-        # Offset by BWM and LYT position
+        # Offset by node and LYT position
         for vert_idx, vert in enumerate(self.verts):
-            self.verts[vert_idx] = [vert[i] + self.geom_node.lytposition[i] + self.geom_node.bwmposition[i] for i in range(3)]
+            self.verts[vert_idx] = [vert[i] + self.geom_node.position[i] + self.geom_node.lytposition[i] for i in range(3)]
 
     def peek_faces(self):
         walkable_face_indices = []
@@ -263,7 +263,7 @@ class BwmSaver:
     def save_header(self):
         rel_use_vec1 = self.use_node1.position if self.use_node1 else [0.0] * 3
         rel_use_vec2 = self.use_node2.position if self.use_node2 else [0.0] * 3
-        position = self.geom_node.bwmposition
+        position = self.geom_node.position
 
         if self.walkmesh.walkmesh_type == WalkmeshType.DWK:
             abs_use_vec1 = [position[i] + rel_use_vec1[i] for i in range(3)]

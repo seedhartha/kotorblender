@@ -37,11 +37,11 @@ class AabbNode(TrimeshNode):
         self.nodetype = NodeType.AABB
         self.meshtype = MeshType.AABB
 
-        self.bwmposition = (0.0, 0.0, 0.0)
         self.lytposition = (0.0, 0.0, 0.0)
         self.roomlinks = dict()
 
     def compute_lyt_position(self, wok_geom):
+        wok_position = Vector(wok_geom.position)
         wok_vert = Vector(wok_geom.verts[wok_geom.facelist.vertices[0][0]])
         wok_mat_id = wok_geom.facelist.materials[0]
         for i in range(len(self.facelist.vertices)):
@@ -49,7 +49,7 @@ class AabbNode(TrimeshNode):
             if mdl_mat_id == wok_mat_id:
                 mdl_vert = self.verts[self.facelist.vertices[i][0]]
                 mdl_vert_from_root = self.from_root @ Vector(mdl_vert)
-                self.lytposition = wok_vert - mdl_vert_from_root + Vector(self.bwmposition)
+                self.lytposition = wok_vert + wok_position - mdl_vert_from_root
                 break
 
     def add_to_collection(self, collection, options):
@@ -149,13 +149,11 @@ class AabbNode(TrimeshNode):
     def set_object_data(self, obj, options):
         TrimeshNode.set_object_data(self, obj, options)
 
-        obj.kb.bwmposition = self.bwmposition
         obj.kb.lytposition = self.lytposition
 
     def load_object_data(self, obj, options):
         TrimeshNode.load_object_data(self, obj, options)
 
-        self.bwmposition = obj.kb.bwmposition
         self.lytposition = obj.kb.lytposition
 
         self.unapply_room_links()
