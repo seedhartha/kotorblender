@@ -1276,7 +1276,6 @@ class MdlSaver:
                         if node.uv2:
                             for val in node.uv2[vert_idx]:
                                 self.mdx.put_float(val)
-                        # TODO: is it (bitangent, tangent, normal) or transposed TBN matrix?
                         if node.tangentspace:
                             if self.xbox:
                                 comp = self.compress_vector_xbox(node.bitangents[vert_idx])
@@ -1286,10 +1285,12 @@ class MdlSaver:
                                 comp = self.compress_vector_xbox(node.tangentspacenormals[vert_idx])
                                 self.mdx.put_uint32(comp)
                             else:
-                                for i in range(3):
-                                    self.mdx.put_float(node.tangents[vert_idx][i])
-                                    self.mdx.put_float(node.bitangents[vert_idx][i])
-                                    self.mdx.put_float(node.tangentspacenormals[vert_idx][i])
+                                for val in node.bitangents[vert_idx]:
+                                    self.mdx.put_float(val)
+                                for val in node.tangents[vert_idx]:
+                                    self.mdx.put_float(val)
+                                for val in node.tangentspacenormals[vert_idx]:
+                                    self.mdx.put_float(val)
                         if type_flags & NODE_SKIN:
                             vert_weights = node.weights[vert_idx]
                             bone_weights = []
