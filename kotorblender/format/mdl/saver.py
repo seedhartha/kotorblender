@@ -1130,11 +1130,11 @@ class MdlSaver:
                     bonemap[bone_node_idx] = bone_idx
 
                 if self.xbox:
-                    off_mdx_bone_weights = mdx_data_size - 4 * 6
-                    off_mdx_bone_indices = mdx_data_size - 4 * 2
+                    off_mdx_bone_indices = mdx_data_size - 2 * 4
+                    off_mdx_bone_weights = off_mdx_bone_indices - 4 * 4
                 else:
-                    off_mdx_bone_weights = mdx_data_size - 4 * 8
                     off_mdx_bone_indices = mdx_data_size - 4 * 4
+                    off_mdx_bone_weights = off_mdx_bone_indices - 4 * 4
                 off_bonemap = self.bonemap_offsets[node_idx]
                 num_bones = len(self.nodes)
 
@@ -1318,8 +1318,11 @@ class MdlSaver:
                     # Extra MDX data
                     for _ in range(3):
                         self.mdx.put_float(1e+7)
-                    for _ in range(3):
-                        self.mdx.put_float(0.0)
+                    if self.xbox:
+                        self.mdx.put_uint32(0)
+                    else:
+                        for _ in range(3):
+                            self.mdx.put_float(0.0)
                     if node.uv1:
                         for _ in range(2):
                             self.mdx.put_float(0.0)
@@ -1565,28 +1568,26 @@ class MdlSaver:
         self.mdl.put_uint32(count)
         self.mdl.put_uint32(count)
 
-    # TODO: copied from MDLedit, this is most likely wrong
     def compress_vector_xbox(self, vec):
         x, y, z = vec
         if abs(x) > 1.0 or abs(y) > 1.0 or abs(z) > 1.0:
             return 0
 
-        if z >= 0.0:
-            tmp = round(z * 511.0)
-        else:
-            tmp = (1024 + round(z * 511.0)) & 0x3ff
+        tmp = round(511.0 * z)
+        if z < 0.0:
+            tmp = 1023 + tmp
         comp = tmp
 
-        if y >= 0.0:
-            tmp = round(y * 1023.0)
-        else:
-            tmp = (2048 + round(y * 1023.0)) & 0x7ff
+        tmp = round(1023.0 * y)
+        if y < 0.0:
+            tmp = 2047 + tmp
         comp = (comp << 11) | tmp
 
-        if x >= 0.0:
-            tmp = round(x * 1023.0)
-        else:
-            tmp = (2048 + round(x * 1023.0)) & 0x7ff
+        tmp = round(1023.0 * x)
+        if x < 0.0:
+            tmp = 2047 + tmp
         comp = (comp << 11) | tmp
+
+        print("Compressed x={:.4f} y={:.4f} z={:.4f} to {:08x}".format(x, y, z, comp))
 
         return comp

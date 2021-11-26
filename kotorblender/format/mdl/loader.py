@@ -785,24 +785,23 @@ class MdlLoader:
 
         return ArrayDefinition(offset, count1)
 
-    # TODO: copied from MDLedit, this is most likely wrong
     def decompress_vector_xbox(self, comp):
         tmp = comp & 0x7ff
         if tmp < 1024:
             x = tmp / 1023.0
         else:
-            x = (2048 - tmp) / 1023.0 * -1.0
+            x = (tmp - 2047) / 1023.0
 
         tmp = (comp >> 11) & 0x7ff
         if tmp < 1024:
             y = tmp / 1023.0
         else:
-            y = (2048 - tmp) / 1023.0 * -1.0
+            y = (tmp - 2047) / 1023.0
 
         tmp = comp >> 22
         if tmp < 512:
             z = tmp / 511.0
         else:
-            z = (1024 - tmp) / 511.0 * -1.0
+            z = (tmp - 1023) / 511.0
 
         return (x, y, z)
