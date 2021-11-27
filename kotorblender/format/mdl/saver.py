@@ -1588,6 +1588,4 @@ class MdlSaver:
             tmp = 2047 + tmp
         comp = (comp << 11) | tmp
 
-        print("Compressed x={:.4f} y={:.4f} z={:.4f} to {:08x}".format(x, y, z, comp))
-
         return comp
