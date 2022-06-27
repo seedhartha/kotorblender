@@ -380,8 +380,13 @@ class TrimeshNode(GeometryNode):
         if not layer_name in mesh.uv_layers:
             return []
         layer_data = mesh.uv_layers[layer_name].data
-        tverts = dict()
+        tvert_by_vert_idx = dict()
         for tri in mesh.loop_triangles:
             for vert_idx, loop_idx in zip(tri.vertices, tri.loops):
-                tverts[vert_idx] = layer_data[loop_idx].uv[:2]
-        return [v for _, v in sorted(tverts.items())]
+                tvert_by_vert_idx[vert_idx] = layer_data[loop_idx].uv[:2]
+        tverts = []
+        max_vert_idx = max([i for i in tvert_by_vert_idx.keys()])
+        for i in range(0, max_vert_idx + 1):
+            tvert = tvert_by_vert_idx[i] if i in tvert_by_vert_idx else [0.0, 0.0]
+            tverts.append(tvert)
+        return tverts
