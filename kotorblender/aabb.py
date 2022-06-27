@@ -18,6 +18,8 @@
 
 from mathutils import Vector
 
+from . import utils
+
 
 def generate_tree(aabb_tree, face_list, rlevel=0):
     if rlevel > 128:
@@ -49,18 +51,19 @@ def generate_tree(aabb_tree, face_list, rlevel=0):
         return
 
     # Find longest axis
-    split_axis = 0
     bb_size = bb_max - bb_min
-    if bb_size.y > bb_size.x:
+    if bb_size.y > bb_size.x and bb_size.y > bb_size.z:
         split_axis = 1
-    if bb_size.z > bb_size.y:
+    elif bb_size.z > bb_size.x and bb_size.z > bb_size.y:
         split_axis = 2
+    else:
+        split_axis = 0
 
     # Change axis in case points are coplanar with the split plane
     change_axis = True
     for face in face_list:
         face_centroid = face[2]
-        change_axis = change_axis and face_centroid[split_axis] == bb_centroid[split_axis]
+        change_axis = change_axis and utils.is_close(face_centroid[split_axis], bb_centroid[split_axis], 1e-4)
     if change_axis:
         split_axis += 1
         if split_axis == 3:
@@ -70,8 +73,10 @@ def generate_tree(aabb_tree, face_list, rlevel=0):
     # lists. Try all axises to prevent tree degeneration.
     face_list_left = []
     face_list_right = []
-    tested_axes = 1
-    while True:
+    for i in range(0, 4):
+        if i == 3:
+            raise RuntimeError("Generated tree is degenerate")
+
         # Sort faces by side
         face_list_left = []
         face_list_right = []
@@ -90,9 +95,6 @@ def generate_tree(aabb_tree, face_list, rlevel=0):
         split_axis += 1
         if split_axis == 3:
             split_axis = 0
-        tested_axes += 1
-        if tested_axes == 3:
-            raise RuntimeError("Generated tree is degenerate")
 
     node = [*bb_min[:3], *bb_max[:3], 0, 0, -1, 1 + split_axis]
     aabb_tree.append(node)
