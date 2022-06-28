@@ -23,7 +23,7 @@ from bpy_extras import image_utils
 from .. import utils
 
 
-def rebuild_object_material(obj, texture_path=""):
+def rebuild_object_material(obj, texture_search_paths=[]):
     material = get_or_create_material(obj)
 
     mesh = obj.data
@@ -34,7 +34,7 @@ def rebuild_object_material(obj, texture_path=""):
     if utils.is_null(obj.kb.bitmap) and utils.is_null(obj.kb.bitmap2):
         rebuild_material_simple(material, obj)
     else:
-        rebuild_material_nodes(material, obj, texture_path)
+        rebuild_material_nodes(material, obj, texture_search_paths)
 
 
 def get_or_create_material(obj):
@@ -60,7 +60,7 @@ def rebuild_material_simple(material, obj):
     material.diffuse_color = [*obj.kb.diffuse, 1.0]
 
 
-def rebuild_material_nodes(material, obj, texture_path):
+def rebuild_material_nodes(material, obj, texture_search_paths):
     material.use_nodes = True
     links = material.node_tree.links
     links.clear()
@@ -97,7 +97,7 @@ def rebuild_material_nodes(material, obj, texture_path):
     if utils.is_not_null(obj.kb.bitmap):
         diffuse = nodes.new("ShaderNodeTexImage")
         diffuse.location = (300, 0)
-        diffuse.image = get_or_create_texture(obj.kb.bitmap, texture_path).image
+        diffuse.image = get_or_create_texture(obj.kb.bitmap, texture_search_paths).image
         links.new(mul_diffuse_by_lightmap.inputs[0], diffuse.outputs[0])
         links.new(mul_alpha.inputs[0], diffuse.outputs[1])
 
@@ -109,7 +109,7 @@ def rebuild_material_nodes(material, obj, texture_path):
 
         lightmap = nodes.new("ShaderNodeTexImage")
         lightmap.location = (300, -300)
-        lightmap.image = get_or_create_texture(obj.kb.bitmap2, texture_path).image
+        lightmap.image = get_or_create_texture(obj.kb.bitmap2, texture_search_paths).image
 
         material.shadow_method = 'NONE'
         links.new(lightmap.inputs[0], lightmap_uv.outputs[0])
@@ -124,14 +124,14 @@ def rebuild_material_nodes(material, obj, texture_path):
     links.new(output.inputs[0], shader.outputs[0])
 
 
-def get_or_create_texture(name, texture_path):
+def get_or_create_texture(name, texture_search_paths):
     if name in bpy.data.textures:
         return bpy.data.textures[name]
 
     if name in bpy.data.images:
         image = bpy.data.images[name]
     else:
-        image = create_image(name, texture_path)
+        image = create_image(name, texture_search_paths)
 
     texture = bpy.data.textures.new(name, type='IMAGE')
     texture.image = image
@@ -140,16 +140,16 @@ def get_or_create_texture(name, texture_path):
     return texture
 
 
-def create_image(name, texture_path):
-    image = image_utils.load_image(
-        name + ".tga",
-        texture_path,
-        recursive=False,
-        place_holder=False,
-        ncase_cmp=True)
-
-    if image:
-        image.name = name
-        return image
+def create_image(name, texture_search_paths):
+    for path in texture_search_paths:
+        image = image_utils.load_image(
+            name + ".tga",
+            path,
+            recursive=False,
+            place_holder=False,
+            ncase_cmp=True)
+        if image:
+            image.name = name
+            return image
 
     return bpy.data.images.new(name, 512, 512)

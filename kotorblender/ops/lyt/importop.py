@@ -70,9 +70,9 @@ class KB_OT_import_lyt(bpy.types.Operator, ImportHelper):
         default=radians(10.0), min=0.0, max=radians(90.0),
         subtype='ANGLE')
 
-    texture_path: bpy.props.StringProperty(
-        name="Texture Path",
-        description="Texture path relative to imported layout directory")
+    texture_search_paths: bpy.props.StringProperty(
+        name="Texture Search Paths",
+        description="Colon-separated list of paths relative to imported layout")
 
     def execute(self, context):
         options = ImportOptions()
@@ -81,7 +81,7 @@ class KB_OT_import_lyt(bpy.types.Operator, ImportHelper):
         options.build_materials = self.build_materials
         options.normals_algorithm = self.normals_algorithm
         options.sharp_edge_angle = self.sharp_edge_angle
-        options.texture_path = self.texture_path if os.path.isabs(self.texture_path) else os.path.join(os.path.dirname(self.filepath), self.texture_path)
+        options.texture_search_paths = self.colon_separated_paths_to_absolute_paths(self.texture_search_paths, os.path.dirname(self.filepath))
 
         try:
             lyt.load_lyt(self, self.filepath, options)
@@ -90,3 +90,13 @@ class KB_OT_import_lyt(bpy.types.Operator, ImportHelper):
             self.report({'ERROR'}, str(e))
 
         return {'FINISHED'}
+
+    def colon_separated_paths_to_absolute_paths(self, paths_str, working_dir):
+        abs_paths = []
+        rel_paths = paths_str.split(":")
+        for rel_path in rel_paths:
+            abs_path = rel_path if os.path.isabs(rel_path) else os.path.join(working_dir, rel_path)
+            abs_paths.append(abs_path)
+        if working_dir not in abs_paths:
+            abs_paths.append(working_dir)
+        return abs_paths
