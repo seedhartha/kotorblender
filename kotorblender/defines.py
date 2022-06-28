@@ -151,7 +151,6 @@ class ImportOptions:
         self.normals_algorithm = NormalsAlgorithm.CUSTOM
         self.sharp_edge_angle = radians(10.0)
         self.texture_path = ""
-        self.texture_search_recursive = False
 
 
 class ExportOptions:

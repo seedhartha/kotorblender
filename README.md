@@ -62,10 +62,6 @@ Fine-tuning:
 1. Ensure that brush blending mode is set to Mix, and brush strength is set to 1.0
 1. Paint over the selected vertices
 
-## Trivia
-
-- Check "Recursive Texture Search" when importing to recursively search for textures in subdirectories
-
 ## Compatibility
 
 - Blender 2.93
