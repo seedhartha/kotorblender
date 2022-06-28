@@ -72,7 +72,8 @@ class KB_OT_import_lyt(bpy.types.Operator, ImportHelper):
 
     texture_search_paths: bpy.props.StringProperty(
         name="Texture Search Paths",
-        description="Colon-separated list of paths relative to imported layout")
+        description="Colon-separated list of paths relative to imported layout",
+        default="../texturepacks/swpc_tex_tpa")
 
     def execute(self, context):
         options = ImportOptions()
