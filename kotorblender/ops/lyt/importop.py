@@ -70,9 +70,9 @@ class KB_OT_import_lyt(bpy.types.Operator, ImportHelper):
         default=radians(10.0), min=0.0, max=radians(90.0),
         subtype='ANGLE')
 
-    texture_search_recursive: bpy.props.BoolProperty(
-        name="Recursive Texture Search",
-        description="Search for textures in subdirectories")
+    texture_path: bpy.props.StringProperty(
+        name="Texture Path",
+        description="Texture path relative to imported layout directory")
 
     def execute(self, context):
         options = ImportOptions()
@@ -81,8 +81,7 @@ class KB_OT_import_lyt(bpy.types.Operator, ImportHelper):
         options.build_materials = self.build_materials
         options.normals_algorithm = self.normals_algorithm
         options.sharp_edge_angle = self.sharp_edge_angle
-        options.texture_path = os.path.dirname(self.filepath)
-        options.texture_search_recursive = self.texture_search_recursive
+        options.texture_path = self.texture_path if os.path.isabs(self.texture_path) else os.path.join(os.path.dirname(self.filepath), self.texture_path)
 
         try:
             lyt.load_lyt(self, self.filepath, options)

@@ -102,7 +102,7 @@ class TrimeshNode(GeometryNode):
         self.set_object_data(obj, options)
 
         if options.build_materials and self.roottype == RootType.MODEL:
-            material.rebuild_object_material(obj, options.texture_path, options.texture_search_recursive)
+            material.rebuild_object_material(obj, options.texture_path)
 
         collection.objects.link(obj)
         return obj
