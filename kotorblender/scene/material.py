@@ -145,7 +145,7 @@ def create_image(name, texture_search_paths):
         image = image_utils.load_image(
             name + ".tga",
             path,
-            recursive=False,
+            recursive=True,
             place_holder=False,
             ncase_cmp=True)
         if image:
