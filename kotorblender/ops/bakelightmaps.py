@@ -84,19 +84,19 @@ class KB_OT_bake_lightmaps(bpy.types.Operator):
         output_node = next((node for node in nodes if node.type == 'OUTPUT_MATERIAL'), None)
         if not output_node:
             self.report({'WARNING'}, "Object '{}' material does not contain output material node".format(obj.name))
-            return
+            return False
         bsdf_node = next((node for node in nodes if node.type == 'BSDF_PRINCIPLED'), None)
         if not bsdf_node:
             self.report({'WARNING'}, "Object '{}' material does not contain BSDF node".format(obj.name))
-            return
+            return False
         diffuse_by_lightmap_node = next((node for node in nodes if node.name == DIFFUSE_BY_LIGHTMAP_NODE_NAME), None)
         if not diffuse_by_lightmap_node:
             self.report({'WARNING'}, "Object '{}' material does not contain diffuse by lightmap node".format(obj.name))
-            return
+            return False
         alpha_node = next((node for node in nodes if node.name == ALPHA_NODE_NAME), None)
         if not alpha_node:
             self.report({'WARNING'}, "Object '{}' material does not contain alpha node".format(obj.name))
-            return
+            return False
         lightmap_node = next((node for node in nodes if node.type == 'TEX_IMAGE' and node.image.name == obj.kb.bitmap2), None)
         if not lightmap_node:
             self.report({'WARNING'}, "Object '{}' material does not contain lightmap texture node".format(obj.name))
