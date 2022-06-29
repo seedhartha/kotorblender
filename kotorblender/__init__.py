@@ -46,6 +46,7 @@ from .props.animevent import AnimEventPropertyGroup
 from .props.lensflare import LensFlarePropertyGroup
 from .props.object import ObjectPropertyGroup
 from .props.pathconnection import PathConnectionPropertyGroup
+from .props.scene import ScenePropertyGroup
 from .ui.list.lensflares import KB_UL_lens_flares
 from .ui.list.pathpoints import KB_UL_path_points
 from .ui.panel.animations import KB_PT_animations, KB_PT_anim_events
@@ -113,6 +114,7 @@ classes = (
     AnimPropertyGroup,
     LensFlarePropertyGroup,
     ObjectPropertyGroup,
+    ScenePropertyGroup,
 
     # Operators
 
@@ -187,6 +189,7 @@ def register():
         bpy.utils.register_class(cls)
 
     bpy.types.Object.kb = bpy.props.PointerProperty(type=ObjectPropertyGroup)
+    bpy.types.Scene.kb = bpy.props.PointerProperty(type=ScenePropertyGroup)
 
     bpy.types.TOPBAR_MT_file_import.append(menu_func_import_mdl)
     bpy.types.TOPBAR_MT_file_import.append(menu_func_import_lyt)

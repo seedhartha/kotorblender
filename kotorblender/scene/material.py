@@ -22,6 +22,9 @@ from bpy_extras import image_utils
 
 from .. import utils
 
+DIFFUSE_BY_LIGHTMAP_NODE_NAME = "Diffuse By Lightmap"
+ALPHA_NODE_NAME = "Multiply Alpha"
+
 
 def rebuild_object_material(obj, texture_search_paths=[]):
     material = get_or_create_material(obj)
@@ -81,6 +84,7 @@ def rebuild_material_nodes(material, obj, texture_search_paths):
 
     # Multiply diffuse by lightmap node
     mul_diffuse_by_lightmap = nodes.new("ShaderNodeVectorMath")
+    mul_diffuse_by_lightmap.name = DIFFUSE_BY_LIGHTMAP_NODE_NAME
     mul_diffuse_by_lightmap.location = (600, 0)
     mul_diffuse_by_lightmap.operation = 'MULTIPLY'
     mul_diffuse_by_lightmap.inputs[0].default_value = [1.0] * 3
@@ -88,6 +92,7 @@ def rebuild_material_nodes(material, obj, texture_search_paths):
 
     # Alpha node
     mul_alpha = nodes.new("ShaderNodeMath")
+    mul_alpha.name = ALPHA_NODE_NAME
     mul_alpha.location = (600, -300)
     mul_alpha.operation = 'MULTIPLY'
     mul_alpha.inputs[0].default_value = 1.0
