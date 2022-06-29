@@ -51,9 +51,6 @@ class KB_OT_bake_lightmaps(bpy.types.Operator):
         # Bake lightmaps
         context.scene.cycles.samples = context.scene.kb.bake_samples
         bpy.ops.object.bake(
-            type='COMBINED',
-            pass_filter={'EMIT', 'DIRECT', 'INDIRECT', 'COLOR', 'DIFFUSE', 'GLOSSY', 'TRANSMISSION'},
-            margin_type='ADJACENT_FACES',
             margin=context.scene.kb.bake_margin,
             use_clear=True)
 
