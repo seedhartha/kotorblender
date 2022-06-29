@@ -19,22 +19,6 @@
 import bpy
 
 
-class KB_PT_lightmaps(bpy.types.Panel):
-    bl_label = "KotOR Lightmaps"
-    bl_space_type = 'PROPERTIES'
-    bl_region_type = 'WINDOW'
-    bl_context = "render"
-    COMPAT_ENGINES = {'CYCLES'}
-
-    @classmethod
-    def poll(cls, context):
-        return (context.engine in cls.COMPAT_ENGINES)
-
-    def draw(self, context):
-        layout = self.layout
-        row = layout.row()
-        row.prop(context.scene.kb, "bake_samples")
-        row = layout.row()
-        row.prop(context.scene.kb, "bake_margin")
-        row = layout.row()
-        row.operator("kb.bake_lightmaps")
+class ScenePropertyGroup(bpy.types.PropertyGroup):
+    bake_samples: bpy.props.IntProperty(name="Samples", min=1, max=(1 << 24), default=1024)
+    bake_margin: bpy.props.IntProperty(name="Margin", default=2)
