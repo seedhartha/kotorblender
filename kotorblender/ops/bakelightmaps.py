@@ -20,6 +20,8 @@ import bpy
 
 from .. import utils
 
+from ..defines import MeshType
+
 UV_MAP_LIGHTMAP = "UVMap_lm"
 
 
@@ -27,18 +29,15 @@ class KB_OT_bake_lightmaps(bpy.types.Operator):
     bl_idname = "kb.bake_lightmaps"
     bl_label = "Bake Lightmaps"
 
-    @classmethod
-    def poll(cls, context):
-        return len(context.selected_objects) > 0
-
     def execute(self, context):
+        objects = context.selected_objects if len(context.selected_objects) > 0 else context.collection.objects
+
         bakeable_objects = []
-        for obj in context.selected_objects:
-            if not self.can_bake_object_lightmap(obj):
-                continue
-            if not self.prepare_object(obj):
-                continue
-            bakeable_objects.append(obj)
+        for obj in objects:
+            bakeable = self.is_bakeable_object(obj)
+            if bakeable:
+                bakeable_objects.append(obj)
+            self.preprocess_object(obj, bakeable)
 
         # Select only bakeable objects
         bpy.ops.object.select_all(action='DESELECT')
@@ -50,28 +49,41 @@ class KB_OT_bake_lightmaps(bpy.types.Operator):
 
         return {'FINISHED'}
 
-    def can_bake_object_lightmap(self, obj):
-        if obj.type == 'MESH' and obj.kb.lightmapped or utils.is_not_null(obj.kb.bitmap2):
-            return True
-        else:
+    def is_bakeable_object(self, obj):
+        if obj.type != 'MESH':
+            return False
+        if not obj.kb.lightmapped:
+            return False
+        if utils.is_null(obj.kb.bitmap2):
             return False
 
-    def prepare_object(self, obj):
-        mesh = obj.data
-
-        # Activate lightmap UV map
-        if not UV_MAP_LIGHTMAP in mesh.uv_layers:
+        # Must contain lightmap UV map
+        if not UV_MAP_LIGHTMAP in obj.data.uv_layers:
             return False
-        uv_layer = mesh.uv_layers[UV_MAP_LIGHTMAP]
-        uv_layer.active = True
 
-        # Activate lightmap material node
+        # Must contain lightmap material node
         if not obj.active_material.use_nodes:
             return False
         nodes = obj.active_material.node_tree.nodes
-        lm_node = next((node for node in nodes if node.type == 'TEX_IMAGE' and node.image.name == obj.kb.bitmap2), None)
-        if not lm_node:
+        lightmap_node = next((node for node in nodes if node.type == 'TEX_IMAGE' and node.image.name == obj.kb.bitmap2), None)
+        if not lightmap_node:
             return False
-        nodes.active = lm_node
+
+        return True
+
+    def preprocess_object(self, obj, bakeable):
+        if bakeable:
+            # Activate lightmap UV map
+            uv_layer = obj.data.uv_layers[UV_MAP_LIGHTMAP]
+            uv_layer.active = True
+
+            # Activate lightmap material node
+            nodes = obj.active_material.node_tree.nodes
+            lightmap_node = next((node for node in nodes if node.type == 'TEX_IMAGE' and node.image.name == obj.kb.bitmap2), None)
+            nodes.active = lightmap_node
+
+        if obj.type == 'MESH':
+            if obj.kb.meshtype == MeshType.AABB:
+                obj.hide_render = True
 
         return True
