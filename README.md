@@ -37,7 +37,7 @@ UV mapping:
 Baking lightmaps:
 
 1. Select objects to bake lightmaps for
-    1. If no object is selected, all objects from selected collection will be used
+    1. If no object is selected, all objects from active collection will be used
 1. In Render Properties
     1. Set Render Engine to Cycles
     1. Set Device to GPU Compute, if available

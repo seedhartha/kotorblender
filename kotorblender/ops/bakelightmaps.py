@@ -62,6 +62,8 @@ class KB_OT_bake_lightmaps(bpy.types.Operator):
     def is_bakeable_object(self, obj):
         if obj.type != 'MESH':
             return False
+        if obj.kb.meshtype in [MeshType.EMITTER, MeshType.AABB]:
+            return False
         if not obj.kb.lightmapped:
             return False
         if utils.is_null(obj.kb.bitmap2):
@@ -126,7 +128,7 @@ class KB_OT_bake_lightmaps(bpy.types.Operator):
             lightmap_node = next((node for node in nodes if node.type == 'TEX_IMAGE' and node.image.name == obj.kb.bitmap2), None)
             nodes.active = lightmap_node
 
-        if obj.type == 'MESH' and obj.kb.meshtype == MeshType.AABB:
+        if obj.type == 'MESH' and obj.kb.meshtype in [MeshType.EMITTER, MeshType.AABB]:
             obj.hide_render = True
 
         return True
