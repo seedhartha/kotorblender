@@ -72,7 +72,7 @@ class KB_PT_mesh(bpy.types.Panel):
         col.prop(obj.kb, "dirt_enabled")
 
         row = layout.row()
-        row.operator("kb.rebuild_materials")
+        row.operator("kb.rebuild_material")
 
 
 class KB_PT_mesh_uv_anim(bpy.types.Panel):

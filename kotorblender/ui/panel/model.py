@@ -51,3 +51,5 @@ class KB_PT_model(bpy.types.Panel):
         row.operator("kb.assign_node_numbers")
         row = layout.row()
         row.operator("kb.rebuild_armature")
+        row = layout.row()
+        row.operator("kb.rebuild_all_materials")

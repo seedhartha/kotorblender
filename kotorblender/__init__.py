@@ -39,8 +39,9 @@ from .ops.pth.addconnection import KB_OT_add_path_connection
 from .ops.pth.export import KB_OT_export_pth
 from .ops.pth.importop import KB_OT_import_pth
 from .ops.pth.removeconnection import KB_OT_delete_path_connection
+from .ops.rebuildallmaterials import KB_OT_rebuild_all_materials
 from .ops.rebuildarmature import KB_OT_rebuild_armature
-from .ops.rebuildmaterials import KB_OT_rebuild_materials
+from .ops.rebuildmaterial import KB_OT_rebuild_material
 from .props.anim import AnimPropertyGroup
 from .props.animevent import AnimEventPropertyGroup
 from .props.lensflare import LensFlarePropertyGroup
@@ -126,8 +127,9 @@ classes = (
     KB_OT_import_mdl,
     KB_OT_import_pth,
     KB_OT_load_wok_materials,
+    KB_OT_rebuild_all_materials,
     KB_OT_rebuild_armature,
-    KB_OT_rebuild_materials,
+    KB_OT_rebuild_material,
 
     KB_OT_add_anim_event,
     KB_OT_move_anim_event,
