@@ -65,6 +65,7 @@ def rebuild_material_simple(material, obj):
 
 def rebuild_material_nodes(material, obj, texture_search_paths):
     material.use_nodes = True
+    material.use_backface_culling = True
     links = material.node_tree.links
     links.clear()
     nodes = material.node_tree.nodes
