@@ -82,7 +82,7 @@ class KB_PT_mesh_uv_anim(bpy.types.Panel):
     bl_region_type = 'WINDOW'
     bl_context = "object"
 
-    @ classmethod
+    @classmethod
     def poll(cls, context):
         obj = context.object
         return (obj and
@@ -112,7 +112,7 @@ class KB_PT_mesh_dirt(bpy.types.Panel):
     bl_region_type = 'WINDOW'
     bl_context = "object"
 
-    @ classmethod
+    @classmethod
     def poll(cls, context):
         obj = context.object
         return (obj and
@@ -138,7 +138,7 @@ class KB_PT_mesh_dangly(bpy.types.Panel):
     bl_region_type = 'WINDOW'
     bl_context = "object"
 
-    @ classmethod
+    @classmethod
     def poll(cls, context):
         obj = context.object
         return utils.is_mesh_type(obj, MeshType.DANGLYMESH)
@@ -165,7 +165,7 @@ class KB_PT_mesh_aabb(bpy.types.Panel):
     bl_region_type = 'WINDOW'
     bl_context = "object"
 
-    @ classmethod
+    @classmethod
     def poll(cls, context):
         obj = context.object
         return utils.is_mesh_type(obj, MeshType.AABB)
