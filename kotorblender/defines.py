@@ -151,6 +151,7 @@ class ImportOptions:
         self.normals_algorithm = NormalsAlgorithm.CUSTOM
         self.sharp_edge_angle = radians(10.0)
         self.texture_search_paths = []
+        self.lightmap_search_paths = []
 
 
 class ExportOptions:
