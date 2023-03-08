@@ -27,6 +27,19 @@ from .ops.anim.move import KB_OT_move_animation
 from .ops.anim.play import KB_OT_play_animation
 from .ops.assignnodenumbers import KB_OT_assign_node_numbers
 from .ops.bakelightmaps import KB_OT_bake_lightmaps
+from .ops.hideobjects import (
+    KB_OT_hide_walkmeshes,
+    KB_OT_hide_lights,
+    KB_OT_hide_blockers,
+    KB_OT_hide_charbones,
+    KB_OT_hide_charnulls,
+    KB_OT_unhide_walkmeshes,
+    KB_OT_unhide_lights,
+    KB_OT_unhide_blockers,
+    KB_OT_unhide_charbones,
+    KB_OT_unhide_charnulls,
+    KB_OT_unhide_all
+)
 from .ops.lensflare.add import KB_OT_add_lens_flare
 from .ops.lensflare.delete import KB_OT_delete_lens_flare
 from .ops.lensflare.move import KB_OT_move_lens_flare
@@ -50,6 +63,7 @@ from .props.pathconnection import PathConnectionPropertyGroup
 from .props.scene import ScenePropertyGroup
 from .ui.list.lensflares import KB_UL_lens_flares
 from .ui.list.pathpoints import KB_UL_path_points
+from .ui.menu.hideobjectsmenu import KB_MT_hide_menu
 from .ui.panel.animations import KB_PT_animations, KB_PT_anim_events
 from .ui.panel.lightmaps import KB_PT_lightmaps
 from .ui.panel.modelnode.emitter import (
@@ -82,7 +96,6 @@ bl_info = {
     "description": "Import, edit and export KotOR models",
     "category": "Import-Export"}
 
-
 def menu_func_import_mdl(self, context):
     self.layout.operator(KB_OT_import_mdl.bl_idname, text="KotOR Model (.mdl)")
 
@@ -105,6 +118,10 @@ def menu_func_export_lyt(self, context):
 
 def menu_func_export_pth(self, context):
     self.layout.operator(KB_OT_export_pth.bl_idname, text="KotOR Path (.pth)")
+
+
+def menu_func_hide_wlk(self, context):
+    self.layout.menu("KB_MT_hide_menu")
 
 
 classes = (
@@ -148,6 +165,18 @@ classes = (
     KB_OT_delete_path_connection,
 
     KB_OT_bake_lightmaps,
+    
+    KB_OT_hide_walkmeshes,
+    KB_OT_hide_lights,
+    KB_OT_hide_blockers,
+    KB_OT_hide_charbones,
+    KB_OT_hide_charnulls,
+    KB_OT_unhide_walkmeshes,
+    KB_OT_unhide_lights,
+    KB_OT_unhide_blockers,
+    KB_OT_unhide_charbones,
+    KB_OT_unhide_charnulls,
+    KB_OT_unhide_all,
 
     # Panels
 
@@ -182,7 +211,11 @@ classes = (
     # UI Lists
 
     KB_UL_lens_flares,
-    KB_UL_path_points
+    KB_UL_path_points,
+    
+    # Menus
+    
+    KB_MT_hide_menu
 )
 
 
@@ -200,6 +233,8 @@ def register():
     bpy.types.TOPBAR_MT_file_export.append(menu_func_export_lyt)
     bpy.types.TOPBAR_MT_file_export.append(menu_func_export_pth)
 
+    bpy.types.TOPBAR_MT_editor_menus.append(menu_func_hide_wlk)
+
 
 def unregister():
     bpy.types.TOPBAR_MT_file_export.remove(menu_func_export_pth)
@@ -208,6 +243,8 @@ def unregister():
     bpy.types.TOPBAR_MT_file_import.remove(menu_func_import_pth)
     bpy.types.TOPBAR_MT_file_import.remove(menu_func_import_lyt)
     bpy.types.TOPBAR_MT_file_import.remove(menu_func_import_mdl)
+
+    bpy.types.TOPBAR_MT_editor_menus.remove(menu_func_hide_wlk)
 
     for cls in classes:
         bpy.utils.unregister_class(cls)

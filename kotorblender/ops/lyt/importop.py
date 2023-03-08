@@ -72,7 +72,12 @@ class KB_OT_import_lyt(bpy.types.Operator, ImportHelper):
 
     texture_search_paths: bpy.props.StringProperty(
         name="Texture Search Paths",
-        description="Colon-separated list of paths relative to imported layout",
+        description="Semi-colon-separated list of paths. Can be relative to the imported layout or absolute.",
+        default="../texturepacks/swpc_tex_tpa")
+
+    lightmap_search_paths: bpy.props.StringProperty(
+        name="Lightmap Search Paths",
+        description="Semi-colon-separated list of paths. Can be relative to the imported layout or absolute.",
         default="../texturepacks/swpc_tex_tpa")
 
     def execute(self, context):
@@ -83,6 +88,7 @@ class KB_OT_import_lyt(bpy.types.Operator, ImportHelper):
         options.normals_algorithm = self.normals_algorithm
         options.sharp_edge_angle = self.sharp_edge_angle
         options.texture_search_paths = self.colon_separated_paths_to_absolute_paths(self.texture_search_paths, os.path.dirname(self.filepath))
+        options.lightmap_search_paths = self.colon_separated_paths_to_absolute_paths(self.lightmap_search_paths, os.path.dirname(self.filepath))
 
         try:
             lyt.load_lyt(self, self.filepath, options)
@@ -94,7 +100,7 @@ class KB_OT_import_lyt(bpy.types.Operator, ImportHelper):
 
     def colon_separated_paths_to_absolute_paths(self, paths_str, working_dir):
         abs_paths = []
-        rel_paths = paths_str.split(":")
+        rel_paths = paths_str.split(";")
         for rel_path in rel_paths:
             abs_path = rel_path if os.path.isabs(rel_path) else os.path.join(working_dir, rel_path)
             abs_paths.append(abs_path)
