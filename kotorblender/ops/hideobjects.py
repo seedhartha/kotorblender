@@ -57,6 +57,23 @@ class KB_OT_hide_lights(bpy.types.Operator):
         return {'FINISHED'}
 
 
+class KB_OT_hide_emitters(bpy.types.Operator):
+    bl_idname = "kb.hide_emitters"
+    bl_label = "Hide Emitters"
+    bl_description = 'Hides all emitters in the scene'
+    
+    def execute(self, context):
+        #Deselect everything in the scene first.
+        bpy.ops.object.select_all(action='DESELECT')
+        
+        #Loop through every object in the scene and hide it if it's an emitter.
+        for obj in bpy.context.scene.objects:
+            if utils.is_mesh_type(obj, MeshType.EMITTER):
+                obj.hide_set(True)
+        
+        return {'FINISHED'}
+
+
 class KB_OT_hide_blockers(bpy.types.Operator):
     bl_idname = "kb.hide_blockers"
     bl_label = "Hide Blockers"
@@ -140,6 +157,23 @@ class KB_OT_unhide_lights(bpy.types.Operator):
         #Loop through every object in the scene and unhide it if it's a light.
         for obj in bpy.context.scene.objects:
             if obj.type == 'LIGHT':
+                obj.hide_set(False)
+        
+        return {'FINISHED'}
+
+
+class KB_OT_unhide_emitters(bpy.types.Operator):
+    bl_idname = "kb.unhide_emitters"
+    bl_label = "Unhide Emitters"
+    bl_description = 'Unhides all emitters in the scene'
+    
+    def execute(self, context):
+        #Deselect everything in the scene first.
+        bpy.ops.object.select_all(action='DESELECT')
+        
+        #Loop through every object in the scene and unhide it if it's an emitter.
+        for obj in bpy.context.scene.objects:
+            if utils.is_mesh_type(obj, MeshType.EMITTER):
                 obj.hide_set(False)
         
         return {'FINISHED'}
