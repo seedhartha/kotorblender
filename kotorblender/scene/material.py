@@ -16,11 +16,15 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+import os
+
 import bpy
 
 from bpy_extras import image_utils
 
 from .. import utils
+
+from ..format.tpc.loader import TpcLoader
 
 DIFFUSE_BY_LIGHTMAP_NODE_NAME = "Diffuse By Lightmap"
 ALPHA_NODE_NAME = "Multiply Alpha"
@@ -37,7 +41,9 @@ def rebuild_object_material(obj, texture_search_paths=[], lightmap_search_paths=
     if utils.is_null(obj.kb.bitmap) and utils.is_null(obj.kb.bitmap2):
         rebuild_material_simple(material, obj)
     else:
-        rebuild_material_nodes(material, obj, texture_search_paths, lightmap_search_paths)
+        rebuild_material_nodes(
+            material, obj, texture_search_paths, lightmap_search_paths
+        )
 
 
 def get_or_create_material(obj):
@@ -87,7 +93,7 @@ def rebuild_material_nodes(material, obj, texture_search_paths, lightmap_search_
     mul_diffuse_by_lightmap = nodes.new("ShaderNodeVectorMath")
     mul_diffuse_by_lightmap.name = DIFFUSE_BY_LIGHTMAP_NODE_NAME
     mul_diffuse_by_lightmap.location = (600, 0)
-    mul_diffuse_by_lightmap.operation = 'MULTIPLY'
+    mul_diffuse_by_lightmap.operation = "MULTIPLY"
     mul_diffuse_by_lightmap.inputs[0].default_value = [1.0] * 3
     mul_diffuse_by_lightmap.inputs[1].default_value = [1.0] * 3
 
@@ -95,7 +101,7 @@ def rebuild_material_nodes(material, obj, texture_search_paths, lightmap_search_
     mul_alpha = nodes.new("ShaderNodeMath")
     mul_alpha.name = ALPHA_NODE_NAME
     mul_alpha.location = (600, -300)
-    mul_alpha.operation = 'MULTIPLY'
+    mul_alpha.operation = "MULTIPLY"
     mul_alpha.inputs[0].default_value = 1.0
     mul_alpha.inputs[1].default_value = obj.kb.alpha
 
@@ -115,9 +121,11 @@ def rebuild_material_nodes(material, obj, texture_search_paths, lightmap_search_
 
         lightmap = nodes.new("ShaderNodeTexImage")
         lightmap.location = (300, -300)
-        lightmap.image = get_or_create_texture(obj.kb.bitmap2, lightmap_search_paths).image
+        lightmap.image = get_or_create_texture(
+            obj.kb.bitmap2, lightmap_search_paths
+        ).image
 
-        material.shadow_method = 'NONE'
+        material.shadow_method = "NONE"
         links.new(lightmap.inputs[0], lightmap_uv.outputs[0])
         links.new(mul_diffuse_by_lightmap.inputs[1], lightmap.outputs[0])
 
@@ -139,7 +147,7 @@ def get_or_create_texture(name, search_paths):
     else:
         image = create_image(name, search_paths)
 
-    texture = bpy.data.textures.new(name, type='IMAGE')
+    texture = bpy.data.textures.new(name, type="IMAGE")
     texture.image = image
     texture.use_fake_user = True
 
@@ -147,15 +155,21 @@ def get_or_create_texture(name, search_paths):
 
 
 def create_image(name, search_paths):
-    for path in search_paths:
-        image = image_utils.load_image(
-            name + ".tga",
-            path,
-            recursive=True,
-            place_holder=False,
-            ncase_cmp=True)
+    tpc_filename = (name + ".tpc").lower()
+    for search_path in search_paths:
+        image = image_utils.load_image(name + ".tga", search_path, recursive=True)
         if image:
             image.name = name
+            return image
+        for filename in os.listdir(search_path):
+            if filename.lower() != tpc_filename:
+                continue
+            path = os.path.join(search_path, filename)
+            print("Loading TPC image: " + path)
+            tpc_image = TpcLoader(path).load()
+            image = bpy.data.images.new(name, tpc_image.w, tpc_image.h)
+            image.pixels = tpc_image.pixels
+            image.update()
             return image
 
     return bpy.data.images.new(name, 512, 512)

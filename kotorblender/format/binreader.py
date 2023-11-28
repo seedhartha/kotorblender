@@ -20,7 +20,7 @@ import struct
 
 
 class BinaryReader:
-    def __init__(self, path, byteorder):
+    def __init__(self, path, byteorder="little"):
         self.file = open(path, "rb")
         self.byteorder = byteorder
 
@@ -55,7 +55,7 @@ class BinaryReader:
         return int.from_bytes(self.file.read(4), self.byteorder, signed=False)
 
     def get_float(self):
-        bo_literal = '>' if self.byteorder == 'big' else '<'
+        bo_literal = ">" if self.byteorder == "big" else "<"
         [val] = struct.unpack(bo_literal + "f", self.file.read(4))
         return val
 
@@ -66,7 +66,7 @@ class BinaryReader:
         str = ""
         while True:
             ch = self.file.read(1).decode("utf-8")
-            if ch == '\0':
+            if ch == "\0":
                 break
             str += ch
         return str
@@ -77,7 +77,7 @@ class BinaryReader:
         while len > 0:
             ch = self.file.read(1).decode("utf-8")
             len -= 1
-            if ch == '\0':
+            if ch == "\0":
                 break
             str += ch
         if len > 0:
