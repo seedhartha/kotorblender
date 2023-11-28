@@ -18,26 +18,27 @@
 
 import bpy
 
-class KB_MT_hide_menu(bpy.types.Menu):
-    bl_label = "KBlender"
+
+class KB_MT_kotorblender(bpy.types.Menu):
+    bl_label = "KotorBlender"
 
     def draw(self, context):
         layout = self.layout
-        
-        layout.operator("kb.hide_walkmeshes", icon='SURFACE_DATA')
-        layout.operator("kb.hide_lights", icon='LIGHT')
-        layout.operator("kb.hide_emitters", icon='CURVES_DATA')
-        layout.operator("kb.hide_blockers", icon='INDIRECT_ONLY_OFF')
+
+        layout.operator("kb.hide_walkmeshes", icon="SURFACE_DATA")
+        layout.operator("kb.hide_lights", icon="LIGHT")
+        layout.operator("kb.hide_emitters", icon="CURVES_DATA")
+        layout.operator("kb.hide_blockers", icon="INDIRECT_ONLY_OFF")
         layout.separator()
-        layout.operator("kb.hide_charbones", icon='BONE_DATA')
-        layout.operator("kb.hide_charnulls", icon='SHADING_BBOX')
+        layout.operator("kb.hide_charbones", icon="BONE_DATA")
+        layout.operator("kb.hide_charnulls", icon="SHADING_BBOX")
         layout.separator()
-        layout.operator("kb.unhide_walkmeshes", icon='OUTLINER_OB_SURFACE')
-        layout.operator("kb.unhide_lights", icon='OUTLINER_OB_LIGHT')
-        layout.operator("kb.unhide_emitters", icon='OUTLINER_OB_CURVES')
-        layout.operator("kb.unhide_blockers", icon='INDIRECT_ONLY_ON')
+        layout.operator("kb.unhide_walkmeshes", icon="OUTLINER_OB_SURFACE")
+        layout.operator("kb.unhide_lights", icon="OUTLINER_OB_LIGHT")
+        layout.operator("kb.unhide_emitters", icon="OUTLINER_OB_CURVES")
+        layout.operator("kb.unhide_blockers", icon="INDIRECT_ONLY_ON")
         layout.separator()
-        layout.operator("kb.unhide_charbones", icon='BONE_DATA')
-        layout.operator("kb.unhide_charnulls", icon='PIVOT_BOUNDBOX')
+        layout.operator("kb.unhide_charbones", icon="BONE_DATA")
+        layout.operator("kb.unhide_charnulls", icon="PIVOT_BOUNDBOX")
         layout.separator()
         layout.operator("kb.unhide_all")
