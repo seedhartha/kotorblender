@@ -62,7 +62,7 @@ Fine-tuning:
 
 ### Editing Paths
 
-1. Extract PTH file from the module's RIM file, e.g. "modules/danm13_s.rim" (Kotor Tool, reone-tools, etc.)
+1. Extract PTH file from the module's RIM file, e.g. "modules/danm13_s.rim" (Kotor Tool, reone toolkit, etc.)
 1. Import PTH into Blender via File → Import → KotOR Path (.pth)
 1. Create/move path points, or modify path connections via Object Properties
 1. Export PTH via File → Export → KotOR Path (.pth)
@@ -73,4 +73,4 @@ Known to work with Blender versions ranging from 2.93 to 4.0.
 
 ## License
 
-[GPL-3.0-or-later](LICENSE)
+[GPL 3.0 or later](LICENSE)
