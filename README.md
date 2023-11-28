@@ -10,9 +10,10 @@ This add-on is a fork of KotorBlender, upgraded to support newer versions of Ble
 
 ## Installation
 
-1. Clone GitHub repository or download the latest release
-1. Copy **kotorblender** folder into Blender addons directory, e.g. "C:/Users/USERNAME/AppData/Roaming/Blender Foundation/Blender/BLENDER_VERSION/scripts/addons"
-1. Enable add-on "Import-Export: KotorBlender" in Blender Preferences via Edit → Preferences → Add-ons
+1. Clone this repository or download the latest release of KotorBlender from [Deadly Stream](https://deadlystream.com/files/file/1853-kotorblender-for-blender-293/)
+1. If you have cloned the repository, create a ZIP archive containing the **io_scene_kotor** directory
+1. From Edit → Preferences → Add-ons in Blender, install the add-on from the ZIP archive and enable it by ticking a box next to "Import-Export: KotorBlender"
+1. Alternatively, if you want to contribute to KotorBlender, you may want to create a symbolic link to the local repository in the Blender add-ons directory, typically located at `C:/Users/{user}/AppData/Roaming/Blender Foundation/Blender/{version}/scripts/addons`.
 
 ## Usage
 
