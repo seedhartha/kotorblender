@@ -19,8 +19,7 @@ This add-on is a fork of KotorBlender, upgraded to support newer versions of Ble
 
 ### Modelling
 
-1. Extract MDL, MDX and, optionally, TPC, WOK, PWK, DWK, and LYT files (Kotor Tool, reone-tools, etc.)
-1. Convert TPC files to TGA/TXI (reone-tools)
+1. Extract MDL, MDX and, optionally, TPC, WOK, PWK, DWK, and LYT files (Kotor Tool, reone toolkit, etc.)
 1. Import MDL into Blender via File → Import → KotOR Model (.mdl)
 1. Edit model
 1. Select a MDL root object to be exported
