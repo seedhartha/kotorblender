@@ -115,7 +115,7 @@ def rebuild_material_nodes(material, obj, texture_search_paths, lightmap_search_
 
         lightmap = nodes.new("ShaderNodeTexImage")
         lightmap.location = (300, -300)
-        lightmap.image = get_or_create_lightmap(obj.kb.bitmap2, lightmap_search_paths).image
+        lightmap.image = get_or_create_texture(obj.kb.bitmap2, lightmap_search_paths).image
 
         material.shadow_method = 'NONE'
         links.new(lightmap.inputs[0], lightmap_uv.outputs[0])
@@ -130,14 +130,14 @@ def rebuild_material_nodes(material, obj, texture_search_paths, lightmap_search_
     links.new(output.inputs[0], shader.outputs[0])
 
 
-def get_or_create_texture(name, texture_search_paths):
+def get_or_create_texture(name, search_paths):
     if name in bpy.data.textures:
         return bpy.data.textures[name]
 
     if name in bpy.data.images:
         image = bpy.data.images[name]
     else:
-        image = create_image(name, texture_search_paths)
+        image = create_image(name, search_paths)
 
     texture = bpy.data.textures.new(name, type='IMAGE')
     texture.image = image
@@ -146,39 +146,8 @@ def get_or_create_texture(name, texture_search_paths):
     return texture
 
 
-def get_or_create_lightmap(name, lightmap_search_paths):
-    if name in bpy.data.textures:
-        return bpy.data.textures[name]
-
-    if name in bpy.data.images:
-        image = bpy.data.images[name]
-    else:
-        image = create_image(name, lightmap_search_paths)
-
-    texture = bpy.data.textures.new(name, type='IMAGE')
-    texture.image = image
-    texture.use_fake_user = True
-
-    return texture
-
-
-def create_image(name, texture_search_paths):
-    for path in texture_search_paths:
-        image = image_utils.load_image(
-            name + ".tga",
-            path,
-            recursive=True,
-            place_holder=False,
-            ncase_cmp=True)
-        if image:
-            image.name = name
-            return image
-
-    return bpy.data.images.new(name, 512, 512)
-
-
-def create_lightmap(name, lightmap_search_paths):
-    for path in lightmap_search_paths:
+def create_image(name, search_paths):
+    for path in search_paths:
         image = image_utils.load_image(
             name + ".tga",
             path,
