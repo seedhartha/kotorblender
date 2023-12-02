@@ -69,7 +69,7 @@ Fine-tuning:
 
 ## Compatibility
 
-Known to work with Blender versions ranging from 2.93 to 4.0.
+Known to work with Blender versions ranging from 3.3 to 4.0.
 
 ## License
 
