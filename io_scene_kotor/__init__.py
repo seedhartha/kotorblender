@@ -92,7 +92,7 @@ from .ui.panel.pathpoint import KB_PT_path_point
 bl_info = {
     "name": "KotorBlender",
     "author": "Attila Gyoerkoes & J.W. Brandon & seedhartha",
-    "version": (3, 7, 1),
+    "version": (3, 8, 0),
     "blender": (3, 3, 0),
     "location": "File > Import-Export, Object Properties",
     "description": "Import, edit and export KotOR models",
