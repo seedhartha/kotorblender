@@ -25,7 +25,7 @@ import bpy
 
 from bpy_extras.io_utils import ImportHelper
 
-from ...defines import ImportOptions, NormalsAlgorithm
+from ...defines import ImportOptions
 
 from ...io import mdl
 
@@ -33,62 +33,45 @@ from ...io import mdl
 class KB_OT_import_mdl(bpy.types.Operator, ImportHelper):
     bl_idname = "kb.mdlimport"
     bl_label = "Import KotOR MDL"
-    bl_options = {'UNDO'}
+    bl_options = {"UNDO"}
 
     filename_ext = ".mdl"
 
-    filter_glob: bpy.props.StringProperty(
-        default="*.mdl",
-        options={'HIDDEN'})
+    filter_glob: bpy.props.StringProperty(default="*.mdl", options={"HIDDEN"})
 
     import_geometry: bpy.props.BoolProperty(
         name="Import Geometry",
         description="Untick to import animations from supermodel",
-        default=True)
+        default=True,
+    )
 
-    import_animations: bpy.props.BoolProperty(
-        name="Import Animations",
-        default=True)
+    import_animations: bpy.props.BoolProperty(name="Import Animations", default=True)
 
     import_walkmeshes: bpy.props.BoolProperty(
         name="Import Walkmeshes",
         description="Import area, door and placeable walkmeshes",
-        default=True)
+        default=True,
+    )
 
     build_materials: bpy.props.BoolProperty(
-        name="Build Materials",
-        description="Build object materials",
-        default=True)
+        name="Build Materials", description="Build object materials", default=True
+    )
 
     build_armature: bpy.props.BoolProperty(
-        name="Build Armature",
-        description="Build armature from MDL root")
-
-    normals_algorithm: bpy.props.EnumProperty(
-        items=[
-            (NormalsAlgorithm.NONE, "None", "Ignore normals", 0),
-            (NormalsAlgorithm.CUSTOM, "Custom", "Import as Custom Split Normals and enable Auto Smooth", 1),
-            (NormalsAlgorithm.SHARP_EDGES, "Sharp Edges", "Merge similar vertices, mark sharp edges and add Edge Split modifier", 2)
-        ],
-        name="Normals Algorithm",
-        description="How to import vertex normals and/or sharp edges",
-        default=NormalsAlgorithm.CUSTOM)
-
-    sharp_edge_angle: bpy.props.FloatProperty(
-        name="Sharp Edge Angle",
-        description="When merging similar vertices, mark edges with an angle higher than this as sharp",
-        default=radians(10.0), min=0.0, max=radians(90.0),
-        subtype='ANGLE')
+        name="Build Armature", description="Build armature from MDL root"
+    )
 
     texture_search_paths: bpy.props.StringProperty(
         name="Texture Search Paths",
         description="Semi-colon-separated list of paths. Can be relative to the imported model or absolute.",
-        default="../texturepacks/swpc_tex_tpa")
+        default="../texturepacks/swpc_tex_tpa",
+    )
 
     lightmap_search_paths: bpy.props.StringProperty(
         name="Lightmap Search Paths",
         description="Semi-colon-separated list of paths. Can be relative to the imported model or absolute.",
-        default="../texturepacks/swpc_tex_tpa")
+        default="../texturepacks/swpc_tex_tpa",
+    )
 
     def execute(self, context):
         options = ImportOptions()
@@ -97,24 +80,30 @@ class KB_OT_import_mdl(bpy.types.Operator, ImportHelper):
         options.import_walkmeshes = self.import_walkmeshes
         options.build_materials = self.build_materials
         options.build_armature = self.build_armature
-        options.normals_algorithm = self.normals_algorithm
-        options.sharp_edge_angle = self.sharp_edge_angle
-        options.texture_search_paths = self.colon_separated_paths_to_absolute_paths(self.texture_search_paths, os.path.dirname(self.filepath))
-        options.lightmap_search_paths = self.colon_separated_paths_to_absolute_paths(self.lightmap_search_paths, os.path.dirname(self.filepath))
+        options.texture_search_paths = self.colon_separated_paths_to_absolute_paths(
+            self.texture_search_paths, os.path.dirname(self.filepath)
+        )
+        options.lightmap_search_paths = self.colon_separated_paths_to_absolute_paths(
+            self.lightmap_search_paths, os.path.dirname(self.filepath)
+        )
 
         try:
             mdl.load_mdl(self, self.filepath, options)
         except Exception as e:
             print(traceback.format_exc())
-            self.report({'ERROR'}, str(e))
+            self.report({"ERROR"}, str(e))
 
-        return {'FINISHED'}
+        return {"FINISHED"}
 
     def colon_separated_paths_to_absolute_paths(self, paths_str, working_dir):
         abs_paths = []
         rel_paths = paths_str.split(";")
         for rel_path in rel_paths:
-            abs_path = rel_path if os.path.isabs(rel_path) else os.path.join(working_dir, rel_path)
+            abs_path = (
+                rel_path
+                if os.path.isabs(rel_path)
+                else os.path.join(working_dir, rel_path)
+            )
             abs_paths.append(abs_path)
         if working_dir not in abs_paths:
             abs_paths.append(working_dir)

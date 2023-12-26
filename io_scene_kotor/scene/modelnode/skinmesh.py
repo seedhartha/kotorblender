@@ -17,49 +17,41 @@
 # ##### END GPL LICENSE BLOCK #####
 
 from ...defines import MeshType, NodeType
-
 from .trimesh import TrimeshNode
 
 
 class SkinmeshNode(TrimeshNode):
-
     def __init__(self, name="UNNAMED"):
         TrimeshNode.__init__(self, name)
         self.nodetype = NodeType.SKIN
         self.meshtype = MeshType.SKIN
-        self.weights = []
 
-    def set_object_data(self, obj, options):
-        TrimeshNode.set_object_data(self, obj, options)
+    def apply_edge_loop_mesh(self, mesh, obj):
+        TrimeshNode.apply_edge_loop_mesh(self, mesh, obj)
+        self.apply_bone_weights(mesh, obj)
 
-        self.add_skin_groups_to_object(obj)
-
-    def compact_vertices(self, unique_indices, split_normals):
-        TrimeshNode.compact_vertices(self, unique_indices, split_normals)
-
-        for new_idx, old_idx in enumerate(unique_indices):
-            self.weights[new_idx] = self.weights[old_idx]
-
-        num_unique = len(unique_indices)
-        self.weights = self.weights[:num_unique]
-
-    def add_skin_groups_to_object(self, obj):
+    def apply_bone_weights(self, mesh, obj):
         groups = dict()
-        for vert_idx, vert_weights in enumerate(self.weights):
+        for vert_idx, vert_weights in enumerate(mesh.weights):
             for bone_name, weight in vert_weights:
                 if bone_name in groups:
-                    groups[bone_name].add([vert_idx], weight, 'REPLACE')
+                    groups[bone_name].add([vert_idx], weight, "REPLACE")
                 else:
                     group = obj.vertex_groups.new(name=bone_name)
-                    group.add([vert_idx], weight, 'REPLACE')
+                    group.add([vert_idx], weight, "REPLACE")
                     groups[bone_name] = group
 
-    def load_object_data(self, obj, options):
-        TrimeshNode.load_object_data(self, obj, options)
+    def unapply_edge_loop_mesh(self, obj):
+        mesh = TrimeshNode.unapply_edge_loop_mesh(self, obj)
+        self.unapply_bone_weights(obj, mesh)
+        return mesh
 
-        for vert in self.eval_mesh.vertices:
+    def unapply_bone_weights(self, obj, mesh):
+        mesh.weights = [[]] * len(mesh.verts)
+        for vert_idx in range(len(mesh.verts)):
+            vert = obj.data.vertices[vert_idx]
             vert_weights = []
             for group_weight in vert.groups:
                 group = obj.vertex_groups[group_weight.group]
                 vert_weights.append((group.name, group_weight.weight))
-            self.weights.append(vert_weights)
+            mesh.weights[vert_idx] = vert_weights

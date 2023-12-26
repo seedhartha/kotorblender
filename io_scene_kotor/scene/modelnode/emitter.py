@@ -24,11 +24,10 @@ from ...defines import MeshType, NodeType
 
 from ... import defines
 
-from .geometry import GeometryNode
+from .base import BaseNode
 
 
-class EmitterNode(GeometryNode):
-
+class EmitterNode(BaseNode):
     EMITTER_ATTRS = [
         "deadspace",
         "blastradius",
@@ -106,10 +105,11 @@ class EmitterNode(GeometryNode):
         "tangentlength",
         "colorstart",
         "colormid",
-        "colorend"]
+        "colorend",
+    ]
 
     def __init__(self, name="UNNAMED"):
-        GeometryNode.__init__(self, name)
+        BaseNode.__init__(self, name)
         self.nodetype = NodeType.EMITTER
         self.meshtype = MeshType.EMITTER
         # object data
@@ -203,15 +203,12 @@ class EmitterNode(GeometryNode):
 
     def create_mesh(self, name):
         verts = [
-            ((self.xsize/2) / 100.0, (self.ysize/2) / 100.0, 0.0),
-            ((self.xsize/2) / 100.0, (-self.ysize/2) / 100.0, 0.0),
-            ((-self.xsize/2) / 100.0, (-self.ysize/2) / 100.0, 0.0),
-            ((-self.xsize/2) / 100.0, (self.ysize/2) / 100.0, 0.0)
+            ((self.xsize / 2) / 100.0, (self.ysize / 2) / 100.0, 0.0),
+            ((self.xsize / 2) / 100.0, (-self.ysize / 2) / 100.0, 0.0),
+            ((-self.xsize / 2) / 100.0, (-self.ysize / 2) / 100.0, 0.0),
+            ((-self.xsize / 2) / 100.0, (self.ysize / 2) / 100.0, 0.0),
         ]
-        indices = [
-            (0, 1, 2),
-            (0, 2, 3)
-        ]
+        indices = [(0, 1, 2), (0, 2, 3)]
         # Create the mesh itself
         mesh = bpy.data.meshes.new(name)
         mesh.vertices.add(len(verts))
@@ -226,7 +223,7 @@ class EmitterNode(GeometryNode):
         return mesh
 
     def set_object_data(self, obj, options):
-        GeometryNode.set_object_data(self, obj, options)
+        BaseNode.set_object_data(self, obj, options)
 
         obj.kb.meshtype = self.meshtype
 
@@ -238,12 +235,25 @@ class EmitterNode(GeometryNode):
                 elif value == 1:
                     value = "Trail"
             elif attrname == "update":
-                if value.title() not in ["Fountain", "Single", "Explosion", "Lightning"]:
+                if value.title() not in [
+                    "Fountain",
+                    "Single",
+                    "Explosion",
+                    "Lightning",
+                ]:
                     value = "NONE"
                 else:
                     value = value.title()
             elif attrname == "emitter_render":
-                if value not in ["Normal", "Linked", "Billboard_to_Local_Z", "Billboard_to_World_Z", "Aligned_to_World_Z", "Aligned_to_Particle_Dir", "Motion_Blur"]:
+                if value not in [
+                    "Normal",
+                    "Linked",
+                    "Billboard_to_Local_Z",
+                    "Billboard_to_World_Z",
+                    "Aligned_to_World_Z",
+                    "Aligned_to_Particle_Dir",
+                    "Motion_Blur",
+                ]:
                     value = "NONE"
             elif attrname == "blend":
                 if value.lower() == "punchthrough":
@@ -259,7 +269,7 @@ class EmitterNode(GeometryNode):
             setattr(obj.kb, attrname, value)
 
     def load_object_data(self, obj, options):
-        GeometryNode.load_object_data(self, obj, options)
+        BaseNode.load_object_data(self, obj, options)
 
         for attrname in self.EMITTER_ATTRS:
             value = getattr(obj.kb, attrname, None)
@@ -275,7 +285,15 @@ class EmitterNode(GeometryNode):
                 if value not in ["Fountain", "Single", "Explosion", "Lightning"]:
                     continue
             elif attrname == "emitter_render":
-                if value not in ["Normal", "Linked", "Billboard_to_Local_Z", "Billboard_to_World_Z", "Aligned_to_World_Z", "Aligned_to_Particle_Dir", "Motion_Blur"]:
+                if value not in [
+                    "Normal",
+                    "Linked",
+                    "Billboard_to_Local_Z",
+                    "Billboard_to_World_Z",
+                    "Aligned_to_World_Z",
+                    "Aligned_to_Particle_Dir",
+                    "Motion_Blur",
+                ]:
                     continue
             elif attrname == "blend":
                 if value == "Punch-Through":

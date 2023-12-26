@@ -56,7 +56,7 @@ SABER_FACES = [
     [3, 6, 2],
     [6, 3, 7],
     [15, 11, 14],
-    [10, 14, 11]
+    [10, 14, 11],
 ]
 
 
@@ -69,14 +69,14 @@ class ArrayDefinition:
 class MdlLoader:
     def __init__(self, path):
         self.path = path
-        self.mdl = BinaryReader(path, 'little')
+        self.mdl = BinaryReader(path, "little")
 
         base, _ = os.path.splitext(path)
         mdx_path = base + ".mdx"
         if not os.path.exists(mdx_path):
             raise RuntimeError("MDX file '{}' not found".format(mdx_path))
 
-        self.mdx = BinaryReader(mdx_path, 'little')
+        self.mdx = BinaryReader(mdx_path, "little")
 
         self.tsl = False
         self.xbox = False
@@ -121,7 +121,9 @@ class MdlLoader:
 
         self.model_type = self.mdl.get_uint8()
         if self.model_type != 2:
-            raise RuntimeError("Invalid model type: expected=2, actual={}".format(self.model_type))
+            raise RuntimeError(
+                "Invalid model type: expected=2, actual={}".format(self.model_type)
+            )
 
         self.mdl.skip(3)  # padding
 
@@ -144,7 +146,11 @@ class MdlLoader:
 
         mdx_size = self.mdl.get_uint32()
         if mdx_size != self.mdx_size:
-            raise RuntimeError("MDX size mismatch: expected={}, actual={}".format(self.mdx_size, mdx_size))
+            raise RuntimeError(
+                "MDX size mismatch: expected={}, actual={}".format(
+                    self.mdx_size, mdx_size
+                )
+            )
 
         mdx_offset = self.mdl.get_uint32()
         self.name_arr = self.get_array_def()
@@ -210,7 +216,11 @@ class MdlLoader:
         node.export_order = export_order
         node.position = position
         node.orientation = orientation
-        node.from_root = node.from_root @ Matrix.Translation(Vector(position)) @ Quaternion(orientation).to_matrix().to_4x4()
+        node.from_root = (
+            node.from_root
+            @ Matrix.Translation(Vector(position))
+            @ Quaternion(orientation).to_matrix().to_4x4()
+        )
 
         if offset == self.off_anim_root:
             self.model.animroot = name
@@ -280,7 +290,11 @@ class MdlLoader:
             node.loop = loop != 0
             node.renderorder = render_order
             node.frame_blending = frame_blending != 0
-            node.depth_texture_name = depth_texture_name if len(depth_texture_name) > 0 and depth_texture_name.lower() != "null" else defines.NULL
+            node.depth_texture_name = (
+                depth_texture_name
+                if len(depth_texture_name) > 0 and depth_texture_name.lower() != "null"
+                else defines.NULL
+            )
             # flags
             node.p2p = flags & EMITTER_FLAG_P2P != 0
             node.p2p_sel = flags & EMITTER_FLAG_P2P_SEL != 0
@@ -428,13 +442,37 @@ class MdlLoader:
         if controller_arr.count > 0:
             controllers = self.load_controllers(controller_arr, controller_data_arr)
             if type_flags & NODE_MESH:
-                node.alpha = controllers[CTRL_MESH_ALPHA][0][1] if CTRL_MESH_ALPHA in controllers else 1.0
-                node.scale = controllers[CTRL_MESH_SCALE][0][1] if CTRL_MESH_SCALE in controllers else 1.0
-                node.selfillumcolor = controllers[CTRL_MESH_SELFILLUMCOLOR][0][1:] if CTRL_MESH_SELFILLUMCOLOR in controllers else [0.0] * 3
+                node.alpha = (
+                    controllers[CTRL_MESH_ALPHA][0][1]
+                    if CTRL_MESH_ALPHA in controllers
+                    else 1.0
+                )
+                node.scale = (
+                    controllers[CTRL_MESH_SCALE][0][1]
+                    if CTRL_MESH_SCALE in controllers
+                    else 1.0
+                )
+                node.selfillumcolor = (
+                    controllers[CTRL_MESH_SELFILLUMCOLOR][0][1:]
+                    if CTRL_MESH_SELFILLUMCOLOR in controllers
+                    else [0.0] * 3
+                )
             elif type_flags & NODE_LIGHT:
-                node.radius = controllers[CTRL_LIGHT_RADIUS][0][1] if CTRL_LIGHT_RADIUS in controllers else 1.0
-                node.multiplier = controllers[CTRL_LIGHT_MULTIPLIER][0][1] if CTRL_LIGHT_MULTIPLIER in controllers else 1.0
-                node.color = controllers[CTRL_LIGHT_COLOR][0][1:] if CTRL_LIGHT_COLOR in controllers else [1.0] * 3
+                node.radius = (
+                    controllers[CTRL_LIGHT_RADIUS][0][1]
+                    if CTRL_LIGHT_RADIUS in controllers
+                    else 1.0
+                )
+                node.multiplier = (
+                    controllers[CTRL_LIGHT_MULTIPLIER][0][1]
+                    if CTRL_LIGHT_MULTIPLIER in controllers
+                    else 1.0
+                )
+                node.color = (
+                    controllers[CTRL_LIGHT_COLOR][0][1:]
+                    if CTRL_LIGHT_COLOR in controllers
+                    else [1.0] * 3
+                )
             elif type_flags & NODE_EMITTER:
                 for val, key, dim in EMITTER_CONTROLLER_KEYS:
                     if val not in controllers:
@@ -442,14 +480,18 @@ class MdlLoader:
                     if dim == 1:
                         setattr(node, key, controllers[val][0][1])
                     else:
-                        setattr(node, key, controllers[val][0][1:dim+1])
+                        setattr(node, key, controllers[val][0][1 : dim + 1])
 
         if type_flags & NODE_LIGHT:
             self.mdl.seek(MDL_OFFSET + flare_size_arr.offset)
-            node.flare_list.sizes = [self.mdl.get_float() for _ in range(flare_size_arr.count)]
+            node.flare_list.sizes = [
+                self.mdl.get_float() for _ in range(flare_size_arr.count)
+            ]
 
             self.mdl.seek(MDL_OFFSET + flare_position_arr.offset)
-            node.flare_list.positions = [self.mdl.get_float() for _ in range(flare_position_arr.count)]
+            node.flare_list.positions = [
+                self.mdl.get_float() for _ in range(flare_position_arr.count)
+            ]
 
             self.mdl.seek(MDL_OFFSET + flare_color_shift_arr.offset)
             for _ in range(flare_color_shift_arr.count):
@@ -457,7 +499,9 @@ class MdlLoader:
                 node.flare_list.colorshifts.append(color_shift)
 
             self.mdl.seek(MDL_OFFSET + flare_tex_name_arr.offset)
-            tex_name_offsets = [self.mdl.get_uint32() for _ in range(flare_tex_name_arr.count)]
+            tex_name_offsets = [
+                self.mdl.get_uint32() for _ in range(flare_tex_name_arr.count)
+            ]
             for tex_name_offset in tex_name_offsets:
                 self.mdl.seek(MDL_OFFSET + tex_name_offset)
                 node.flare_list.textures.append(self.mdl.get_c_string())
@@ -540,7 +584,9 @@ class MdlLoader:
                             comp = self.mdx.get_uint32()
                             node.normals.append(self.decompress_vector_xbox(comp))
                         else:
-                            node.normals.append(tuple([self.mdx.get_float() for _ in range(3)]))
+                            node.normals.append(
+                                tuple([self.mdx.get_float() for _ in range(3)])
+                            )
                     if mdx_data_bitmap & MDX_FLAG_UV1:
                         self.mdx.seek(mdx_offset + i * mdx_data_size + off_mdx_uv1)
                         node.uv1.append(tuple([self.mdx.get_float() for _ in range(2)]))
@@ -548,9 +594,13 @@ class MdlLoader:
                         self.mdx.seek(mdx_offset + i * mdx_data_size + off_mdx_uv2)
                         node.uv2.append(tuple([self.mdx.get_float() for _ in range(2)]))
                     if type_flags & NODE_SKIN:
-                        self.mdx.seek(mdx_offset + i * mdx_data_size + off_mdx_bone_weights)
+                        self.mdx.seek(
+                            mdx_offset + i * mdx_data_size + off_mdx_bone_weights
+                        )
                         bone_weights = [self.mdx.get_float() for _ in range(4)]
-                        self.mdx.seek(mdx_offset + i * mdx_data_size + off_mdx_bone_indices)
+                        self.mdx.seek(
+                            mdx_offset + i * mdx_data_size + off_mdx_bone_indices
+                        )
                         if self.xbox:
                             bone_indices = [self.mdx.get_uint16() for _ in range(4)]
                         else:
@@ -567,7 +617,9 @@ class MdlLoader:
 
         if type_flags & NODE_DANGLY:
             self.mdl.seek(MDL_OFFSET + constraint_arr.offset)
-            node.constraints = [self.mdl.get_float() for _ in range(constraint_arr.count)]
+            node.constraints = [
+                self.mdl.get_float() for _ in range(constraint_arr.count)
+            ]
 
         self.mdl.seek(MDL_OFFSET + children_arr.offset)
         child_offsets = [self.mdl.get_uint32() for _ in range(children_arr.count)]
@@ -655,34 +707,58 @@ class MdlLoader:
 
         if controller_arr.count > 0:
             if not node_number in self.node_by_number:
-                raise RuntimeError("Model node not found for animation node: " + str(name))
+                raise RuntimeError(
+                    "Model node not found for animation node: " + str(name)
+                )
             supernode = self.node_by_number[node_number]
             controllers = self.load_controllers(controller_arr, controller_data_arr)
             if CTRL_BASE_POSITION in controllers:
-                node.keyframes["position"] = [row[:4] for row in controllers[CTRL_BASE_POSITION]]
+                node.keyframes["position"] = [
+                    row[:4] for row in controllers[CTRL_BASE_POSITION]
+                ]
             if CTRL_BASE_ORIENTATION in controllers:
-                orientations = [self.orientation_controller_to_quaternion(row[1:]) for row in controllers[CTRL_BASE_ORIENTATION]]
-                node.keyframes["orientation"] = [[row[0]] + orientations[i] for i, row in enumerate(controllers[CTRL_BASE_ORIENTATION])]
+                orientations = [
+                    self.orientation_controller_to_quaternion(row[1:])
+                    for row in controllers[CTRL_BASE_ORIENTATION]
+                ]
+                node.keyframes["orientation"] = [
+                    [row[0]] + orientations[i]
+                    for i, row in enumerate(controllers[CTRL_BASE_ORIENTATION])
+                ]
             if isinstance(supernode, TrimeshNode):
                 if CTRL_MESH_ALPHA in controllers:
-                    node.keyframes["alpha"] = [row[:2] for row in controllers[CTRL_MESH_ALPHA]]
+                    node.keyframes["alpha"] = [
+                        row[:2] for row in controllers[CTRL_MESH_ALPHA]
+                    ]
                 if CTRL_MESH_SCALE in controllers:
-                    node.keyframes["scale"] = [row[:2] for row in controllers[CTRL_MESH_SCALE]]
+                    node.keyframes["scale"] = [
+                        row[:2] for row in controllers[CTRL_MESH_SCALE]
+                    ]
                 if CTRL_MESH_SELFILLUMCOLOR in controllers:
-                    node.keyframes["selfillumcolor"] = [row[:4] for row in controllers[CTRL_MESH_SELFILLUMCOLOR]]
+                    node.keyframes["selfillumcolor"] = [
+                        row[:4] for row in controllers[CTRL_MESH_SELFILLUMCOLOR]
+                    ]
             if isinstance(supernode, LightNode):
                 if CTRL_LIGHT_RADIUS in controllers:
-                    node.keyframes["radius"] = [row[:2] for row in controllers[CTRL_LIGHT_RADIUS]]
+                    node.keyframes["radius"] = [
+                        row[:2] for row in controllers[CTRL_LIGHT_RADIUS]
+                    ]
                 if CTRL_LIGHT_MULTIPLIER in controllers:
-                    node.keyframes["multiplier"] = [row[:2] for row in controllers[CTRL_LIGHT_MULTIPLIER]]
+                    node.keyframes["multiplier"] = [
+                        row[:2] for row in controllers[CTRL_LIGHT_MULTIPLIER]
+                    ]
                 if CTRL_LIGHT_COLOR in controllers:
-                    node.keyframes["color"] = [row[:4] for row in controllers[CTRL_LIGHT_COLOR]]
+                    node.keyframes["color"] = [
+                        row[:4] for row in controllers[CTRL_LIGHT_COLOR]
+                    ]
             if isinstance(supernode, EmitterNode):
                 for key in EMITTER_CONTROLLER_KEYS:
                     if not key[0] in controllers:
                         continue
                     num_columns = key[2]
-                    node.keyframes[key[1]] = [row[:num_columns+1] for row in controllers[key[0]]]
+                    node.keyframes[key[1]] = [
+                        row[: num_columns + 1] for row in controllers[key[0]]
+                    ]
 
         self.mdl.seek(MDL_OFFSET + children_arr.offset)
         child_offsets = [self.mdl.get_uint32() for _ in range(children_arr.count)]
@@ -703,23 +779,37 @@ class MdlLoader:
             values_start = self.mdl.get_uint16()
             num_columns = self.mdl.get_uint8()
             self.mdl.skip(3)  # padding
-            keys.append(ControllerKey(ctrl_type, num_rows, timekeys_start, values_start, num_columns))
+            keys.append(
+                ControllerKey(
+                    ctrl_type, num_rows, timekeys_start, values_start, num_columns
+                )
+            )
         controllers = dict()
         for key in keys:
-            self.mdl.seek(MDL_OFFSET + controller_data_arr.offset + 4 * key.timekeys_start)
+            self.mdl.seek(
+                MDL_OFFSET + controller_data_arr.offset + 4 * key.timekeys_start
+            )
             timekeys = [self.mdl.get_float() for _ in range(key.num_rows)]
-            self.mdl.seek(MDL_OFFSET + controller_data_arr.offset + 4 * key.values_start)
+            self.mdl.seek(
+                MDL_OFFSET + controller_data_arr.offset + 4 * key.values_start
+            )
             if key.ctrl_type == CTRL_BASE_ORIENTATION and key.num_columns == 2:
                 integral = True
                 num_columns = 1
             else:
                 integral = False
-                num_columns = key.num_columns & 0xf
+                num_columns = key.num_columns & 0xF
                 bezier = key.num_columns & CTRL_FLAG_BEZIER
                 if bezier:
                     num_columns *= 3
-            values = [self.mdl.get_uint32() if integral else self.mdl.get_float() for _ in range(num_columns * key.num_rows)]
-            controllers[key.ctrl_type] = [[timekeys[i]] + values[i*num_columns:i*num_columns+num_columns] for i in range(key.num_rows)]
+            values = [
+                self.mdl.get_uint32() if integral else self.mdl.get_float()
+                for _ in range(num_columns * key.num_rows)
+            ]
+            controllers[key.ctrl_type] = [
+                [timekeys[i]] + values[i * num_columns : i * num_columns + num_columns]
+                for i in range(key.num_rows)
+            ]
         return controllers
 
     def get_node_type(self, flags):
@@ -751,7 +841,7 @@ class MdlLoader:
             NodeType.SKIN: SkinmeshNode,
             NodeType.EMITTER: EmitterNode,
             NodeType.LIGHT: LightNode,
-            NodeType.AABB: AabbNode
+            NodeType.AABB: AabbNode,
         }
         try:
             return switch[node_type](name)
@@ -764,8 +854,8 @@ class MdlLoader:
             return [values[3], *values[0:3]]
         elif num_columns == 1:
             comp = values[0]
-            x = ((comp & 0x7ff) / 1023.0) - 1.0
-            y = (((comp >> 11) & 0x7ff) / 1023.0) - 1.0
+            x = ((comp & 0x7FF) / 1023.0) - 1.0
+            y = (((comp >> 11) & 0x7FF) / 1023.0) - 1.0
             z = ((comp >> 22) / 511.0) - 1.0
             mag2 = x * x + y * y + z * z
             if mag2 < 1.0:
@@ -774,25 +864,29 @@ class MdlLoader:
                 w = 0.0
             return [w, x, y, z]
         else:
-            raise RuntimeError("Unsupported number of orientation columns: " + str(num_columns))
+            raise RuntimeError(
+                "Unsupported number of orientation columns: " + str(num_columns)
+            )
 
     def get_array_def(self):
         offset = self.mdl.get_uint32()
         count1 = self.mdl.get_uint32()
         count2 = self.mdl.get_uint32()
         if count1 != count2:
-            raise RuntimeError("Array count mismatch: count1={}, count2={}".format(count1, count2))
+            raise RuntimeError(
+                "Array count mismatch: count1={}, count2={}".format(count1, count2)
+            )
 
         return ArrayDefinition(offset, count1)
 
     def decompress_vector_xbox(self, comp):
-        tmp = comp & 0x7ff
+        tmp = comp & 0x7FF
         if tmp < 1024:
             x = tmp / 1023.0
         else:
             x = (tmp - 2047) / 1023.0
 
-        tmp = (comp >> 11) & 0x7ff
+        tmp = (comp >> 11) & 0x7FF
         if tmp < 1024:
             y = tmp / 1023.0
         else:

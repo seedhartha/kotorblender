@@ -31,7 +31,7 @@ class BwmLoader:
     def __init__(self, path, model_name):
         self.path = path
         self.model_name = model_name
-        self.bwm = BinaryReader(path, 'little')
+        self.bwm = BinaryReader(path, "little")
 
         self.position = [0.0] * 3
         self.verts = []
@@ -52,7 +52,11 @@ class BwmLoader:
     def load_header(self):
         file_type = self.bwm.get_string(4)
         if file_type != "BWM ":
-            raise RuntimeError("BWM file type is invalid: expected='BWM ', actual='{}'".format(file_type))
+            raise RuntimeError(
+                "BWM file type is invalid: expected='BWM ', actual='{}'".format(
+                    file_type
+                )
+            )
 
         version = self.bwm.get_string(4)
         self.bwm_type = self.bwm.get_uint32()
@@ -117,7 +121,15 @@ class BwmLoader:
             most_significant_plane = self.bwm.get_uint32()
             child_idx1 = self.bwm.get_uint32()
             child_idx2 = self.bwm.get_uint32()
-            aabbs.append(AABB(bounding_box, face_idx, most_significant_plane, child_idx1, child_idx2))
+            aabbs.append(
+                AABB(
+                    bounding_box,
+                    face_idx,
+                    most_significant_plane,
+                    child_idx1,
+                    child_idx2,
+                )
+            )
 
     def load_adjacent_edges(self):
         adj_edges = []
@@ -153,7 +165,11 @@ class BwmLoader:
         geom_node.parent = root_node
         geom_node.verts = self.verts
         geom_node.facelist = self.facelist
-        geom_node.roomlinks = {edge_idx: transition for edge_idx, transition in self.outer_edges if transition != -1}
+        geom_node.roomlinks = {
+            edge_idx: transition
+            for edge_idx, transition in self.outer_edges
+            if transition != -1
+        }
 
         root_node.children.append(geom_node)
 
@@ -163,7 +179,9 @@ class BwmLoader:
         return walkmesh
 
     def new_placeable_walkmesh(self):
-        walkmesh_type = WalkmeshType.DWK if self.path.endswith("dwk") else WalkmeshType.PWK
+        walkmesh_type = (
+            WalkmeshType.DWK if self.path.endswith("dwk") else WalkmeshType.PWK
+        )
         if walkmesh_type == WalkmeshType.DWK:
             if self.path.endswith("1.dwk"):
                 dwk_state = "open1"
@@ -182,7 +200,11 @@ class BwmLoader:
             use_name2 = "{}_pwk_use02".format(geom_name)
 
         root_node = DummyNode(root_name)
-        root_node.dummytype = DummyType.DWKROOT if walkmesh_type == WalkmeshType.DWK else DummyType.PWKROOT
+        root_node.dummytype = (
+            DummyType.DWKROOT
+            if walkmesh_type == WalkmeshType.DWK
+            else DummyType.PWKROOT
+        )
 
         geom_node = AabbNode(geom_name)
         geom_node.roottype = RootType.WALKMESH

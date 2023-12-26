@@ -32,31 +32,23 @@ class KB_OT_export_mdl(bpy.types.Operator, ExportHelper):
 
     filename_ext = ".mdl"
 
-    filter_glob: bpy.props.StringProperty(
-        default="*.mdl",
-        options={'HIDDEN'})
+    filter_glob: bpy.props.StringProperty(default="*.mdl", options={"HIDDEN"})
 
     export_for_tsl: bpy.props.BoolProperty(
-        name="Export for TSL",
-        description="Use The Sith Lords MDL format")
+        name="Export for TSL", description="Use The Sith Lords MDL format"
+    )
 
     export_for_xbox: bpy.props.BoolProperty(
-        name="Export for Xbox",
-        description="Use Xbox MDL format")
+        name="Export for Xbox", description="Use Xbox MDL format"
+    )
 
-    export_animations: bpy.props.BoolProperty(
-        name="Export Animations",
-        default=True)
+    export_animations: bpy.props.BoolProperty(name="Export Animations", default=True)
 
     export_walkmeshes: bpy.props.BoolProperty(
         name="Export Walkmeshes",
         description="Import area, door and placeable walkmeshes",
-        default=True)
-
-    export_custom_normals: bpy.props.BoolProperty(
-        name="Export Custom Normals",
-        description="Export previously imported normals, if any",
-        default=True)
+        default=True,
+    )
 
     def execute(self, context):
         options = ExportOptions()
@@ -64,12 +56,11 @@ class KB_OT_export_mdl(bpy.types.Operator, ExportHelper):
         options.export_for_xbox = self.export_for_xbox
         options.export_animations = self.export_animations
         options.export_walkmeshes = self.export_walkmeshes
-        options.export_custom_normals = self.export_custom_normals
 
         try:
             mdl.save_mdl(self, self.filepath, options)
         except Exception as e:
             print(traceback.format_exc())
-            self.report({'ERROR'}, str(e))
+            self.report({"ERROR"}, str(e))
 
-        return {'FINISHED'}
+        return {"FINISHED"}

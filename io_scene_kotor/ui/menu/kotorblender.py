@@ -19,8 +19,8 @@
 import bpy
 
 
-class KB_MT_kotorblender(bpy.types.Menu):
-    bl_label = "KotorBlender"
+class KB_MT_kotor(bpy.types.Menu):
+    bl_label = "KotOR"
 
     def draw(self, context):
         layout = self.layout

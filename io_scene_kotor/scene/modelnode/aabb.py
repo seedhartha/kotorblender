@@ -21,7 +21,7 @@ import bpy
 from bpy_extras.io_utils import unpack_list
 from mathutils import Vector
 
-from ...defines import MeshType, NodeType, NormalsAlgorithm, RootType, WalkmeshMaterial
+from ...defines import MeshType, NodeType, WalkmeshMaterial
 
 from ... import defines
 
@@ -31,11 +31,11 @@ ROOM_LINKS_COLORS = "RoomLinks"
 
 
 class AabbNode(TrimeshNode):
-
     def __init__(self, name="UNNAMED"):
         TrimeshNode.__init__(self, name)
         self.nodetype = NodeType.AABB
         self.meshtype = MeshType.AABB
+        self.compress = False
 
         self.lytposition = (0.0, 0.0, 0.0)
         self.roomlinks = dict()
@@ -53,7 +53,7 @@ class AabbNode(TrimeshNode):
                 break
 
     def add_to_collection(self, collection, options):
-        mesh = self.create_mesh(self.name, options)
+        mesh = self.create_blender_mesh(self.name)
         obj = bpy.data.objects.new(self.name, mesh)
         self.set_object_data(obj, options)
         self.apply_room_links(mesh)
@@ -61,10 +61,7 @@ class AabbNode(TrimeshNode):
 
         return obj
 
-    def create_mesh(self, name, options):
-        if options.normals_algorithm == NormalsAlgorithm.SHARP_EDGES and self.roottype == RootType.MODEL:
-            self.merge_similar_vertices(options.sharp_edge_angle)
-
+    def create_blender_mesh(self, name):
         # Create the mesh itself
         mesh = bpy.data.meshes.new(name)
         mesh.vertices.add(len(self.verts))
@@ -95,20 +92,21 @@ class AabbNode(TrimeshNode):
 
         # Create UV map
         if len(self.uv1) > 0:
-            uv = unpack_list([self.uv1[i] for indices in self.facelist.uv for i in indices])
+            uv = unpack_list(
+                [self.uv1[i] for indices in self.facelist.uv for i in indices]
+            )
             uv_layer = mesh.uv_layers.new(name=UV_MAP_DIFFUSE, do_init=False)
             uv_layer.data.foreach_set("uv", uv)
 
         # Create lightmap UV map
         if len(self.uv2) > 0:
-            uv = unpack_list([self.uv2[i] for indices in self.facelist.uv for i in indices])
+            uv = unpack_list(
+                [self.uv2[i] for indices in self.facelist.uv for i in indices]
+            )
             uv_layer = mesh.uv_layers.new(name=UV_MAP_LIGHTMAP, do_init=False)
             uv_layer.data.foreach_set("uv", uv)
 
         mesh.update()
-
-        if self.roottype == RootType.MODEL:
-            self.post_process_mesh(mesh, options)
 
         return mesh
 
@@ -121,7 +119,13 @@ class AabbNode(TrimeshNode):
         for wok_edge_idx, transition in self.roomlinks.items():
             wok_face_idx = wok_edge_idx // 3
             aabb_face = None
-            for walkable_idx, polygon in enumerate([p for p in mesh.polygons if p.material_index not in WalkmeshMaterial.NONWALKABLE]):
+            for walkable_idx, polygon in enumerate(
+                [
+                    p
+                    for p in mesh.polygons
+                    if p.material_index not in WalkmeshMaterial.NONWALKABLE
+                ]
+            ):
                 if walkable_idx == wok_face_idx:
                     aabb_face = polygon
                     break
@@ -132,12 +136,18 @@ class AabbNode(TrimeshNode):
                     color = [0.0, (200.0 + transition) / 255.0, 0.0]
                     colors.data[loop_idx].color = [*color, 1.0]
 
-    def unapply_room_links(self):
+    def unapply_room_links(self, obj):
         self.roomlinks = dict()
-        if ROOM_LINKS_COLORS not in self.eval_mesh.vertex_colors:
+        if ROOM_LINKS_COLORS not in obj.data.vertex_colors:
             return
-        colors = self.eval_mesh.vertex_colors[ROOM_LINKS_COLORS]
-        for walkable_idx, tri in enumerate([p for p in self.eval_mesh.loop_triangles if p.material_index not in WalkmeshMaterial.NONWALKABLE]):
+        colors = obj.data.vertex_colors[ROOM_LINKS_COLORS]
+        for walkable_idx, tri in enumerate(
+            [
+                p
+                for p in obj.data.loop_triangles
+                if p.material_index not in WalkmeshMaterial.NONWALKABLE
+            ]
+        ):
             for edge, loop_idx in enumerate(tri.loops):
                 color = colors.data[loop_idx].color
                 if color[0] > 0.0 or color[2] > 0.0 and (255.0 * color[1]) < 200.0:
@@ -156,4 +166,4 @@ class AabbNode(TrimeshNode):
 
         self.lytposition = obj.kb.lytposition
 
-        self.unapply_room_links()
+        self.unapply_room_links(obj)

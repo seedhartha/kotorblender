@@ -18,23 +18,22 @@
 
 from ...defines import DummyType, NodeType
 
-from .geometry import GeometryNode
+from .base import BaseNode
 
 
-class DummyNode(GeometryNode):
-
+class DummyNode(BaseNode):
     def __init__(self, name="UNNAMED"):
-        GeometryNode.__init__(self, name)
+        BaseNode.__init__(self, name)
 
         self.nodetype = NodeType.DUMMY
         self.dummytype = DummyType.NONE
 
     def set_object_data(self, obj, options):
-        GeometryNode.set_object_data(self, obj, options)
+        BaseNode.set_object_data(self, obj, options)
 
         obj.kb.dummytype = self.dummytype
 
     def load_object_data(self, obj, options):
-        GeometryNode.load_object_data(self, obj, options)
+        BaseNode.load_object_data(self, obj, options)
 
         self.dummytype = obj.kb.dummytype

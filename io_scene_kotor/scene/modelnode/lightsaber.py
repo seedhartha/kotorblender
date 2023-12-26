@@ -17,17 +17,12 @@
 # ##### END GPL LICENSE BLOCK #####
 
 from ...defines import MeshType, NodeType
-
 from .trimesh import TrimeshNode
 
 
 class LightsaberNode(TrimeshNode):
-
     def __init__(self, name="UNNAMED"):
         TrimeshNode.__init__(self, name)
-
         self.nodetype = NodeType.LIGHTSABER
         self.meshtype = MeshType.LIGHTSABER
-
-    def create_mesh(self, name, options):
-        return TrimeshNode.create_mesh(self, name, options)
+        self.compress = False

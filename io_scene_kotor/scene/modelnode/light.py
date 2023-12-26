@@ -20,7 +20,7 @@ import bpy
 
 from ...defines import NodeType
 
-from .geometry import GeometryNode
+from .base import BaseNode
 
 
 class FlareList:
@@ -31,10 +31,9 @@ class FlareList:
         self.colorshifts = []
 
 
-class LightNode(GeometryNode):
-
+class LightNode(BaseNode):
     def __init__(self, name="UNNAMED"):
-        GeometryNode.__init__(self, name)
+        BaseNode.__init__(self, name)
         self.nodetype = NodeType.LIGHT
 
         self.shadow = 1
@@ -59,7 +58,7 @@ class LightNode(GeometryNode):
         return obj
 
     def create_light(self, name):
-        light = bpy.data.lights.new(name, 'POINT')
+        light = bpy.data.lights.new(name, "POINT")
         if self.color[0] >= 0.0:
             light.color = self.color
         else:
@@ -67,16 +66,16 @@ class LightNode(GeometryNode):
         return light
 
     def set_object_data(self, obj, options):
-        GeometryNode.set_object_data(self, obj, options)
+        BaseNode.set_object_data(self, obj, options)
 
         obj.kb.multiplier = self.multiplier
         obj.kb.radius = self.radius
-        obj.kb.ambientonly = (self.ambientonly >= 1)
-        obj.kb.shadow = (self.shadow >= 1)
+        obj.kb.ambientonly = self.ambientonly >= 1
+        obj.kb.shadow = self.shadow >= 1
         obj.kb.lightpriority = self.lightpriority
-        obj.kb.fadinglight = (self.fadinglight >= 1)
+        obj.kb.fadinglight = self.fadinglight >= 1
         obj.kb.dynamictype = self.dynamictype
-        obj.kb.affectdynamic = (self.affectdynamic >= 1)
+        obj.kb.affectdynamic = self.affectdynamic >= 1
         obj.kb.flareradius = self.flareradius
         obj.kb.negativelight = self.color[0] < 0.0
 
@@ -93,7 +92,7 @@ class LightNode(GeometryNode):
         LightNode.calc_light_power(obj)
 
     def load_object_data(self, obj, options):
-        GeometryNode.load_object_data(self, obj, options)
+        BaseNode.load_object_data(self, obj, options)
 
         if not obj.kb.negativelight:
             self.color = obj.data.color

@@ -65,7 +65,7 @@ from .props.pathconnection import PathConnectionPropertyGroup
 from .props.scene import ScenePropertyGroup
 from .ui.list.lensflares import KB_UL_lens_flares
 from .ui.list.pathpoints import KB_UL_path_points
-from .ui.menu.kotorblender import KB_MT_kotorblender
+from .ui.menu.kotorblender import KB_MT_kotor
 from .ui.panel.animations import KB_PT_animations, KB_PT_anim_events
 from .ui.panel.lightmaps import KB_PT_lightmaps
 from .ui.panel.modelnode.emitter import (
@@ -125,7 +125,7 @@ def menu_func_export_pth(self, context):
 
 
 def menu_func_hide_wlk(self, context):
-    self.layout.menu("KB_MT_kotorblender")
+    self.layout.menu("KB_MT_kotor")
 
 
 classes = (
@@ -199,7 +199,7 @@ classes = (
     KB_UL_lens_flares,
     KB_UL_path_points,
     # Menus
-    KB_MT_kotorblender,
+    KB_MT_kotor,
 )
 
 

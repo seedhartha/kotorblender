@@ -23,8 +23,7 @@ from mathutils import Matrix, Quaternion
 from ...defines import RootType
 
 
-class GeometryNode:
-
+class BaseNode:
     def __init__(self, name="UNNAMED"):
         self.nodetype = "undefined"
         self.roottype = RootType.MODEL
@@ -50,7 +49,7 @@ class GeometryNode:
         obj.kb.node_number = self.node_number
         obj.kb.export_order = self.export_order
         obj.location = self.position
-        obj.rotation_mode = 'QUATERNION'
+        obj.rotation_mode = "QUATERNION"
         obj.rotation_quaternion = Quaternion(self.orientation)
         obj.scale = (self.scale, self.scale, self.scale)
 

@@ -41,7 +41,6 @@ from . import armature
 
 
 class Model:
-
     def __init__(self):
         self.name = "UNNAMED"
         self.supermodel = defines.NULL
@@ -72,11 +71,27 @@ class Model:
             for child in self.root_node.children:
                 self.import_nodes_to_collection(child, root_obj, collection, options)
 
-            animscale = 1.0  # animation scale must only be applied to supermodel animations
+            animscale = (
+                1.0  # animation scale must only be applied to supermodel animations
+            )
         else:
-            root_obj = next(iter(obj for obj in bpy.context.selected_objects if utils.is_mdl_root(obj)), None)
+            root_obj = next(
+                iter(
+                    obj
+                    for obj in bpy.context.selected_objects
+                    if utils.is_mdl_root(obj)
+                ),
+                None,
+            )
             if not root_obj:
-                root_obj = next(iter(obj for obj in bpy.context.collection.objects if utils.is_mdl_root(obj)), None)
+                root_obj = next(
+                    iter(
+                        obj
+                        for obj in bpy.context.collection.objects
+                        if utils.is_mdl_root(obj)
+                    ),
+                    None,
+                )
             if not root_obj:
                 return
 
@@ -118,7 +133,10 @@ class Model:
         model.root_node = cls.model_node_from_object(root_obj, options)
 
         if options.export_animations:
-            model.animations = [Animation.from_list_anim(anim, root_obj) for anim in root_obj.kb.anim_list]
+            model.animations = [
+                Animation.from_list_anim(anim, root_obj)
+                for anim in root_obj.kb.anim_list
+            ]
 
         return model
 
@@ -127,12 +145,12 @@ class Model:
         if exclude_xwk and (utils.is_pwk_root(obj) or utils.is_dwk_root(obj)):
             return None
 
-        if obj.type == 'EMPTY':
+        if obj.type == "EMPTY":
             if obj.kb.dummytype == DummyType.REFERENCE:
                 node_type = NodeType.REFERENCE
             else:
                 node_type = NodeType.DUMMY
-        elif obj.type == 'MESH':
+        elif obj.type == "MESH":
             if obj.kb.meshtype == MeshType.EMITTER:
                 node_type = NodeType.EMITTER
             elif obj.kb.meshtype == MeshType.AABB:
@@ -145,7 +163,7 @@ class Model:
                 node_type = NodeType.DANGLYMESH
             else:
                 node_type = NodeType.TRIMESH
-        elif obj.type == 'LIGHT':
+        elif obj.type == "LIGHT":
             node_type = NodeType.LIGHT
 
         switch = {
@@ -157,7 +175,7 @@ class Model:
             NodeType.EMITTER: EmitterNode,
             NodeType.LIGHT: LightNode,
             NodeType.AABB: AabbNode,
-            NodeType.LIGHTSABER: LightsaberNode
+            NodeType.LIGHTSABER: LightsaberNode,
         }
 
         name = obj.name
@@ -166,7 +184,9 @@ class Model:
 
         node = switch[node_type](name)
         node.parent = parent
-        node.load_object_data(obj, options)
+        depsgraph = bpy.context.evaluated_depsgraph_get()
+        eval_obj = obj.evaluated_get(depsgraph)
+        node.load_object_data(eval_obj, options)
 
         # Ignore transformations up to MDL root
         if not parent:

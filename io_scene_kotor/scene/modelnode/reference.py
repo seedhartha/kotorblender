@@ -20,27 +20,26 @@ from ...defines import DummyType, NodeType
 
 from ... import defines
 
-from .geometry import GeometryNode
+from .base import BaseNode
 
 
-class ReferenceNode(GeometryNode):
-
+class ReferenceNode(BaseNode):
     def __init__(self, name="UNNAMED"):
-        GeometryNode.__init__(self, name)
+        BaseNode.__init__(self, name)
         self.nodetype = NodeType.REFERENCE
         self.dummytype = DummyType.REFERENCE
         self.refmodel = defines.NULL
         self.reattachable = 0
 
     def set_object_data(self, obj, options):
-        GeometryNode.set_object_data(self, obj, options)
+        BaseNode.set_object_data(self, obj, options)
 
         obj.kb.dummytype = DummyType.REFERENCE
         obj.kb.refmodel = self.refmodel
-        obj.kb.reattachable = (self.reattachable == 1)
+        obj.kb.reattachable = self.reattachable == 1
 
     def load_object_data(self, obj, options):
-        GeometryNode.load_object_data(self, obj, options)
+        BaseNode.load_object_data(self, obj, options)
 
         self.refmodel = obj.kb.refmodel
         self.reattachable = 1 if obj.kb.reattachable else 0

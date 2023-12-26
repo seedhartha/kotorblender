@@ -16,23 +16,15 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-from math import cos, sqrt
-
 import bpy
 
 from bpy_extras.io_utils import unpack_list
 from mathutils import Vector
 
-from ...defines import NodeType, NormalsAlgorithm, RootType
-
+from ...defines import NodeType, RootType
 from ... import defines, utils
-
 from .. import material
-
-from .geometry import GeometryNode
-
-MERGE_DISTANCE = 1e-4
-MERGE_DISTANCE_UV = 1e-4
+from .base import BaseNode
 
 UV_MAP_DIFFUSE = "UVMap"
 UV_MAP_LIGHTMAP = "UVMap_lm"
@@ -46,11 +38,37 @@ class FaceList:
         self.normals = []
 
 
-class TrimeshNode(GeometryNode):
+class EdgeLoopMesh:
+    def __init__(self):
+        self.verts = []  # vertex coordinates
+        self.weights = []  # vertex bone weights
+        self.constraints = []  # vertex constraints (danglymesh)
 
+        self.loop_verts = []  # vertex indices
+        self.loop_normals = []
+        self.loop_uv1 = []  # diffuse texture coordinates
+        self.loop_uv2 = []  # lightmap texture coordinates
+        self.loop_tangents = []
+        self.loop_bitangents = []
+
+        self.face_materials = []
+        self.face_normals = []
+
+    def num_faces(self):
+        return self.num_loops() // 3
+
+    def num_loops(self):
+        return len(self.loop_verts)
+
+    def num_verts(self):
+        return len(self.verts)
+
+
+class TrimeshNode(BaseNode):
     def __init__(self, name="UNNAMED"):
-        GeometryNode.__init__(self, name)
+        BaseNode.__init__(self, name)
         self.nodetype = NodeType.TRIMESH
+        self.compress = True
 
         # Properties
         self.meshtype = defines.MeshType.TRIMESH
@@ -79,7 +97,7 @@ class TrimeshNode(GeometryNode):
         self.tangentspace = 0
         self.rotatetexture = 0
 
-        # Vertices
+        # Mesh
         self.verts = []
         self.normals = []
         self.uv1 = []
@@ -87,194 +105,126 @@ class TrimeshNode(GeometryNode):
         self.tangents = []
         self.bitangents = []
         self.tangentspacenormals = []
-
-        # Faces
+        self.weights = []
+        self.constraints = []
         self.facelist = FaceList()
 
-        # Internal
-        self.sharp_edges = set()
-        self.eval_obj = None
-        self.eval_mesh = None
-
     def add_to_collection(self, collection, options):
-        mesh = self.create_mesh(self.name, options)
-        obj = bpy.data.objects.new(self.name, mesh)
+        mesh = self.mdl_to_edge_loop_mesh()
+        bl_mesh = self.create_blender_mesh(self.name, mesh)
+        obj = bpy.data.objects.new(self.name, bl_mesh)
+        self.apply_edge_loop_mesh(mesh, obj)
         self.set_object_data(obj, options)
-
         if options.build_materials and self.roottype == RootType.MODEL:
-            material.rebuild_object_material(obj, options.texture_search_paths, options.lightmap_search_paths)
-
+            material.rebuild_object_material(
+                obj, options.texture_search_paths, options.lightmap_search_paths
+            )
         collection.objects.link(obj)
         return obj
 
-    def create_mesh(self, name, options):
-        if options.normals_algorithm == NormalsAlgorithm.SHARP_EDGES and self.roottype == RootType.MODEL:
-            self.merge_similar_vertices(options.sharp_edge_angle)
-
-        # Create the mesh itself
-        mesh = bpy.data.meshes.new(name)
-        mesh.vertices.add(len(self.verts))
-        mesh.vertices.foreach_set("co", unpack_list(self.verts))
+    def mdl_to_edge_loop_mesh(self):
         num_faces = len(self.facelist.vertices)
-        mesh.loops.add(3 * num_faces)
-        mesh.loops.foreach_set("vertex_index", unpack_list(self.facelist.vertices))
-        mesh.polygons.add(num_faces)
-        mesh.polygons.foreach_set("loop_start", range(0, 3 * num_faces, 3))
-        mesh.polygons.foreach_set("loop_total", (3,) * num_faces)
-        mesh.polygons.foreach_set("use_smooth", [True] * num_faces)
-
-        # Create UV map
-        if len(self.uv1) > 0:
-            uv = unpack_list([self.uv1[i] for indices in self.facelist.uv for i in indices])
-            uv_layer = mesh.uv_layers.new(name=UV_MAP_DIFFUSE, do_init=False)
-            uv_layer.data.foreach_set("uv", uv)
-
-        # Create lightmap UV map
-        if len(self.uv2) > 0:
-            uv = unpack_list([self.uv2[i] for indices in self.facelist.uv for i in indices])
-            uv_layer = mesh.uv_layers.new(name=UV_MAP_LIGHTMAP, do_init=False)
-            uv_layer.data.foreach_set("uv", uv)
-
-        mesh.update()
-
-        if self.roottype == RootType.MODEL:
-            self.post_process_mesh(mesh, options)
-
+        num_loops = 3 * num_faces
+        mesh = EdgeLoopMesh()
+        mesh.loop_verts = [-1] * num_loops
+        mesh.loop_normals = [(0, 0, 1)] * num_loops
+        mesh.loop_uv1 = [(0, 0)] * num_loops if self.uv1 else []
+        mesh.loop_uv2 = [(0, 0)] * num_loops if self.uv2 else []
+        if self.compress:
+            attrs_to_vert_idx = dict()
+            for face_idx in range(num_faces):
+                face_verts = self.facelist.vertices[face_idx]
+                for i in range(3):
+                    loop_idx = 3 * face_idx + i
+                    vert_idx = face_verts[i]
+                    vert = tuple(self.verts[vert_idx])
+                    # TODO: hash also by weights and constraint?
+                    attrs = (vert,)
+                    if attrs in attrs_to_vert_idx:
+                        mesh.loop_verts[loop_idx] = attrs_to_vert_idx[attrs]
+                    else:
+                        num_verts = len(mesh.verts)
+                        mesh.verts.append(vert)
+                        if self.weights:
+                            mesh.weights.append(self.weights[vert_idx])
+                        if self.constraints:
+                            mesh.constraints.append(self.constraints[vert_idx])
+                        attrs_to_vert_idx[attrs] = num_verts
+                        mesh.loop_verts[loop_idx] = num_verts
+                    mesh.loop_normals[loop_idx] = self.normals[vert_idx]
+                    if self.uv1:
+                        mesh.loop_uv1[loop_idx] = self.uv1[vert_idx]
+                    if self.uv2:
+                        mesh.loop_uv2[loop_idx] = self.uv2[vert_idx]
+                    if self.tangents and self.bitangents:
+                        mesh.loop_tangents[loop_idx] = self.tangents[vert_idx]
+                        mesh.loop_bitangents[loop_idx] = self.bitangents[vert_idx]
+        else:
+            mesh.verts = self.verts
+            mesh.weights = self.weights
+            mesh.constraints = self.constraints
+            for face_idx in range(num_faces):
+                face_verts = self.facelist.vertices[face_idx]
+                for i in range(3):
+                    loop_idx = 3 * face_idx + i
+                    vert_idx = face_verts[i]
+                    mesh.loop_verts[loop_idx] = vert_idx
+                    mesh.loop_normals[loop_idx] = self.normals[vert_idx]
+                    if self.uv1:
+                        mesh.loop_uv1[loop_idx] = self.uv1[vert_idx]
+                    if self.uv2:
+                        mesh.loop_uv2[loop_idx] = self.uv2[vert_idx]
+                    if self.tangents and self.bitangents:
+                        mesh.loop_tangents[loop_idx] = self.tangents[vert_idx]
+                        mesh.loop_bitangents[loop_idx] = self.bitangents[vert_idx]
+        mesh.face_materials = self.facelist.materials
+        mesh.face_normals = self.facelist.normals
         return mesh
 
-    def merge_similar_vertices(self, sharp_edge_angle):
+    def create_blender_mesh(self, name, mesh):
+        bl_mesh = bpy.data.meshes.new(name)
+        bl_mesh.vertices.add(mesh.num_verts())
+        bl_mesh.vertices.foreach_set("co", unpack_list(mesh.verts))
+        bl_mesh.loops.add(mesh.num_loops())
+        bl_mesh.loops.foreach_set("vertex_index", mesh.loop_verts)
+        bl_mesh.polygons.add(mesh.num_faces())
+        bl_mesh.polygons.foreach_set("loop_start", range(0, mesh.num_loops(), 3))
+        bl_mesh.polygons.foreach_set("loop_total", [3] * mesh.num_faces())
+        bl_mesh.polygons.foreach_set("use_smooth", [True] * mesh.num_faces())
+        bl_mesh.update()
+        if mesh.loop_normals:
+            bl_mesh.normals_split_custom_set(mesh.loop_normals)
+            bl_mesh.use_auto_smooth = True
+        if mesh.loop_uv1:
+            uv_layer = bl_mesh.uv_layers.new(name=UV_MAP_DIFFUSE, do_init=False)
+            uv_layer.data.foreach_set("uv", unpack_list(mesh.loop_uv1))
+        if mesh.loop_uv2:
+            uv_layer = bl_mesh.uv_layers.new(name=UV_MAP_LIGHTMAP, do_init=False)
+            uv_layer.data.foreach_set("uv", unpack_list(mesh.loop_uv2))
+        return bl_mesh
 
-        def cos_angle_between(a, b):
-            len2_a = sum([a[i] * a[i] for i in range(3)])
-            if len2_a == 0.0:
-                return -1.0
-            len2_b = sum([b[i] * b[i] for i in range(3)])
-            if len2_b == 0.0:
-                return -1.0
-            dot = sum([a[i] * b[i] for i in range(3)])
-            return dot / sqrt(len2_a * len2_b)
-
-        # Sort vertices into unique and duplicate
-
-        new_idx_by_old_idx = dict()
-        unique_indices = []
-        split_normals = []
-        for vert_idx, vert in enumerate(self.verts):
-            if vert_idx in new_idx_by_old_idx:
-                continue
-            num_unique = len(unique_indices)
-            normal = self.normals[vert_idx]
-            normals = [normal]
-            if self.uv1:
-                uv1 = self.uv1[vert_idx]
-            if self.uv2:
-                uv2 = self.uv2[vert_idx]
-            for other_vert_idx in range(vert_idx+1, len(self.verts)):
-                if other_vert_idx in new_idx_by_old_idx:
-                    continue
-                other_vert = self.verts[other_vert_idx]
-                other_normal = self.normals[other_vert_idx]
-                if self.uv1:
-                    other_uv1 = self.uv1[other_vert_idx]
-                if self.uv2:
-                    other_uv2 = self.uv2[other_vert_idx]
-                # Vertices are similar if their coords and UV are very close, and angle between their normals is acute
-                if (utils.is_close_3(vert, other_vert, MERGE_DISTANCE) and
-                        ((not self.uv1) or utils.is_close_2(uv1, other_uv1, MERGE_DISTANCE_UV)) and
-                        ((not self.uv2) or utils.is_close_2(uv2, other_uv2, MERGE_DISTANCE_UV)) and
-                        cos_angle_between(normal, other_normal) > 0.5):
-                    new_idx_by_old_idx[other_vert_idx] = num_unique
-                    normals.append(other_normal)
-            new_idx_by_old_idx[vert_idx] = num_unique
-            unique_indices.append(vert_idx)
-            split_normals.append(normals)
-
-        # Compact vertices
-
-        self.compact_vertices(unique_indices, split_normals)
-
-        # Determine sharp vertices
-
-        sharp_verts = [False] * len(self.verts)
-        cos_angle_sharp = cos(sharp_edge_angle)
-        for vert_idx, normals in enumerate(split_normals):
-            # Vertex is sharp if an angle between at least two of its split normals exceeds threshold
-            for normal_idx, normal in enumerate(normals):
-                if sharp_verts[vert_idx]:
-                    break
-                for other_normal_idx in range(normal_idx+1, len(normals)):
-                    other_normal = normals[other_normal_idx]
-                    if cos_angle_between(normal, other_normal) < cos_angle_sharp:
-                        sharp_verts[vert_idx] = True
-                        break
-
-        # Fix face vertex indices, determine sharp edges
-
-        for face_idx, old_face in enumerate(self.facelist.vertices):
-            new_face = [new_idx_by_old_idx[old_face[i]] for i in range(3)]
-            self.facelist.vertices[face_idx] = new_face
-            self.facelist.uv[face_idx] = new_face
-
-            # Edge is sharp if both of its vertices are sharp
-
-            edges = [tuple(sorted(pair)) for pair in [(new_face[0], new_face[1]), (new_face[1], new_face[2]), (new_face[2], new_face[0])]]
-            for edge in edges:
-                if sharp_verts[edge[0]] and sharp_verts[edge[1]]:
-                    self.sharp_edges.add(edge)
-
-    def compact_vertices(self, unique_indices, split_normals):
-        for new_idx, old_idx in enumerate(unique_indices):
-            normal = Vector()
-            for n in split_normals[new_idx]:
-                for i in range(3):
-                    normal[i] += n[i]
-            normal.normalize()
-
-            self.verts[new_idx] = self.verts[old_idx]
-            self.normals[new_idx] = tuple(normal[:3])
-            if self.uv1:
-                self.uv1[new_idx] = self.uv1[old_idx]
-            if self.uv2:
-                self.uv2[new_idx] = self.uv2[old_idx]
-
-        num_unique = len(unique_indices)
-        self.verts = self.verts[:num_unique]
-        self.normals = self.normals[:num_unique]
-        if self.uv1:
-            self.uv1 = self.uv1[:num_unique]
-        if self.uv2:
-            self.uv2 = self.uv2[:num_unique]
-
-    def post_process_mesh(self, mesh, options):
-        if options.normals_algorithm == NormalsAlgorithm.SHARP_EDGES:
-            # Mark sharp edges
-            for edge in mesh.edges:
-                if tuple(sorted(edge.vertices)) in self.sharp_edges:
-                    edge.use_edge_sharp = True
-        elif options.normals_algorithm == NormalsAlgorithm.CUSTOM:
-            # Set custom normals
-            mesh.normals_split_custom_set_from_vertices(self.normals)
-            mesh.use_auto_smooth = True
+    def apply_edge_loop_mesh(self, mesh, obj):
+        pass
 
     def set_object_data(self, obj, options):
-        GeometryNode.set_object_data(self, obj, options)
+        BaseNode.set_object_data(self, obj, options)
 
         obj.kb.meshtype = self.meshtype
         obj.kb.bitmap = self.bitmap if utils.is_not_null(self.bitmap) else ""
         obj.kb.bitmap2 = self.bitmap2 if utils.is_not_null(self.bitmap2) else ""
         obj.kb.alpha = self.alpha
-        obj.kb.lightmapped = (self.lightmapped == 1)
-        obj.kb.render = (self.render == 1)
-        obj.kb.shadow = (self.shadow == 1)
-        obj.kb.beaming = (self.beaming == 1)
-        obj.kb.tangentspace = (self.tangentspace == 1)
-        obj.kb.rotatetexture = (self.rotatetexture == 1)
-        obj.kb.background_geometry = (self.background_geometry == 1)
-        obj.kb.dirt_enabled = (self.dirt_enabled == 1)
+        obj.kb.lightmapped = self.lightmapped == 1
+        obj.kb.render = self.render == 1
+        obj.kb.shadow = self.shadow == 1
+        obj.kb.beaming = self.beaming == 1
+        obj.kb.tangentspace = self.tangentspace == 1
+        obj.kb.rotatetexture = self.rotatetexture == 1
+        obj.kb.background_geometry = self.background_geometry == 1
+        obj.kb.dirt_enabled = self.dirt_enabled == 1
         obj.kb.dirt_texture = self.dirt_texture
         obj.kb.dirt_worldspace = self.dirt_worldspace
-        obj.kb.hologram_donotdraw = (self.hologram_donotdraw == 1)
-        obj.kb.animateuv = (self.animateuv == 1)
+        obj.kb.hologram_donotdraw = self.hologram_donotdraw == 1
+        obj.kb.animateuv = self.animateuv == 1
         obj.kb.uvdirectionx = self.uvdirectionx
         obj.kb.uvdirectiony = self.uvdirectiony
         obj.kb.uvjitter = self.uvjitter
@@ -284,12 +234,8 @@ class TrimeshNode(GeometryNode):
         obj.kb.diffuse = self.diffuse
         obj.kb.ambient = self.ambient
 
-        if options.normals_algorithm == NormalsAlgorithm.SHARP_EDGES:
-            modifier = obj.modifiers.new(name="EdgeSplit", type='EDGE_SPLIT')
-            modifier.use_edge_angle = False
-
     def load_object_data(self, obj, options):
-        GeometryNode.load_object_data(self, obj, options)
+        BaseNode.load_object_data(self, obj, options)
 
         self.meshtype = obj.kb.meshtype
         self.bitmap = obj.kb.bitmap if obj.kb.bitmap else defines.NULL
@@ -316,77 +262,127 @@ class TrimeshNode(GeometryNode):
         self.diffuse = obj.kb.diffuse
         self.ambient = obj.kb.ambient
 
-        depsgraph = bpy.context.evaluated_depsgraph_get()
-        self.eval_obj = obj.evaluated_get(depsgraph)
-        self.eval_mesh = self.eval_obj.data
-        self.eval_mesh.calc_loop_triangles()
+        mesh = self.unapply_edge_loop_mesh(obj)
+        self.edge_loop_to_mdl_mesh(mesh)
 
-        for vert in self.eval_mesh.vertices:
-            self.verts.append(vert.co[:3])
+    def unapply_edge_loop_mesh(self, obj):
+        bl_mesh = obj.data
+        bl_mesh.calc_loop_triangles()
+        bl_mesh.calc_normals_split()
+        mesh = EdgeLoopMesh()
+        for vert in bl_mesh.vertices:
+            mesh.verts.append(vert.co[:3])
+        for face in bl_mesh.loop_triangles:
+            for i in range(3):
+                mesh.loop_verts.append(face.vertices[i])
+                mesh.loop_normals.append(face.split_normals[i])
+                if self.tangentspace:
+                    loop_idx = face.loops[i]
+                    loop = bl_mesh.loops[loop_idx]
+                    mesh.loop_tangents.append(loop.tangent)
+                    mesh.loop_bitangents.append(loop.bitangent)
+            mesh.face_materials.append(face.material_index)
+            mesh.face_normals.append(face.normal)
+        if UV_MAP_DIFFUSE in bl_mesh.uv_layers:
+            mesh.loop_uv1 = [
+                loop.uv[:2] for loop in bl_mesh.uv_layers[UV_MAP_DIFFUSE].data
+            ]
+            if self.tangentspace:
+                bl_mesh.calc_tangents(uvmap=UV_MAP_DIFFUSE)
+        if UV_MAP_LIGHTMAP in bl_mesh.uv_layers:
+            mesh.loop_uv2 = [
+                loop.uv[:2] for loop in bl_mesh.uv_layers[UV_MAP_LIGHTMAP].data
+            ]
+        return mesh
 
-        if options.export_custom_normals and self.eval_mesh.has_custom_normals:
-            self.eval_mesh.calc_normals_split()
-            normals = dict()
-            for tri in self.eval_mesh.loop_triangles:
-                for vert_idx, normal in zip(tri.vertices, tri.split_normals):
-                    if vert_idx not in normals:
-                        normals[vert_idx] = Vector(normal)
+    def edge_loop_to_mdl_mesh(self, mesh):
+        self.verts = []
+        self.normals = []
+        self.uv1 = []
+        self.uv2 = []
+        self.tangents = []
+        self.bitangents = []
+        self.tangentspacenormals = []
+        self.weights = []
+        self.constraints = []
+        self.facelist = FaceList()
+
+        if self.compress:
+            attrs_to_vert_idx = dict()
+            for face_idx in range(mesh.num_faces()):
+                vert_indices = [0] * 3
+                for i in range(3):
+                    loop_idx = 3 * face_idx + i
+                    vert_idx = mesh.loop_verts[loop_idx]
+                    vert = mesh.verts[vert_idx]
+                    normal = mesh.loop_normals[loop_idx]
+                    uv1 = mesh.loop_uv1[loop_idx] if mesh.loop_uv1 else (0, 0)
+                    uv2 = mesh.loop_uv2[loop_idx] if mesh.loop_uv2 else (0, 0)
+                    attrs = (vert, normal, uv1, uv2)
+                    if attrs in attrs_to_vert_idx:
+                        vert_indices[i] = attrs_to_vert_idx[attrs]
                     else:
-                        normals[vert_idx] += Vector(normal)
-            for vert_idx in range(len(self.eval_mesh.vertices)):
-                normal = normals[vert_idx].normalized()
-                self.normals.append(normal)
+                        num_verts = len(self.verts)
+                        attrs_to_vert_idx[attrs] = num_verts
+                        vert_indices[i] = num_verts
+                        self.verts.append(vert)
+                        self.normals.append(normal)
+                        if mesh.loop_uv1:
+                            self.uv1.append(uv1)
+                        if mesh.loop_uv2:
+                            self.uv2.append(uv2)
+                        if mesh.loop_tangents and mesh.loop_bitangents:
+                            self.tangents.append(mesh.loop_tangents[loop_idx])
+                            self.bitangents.append(mesh.loop_bitangents[loop_idx])
+                            # TODO: is this correct?
+                            self.tangentspacenormals.append(mesh.loop_normals[loop_idx])
+                        if mesh.weights:
+                            self.weights.append(mesh.weights[vert_idx])
+                        if mesh.constraints:
+                            self.constraints.append(mesh.constraints[vert_idx])
+                self.facelist.vertices.append(vert_indices)
+                self.facelist.uv.append(vert_indices)
         else:
-            for vert in self.eval_mesh.vertices:
-                self.normals.append(vert.normal[:3])
+            num_verts = len(mesh.verts)
+            self.verts = mesh.verts
+            self.weights = mesh.weights
+            self.constraints = mesh.constraints
+            normals = [Vector((0, 0, 0))] * num_verts
+            if mesh.loop_tangents and mesh.loop_bitangents:
+                tangents = [Vector((0, 0, 0))] * num_verts
+                bitangents = [Vector((0, 0, 0))] * num_verts
+                tanspacenormals = [Vector((0, 0, 0))] * num_verts
+            if mesh.loop_uv1:
+                self.uv1 = [(0, 0)] * num_verts
+            if mesh.loop_uv2:
+                self.uv2 = [(0, 0)] * num_verts
+            for face_idx in range(mesh.num_faces()):
+                start_loop_idx = 3 * face_idx
+                face_verts = mesh.loop_verts[start_loop_idx : (start_loop_idx + 3)]
+                for i in range(3):
+                    loop_idx = start_loop_idx + i
+                    vert_idx = face_verts[i]
+                    normals[vert_idx] += Vector(mesh.loop_normals[loop_idx])
+                    if mesh.loop_uv1:
+                        self.uv1[vert_idx] = mesh.loop_uv1[loop_idx]
+                    if mesh.loop_uv2:
+                        self.uv2[vert_idx] = mesh.loop_uv2[loop_idx]
+                    if mesh.loop_tangents and mesh.loop_bitangents:
+                        tangents[vert_idx] += Vector(mesh.loop_tangents[loop_idx])
+                        bitangents[vert_idx] += Vector(mesh.loop_bitangents[loop_idx])
+                        # TODO: is this correct?
+                        tanspacenormals[vert_idx] += Vector(mesh.loop_normals[loop_idx])
+                self.facelist.vertices.append(face_verts)
+                self.facelist.uv.append(face_verts)
+            normals = [normal.normalized() for normal in normals]
+            self.normals = [normal[:3] for normal in normals]
+            if mesh.loop_tangents and mesh.loop_bitangents:
+                tangents = [tangent.normalized() for tangent in tangents]
+                bitangents = [bitangent.normalized() for bitangent in bitangents]
+                tanspacenormals = [normal.normalized() for normal in tanspacenormals]
+                self.tangents = [tangent[:3] for tangent in tangents]
+                self.bitangents = [bitangent[:3] for bitangent in bitangents]
+                self.tangentspacenormals = [normal[:3] for normal in tanspacenormals]
 
-        self.uv1 = self.get_uv_from_uv_layer(self.eval_mesh, UV_MAP_DIFFUSE)
-        self.uv2 = self.get_uv_from_uv_layer(self.eval_mesh, UV_MAP_LIGHTMAP)
-
-        if self.tangentspace:
-            num_verts = len(self.eval_mesh.vertices)
-            self.tangents = [Vector() for _ in range(num_verts)]
-            self.bitangents = [Vector() for _ in range(num_verts)]
-            self.tangentspacenormals = [Vector() for _ in range(num_verts)]
-            if self.uv1:
-                self.eval_mesh.calc_tangents(uvmap=UV_MAP_DIFFUSE)
-
-        for tri in self.eval_mesh.loop_triangles:
-            self.facelist.vertices.append(tri.vertices[:3])
-            self.facelist.uv.append(tri.vertices[:3])
-            self.facelist.materials.append(tri.material_index)
-            self.facelist.normals.append(tri.normal)
-
-            if self.tangentspace and self.uv1:
-                for loop in [self.eval_mesh.loops[i] for i in tri.loops]:
-                    vert_idx = loop.vertex_index
-                    self.tangents[vert_idx] += loop.tangent
-                    self.bitangents[vert_idx] += loop.bitangent
-                    self.tangentspacenormals[vert_idx] += loop.normal
-
-        if self.tangentspace:
-            if self.uv1:
-                for vert_idx in range(num_verts):
-                    self.tangents[vert_idx].normalize()
-                    self.bitangents[vert_idx].normalize()
-                    self.tangentspacenormals[vert_idx].normalize()
-            else:
-                for vert_idx in range(num_verts):
-                    self.tangents[vert_idx] = Vector((1.0, 0.0, 0.0))
-                    self.bitangents[vert_idx] = Vector((0.0, 1.0, 0.0))
-                    self.tangentspacenormals[vert_idx] = Vector((0.0, 0.0, 1.0))
-
-    def get_uv_from_uv_layer(self, mesh, layer_name):
-        if not layer_name in mesh.uv_layers:
-            return []
-        layer_data = mesh.uv_layers[layer_name].data
-        tvert_by_vert_idx = dict()
-        for tri in mesh.loop_triangles:
-            for vert_idx, loop_idx in zip(tri.vertices, tri.loops):
-                tvert_by_vert_idx[vert_idx] = layer_data[loop_idx].uv[:2]
-        tverts = []
-        max_vert_idx = max([i for i in tvert_by_vert_idx.keys()])
-        for i in range(0, max_vert_idx + 1):
-            tvert = tvert_by_vert_idx[i] if i in tvert_by_vert_idx else [0.0, 0.0]
-            tverts.append(tvert)
-        return tverts
+        self.facelist.materials = mesh.face_materials
+        self.facelist.normals = mesh.face_normals

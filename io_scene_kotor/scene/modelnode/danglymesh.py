@@ -17,14 +17,12 @@
 # ##### END GPL LICENSE BLOCK #####
 
 from ...defines import MeshType, NodeType
-
 from .trimesh import TrimeshNode
 
 CONSTRAINTS = "constraints"
 
 
 class DanglymeshNode(TrimeshNode):
-
     def __init__(self, name="UNNAMED"):
         TrimeshNode.__init__(self, name)
         self.nodetype = NodeType.DANGLYMESH
@@ -32,40 +30,38 @@ class DanglymeshNode(TrimeshNode):
         self.period = 1.0
         self.tightness = 1.0
         self.displacement = 1.0
-        self.constraints = []
+
+    def apply_edge_loop_mesh(self, mesh, obj):
+        TrimeshNode.apply_edge_loop_mesh(self, mesh, obj)
+        self.apply_vertex_constraints(mesh, obj)
+
+    def apply_vertex_constraints(self, mesh, obj):
+        group = obj.vertex_groups.new(name=CONSTRAINTS)
+        for vert_idx, constraint in enumerate(mesh.constraints):
+            weight = constraint / 255
+            group.add([vert_idx], weight, "REPLACE")
+        obj.kb.constraints = group.name
 
     def set_object_data(self, obj, options):
         TrimeshNode.set_object_data(self, obj, options)
-
         obj.kb.period = self.period
         obj.kb.tightness = self.tightness
         obj.kb.displacement = self.displacement
-        self.add_constraints_to_object(obj)
-
-    def compact_vertices(self, unique_indices, split_normals):
-        TrimeshNode.compact_vertices(self, unique_indices, split_normals)
-
-        for new_idx, old_idx in enumerate(unique_indices):
-            self.constraints[new_idx] = self.constraints[old_idx]
-
-        num_unique = len(unique_indices)
-        self.constraints = self.constraints[:num_unique]
-
-    def add_constraints_to_object(self, obj):
-        group = obj.vertex_groups.new(name=CONSTRAINTS)
-        for vert_idx, constraint in enumerate(self.constraints):
-            weight = constraint / 255
-            group.add([vert_idx], weight, 'REPLACE')
-        obj.kb.constraints = group.name
 
     def load_object_data(self, obj, options):
         TrimeshNode.load_object_data(self, obj, options)
-
         self.period = obj.kb.period
         self.tightness = obj.kb.tightness
         self.displacement = obj.kb.displacement
 
-        if CONSTRAINTS not in self.eval_obj.vertex_groups:
+    def unapply_edge_loop_mesh(self, obj):
+        mesh = TrimeshNode.unapply_edge_loop_mesh(self, obj)
+        self.unapply_vertex_constraints(obj, mesh)
+        return mesh
+
+    def unapply_vertex_constraints(self, obj, mesh):
+        if CONSTRAINTS not in obj.vertex_groups:
+            mesh.constraints = [0] * range(len(mesh.verts))
             return
-        group = self.eval_obj.vertex_groups[CONSTRAINTS]
-        self.constraints = [255.0 * group.weight(i) for i in range(len(self.verts))]
+        group = obj.vertex_groups[CONSTRAINTS]
+        mesh.constraints = [255.0 * group.weight(i) for i in range(len(mesh.verts))]
