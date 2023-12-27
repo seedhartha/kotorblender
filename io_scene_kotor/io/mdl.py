@@ -111,6 +111,7 @@ def save_mdl(operator, filepath, options):
 
     # Ensure MDL root is selected and is in OBJECT mode
     mdl_root.select_set(True)
+    bpy.context.view_layer.objects.active = mdl_root
     bpy.ops.object.mode_set(mode="OBJECT")
 
     # Export MDL
