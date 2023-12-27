@@ -91,9 +91,10 @@ def load_mdl(operator, filepath, options, position=(0.0, 0.0, 0.0)):
 
 
 def save_mdl(operator, filepath, options):
-    # Reset Pose
+    # Reset pose
     bpy.context.scene.frame_set(0)
 
+    # Find MDL root
     mdl_root = next(
         iter(obj for obj in bpy.context.selected_objects if utils.is_mdl_root(obj)),
         None,
@@ -107,6 +108,9 @@ def save_mdl(operator, filepath, options):
         )
     if not mdl_root:
         return
+
+    # Ensure current mode is Object
+    bpy.ops.object.mode_set(mode="OBJECT")
 
     # Export MDL
     model = Model.from_mdl_root(mdl_root, options)
@@ -125,7 +129,7 @@ def save_mdl(operator, filepath, options):
             bwm = BwmSaver(wok_path, walkmesh)
             bwm.save()
 
-        # Export PWK, DWK
+        # Export PWK or DWK
         xwk_roots = utils.find_objects(
             mdl_root, lambda obj: utils.is_pwk_root(obj) or utils.is_dwk_root(obj)
         )
