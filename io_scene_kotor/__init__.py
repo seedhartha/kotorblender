@@ -40,7 +40,6 @@ from .ops.hideobjects import (
     KB_OT_unhide_blockers,
     KB_OT_unhide_charbones,
     KB_OT_unhide_charnulls,
-    KB_OT_unhide_all,
 )
 from .ops.lensflare.add import KB_OT_add_lens_flare
 from .ops.lensflare.delete import KB_OT_delete_lens_flare
@@ -173,7 +172,6 @@ classes = (
     KB_OT_unhide_blockers,
     KB_OT_unhide_charbones,
     KB_OT_unhide_charnulls,
-    KB_OT_unhide_all,
     # Panels
     KB_PT_model,
     KB_PT_animations,  # child of KB_PT_model

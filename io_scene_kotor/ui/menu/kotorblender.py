@@ -40,5 +40,3 @@ class KB_MT_kotor(bpy.types.Menu):
         layout.separator()
         layout.operator("kb.unhide_charbones", icon="BONE_DATA")
         layout.operator("kb.unhide_charnulls", icon="PIVOT_BOUNDBOX")
-        layout.separator()
-        layout.operator("kb.unhide_all")
