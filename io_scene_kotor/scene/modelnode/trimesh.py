@@ -269,6 +269,8 @@ class TrimeshNode(BaseNode):
         bl_mesh = obj.data
         bl_mesh.calc_loop_triangles()
         bl_mesh.calc_normals_split()
+        if self.tangentspace and UV_MAP_DIFFUSE in bl_mesh.uv_layers:
+            bl_mesh.calc_tangents(uvmap=UV_MAP_DIFFUSE)
         mesh = EdgeLoopMesh()
         for vert in bl_mesh.vertices:
             mesh.verts.append(vert.co[:3])
@@ -276,23 +278,21 @@ class TrimeshNode(BaseNode):
             for i in range(3):
                 mesh.loop_verts.append(face.vertices[i])
                 mesh.loop_normals.append(face.split_normals[i])
+                loop_idx = face.loops[i]
+                if UV_MAP_DIFFUSE in bl_mesh.uv_layers:
+                    mesh.loop_uv1.append(
+                        bl_mesh.uv_layers[UV_MAP_DIFFUSE].data[loop_idx].uv[:2]
+                    )
+                if UV_MAP_LIGHTMAP in bl_mesh.uv_layers:
+                    mesh.loop_uv2.append(
+                        bl_mesh.uv_layers[UV_MAP_LIGHTMAP].data[loop_idx].uv[:2]
+                    )
                 if self.tangentspace:
-                    loop_idx = face.loops[i]
                     loop = bl_mesh.loops[loop_idx]
                     mesh.loop_tangents.append(loop.tangent)
                     mesh.loop_bitangents.append(loop.bitangent)
             mesh.face_materials.append(face.material_index)
             mesh.face_normals.append(face.normal)
-        if UV_MAP_DIFFUSE in bl_mesh.uv_layers:
-            mesh.loop_uv1 = [
-                loop.uv[:2] for loop in bl_mesh.uv_layers[UV_MAP_DIFFUSE].data
-            ]
-            if self.tangentspace:
-                bl_mesh.calc_tangents(uvmap=UV_MAP_DIFFUSE)
-        if UV_MAP_LIGHTMAP in bl_mesh.uv_layers:
-            mesh.loop_uv2 = [
-                loop.uv[:2] for loop in bl_mesh.uv_layers[UV_MAP_LIGHTMAP].data
-            ]
         return mesh
 
     def edge_loop_to_mdl_mesh(self, mesh):

@@ -109,7 +109,8 @@ def save_mdl(operator, filepath, options):
     if not mdl_root:
         return
 
-    # Ensure current mode is Object
+    # Ensure MDL root is selected and is in OBJECT mode
+    mdl_root.select_set(True)
     bpy.ops.object.mode_set(mode="OBJECT")
 
     # Export MDL

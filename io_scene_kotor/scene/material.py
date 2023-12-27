@@ -157,6 +157,8 @@ def get_or_create_texture(name, search_paths):
 def create_image(name, search_paths):
     tpc_filename = (name + ".tpc").lower()
     for search_path in search_paths:
+        if not os.path.exists(search_path):
+            continue
         image = image_utils.load_image(name + ".tga", search_path, recursive=True)
         if image:
             image.name = name
