@@ -23,9 +23,9 @@ from ..binreader import BinaryReader
 from .types import *
 
 
-class GffLoader:
+class GffReader:
     def __init__(self, path, file_type):
-        self.reader = BinaryReader(path, 'little')
+        self.reader = BinaryReader(path, "little")
         self.file_type = file_type.ljust(4)
 
     def load(self):
@@ -33,9 +33,17 @@ class GffLoader:
         file_version = self.reader.get_string(4)
 
         if file_type != self.file_type:
-            raise RuntimeError("GFF file type is invalid: expected='{}', actual='{}'".format(self.file_type, file_type))
+            raise RuntimeError(
+                "GFF file type is invalid: expected='{}', actual='{}'".format(
+                    self.file_type, file_type
+                )
+            )
         if file_version != FILE_VERSION:
-            raise RuntimeError("GFF file version is invalid: expected='{}', actual='{}'".format(FILE_VERSION, file_version))
+            raise RuntimeError(
+                "GFF file version is invalid: expected='{}', actual='{}'".format(
+                    FILE_VERSION, file_version
+                )
+            )
 
         self.off_structs = self.reader.get_uint32()
         self.num_structs = self.reader.get_uint32()
@@ -65,7 +73,7 @@ class GffLoader:
             struct = GffStruct(
                 self.reader.get_uint32(),
                 self.reader.get_uint32(),
-                self.reader.get_uint32()
+                self.reader.get_uint32(),
             )
             self.structs.append(struct)
 
@@ -76,13 +84,15 @@ class GffLoader:
             field = GffField(
                 self.reader.get_uint32(),
                 self.reader.get_uint32(),
-                self.reader.get_uint32()
+                self.reader.get_uint32(),
             )
             self.fields.append(field)
 
     def load_labels(self):
         self.reader.seek(self.off_labels)
-        self.labels = [self.reader.get_string(16).rstrip('\0') for _ in range(self.num_labels)]
+        self.labels = [
+            self.reader.get_string(16).rstrip("\0") for _ in range(self.num_labels)
+        ]
 
     def load_field_data(self):
         self.reader.seek(self.off_field_data)
@@ -90,11 +100,15 @@ class GffLoader:
 
     def load_field_indices(self):
         self.reader.seek(self.off_field_indices)
-        self.field_indices = [self.reader.get_uint32() for _ in range(self.num_field_indices // 4)]
+        self.field_indices = [
+            self.reader.get_uint32() for _ in range(self.num_field_indices // 4)
+        ]
 
     def load_list_indices(self):
         self.reader.seek(self.off_list_indices)
-        self.list_indices = [self.reader.get_uint32() for _ in range(self.num_list_indices // 4)]
+        self.list_indices = [
+            self.reader.get_uint32() for _ in range(self.num_list_indices // 4)
+        ]
 
     def new_tree_struct(self, structIdx):
         tree = dict()
@@ -128,7 +142,9 @@ class GffLoader:
             indices = self.list_indices[start:stop]
             data = [self.new_tree_struct(idx) for idx in indices]
         else:
-            raise NotImplementedError("Field type {} is not supported".format(field.type))
+            raise NotImplementedError(
+                "Field type {} is not supported".format(field.type)
+            )
 
         return KeyValue(label, data)
 

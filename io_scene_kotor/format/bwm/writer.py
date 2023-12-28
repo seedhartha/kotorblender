@@ -31,7 +31,7 @@ from .types import *
 MERGE_DISTANCE = 1e-4
 
 
-class BwmSaver:
+class BwmWriter:
     def __init__(self, path, walkmesh):
         self.path = path
         self.bwm = BinaryWriter(path, "little")

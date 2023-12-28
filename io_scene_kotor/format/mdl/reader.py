@@ -64,7 +64,7 @@ class ArrayDefinition:
         self.count = count
 
 
-class MdlLoader:
+class MdlReader:
     def __init__(self, path):
         self.path = path
         self.mdl = BinaryReader(path, "little")

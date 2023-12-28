@@ -20,10 +20,10 @@ import os
 
 import bpy
 
-from ..format.bwm.loader import BwmLoader
-from ..format.bwm.saver import BwmSaver
-from ..format.mdl.loader import MdlLoader
-from ..format.mdl.saver import MdlSaver
+from ..format.bwm.reader import BwmReader
+from ..format.bwm.writer import BwmWriter
+from ..format.mdl.reader import MdlReader
+from ..format.mdl.writer import MdlWriter
 from ..scene.modelnode.aabb import AabbNode
 from ..scene.model import Model
 from ..scene.walkmesh import Walkmesh
@@ -32,7 +32,7 @@ from ..utils import is_mdl_root, is_pwk_root, is_dwk_root, find_objects
 
 def load_mdl(operator, filepath, options, position=(0.0, 0.0, 0.0)):
     operator.report({"INFO"}, "Loading model from '{}'".format(filepath))
-    mdl = MdlLoader(filepath)
+    mdl = MdlReader(filepath)
     model = mdl.load()
 
     pwk_walkmesh = None
@@ -43,7 +43,7 @@ def load_mdl(operator, filepath, options, position=(0.0, 0.0, 0.0)):
     if options.import_geometry and options.import_walkmeshes:
         wok_path = filepath[:-4] + ".wok"
         if os.path.exists(wok_path):
-            wok = BwmLoader(wok_path, model.name)
+            wok = BwmReader(wok_path, model.name)
             walkmesh = wok.load()
             aabb = model.find_node(lambda n: isinstance(n, AabbNode))
             aabb_wok = walkmesh.find_node(lambda n: isinstance(n, AabbNode))
@@ -54,7 +54,7 @@ def load_mdl(operator, filepath, options, position=(0.0, 0.0, 0.0)):
         pwk_path = filepath[:-4] + ".pwk"
         if os.path.exists(pwk_path):
             operator.report({"INFO"}, "Loading walkmesh from '{}'".format(pwk_path))
-            pwk = BwmLoader(pwk_path, model.name)
+            pwk = BwmReader(pwk_path, model.name)
             pwk_walkmesh = pwk.load()
 
         dwk0_path = filepath[:-4] + "0.dwk"
@@ -66,11 +66,11 @@ def load_mdl(operator, filepath, options, position=(0.0, 0.0, 0.0)):
             and os.path.exists(dwk2_path)
         ):
             operator.report({"INFO"}, "Loading walkmesh from '{}'".format(dwk0_path))
-            dwk1 = BwmLoader(dwk0_path, model.name)
+            dwk1 = BwmReader(dwk0_path, model.name)
             operator.report({"INFO"}, "Loading walkmesh from '{}'".format(dwk1_path))
-            dwk2 = BwmLoader(dwk1_path, model.name)
+            dwk2 = BwmReader(dwk1_path, model.name)
             operator.report({"INFO"}, "Loading walkmesh from '{}'".format(dwk2_path))
-            dwk3 = BwmLoader(dwk2_path, model.name)
+            dwk3 = BwmReader(dwk2_path, model.name)
             dwk_walkmesh1 = dwk1.load()
             dwk_walkmesh2 = dwk2.load()
             dwk_walkmesh3 = dwk3.load()
@@ -114,7 +114,7 @@ def save_mdl(operator, filepath, options):
     # Export MDL
     model = Model.from_mdl_root(mdl_root, options)
     operator.report({"INFO"}, "Saving model to '{}'".format(filepath))
-    mdl = MdlSaver(filepath, model, options.export_for_tsl, options.export_for_xbox)
+    mdl = MdlWriter(filepath, model, options.export_for_tsl, options.export_for_xbox)
     mdl.save()
 
     if options.export_walkmeshes:
@@ -125,7 +125,7 @@ def save_mdl(operator, filepath, options):
             wok_path = base_path + ".wok"
             walkmesh = Walkmesh.from_aabb_node(aabb_node)
             operator.report({"INFO"}, "Saving walkmesh to '{}'".format(wok_path))
-            bwm = BwmSaver(wok_path, walkmesh)
+            bwm = BwmWriter(wok_path, walkmesh)
             bwm.save()
 
         # Export PWK or DWK
@@ -146,5 +146,5 @@ def save_mdl(operator, filepath, options):
                 xwk_path = "{}{}.dwk".format(base_path, dwk_state)
             walkmesh = Walkmesh.from_root_object(xwk_root, options)
             operator.report({"INFO"}, "Saving walkmesh to '{}'".format(xwk_path))
-            bwm = BwmSaver(xwk_path, walkmesh)
+            bwm = BwmWriter(xwk_path, walkmesh)
             bwm.save()

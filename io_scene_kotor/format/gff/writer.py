@@ -23,10 +23,10 @@ from ..binwriter import BinaryWriter
 from .types import *
 
 
-class GffSaver:
+class GffWriter:
     def __init__(self, tree, path, file_type):
         self.tree = tree
-        self.writer = BinaryWriter(path, 'little')
+        self.writer = BinaryWriter(path, "little")
         self.file_type = file_type.ljust(4)
 
     def save(self):
@@ -75,7 +75,7 @@ class GffSaver:
             self.writer.put_uint32(field.label_idx)
             self.writer.put_uint32(field.data_or_data_offset)
         for label in self.labels:
-            self.writer.put_string(label.ljust(16, '\0'))
+            self.writer.put_string(label.ljust(16, "\0"))
         if len(self.field_data) > 0:
             self.writer.put_bytes(bytearray(self.field_data))
         for idx in self.field_indices:
@@ -117,13 +117,11 @@ class GffSaver:
                         self.list_indices.append(num_structs)
                         queue.append(item)
                 else:
-                    raise NotImplementedError("Field type {} is not supported".format(field_type))
+                    raise NotImplementedError(
+                        "Field type {} is not supported".format(field_type)
+                    )
 
-                field = GffField(
-                    field_type,
-                    label_idx,
-                    data_or_data_offset
-                )
+                field = GffField(field_type, label_idx, data_or_data_offset)
                 self.fields.append(field)
 
             if len(field_indices) == 1:
@@ -133,11 +131,7 @@ class GffSaver:
                 for idx in field_indices:
                     self.field_indices.append(idx)
 
-            struct = GffStruct(
-                tree["_type"],
-                data_or_data_offset,
-                len(field_indices)
-            )
+            struct = GffStruct(tree["_type"], data_or_data_offset, len(field_indices))
             self.structs.append(struct)
 
     def repack_float_to_int(self, val):

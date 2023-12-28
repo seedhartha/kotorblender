@@ -22,7 +22,7 @@ import bpy
 
 from bpy_extras import image_utils
 
-from ..format.tpc.loader import TpcLoader
+from ..format.tpc.reader import TpcReader
 from ..utils import (
     is_null,
     is_not_null,
@@ -174,7 +174,7 @@ def create_image(name, search_paths):
                 continue
             path = os.path.join(search_path, filename)
             print("Loading TPC image: " + path)
-            tpc_image = TpcLoader(path).load()
+            tpc_image = TpcReader(path).load()
             image = bpy.data.images.new(name, tpc_image.w, tpc_image.h)
             image.pixels = tpc_image.pixels
             image.update()

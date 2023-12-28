@@ -27,7 +27,7 @@ from ..binreader import BinaryReader
 from .types import *
 
 
-class BwmLoader:
+class BwmReader:
     def __init__(self, path, model_name):
         self.path = path
         self.model_name = model_name

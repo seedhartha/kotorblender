@@ -21,8 +21,8 @@ import os
 import bpy
 
 from ..constants import DummyType
-from ..format.gff.loader import GffLoader
-from ..format.gff.saver import GffSaver
+from ..format.gff.reader import GffReader
+from ..format.gff.writer import GffWriter
 from ..utils import is_path_point
 
 
@@ -40,7 +40,7 @@ def load_pth(operator, filepath):
         bpy.context.collection.objects.link(path_object)
 
     operator.report({"INFO"}, "Loading path from '{}'".format(filepath))
-    loader = GffLoader(filepath, "PTH")
+    loader = GffReader(filepath, "PTH")
     tree = loader.load()
     points = []
 
@@ -98,5 +98,5 @@ def save_pth(operator, filepath):
     tree["Path_Conections"] = conections
 
     operator.report({"INFO"}, "Saving path to '{}'".format(filepath))
-    saver = GffSaver(tree, filepath, "PTH")
+    saver = GffWriter(tree, filepath, "PTH")
     saver.save()

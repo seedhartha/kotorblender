@@ -42,7 +42,7 @@ class TpcImage:
         self.pixels = pixels
 
 
-class TpcLoader:
+class TpcReader:
     def __init__(self, path):
         self.reader = BinaryReader(path)
 

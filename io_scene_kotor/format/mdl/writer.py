@@ -29,7 +29,7 @@ from ..binwriter import BinaryWriter
 from .types import *
 
 
-class MdlSaver:
+class MdlWriter:
     def __init__(self, path, model, tsl, xbox):
         self.path = path
         self.mdl = BinaryWriter(path, "little")
