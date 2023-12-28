@@ -22,3 +22,4 @@ from bpy.props import StringProperty
 
 class ImagePropertyGroup(PropertyGroup):
     envmap: StringProperty(name="Environment Map")
+    bumpmap: StringProperty(name="Bumpmap")
