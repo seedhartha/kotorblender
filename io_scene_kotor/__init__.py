@@ -32,14 +32,14 @@ from .ops.showhideobjects import (
     KB_OT_hide_lights,
     KB_OT_hide_emitters,
     KB_OT_hide_blockers,
-    KB_OT_hide_charbones,
-    KB_OT_hide_charnulls,
+    KB_OT_hide_char_bones,
+    KB_OT_hide_char_dummies,
     KB_OT_show_walkmeshes,
     KB_OT_show_lights,
     KB_OT_show_emitters,
     KB_OT_show_blockers,
-    KB_OT_show_charbones,
-    KB_OT_show_charnulls,
+    KB_OT_show_char_bones,
+    KB_OT_show_char_dummies,
 )
 from .ops.lensflare.add import KB_OT_add_lens_flare
 from .ops.lensflare.delete import KB_OT_delete_lens_flare
@@ -165,14 +165,14 @@ classes = (
     KB_OT_hide_lights,
     KB_OT_hide_emitters,
     KB_OT_hide_blockers,
-    KB_OT_hide_charbones,
-    KB_OT_hide_charnulls,
+    KB_OT_hide_char_bones,
+    KB_OT_hide_char_dummies,
     KB_OT_show_walkmeshes,
     KB_OT_show_lights,
     KB_OT_show_emitters,
     KB_OT_show_blockers,
-    KB_OT_show_charbones,
-    KB_OT_show_charnulls,
+    KB_OT_show_char_bones,
+    KB_OT_show_char_dummies,
     # Panels
     KB_PT_model,
     KB_PT_animations,  # child of KB_PT_model

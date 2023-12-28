@@ -25,19 +25,19 @@ class KB_MT_kotor_showhide(Menu):
     def draw(self, context):
         layout = self.layout
 
-        layout.operator("kb.show__walkmeshes", icon="OUTLINER_OB_SURFACE")
-        layout.operator("kb.show__lights", icon="OUTLINER_OB_LIGHT")
-        layout.operator("kb.show__emitters", icon="OUTLINER_OB_CURVES")
-        layout.operator("kb.show__blockers", icon="INDIRECT_ONLY_ON")
-        layout.operator("kb.show__charbones", icon="BONE_DATA")
-        layout.operator("kb.show__charnulls", icon="PIVOT_BOUNDBOX")
+        layout.operator("kb.show_walkmeshes", icon="OUTLINER_OB_SURFACE")
+        layout.operator("kb.show_lights", icon="OUTLINER_OB_LIGHT")
+        layout.operator("kb.show_emitters", icon="OUTLINER_OB_CURVES")
+        layout.operator("kb.show_blockers", icon="INDIRECT_ONLY_ON")
+        layout.operator("kb.show_char_bones", icon="BONE_DATA")
+        layout.operator("kb.show_char_dummies", icon="PIVOT_BOUNDBOX")
         layout.separator()
         layout.operator("kb.hide_walkmeshes", icon="SURFACE_DATA")
         layout.operator("kb.hide_lights", icon="LIGHT")
         layout.operator("kb.hide_emitters", icon="CURVES_DATA")
         layout.operator("kb.hide_blockers", icon="INDIRECT_ONLY_OFF")
-        layout.operator("kb.hide_charbones", icon="BONE_DATA")
-        layout.operator("kb.hide_charnulls", icon="SHADING_BBOX")
+        layout.operator("kb.hide_char_bones", icon="BONE_DATA")
+        layout.operator("kb.hide_char_dummies", icon="SHADING_BBOX")
 
 
 class KB_MT_kotor(Menu):

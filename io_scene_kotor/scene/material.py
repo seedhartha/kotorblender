@@ -95,7 +95,6 @@ def rebuild_material_simple(material, obj):
 
 def rebuild_material_nodes(material, obj, texture_search_paths, lightmap_search_paths):
     material.use_nodes = True
-    material.blend_method = "BLEND"
 
     links = material.node_tree.links
     links.clear()
@@ -105,6 +104,7 @@ def rebuild_material_nodes(material, obj, texture_search_paths, lightmap_search_
 
     x = 0
     additive = False
+    decal = False
 
     # Diffuse texture
     if is_not_null(obj.kb.bitmap):
@@ -125,8 +125,8 @@ def rebuild_material_nodes(material, obj, texture_search_paths, lightmap_search_
             normal_map.name = NodeName.NORMAL_MAP
             normal_map.location = (x + 300, 300)
             links.new(normal_map.inputs[1], bumpmap_tex.outputs[0])
-        material.use_backface_culling = not diffuse_tex.image.kb.decal
         additive = diffuse_tex.image.kb.additive
+        decal = diffuse_tex.image.kb.decal
 
     # Lightmap texture
     if is_not_null(obj.kb.bitmap2):
@@ -267,6 +267,9 @@ def rebuild_material_nodes(material, obj, texture_search_paths, lightmap_search_
         links.new(material_output.inputs[0], add_opaque_transparent.outputs[0])
     else:
         links.new(material_output.inputs[0], mix_opaque_transparent.outputs[0])
+
+    material.use_backface_culling = not decal
+    material.blend_method = "BLEND" if additive else "HASHED"
 
 
 def get_or_create_texture(name, search_paths):

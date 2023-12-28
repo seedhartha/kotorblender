@@ -21,7 +21,7 @@ import os
 import bpy
 
 from ..constants import DummyType
-from ..utils import get_object_root
+from ..utils import find_mdl_root_of
 from . import mdl
 
 
@@ -63,7 +63,7 @@ def load_lyt(operator, filepath, options):
 
 def save_lyt(operator, filepath):
     def describe_object(obj):
-        parent = get_object_root(obj)
+        parent = find_mdl_root_of(obj)
         orientation = obj.rotation_euler.to_quaternion()
         return "{} {} {:.7g} {:.7g} {:.7g} {:.7g} {:.7g} {:.7g} {:.7g}".format(
             parent.name if parent else "NULL",

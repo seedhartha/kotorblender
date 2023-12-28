@@ -103,8 +103,8 @@ class KB_OT_hide_blockers(bpy.types.Operator):
         return {"FINISHED"}
 
 
-class KB_OT_hide_charbones(bpy.types.Operator):
-    bl_idname = "kb.hide_charbones"
+class KB_OT_hide_char_bones(bpy.types.Operator):
+    bl_idname = "kb.hide_char_bones"
     bl_label = "Hide Character Bones"
     bl_description = "Hides all humanoid rig bones in the scene"
 
@@ -120,8 +120,8 @@ class KB_OT_hide_charbones(bpy.types.Operator):
         return {"FINISHED"}
 
 
-class KB_OT_hide_charnulls(bpy.types.Operator):
-    bl_idname = "kb.hide_charnulls"
+class KB_OT_hide_char_dummies(bpy.types.Operator):
+    bl_idname = "kb.hide_char_dummies"
     bl_label = "Hide Character Dummies"
     bl_description = "Hides all humanoid rig dummy/null objects in the scene"
 
@@ -138,7 +138,7 @@ class KB_OT_hide_charnulls(bpy.types.Operator):
 
 
 class KB_OT_show_walkmeshes(bpy.types.Operator):
-    bl_idname = "kb.show__walkmeshes"
+    bl_idname = "kb.show_walkmeshes"
     bl_label = "Show Walkmeshes"
     bl_description = "Unhides all walkmeshes in the scene"
 
@@ -155,7 +155,7 @@ class KB_OT_show_walkmeshes(bpy.types.Operator):
 
 
 class KB_OT_show_lights(bpy.types.Operator):
-    bl_idname = "kb.show__lights"
+    bl_idname = "kb.show_lights"
     bl_label = "Show Lights"
     bl_description = "Unhides all lights in the scene"
 
@@ -172,7 +172,7 @@ class KB_OT_show_lights(bpy.types.Operator):
 
 
 class KB_OT_show_emitters(bpy.types.Operator):
-    bl_idname = "kb.show__emitters"
+    bl_idname = "kb.show_emitters"
     bl_label = "Show Emitters"
     bl_description = "Unhides all emitters in the scene"
 
@@ -189,7 +189,7 @@ class KB_OT_show_emitters(bpy.types.Operator):
 
 
 class KB_OT_show_blockers(bpy.types.Operator):
-    bl_idname = "kb.show__blockers"
+    bl_idname = "kb.show_blockers"
     bl_label = "Show Blockers"
     bl_description = "Unhides all untextured blocker trimeshes in the scene"
 
@@ -210,8 +210,8 @@ class KB_OT_show_blockers(bpy.types.Operator):
         return {"FINISHED"}
 
 
-class KB_OT_show_charbones(bpy.types.Operator):
-    bl_idname = "kb.show__charbones"
+class KB_OT_show_char_bones(bpy.types.Operator):
+    bl_idname = "kb.show_char_bones"
     bl_label = "Show Character Bones"
     bl_description = "Unhides all humanoid rig bones in the scene"
 
@@ -227,8 +227,8 @@ class KB_OT_show_charbones(bpy.types.Operator):
         return {"FINISHED"}
 
 
-class KB_OT_show_charnulls(bpy.types.Operator):
-    bl_idname = "kb.show__charnulls"
+class KB_OT_show_char_dummies(bpy.types.Operator):
+    bl_idname = "kb.show_char_dummies"
     bl_label = "Show Character Dummies"
     bl_description = "Unhides all humanoid rig dummy/null objects in the scene"
 

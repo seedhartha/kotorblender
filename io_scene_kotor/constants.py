@@ -52,34 +52,6 @@ WOK_MATERIALS = [
     ["wok_StoneBridge", (0.081, 0.108, 0.139), 0.0],
 ]
 
-CHAR_DUMMY_NAMES = [
-    "camerahook",
-    "cutscenedummy",
-    "deflecthook",
-    "dummy01",
-    "dummy02",
-    "freelookhook",
-    "gogglehook",
-    "handconjure",
-    "headconjure",
-    "headhook",
-    "impact",
-    "impact_bolt",
-    "lcollar_dum",
-    "lforearm",
-    "lhand",
-    "lightsaberhook",
-    "maskhook",
-    "rcollar_dum",
-    "revmask1hook",
-    "revmask2hook",
-    "rhand",
-    "rootdummy",
-    "talkdummy",
-]
-
-CHAR_BONE_NAMES = ["breastbone"]
-
 
 class Classification:
     OTHER = "OTHER"

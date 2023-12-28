@@ -48,20 +48,28 @@ def is_skin_mesh(obj):
 
 
 def is_char_dummy(obj):
-    lower_name = obj.name.lower()
-    return is_dummy_type(obj, DummyType.NONE) and any(
-        [lower_name.startswith(test) for test in CHAR_DUMMY_NAMES]
-    )
+    dummy = obj and obj.type == "EMPTY"
+    if not dummy:
+        return False
+    root = find_mdl_root_of(obj)
+    if not root or root.kb.classification != Classification.CHARACTER:
+        return False
+    return True
 
 
 def is_char_bone(obj):
-    lower_name = obj.name.lower()
-    return (
-        is_dummy_type(obj, DummyType.NONE) or is_mesh_type(obj, MeshType.TRIMESH)
-    ) and (
-        lower_name.endswith("_g")
-        or any([lower_name.startswith(test) for test in CHAR_BONE_NAMES])
-    )
+    dummy = is_dummy_type(obj, DummyType.NONE)
+    mesh = is_mesh_type(obj, MeshType.TRIMESH)
+    if not dummy and not mesh:
+        return False
+    root = find_mdl_root_of(obj)
+    if not root or root.kb.classification != Classification.CHARACTER:
+        return False
+    if obj.name.lower().endswith("_g"):
+        return True
+    if mesh and ((not obj.kb.render) or (obj.kb.render and is_null(obj.kb.bitmap))):
+        return True
+    return False
 
 
 def is_exported_to_mdl(obj):
@@ -76,12 +84,12 @@ def is_exported_to_mdl(obj):
     ]
 
 
-def get_object_root(obj):
+def find_mdl_root_of(obj):
     if is_mdl_root(obj):
         return obj
     if not obj.parent:
         return None
-    return get_object_root(obj.parent)
+    return find_mdl_root_of(obj.parent)
 
 
 def find_object(obj, test=lambda _: True):
