@@ -116,7 +116,7 @@ def rebuild_material_nodes(material, obj, texture_search_paths, lightmap_search_
         diffuse_tex.image = get_or_create_texture(
             obj.kb.bitmap, texture_search_paths
         ).image
-        envmapped = not diffuse_tex.image.kb.envmap
+        envmapped = diffuse_tex.image.kb.envmap
         if diffuse_tex.image.kb.bumpmap:
             bumpmapped = True
             bumpmap_tex = nodes.new("ShaderNodeTexImage")
