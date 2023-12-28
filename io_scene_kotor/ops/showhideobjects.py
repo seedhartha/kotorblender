@@ -21,12 +21,11 @@ import bpy
 from ..constants import MeshType
 from ..utils import (
     is_null,
-    is_dwk_root,
-    is_pwk_root,
     is_char_dummy,
     is_char_bone,
     is_mesh_type,
     is_skin_mesh,
+    is_walkmesh,
 )
 
 
@@ -41,7 +40,7 @@ class KB_OT_hide_walkmeshes(bpy.types.Operator):
 
         # Loop through every object in the scene and hide it if it's a walkmesh.
         for obj in bpy.context.scene.objects:
-            if is_mesh_type(obj, MeshType.AABB) or is_dwk_root(obj) or is_pwk_root(obj):
+            if is_walkmesh(obj):
                 obj.hide_set(True)
 
         return {"FINISHED"}
@@ -148,7 +147,7 @@ class KB_OT_show_walkmeshes(bpy.types.Operator):
 
         # Loop through every object in the scene and unhide it if it's a walkmesh.
         for obj in bpy.context.scene.objects:
-            if is_mesh_type(obj, MeshType.AABB) or is_dwk_root(obj) or is_pwk_root(obj):
+            if is_walkmesh(obj):
                 obj.hide_set(False)
 
         return {"FINISHED"}

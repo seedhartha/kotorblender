@@ -47,6 +47,18 @@ def is_skin_mesh(obj):
     return is_mesh_type(obj, MeshType.SKIN)
 
 
+def is_walkmesh(obj):
+    return (
+        (
+            is_mesh_type(obj, MeshType.AABB)
+            and (not obj.kb.render)
+            or (obj.kb.render and is_null(obj.kb.bitmap))
+        )
+        or is_pwk_root(obj)
+        or is_dwk_root(obj)
+    )
+
+
 def is_char_dummy(obj):
     dummy = obj and obj.type == "EMPTY"
     if not dummy:
