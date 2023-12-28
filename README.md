@@ -17,39 +17,39 @@ This add-on is a fork of KotorBlender, upgraded to support newer versions of Ble
 
 ## Usage
 
+### Data Preparation
+
+Extract models, textures, walkmeshes, LYT and PTH files into a working directory, using a tool of your choice, e.g. [reone toolkit](https://deadlystream.com/files/file/1862-reone-toolkit/). Recommended directory structure:
+
+- *data* — extract all BIF archives here without subdirectories
+- *texturepacks*
+  - *swpc_tex_tpa* — extract swpc_tex_tpa ERF archive here
+
+If you plan to edit textures, batch-convert TPC to TGA / TXI files using **reone toolkit**, although TPC textures are also supported by KotorBlender.
+
 ### Modelling
 
-1. Extract MDL, MDX and, optionally, TPC, WOK, PWK, DWK, and LYT files (Kotor Tool, reone toolkit, etc.)
-1. Import MDL into Blender via File → Import → KotOR Model (.mdl)
+1. Import MDL via File → Import → KotOR Model (.mdl)
 1. Edit model
-1. Select a MDL root object to be exported
+1. Select top-level MDL root object to be exported
 1. Export MDL via File → Export → KotOR Model (.mdl)
 
 ### Lightmapping
 
-Most of the time, it will not be possible to use vanilla lighting and UV maps to recreate lightmaps. Depending on the scene, it might be necessary to tweak or replace both.
+1. Select objects for which you want lightmaps to be recreated, or unselect all objects to recreate all lightmaps
+1. Press KotOR → Bake Lightmaps
 
 UV mapping:
 
 1. Select objects having the same lightmap texture and enter Edit mode
-1. Unwrap faces via UV → Lightmap Pack (increase Margin to avoid overlapping faces)
-
-Baking lightmaps:
-
-1. Select objects to bake lightmaps for
-    1. If no object is selected, all objects from active collection will be used
-1. In Render Properties
-    1. Set Render Engine to Cycles
-    1. Set Device to GPU Compute, if available
-1. In Render Properties → KotOR Lightmaps
-    1. Tweak number of Samples (higher numbers increase quality, but also increase render time)
-    1. Tweak Margin
-    1. Press the Bake button
+1. Select all faces and unwrap UVs via UV → Lightmap Pack, increase Margin to avoid face overlapping
 
 Fine-tuning:
 
-1. In Outliner disable rendering of obstructing geometry, e.g. skyboxes
-1. Enable Ambient Occlusion in World Properties and tweak Factor to increase contrast 
+1. Increase lightmap image size via UV Editing → Image → Resize
+1. Tweak ambient color via Scene → World → Surface → Color
+1. In Scene → Render, set Device to GPU Compute to improve performance, set Render Engine to Cycles if not already
+1. In Scene → Render → Sampling → Render increase Max Samples to improve quality
 
 ### Connecting Room Walkmeshes
 
