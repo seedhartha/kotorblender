@@ -103,6 +103,8 @@ def rebuild_material_nodes(material, obj, texture_search_paths, lightmap_search_
     nodes.clear()
 
     x = 0
+    envmapped = False
+    bumpmapped = False
     additive = False
     decal = False
 
@@ -114,7 +116,9 @@ def rebuild_material_nodes(material, obj, texture_search_paths, lightmap_search_
         diffuse_tex.image = get_or_create_texture(
             obj.kb.bitmap, texture_search_paths
         ).image
+        envmapped = not diffuse_tex.image.kb.envmap
         if diffuse_tex.image.kb.bumpmap:
+            bumpmapped = True
             bumpmap_tex = nodes.new("ShaderNodeTexImage")
             bumpmap_tex.name = NodeName.BUMPMAP_TEX
             bumpmap_tex.location = (x, 300)
@@ -175,6 +179,8 @@ def rebuild_material_nodes(material, obj, texture_search_paths, lightmap_search_
     diffuse_bsdf.name = NodeName.DIFFUSE_BSDF
     diffuse_bsdf.location = (x, 0)
     links.new(diffuse_bsdf.inputs["Color"], diffuse_tex.outputs[0])
+    if bumpmapped:
+        links.new(diffuse_bsdf.inputs["Normal"], normal_map.outputs[0])
 
     # Emission from diffuse * lightmap
     diff_lm_emission = nodes.new("ShaderNodeEmission")
@@ -201,7 +207,7 @@ def rebuild_material_nodes(material, obj, texture_search_paths, lightmap_search_
     glossy_bsdf.name = NodeName.GLOSSY_BSDF
     glossy_bsdf.location = (x, 0)
     glossy_bsdf.inputs["Roughness"].default_value = 0.2
-    if diffuse_tex.image.kb.bumpmap:
+    if bumpmapped:
         links.new(glossy_bsdf.inputs["Normal"], normal_map.outputs[0])
 
     # Combine diffuse or diffuse * lightmap, and self-illumination emission
@@ -223,7 +229,7 @@ def rebuild_material_nodes(material, obj, texture_search_paths, lightmap_search_
     mul_diff_obj_alpha.location = (x, 300)
     mul_diff_obj_alpha.inputs[1].default_value = 1.0
     links.new(mul_diff_obj_alpha.inputs[0], object_alpha.outputs[0])
-    if not diffuse_tex.image.kb.envmap:
+    if not envmapped and not bumpmapped:
         links.new(mul_diff_obj_alpha.inputs[1], diffuse_tex.outputs[1])
 
     # Transparent BSDF
@@ -236,7 +242,7 @@ def rebuild_material_nodes(material, obj, texture_search_paths, lightmap_search_
     mix_matte_glossy.name = NodeName.MIX_MATTE_GLOSSY
     mix_matte_glossy.location = (x, -300)
     mix_matte_glossy.inputs[0].default_value = 1.0
-    if diffuse_tex.image.kb.envmap:
+    if envmapped:
         links.new(mix_matte_glossy.inputs[0], diffuse_tex.outputs[1])
     links.new(mix_matte_glossy.inputs[1], glossy_bsdf.outputs[0])
     links.new(mix_matte_glossy.inputs[2], add_diffuse_emission.outputs[0])
