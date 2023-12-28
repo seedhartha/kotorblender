@@ -17,9 +17,10 @@
 # ##### END GPL LICENSE BLOCK #####
 
 from bpy.types import PropertyGroup
-from bpy.props import StringProperty
+from bpy.props import StringProperty, BoolProperty
 
 
 class ImagePropertyGroup(PropertyGroup):
     envmap: StringProperty(name="Environment Map")
     bumpmap: StringProperty(name="Bumpmap")
+    decal: BoolProperty(name="Decal")

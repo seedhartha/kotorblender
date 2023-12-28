@@ -94,10 +94,7 @@ def rebuild_material_simple(material, obj):
 
 def rebuild_material_nodes(material, obj, texture_search_paths, lightmap_search_paths):
     material.use_nodes = True
-    material.use_backface_culling = True
-    material.blend_method = "HASHED"
-    if not is_close_3(obj.kb.selfillumcolor, (0.0, 0.0, 0.0)):
-        material.shadow_method = "NONE"
+    material.blend_method = "BLEND"
 
     links = material.node_tree.links
     links.clear()
@@ -127,6 +124,7 @@ def rebuild_material_nodes(material, obj, texture_search_paths, lightmap_search_
             normal_map.name = NodeName.NORMAL_MAP
             normal_map.location = (x + 300, 300)
             links.new(normal_map.inputs[1], bumpmap_tex.outputs[0])
+        material.use_backface_culling = not diffuse_tex.image.kb.decal
 
     # Lightmap texture
     if is_not_null(obj.kb.bitmap2):
@@ -325,3 +323,5 @@ def apply_txi_to_image(txi, image):
             image.kb.envmap = tokens[1]
         elif lower_token == "bumpmaptexture":
             image.kb.bumpmap = tokens[1]
+        elif lower_token == "decal":
+            image.kb.decal = bool(int(tokens[1]))
