@@ -50,14 +50,17 @@ def is_skin_mesh(obj):
 def is_char_dummy(obj):
     lower_name = obj.name.lower()
     return is_dummy_type(obj, DummyType.NONE) and any(
-        [lower_name.startswith(bone_name) for bone_name in CHAR_DUMMY_NAMES]
+        [lower_name.startswith(test) for test in CHAR_DUMMY_NAMES]
     )
 
 
 def is_char_bone(obj):
     lower_name = obj.name.lower()
-    return is_mesh_type(obj, MeshType.TRIMESH) and any(
-        [lower_name.startswith(bone_name) for bone_name in CHAR_BONE_NAMES]
+    return (
+        is_dummy_type(obj, DummyType.NONE) or is_mesh_type(obj, MeshType.TRIMESH)
+    ) and (
+        lower_name.endswith("_g")
+        or any([lower_name.startswith(test) for test in CHAR_BONE_NAMES])
     )
 
 
