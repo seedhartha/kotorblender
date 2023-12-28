@@ -19,7 +19,7 @@
 import bpy
 
 from ..constants import MeshType
-from ..scene.material import ALPHA_NODE_NAME, DIFFUSE_BY_LIGHTMAP_NODE_NAME
+from ..scene.material import NodeName
 from ..utils import is_null
 
 UV_MAP_LIGHTMAP = "UVMap_lm"
@@ -107,7 +107,7 @@ class KB_OT_bake_lightmaps(bpy.types.Operator):
             )
             return False
         diffuse_by_lightmap_node = next(
-            (node for node in nodes if node.name == DIFFUSE_BY_LIGHTMAP_NODE_NAME), None
+            (node for node in nodes if node.name == NodeName.MUL_DIFFUSE_LIGHTMAP), None
         )
         if not diffuse_by_lightmap_node:
             self.report(
@@ -118,7 +118,8 @@ class KB_OT_bake_lightmaps(bpy.types.Operator):
             )
             return False
         alpha_node = next(
-            (node for node in nodes if node.name == ALPHA_NODE_NAME), None
+            (node for node in nodes if node.name == NodeName.MUL_DIFFUSE_OBJECT_ALPHA),
+            None,
         )
         if not alpha_node:
             self.report(
@@ -159,11 +160,16 @@ class KB_OT_bake_lightmaps(bpy.types.Operator):
                 (node for node in nodes if node.type == "BSDF_PRINCIPLED"), None
             )
             diffuse_by_lightmap_node = next(
-                (node for node in nodes if node.name == DIFFUSE_BY_LIGHTMAP_NODE_NAME),
+                (node for node in nodes if node.name == NodeName.MUL_DIFFUSE_LIGHTMAP),
                 None,
             )
             alpha_node = next(
-                (node for node in nodes if node.name == ALPHA_NODE_NAME), None
+                (
+                    node
+                    for node in nodes
+                    if node.name == NodeName.MUL_DIFFUSE_OBJECT_ALPHA
+                ),
+                None,
             )
             links = node_tree.links
             base_color_link = next(
@@ -213,10 +219,11 @@ class KB_OT_bake_lightmaps(bpy.types.Operator):
             (node for node in nodes if node.type == "BSDF_PRINCIPLED"), None
         )
         diffuse_by_lightmap_node = next(
-            (node for node in nodes if node.name == DIFFUSE_BY_LIGHTMAP_NODE_NAME), None
+            (node for node in nodes if node.name == NodeName.MUL_DIFFUSE_LIGHTMAP), None
         )
         alpha_node = next(
-            (node for node in nodes if node.name == ALPHA_NODE_NAME), None
+            (node for node in nodes if node.name == NodeName.MUL_DIFFUSE_OBJECT_ALPHA),
+            None,
         )
         links.new(bsdf_node.inputs["Base Color"], diffuse_by_lightmap_node.outputs[0])
         links.new(bsdf_node.inputs["Alpha"], alpha_node.outputs[0])

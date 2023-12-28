@@ -79,6 +79,7 @@ class AabbNode(TrimeshNode):
                 material = bpy.data.materials[mat_name]
             else:
                 material = bpy.data.materials.new(mat_name)
+                material.shadow_method = "NONE"
                 material.diffuse_color = [*wok_mat[1], 1.0]
                 material.specular_color = (0.0, 0.0, 0.0)
                 material.specular_intensity = wok_mat[2]

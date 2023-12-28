@@ -58,11 +58,13 @@ class LightNode(BaseNode):
         return obj
 
     def create_light(self, name):
+        negative = any([c < 0.0 for c in self.color])
         light = bpy.data.lights.new(name, "POINT")
-        if self.color[0] >= 0.0:
-            light.color = self.color
-        else:
-            light.color = [-self.color[i] for i in range(3)]
+        light.color = [(-c if negative else c) for c in self.color]
+        light.use_shadow = self.shadow
+        if self.shadow:
+            light.use_contact_shadow = True
+            light.contact_shadow_distance = self.radius
         return light
 
     def set_object_data(self, obj, options):
@@ -77,7 +79,7 @@ class LightNode(BaseNode):
         obj.kb.dynamictype = self.dynamictype
         obj.kb.affectdynamic = self.affectdynamic >= 1
         obj.kb.flareradius = self.flareradius
-        obj.kb.negativelight = self.color[0] < 0.0
+        obj.kb.negativelight = any([c < 0.0 for c in self.color])
 
         if (self.flareradius > 0) or (self.lensflares >= 1):
             obj.kb.lensflares = True
@@ -94,11 +96,7 @@ class LightNode(BaseNode):
     def load_object_data(self, obj, options):
         BaseNode.load_object_data(self, obj, options)
 
-        if not obj.kb.negativelight:
-            self.color = obj.data.color
-        else:
-            self.color = [-obj.data.color[i] for i in range(3)]
-
+        self.color = [(-c if obj.kb.negativelight else c) for c in obj.data.color]
         self.multiplier = obj.kb.multiplier
         self.radius = obj.kb.radius
         self.ambientonly = 1 if obj.kb.ambientonly else 0
@@ -108,6 +106,7 @@ class LightNode(BaseNode):
         self.dynamictype = obj.kb.dynamictype
         self.affectdynamic = 1 if obj.kb.affectdynamic else 0
         self.flareradius = obj.kb.flareradius
+        self.negativelight = 1 if obj.kb.negativelight else 0
 
         if obj.kb.lensflares:
             self.lensflares = 1
@@ -120,5 +119,6 @@ class LightNode(BaseNode):
     @classmethod
     def calc_light_power(cls, light):
         if light.kb.negativelight:
-            return
-        light.data.energy = light.kb.multiplier * light.kb.radius * light.kb.radius
+            light.data.energy = 0
+        else:
+            light.data.energy = light.kb.multiplier * light.kb.radius * light.kb.radius
