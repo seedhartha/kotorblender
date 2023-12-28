@@ -19,6 +19,12 @@
 import struct
 
 
+class SeekOrigin:
+    BEGIN = 0
+    CURRENT = 1
+    END = 2
+
+
 class BinaryReader:
     def __init__(self, path, byteorder="little"):
         self.file = open(path, "rb")
@@ -27,11 +33,11 @@ class BinaryReader:
     def __del__(self):
         self.file.close()
 
-    def seek(self, offset):
-        self.file.seek(offset)
+    def seek(self, offset, origin=SeekOrigin.BEGIN):
+        self.file.seek(offset, origin)
 
     def skip(self, offset):
-        self.file.seek(offset, 1)
+        self.file.seek(offset, SeekOrigin.CURRENT)
 
     def tell(self):
         return self.file.tell()

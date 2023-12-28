@@ -46,6 +46,7 @@ class NodeName:
     ADD_DIFFUSE_EMISSION = "add_diffuse_emission"
     MIX_MATTE_GLOSSY = "mix_matte_glossy"
     OBJECT_ALPHA = "object_alpha"
+    MUL_DIFFUSE_OBJECT_ALPHA = "mul_diffuse_object_alpha"
     TRANSPARENT_BSDF = "transparent_bsdf"
     MIX_OPAQUE_TRANSPARENT = "mix_opaque_transparent"
 
@@ -102,6 +103,8 @@ def rebuild_material_nodes(material, obj, texture_search_paths, lightmap_search_
     nodes = material.node_tree.nodes
     nodes.clear()
 
+    envmapped = False
+
     x = 0
 
     # Diffuse texture
@@ -112,6 +115,7 @@ def rebuild_material_nodes(material, obj, texture_search_paths, lightmap_search_
         diffuse_tex.image = get_or_create_texture(
             obj.kb.bitmap, texture_search_paths
         ).image
+        envmapped = bool(diffuse_tex.image.kb.envmap)
 
     # Lightmap texture
     if is_not_null(obj.kb.bitmap2):
@@ -175,6 +179,12 @@ def rebuild_material_nodes(material, obj, texture_search_paths, lightmap_search_
 
     x += 300
 
+    # Object alpha
+    object_alpha = nodes.new("ShaderNodeValue")
+    object_alpha.name = NodeName.OBJECT_ALPHA
+    object_alpha.location = (x, 300)
+    object_alpha.outputs[0].default_value = obj.kb.alpha
+
     # Glossy BSDF
     glossy_bsdf = nodes.new("ShaderNodeBsdfGlossy")
     glossy_bsdf.name = NodeName.GLOSSY_BSDF
@@ -192,11 +202,15 @@ def rebuild_material_nodes(material, obj, texture_search_paths, lightmap_search_
 
     x += 300
 
-    # Object alpha
-    object_alpha = nodes.new("ShaderNodeValue")
-    object_alpha.name = NodeName.OBJECT_ALPHA
-    object_alpha.location = (x, 300)
-    object_alpha.outputs[0].default_value = obj.kb.alpha
+    # Multiply diffuse texture alpha by object alpha
+    mul_diff_obj_alpha = nodes.new("ShaderNodeMath")
+    mul_diff_obj_alpha.name = NodeName.MUL_DIFFUSE_OBJECT_ALPHA
+    mul_diff_obj_alpha.operation = "MULTIPLY"
+    mul_diff_obj_alpha.location = (x, 300)
+    mul_diff_obj_alpha.inputs[1].default_value = 1.0
+    links.new(mul_diff_obj_alpha.inputs[0], object_alpha.outputs[0])
+    if not envmapped:
+        links.new(mul_diff_obj_alpha.inputs[1], diffuse_tex.outputs[1])
 
     # Transparent BSDF
     transparent_bsdf = nodes.new("ShaderNodeBsdfTransparent")
@@ -207,7 +221,9 @@ def rebuild_material_nodes(material, obj, texture_search_paths, lightmap_search_
     mix_matte_glossy = nodes.new("ShaderNodeMixShader")
     mix_matte_glossy.name = NodeName.MIX_MATTE_GLOSSY
     mix_matte_glossy.location = (x, -300)
-    links.new(mix_matte_glossy.inputs[0], diffuse_tex.outputs[1])
+    mix_matte_glossy.inputs[0].default_value = 1.0
+    if envmapped:
+        links.new(mix_matte_glossy.inputs[0], diffuse_tex.outputs[1])
     links.new(mix_matte_glossy.inputs[1], glossy_bsdf.outputs[0])
     links.new(mix_matte_glossy.inputs[2], add_diffuse_emission.outputs[0])
 
@@ -217,7 +233,7 @@ def rebuild_material_nodes(material, obj, texture_search_paths, lightmap_search_
     mix_opaque_transparent = nodes.new("ShaderNodeMixShader")
     mix_opaque_transparent.name = NodeName.MIX_OPAQUE_TRANSPARENT
     mix_opaque_transparent.location = (x, -300)
-    links.new(mix_opaque_transparent.inputs[0], object_alpha.outputs[0])
+    links.new(mix_opaque_transparent.inputs[0], mul_diff_obj_alpha.outputs[0])
     links.new(mix_opaque_transparent.inputs[1], transparent_bsdf.outputs[0])
     links.new(mix_opaque_transparent.inputs[2], mix_matte_glossy.outputs[0])
 
@@ -246,23 +262,50 @@ def get_or_create_texture(name, search_paths):
 
 
 def create_image(name, search_paths):
+    tga_filename = (name + ".tga").lower()
+    txi_filename = (name + ".txi").lower()
     tpc_filename = (name + ".tpc").lower()
     for search_path in search_paths:
         if not os.path.exists(search_path):
             continue
-        image = image_utils.load_image(name + ".tga", search_path, recursive=True)
-        if image:
-            image.name = name
-            return image
+        tga_path = None
+        txi_path = None
+        tpc_path = None
         for filename in os.listdir(search_path):
-            if filename.lower() != tpc_filename:
-                continue
-            path = os.path.join(search_path, filename)
-            print("Loading TPC image: " + path)
-            tpc_image = TpcReader(path).load()
+            lower_filename = filename.lower()
+            if lower_filename == tga_filename:
+                tga_path = os.path.join(search_path, filename)
+            elif lower_filename == txi_filename:
+                txi_path = os.path.join(search_path, filename)
+            elif lower_filename == tpc_filename:
+                tpc_path = os.path.join(search_path, filename)
+        if tga_path:
+            print("Loading image: " + tga_path)
+            image = image_utils.load_image(tga_path)
+            image.name = name
+            if txi_path:
+                print("Loading TXI: " + txi_path)
+                with open(txi_path) as txi:
+                    txi_lines = txi.readlines()
+                    apply_txi_to_image(txi_lines, image)
+            return image
+        elif tpc_path:
+            print("Loading image: " + tpc_path)
+            tpc_image = TpcReader(tpc_path).load()
             image = bpy.data.images.new(name, tpc_image.w, tpc_image.h)
             image.pixels = tpc_image.pixels
             image.update()
+            apply_txi_to_image(tpc_image.txi_lines, image)
             return image
 
     return bpy.data.images.new(name, 512, 512)
+
+
+def apply_txi_to_image(txi, image):
+    for line in txi:
+        tokens = line.split()
+        if not tokens:
+            continue
+        lower_token = tokens[0]
+        if lower_token in ["envmaptexture", "bumpyshinytexture"]:
+            image.kb.envmap = tokens[1]

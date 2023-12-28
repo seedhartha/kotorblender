@@ -19,7 +19,7 @@
 from enum import Enum
 from struct import unpack
 
-from ..binreader import BinaryReader
+from ..binreader import BinaryReader, SeekOrigin
 
 
 class TpcEncoding(Enum):
@@ -40,6 +40,7 @@ class TpcImage:
         self.w = w
         self.h = h
         self.pixels = pixels
+        self.txi_lines = []
 
 
 class TpcReader:
@@ -67,8 +68,17 @@ class TpcReader:
         else:
             mips = self.read_mips(image_w, image_h)
             mip = self.decompress_mip_if_compressed(mips[0])
+        image = self.mip_to_image(mip)
 
-        return self.mip_to_image(mip)
+        current = self.reader.tell()
+        filesize = self.reader.seek(0, SeekOrigin.END)
+        if filesize > current:
+            self.reader.seek(current)
+            image.txi_lines = (
+                self.reader.read_bytes(filesize - current).decode("utf-8").splitlines()
+            )
+
+        return image
 
     def read_mips(self, image_w, image_h):
         mips = []

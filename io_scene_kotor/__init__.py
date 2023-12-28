@@ -76,12 +76,13 @@ from .ui.panel.modelnode.mesh import (
     KB_PT_mesh_dangly,
     KB_PT_mesh_aabb,
 )
-from .ui.panel.modelnode.reference import KB_PT_reference
 from .ui.panel.model import KB_PT_model
 from .ui.panel.modelnode.modelnode import KB_PT_modelnode
+from .ui.panel.modelnode.reference import KB_PT_reference
 from .ui.panel.pathpoint import KB_PT_path_point
 from .ui.props.anim import AnimPropertyGroup
 from .ui.props.animevent import AnimEventPropertyGroup
+from .ui.props.image import ImagePropertyGroup
 from .ui.props.lensflare import LensFlarePropertyGroup
 from .ui.props.object import ObjectPropertyGroup
 from .ui.props.pathconnection import PathConnectionPropertyGroup
@@ -134,6 +135,7 @@ classes = (
     LensFlarePropertyGroup,
     ObjectPropertyGroup,
     ScenePropertyGroup,
+    ImagePropertyGroup,
     # Operators
     KB_OT_assign_node_numbers,
     KB_OT_export_lyt,
@@ -206,6 +208,7 @@ def register():
 
     bpy.types.Object.kb = bpy.props.PointerProperty(type=ObjectPropertyGroup)
     bpy.types.Scene.kb = bpy.props.PointerProperty(type=ScenePropertyGroup)
+    bpy.types.Image.kb = bpy.props.PointerProperty(type=ImagePropertyGroup)
 
     bpy.types.TOPBAR_MT_file_import.append(menu_func_import_mdl)
     bpy.types.TOPBAR_MT_file_import.append(menu_func_import_lyt)
