@@ -133,7 +133,7 @@ def rebuild_material_nodes(material, obj, texture_search_paths, lightmap_search_
 
         material.shadow_method = "NONE"
         links.new(lightmap.inputs[0], lightmap_uv.outputs[0])
-        links.new(mul_diffuse_by_lightmap.inputs[1], lightmap.outputs[0])
+        # links.new(mul_diffuse_by_lightmap.inputs[1], lightmap.outputs[0])
 
     if selfillumed:
         links.new(shader.inputs["Color"], mul_diffuse_by_lightmap.outputs[0])
