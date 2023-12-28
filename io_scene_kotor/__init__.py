@@ -123,7 +123,7 @@ def menu_func_export_pth(self, context):
     self.layout.operator(KB_OT_export_pth.bl_idname, text="KotOR Path (.pth)")
 
 
-def menu_func_hide_wlk(self, context):
+def menu_func_kotor(self, context):
     self.layout.menu("KB_MT_kotor")
 
 
@@ -215,7 +215,7 @@ def register():
     bpy.types.TOPBAR_MT_file_export.append(menu_func_export_lyt)
     bpy.types.TOPBAR_MT_file_export.append(menu_func_export_pth)
 
-    bpy.types.TOPBAR_MT_editor_menus.append(menu_func_hide_wlk)
+    bpy.types.TOPBAR_MT_editor_menus.append(menu_func_kotor)
 
 
 def unregister():
@@ -226,7 +226,7 @@ def unregister():
     bpy.types.TOPBAR_MT_file_import.remove(menu_func_import_lyt)
     bpy.types.TOPBAR_MT_file_import.remove(menu_func_import_mdl)
 
-    bpy.types.TOPBAR_MT_editor_menus.remove(menu_func_hide_wlk)
+    bpy.types.TOPBAR_MT_editor_menus.remove(menu_func_kotor)
 
     for cls in classes:
         bpy.utils.unregister_class(cls)
