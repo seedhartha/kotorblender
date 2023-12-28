@@ -23,4 +23,5 @@ from bpy.props import StringProperty, BoolProperty
 class ImagePropertyGroup(PropertyGroup):
     envmap: StringProperty(name="Environment Map")
     bumpmap: StringProperty(name="Bumpmap")
+    additive: BoolProperty(name="Additive Blending")
     decal: BoolProperty(name="Decal")

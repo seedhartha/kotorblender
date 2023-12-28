@@ -51,6 +51,7 @@ class NodeName:
     MUL_DIFFUSE_OBJECT_ALPHA = "mul_diffuse_object_alpha"
     TRANSPARENT_BSDF = "transparent_bsdf"
     MIX_OPAQUE_TRANSPARENT = "mix_opaque_transparent"
+    ADD_OPAQUE_TRANSPARENT = "add_opaque_transparent"
 
 
 def rebuild_object_material(obj, texture_search_paths=[], lightmap_search_paths=[]):
@@ -103,6 +104,7 @@ def rebuild_material_nodes(material, obj, texture_search_paths, lightmap_search_
     nodes.clear()
 
     x = 0
+    additive = False
 
     # Diffuse texture
     if is_not_null(obj.kb.bitmap):
@@ -119,12 +121,12 @@ def rebuild_material_nodes(material, obj, texture_search_paths, lightmap_search_
             bumpmap_tex.image = get_or_create_texture(
                 diffuse_tex.image.kb.bumpmap, texture_search_paths
             ).image
-
             normal_map = nodes.new("ShaderNodeNormalMap")
             normal_map.name = NodeName.NORMAL_MAP
             normal_map.location = (x + 300, 300)
             links.new(normal_map.inputs[1], bumpmap_tex.outputs[0])
         material.use_backface_culling = not diffuse_tex.image.kb.decal
+        additive = diffuse_tex.image.kb.additive
 
     # Lightmap texture
     if is_not_null(obj.kb.bitmap2):
@@ -241,6 +243,13 @@ def rebuild_material_nodes(material, obj, texture_search_paths, lightmap_search_
 
     x += 300
 
+    # Add opaque and transparent
+    add_opaque_transparent = nodes.new("ShaderNodeAddShader")
+    add_opaque_transparent.name = NodeName.ADD_OPAQUE_TRANSPARENT
+    add_opaque_transparent.location = (x, 0)
+    links.new(add_opaque_transparent.inputs[0], transparent_bsdf.outputs[0])
+    links.new(add_opaque_transparent.inputs[1], mix_matte_glossy.outputs[0])
+
     # Mix opaque and transparent
     mix_opaque_transparent = nodes.new("ShaderNodeMixShader")
     mix_opaque_transparent.name = NodeName.MIX_OPAQUE_TRANSPARENT
@@ -254,7 +263,10 @@ def rebuild_material_nodes(material, obj, texture_search_paths, lightmap_search_
     # Material output node
     material_output = nodes.new("ShaderNodeOutputMaterial")
     material_output.location = (x, 0)
-    links.new(material_output.inputs[0], mix_opaque_transparent.outputs[0])
+    if additive:
+        links.new(material_output.inputs[0], add_opaque_transparent.outputs[0])
+    else:
+        links.new(material_output.inputs[0], mix_opaque_transparent.outputs[0])
 
 
 def get_or_create_texture(name, search_paths):
@@ -323,5 +335,7 @@ def apply_txi_to_image(txi, image):
             image.kb.envmap = tokens[1]
         elif lower_token == "bumpmaptexture":
             image.kb.bumpmap = tokens[1]
+        elif lower_token == "blending":
+            image.kb.additive = tokens[1].lower() == "additive"
         elif lower_token == "decal":
             image.kb.decal = bool(int(tokens[1]))
