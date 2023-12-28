@@ -23,7 +23,7 @@ from ...scene.modelnode.aabb import AabbNode
 from ...scene.modelnode.dummy import DummyNode
 from ...scene.modelnode.trimesh import FaceList
 from ...utils import is_close_3
-from ... import aabb
+from ...aabb import generate_tree
 from ..binwriter import BinaryWriter
 from ..mdl.types import *
 from .types import *
@@ -204,7 +204,7 @@ class BwmSaver:
             face_idx += 1
 
         aabbs = []
-        aabb.generate_tree(aabbs, face_list)
+        generate_tree(aabbs, face_list)
 
         for aabb_node in aabbs:
             child_idx1 = aabb_node[6]

@@ -24,7 +24,7 @@ from mathutils import Vector
 
 from ...constants import NodeType
 from ...utils import is_not_null
-from ... import aabb
+from ...aabb import generate_tree
 from ..binwriter import BinaryWriter
 from .types import *
 
@@ -1665,7 +1665,7 @@ class MdlSaver:
             face_idx += 1
 
         aabbs = []
-        aabb.generate_tree(aabbs, face_list)
+        generate_tree(aabbs, face_list)
 
         return aabbs
 
