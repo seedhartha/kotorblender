@@ -56,12 +56,6 @@ from .ops.pth.removeconnection import KB_OT_delete_path_connection
 from .ops.rebuildallmaterials import KB_OT_rebuild_all_materials
 from .ops.rebuildarmature import KB_OT_rebuild_armature
 from .ops.rebuildmaterial import KB_OT_rebuild_material
-from .props.anim import AnimPropertyGroup
-from .props.animevent import AnimEventPropertyGroup
-from .props.lensflare import LensFlarePropertyGroup
-from .props.object import ObjectPropertyGroup
-from .props.pathconnection import PathConnectionPropertyGroup
-from .props.scene import ScenePropertyGroup
 from .ui.list.lensflares import KB_UL_lens_flares
 from .ui.list.pathpoints import KB_UL_path_points
 from .ui.menu.kotorblender import KB_MT_kotor
@@ -87,6 +81,12 @@ from .ui.panel.modelnode.reference import KB_PT_reference
 from .ui.panel.model import KB_PT_model
 from .ui.panel.modelnode.modelnode import KB_PT_modelnode
 from .ui.panel.pathpoint import KB_PT_path_point
+from .ui.props.anim import AnimPropertyGroup
+from .ui.props.animevent import AnimEventPropertyGroup
+from .ui.props.lensflare import LensFlarePropertyGroup
+from .ui.props.object import ObjectPropertyGroup
+from .ui.props.pathconnection import PathConnectionPropertyGroup
+from .ui.props.scene import ScenePropertyGroup
 
 bl_info = {
     "name": "KotorBlender",
