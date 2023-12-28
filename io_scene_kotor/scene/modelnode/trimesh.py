@@ -21,8 +21,8 @@ import bpy
 from bpy_extras.io_utils import unpack_list
 from mathutils import Vector
 
-from ...defines import NodeType, RootType
-from ... import defines, utils
+from ...constants import NodeType, RootType, MeshType, NULL
+from ... import utils
 from .. import material
 from .base import BaseNode
 
@@ -71,7 +71,7 @@ class TrimeshNode(BaseNode):
         self.compress = True
 
         # Properties
-        self.meshtype = defines.MeshType.TRIMESH
+        self.meshtype = MeshType.TRIMESH
         self.center = (0.0, 0.0, 0.0)  # Unused ?
         self.lightmapped = 0
         self.render = 1
@@ -92,8 +92,8 @@ class TrimeshNode(BaseNode):
         self.selfillumcolor = (0.0, 0.0, 0.0)
         self.ambient = (0.2, 0.2, 0.2)
         self.diffuse = (0.8, 0.8, 0.8)
-        self.bitmap = defines.NULL
-        self.bitmap2 = defines.NULL
+        self.bitmap = NULL
+        self.bitmap2 = NULL
         self.tangentspace = 0
         self.rotatetexture = 0
 
@@ -238,7 +238,7 @@ class TrimeshNode(BaseNode):
         BaseNode.load_object_data(self, obj, options)
 
         self.meshtype = obj.kb.meshtype
-        self.bitmap = obj.kb.bitmap if obj.kb.bitmap else defines.NULL
+        self.bitmap = obj.kb.bitmap if obj.kb.bitmap else NULL
         self.bitmap2 = obj.kb.bitmap2 if obj.kb.bitmap2 else ""
         self.alpha = obj.kb.alpha
         self.lightmapped = 1 if obj.kb.lightmapped else 0

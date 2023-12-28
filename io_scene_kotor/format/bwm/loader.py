@@ -16,7 +16,7 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-from ...defines import DummyType, RootType, WalkmeshType
+from ...constants import DummyType, RootType, WalkmeshType
 from ...scene.modelnode.aabb import AabbNode
 from ...scene.modelnode.dummy import DummyNode
 from ...scene.modelnode.trimesh import FaceList

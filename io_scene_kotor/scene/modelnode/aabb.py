@@ -21,9 +21,7 @@ import bpy
 from bpy_extras.io_utils import unpack_list
 from mathutils import Vector
 
-from ...defines import MeshType, NodeType, WalkmeshMaterial
-
-from ... import defines
+from ...constants import MeshType, NodeType, WalkmeshMaterial, WOK_MATERIALS
 
 from .trimesh import TrimeshNode, UV_MAP_DIFFUSE, UV_MAP_LIGHTMAP
 
@@ -74,7 +72,7 @@ class AabbNode(TrimeshNode):
         mesh.polygons.foreach_set("loop_total", (3,) * num_faces)
 
         # Create materials
-        for wok_mat in defines.WOK_MATERIALS:
+        for wok_mat in WOK_MATERIALS:
             mat_name = wok_mat[0]
             # Walkmesh materials will be shared across multiple walkmesh objects
             if mat_name in bpy.data.materials:

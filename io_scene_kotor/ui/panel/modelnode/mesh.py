@@ -18,7 +18,7 @@
 
 import bpy
 
-from ....defines import MeshType
+from ....constants import MeshType
 
 from .... import utils
 
@@ -26,14 +26,14 @@ from .... import utils
 class KB_PT_mesh(bpy.types.Panel):
     bl_label = "Mesh"
     bl_parent_id = "KB_PT_modelnode"
-    bl_space_type = 'PROPERTIES'
-    bl_region_type = 'WINDOW'
+    bl_space_type = "PROPERTIES"
+    bl_region_type = "WINDOW"
     bl_context = "object"
 
     @classmethod
     def poll(cls, context):
         obj = context.object
-        return obj and obj.type == 'MESH' and obj.kb.meshtype != MeshType.EMITTER
+        return obj and obj.type == "MESH" and obj.kb.meshtype != MeshType.EMITTER
 
     def draw(self, context):
         obj = context.object
@@ -78,17 +78,19 @@ class KB_PT_mesh(bpy.types.Panel):
 class KB_PT_mesh_uv_anim(bpy.types.Panel):
     bl_label = "UV animation"
     bl_parent_id = "KB_PT_mesh"
-    bl_space_type = 'PROPERTIES'
-    bl_region_type = 'WINDOW'
+    bl_space_type = "PROPERTIES"
+    bl_region_type = "WINDOW"
     bl_context = "object"
 
     @classmethod
     def poll(cls, context):
         obj = context.object
-        return (obj and
-                obj.type == 'MESH' and
-                obj.kb.meshtype != MeshType.EMITTER and
-                obj.kb.animateuv)
+        return (
+            obj
+            and obj.type == "MESH"
+            and obj.kb.meshtype != MeshType.EMITTER
+            and obj.kb.animateuv
+        )
 
     def draw(self, context):
         obj = context.object
@@ -108,17 +110,19 @@ class KB_PT_mesh_uv_anim(bpy.types.Panel):
 class KB_PT_mesh_dirt(bpy.types.Panel):
     bl_label = "Dirt"
     bl_parent_id = "KB_PT_mesh"
-    bl_space_type = 'PROPERTIES'
-    bl_region_type = 'WINDOW'
+    bl_space_type = "PROPERTIES"
+    bl_region_type = "WINDOW"
     bl_context = "object"
 
     @classmethod
     def poll(cls, context):
         obj = context.object
-        return (obj and
-                obj.type == 'MESH' and
-                obj.kb.meshtype != MeshType.EMITTER and
-                obj.kb.dirt_enabled)
+        return (
+            obj
+            and obj.type == "MESH"
+            and obj.kb.meshtype != MeshType.EMITTER
+            and obj.kb.dirt_enabled
+        )
 
     def draw(self, context):
         obj = context.object
@@ -134,8 +138,8 @@ class KB_PT_mesh_dirt(bpy.types.Panel):
 class KB_PT_mesh_dangly(bpy.types.Panel):
     bl_label = "Danglymesh"
     bl_parent_id = "KB_PT_mesh"
-    bl_space_type = 'PROPERTIES'
-    bl_region_type = 'WINDOW'
+    bl_space_type = "PROPERTIES"
+    bl_region_type = "WINDOW"
     bl_context = "object"
 
     @classmethod
@@ -161,8 +165,8 @@ class KB_PT_mesh_dangly(bpy.types.Panel):
 class KB_PT_mesh_aabb(bpy.types.Panel):
     bl_label = "AABB"
     bl_parent_id = "KB_PT_mesh"
-    bl_space_type = 'PROPERTIES'
-    bl_region_type = 'WINDOW'
+    bl_space_type = "PROPERTIES"
+    bl_region_type = "WINDOW"
     bl_context = "object"
 
     @classmethod
@@ -178,4 +182,4 @@ class KB_PT_mesh_aabb(bpy.types.Panel):
         row = layout.row()
         row.prop(obj.kb, "lytposition")
         row = layout.row()
-        row.operator("kb.load_wok_mats", icon='NONE')
+        row.operator("kb.load_wok_mats", icon="NONE")

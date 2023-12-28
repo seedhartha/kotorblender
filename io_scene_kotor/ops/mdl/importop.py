@@ -25,7 +25,7 @@ import bpy
 
 from bpy_extras.io_utils import ImportHelper
 
-from ...defines import ImportOptions
+from ...constants import ImportOptions
 
 from ...io import mdl
 

@@ -22,7 +22,7 @@ from math import sqrt
 
 from mathutils import Matrix, Quaternion, Vector
 
-from ...defines import NodeType
+from ...constants import NodeType, NULL
 from ...scene.animation import Animation
 from ...scene.animnode import AnimationNode
 from ...scene.model import Model
@@ -35,8 +35,6 @@ from ...scene.modelnode.lightsaber import LightsaberNode
 from ...scene.modelnode.reference import ReferenceNode
 from ...scene.modelnode.skinmesh import SkinmeshNode
 from ...scene.modelnode.trimesh import FaceList, TrimeshNode
-
-from ... import defines
 
 from ..binreader import BinaryReader
 
@@ -293,7 +291,7 @@ class MdlLoader:
             node.depth_texture_name = (
                 depth_texture_name
                 if len(depth_texture_name) > 0 and depth_texture_name.lower() != "null"
-                else defines.NULL
+                else NULL
             )
             # flags
             node.p2p = flags & EMITTER_FLAG_P2P != 0

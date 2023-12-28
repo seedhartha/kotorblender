@@ -18,24 +18,19 @@
 
 import bpy
 
-from ..defines import NodeType
-
-from .. import defines
+from ..constants import NodeType, FPS, ANIM_REST_POSE_OFFSET
 
 DATA_PATH_BY_LABEL = {
     "position": "location",
     "orientation": "rotation_quaternion",
     "scale": "scale",
-
     # Meshes
     "alpha": "kb.alpha",
     "selfillumcolor": "kb.selfillumcolor",
-
     # Lights
     "color": "color",
     "radius": "kb.radius",
     "multiplier": "kb.multiplier",
-
     # Emitters
     "alphastart": "kb.alphastart",
     "alphamid": "kb.alphamid",
@@ -83,24 +78,25 @@ DATA_PATH_BY_LABEL = {
     "tangentlength": "kb.tangentlength",
     "colorstart": "kb.colorstart",
     "colormid": "kb.colormid",
-    "colorend": "kb.colorend"
+    "colorend": "kb.colorend",
 }
 
 LABEL_BY_DATA_PATH = {value: key for key, value in DATA_PATH_BY_LABEL.items()}
 
 CONVERTER_BY_LABEL = {
-    "position": lambda val, obj, animscale: [obj.location[i] + animscale * val[i] for i in range(3)],
-    "scale": lambda val, obj, animscale: [val[0], val[0], val[0]]
+    "position": lambda val, obj, animscale: [
+        obj.location[i] + animscale * val[i] for i in range(3)
+    ],
+    "scale": lambda val, obj, animscale: [val[0], val[0], val[0]],
 }
 
 CONVERTER_BY_DATA_PATH = {
     "location": lambda val, obj: [val[i] - obj.location[i] for i in range(3)],
-    "scale": lambda val, obj: [val[0]]
+    "scale": lambda val, obj: [val[0]],
 }
 
 
 class AnimationNode:
-
     def __init__(self, name="UNNAMED"):
         self.nodetype = NodeType.DUMMY
         self.name = name
@@ -118,7 +114,7 @@ class AnimationNode:
 
             # Action, Animation Data
 
-            if obj.type == 'LIGHT' and label == "color":
+            if obj.type == "LIGHT" and label == "color":
                 target = obj.data
                 action_name = "{}.{}.data".format(root_name, obj.name)
             else:
@@ -130,7 +126,7 @@ class AnimationNode:
 
             # Convert keyframes to frames/values
 
-            frames = [anim.frame_start + defines.FPS * d[0] for d in data]
+            frames = [anim.frame_start + FPS * d[0] for d in data]
 
             if label in CONVERTER_BY_LABEL:
                 converter = CONVERTER_BY_LABEL[label]
@@ -143,7 +139,9 @@ class AnimationNode:
             # Keyframe Points
 
             data_path = DATA_PATH_BY_LABEL[label]
-            fcurves = [self.get_or_create_fcurve(action, data_path, i) for i in range(dim)]
+            fcurves = [
+                self.get_or_create_fcurve(action, data_path, i) for i in range(dim)
+            ]
             keyframe_points = [fcurve.keyframe_points for fcurve in fcurves]
 
             # Rest Pose Keyframes
@@ -152,18 +150,20 @@ class AnimationNode:
                 rest_values = getattr(target.kb, data_path[3:])
             else:
                 rest_values = getattr(target, data_path)
-            rest_frame = anim.frame_start - defines.ANIM_REST_POSE_OFFSET
+            rest_frame = anim.frame_start - ANIM_REST_POSE_OFFSET
             if dim == 1:
-                keyframe_points[0].insert(rest_frame, rest_values, options={'FAST'})
+                keyframe_points[0].insert(rest_frame, rest_values, options={"FAST"})
             else:
                 for i in range(dim):
-                    keyframe_points[i].insert(rest_frame, rest_values[i], options={'FAST'})
+                    keyframe_points[i].insert(
+                        rest_frame, rest_values[i], options={"FAST"}
+                    )
 
             # Animation Keyframes
 
             for frame, val in zip(frames, values):
                 for i in range(dim):
-                    keyframe_points[i].insert(frame, val[i], options={'FAST'})
+                    keyframe_points[i].insert(frame, val[i], options={"FAST"})
             for kfp in keyframe_points:
                 kfp.update()
 
@@ -195,7 +195,9 @@ class AnimationNode:
         if not action:
             return
 
-        keyframes = self.get_keyframes_in_range(action, anim.frame_start, anim.frame_end)
+        keyframes = self.get_keyframes_in_range(
+            action, anim.frame_start, anim.frame_end
+        )
         flat_keyframes = self.flatten_keyframes(keyframes)
 
         for data_path, dp_keyframes in flat_keyframes.items():
@@ -206,7 +208,7 @@ class AnimationNode:
             self.keyframes[label] = []
 
             for point in dp_keyframes:
-                timekey = (point[0] - anim.frame_start) / defines.FPS
+                timekey = (point[0] - anim.frame_start) / FPS
                 if data_path in CONVERTER_BY_DATA_PATH:
                     converter = CONVERTER_BY_DATA_PATH[data_path]
                     values = converter(point[1:], target)
@@ -245,6 +247,9 @@ class AnimationNode:
             assert all([len(x) == num_points for x in dp_keyframes[1:]])
             flat_keyframes[data_path] = []
             for i in range(num_points):
-                flat_keyframes[data_path].append([dp_keyframes[0][i][0]] + [dp_keyframes[j][i][1] for j in range(dim)])
+                flat_keyframes[data_path].append(
+                    [dp_keyframes[0][i][0]]
+                    + [dp_keyframes[j][i][1] for j in range(dim)]
+                )
 
         return flat_keyframes

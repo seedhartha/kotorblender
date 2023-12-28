@@ -22,9 +22,9 @@ import bpy
 
 from mathutils import Matrix
 
-from ..defines import DummyType, MeshType, NodeType
+from ..constants import DummyType, MeshType, NodeType, Classification, NULL
 
-from .. import defines, utils
+from .. import utils
 
 from .animation import Animation
 from .modelnode.aabb import AabbNode
@@ -43,11 +43,11 @@ from . import armature
 class Model:
     def __init__(self):
         self.name = "UNNAMED"
-        self.supermodel = defines.NULL
-        self.classification = defines.Classification.OTHER
+        self.supermodel = NULL
+        self.classification = Classification.OTHER
         self.subclassification = 0
         self.affected_by_fog = True
-        self.animroot = defines.NULL
+        self.animroot = NULL
         self.animscale = 1.0
 
         self.root_node = None
@@ -60,7 +60,7 @@ class Model:
         if options.import_geometry:
             root_obj = self.root_node.add_to_collection(collection, options)
             root_obj.location = position
-            root_obj.kb.dummytype = defines.DummyType.MDLROOT
+            root_obj.kb.dummytype = DummyType.MDLROOT
             root_obj.kb.supermodel = self.supermodel
             root_obj.kb.classification = self.classification
             root_obj.kb.subclassification = self.subclassification

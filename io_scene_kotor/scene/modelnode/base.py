@@ -20,7 +20,7 @@ import bpy
 
 from mathutils import Matrix, Quaternion
 
-from ...defines import RootType
+from ...constants import RootType
 
 
 class BaseNode:

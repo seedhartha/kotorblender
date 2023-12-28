@@ -16,7 +16,7 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-from ...defines import Classification
+from ...constants import Classification
 
 # BEGIN Function Pointers
 
@@ -87,7 +87,7 @@ CLASS_BY_VALUE = {
     CLASS_DOOR: Classification.DOOR,
     CLASS_LIGHTSABER: Classification.LIGHTSABER,
     CLASS_PLACEABLE: Classification.PLACEABLE,
-    CLASS_FLYER: Classification.FLYER
+    CLASS_FLYER: Classification.FLYER,
 }
 
 NODE_BASE = 0x0001
@@ -243,7 +243,7 @@ EMITTER_CONTROLLER_KEYS = [
     (CTRL_EMITTER_DRAG, "drag", 1),
     (CTRL_EMITTER_GRAV, "grav", 1),
     (CTRL_EMITTER_THRESHOLD, "threshold", 1),
-    (CTRL_EMITTER_BLURLENGTH, "blurlength", 1)
+    (CTRL_EMITTER_BLURLENGTH, "blurlength", 1),
 ]
 
 

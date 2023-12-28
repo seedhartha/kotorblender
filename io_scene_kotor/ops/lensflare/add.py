@@ -18,7 +18,7 @@
 
 import bpy
 
-from ... import defines
+from ...constants import NULL
 
 
 class KB_OT_add_lens_flare(bpy.types.Operator):
@@ -28,10 +28,10 @@ class KB_OT_add_lens_flare(bpy.types.Operator):
     @classmethod
     def poll(cls, context):
         obj = context.object
-        return obj and obj.type == 'LIGHT' and obj.kb.lensflares
+        return obj and obj.type == "LIGHT" and obj.kb.lensflares
 
     def execute(self, context):
         flare = context.object.kb.flare_list.add()
-        flare.texture = defines.NULL
+        flare.texture = NULL
 
-        return{'FINISHED'}
+        return {"FINISHED"}

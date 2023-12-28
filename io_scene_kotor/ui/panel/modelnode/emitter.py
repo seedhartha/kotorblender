@@ -18,7 +18,7 @@
 
 import bpy
 
-from ....defines import MeshType
+from ....constants import MeshType
 
 from .... import utils
 
@@ -26,8 +26,8 @@ from .... import utils
 class KB_PT_emitter(bpy.types.Panel):
     bl_label = "Emitter"
     bl_parent_id = "KB_PT_modelnode"
-    bl_space_type = 'PROPERTIES'
-    bl_region_type = 'WINDOW'
+    bl_space_type = "PROPERTIES"
+    bl_region_type = "WINDOW"
     bl_context = "object"
 
     @classmethod
@@ -92,8 +92,8 @@ class KB_PT_emitter(bpy.types.Panel):
 class KB_PT_emitter_particles(bpy.types.Panel):
     bl_label = "Particles"
     bl_parent_id = "KB_PT_emitter"
-    bl_space_type = 'PROPERTIES'
-    bl_region_type = 'WINDOW'
+    bl_space_type = "PROPERTIES"
+    bl_region_type = "WINDOW"
     bl_context = "object"
 
     @classmethod
@@ -185,8 +185,8 @@ class KB_PT_emitter_particles(bpy.types.Panel):
 class KB_PT_emitter_texture_anim(bpy.types.Panel):
     bl_label = "Texture Animation"
     bl_parent_id = "KB_PT_emitter"
-    bl_space_type = 'PROPERTIES'
-    bl_region_type = 'WINDOW'
+    bl_space_type = "PROPERTIES"
+    bl_region_type = "WINDOW"
     bl_context = "object"
 
     @classmethod
@@ -220,14 +220,16 @@ class KB_PT_emitter_texture_anim(bpy.types.Panel):
 class KB_PT_emitter_lighting(bpy.types.Panel):
     bl_label = "Lighting"
     bl_parent_id = "KB_PT_emitter"
-    bl_space_type = 'PROPERTIES'
-    bl_region_type = 'WINDOW'
+    bl_space_type = "PROPERTIES"
+    bl_region_type = "WINDOW"
     bl_context = "object"
 
     @classmethod
     def poll(cls, context):
         obj = context.object
-        return utils.is_mesh_type(obj, MeshType.EMITTER) and obj.kb.update == "Lightning"
+        return (
+            utils.is_mesh_type(obj, MeshType.EMITTER) and obj.kb.update == "Lightning"
+        )
 
     def draw(self, context):
         obj = context.object
@@ -249,8 +251,8 @@ class KB_PT_emitter_lighting(bpy.types.Panel):
 class KB_PT_emitter_p2p(bpy.types.Panel):
     bl_label = "P2P"
     bl_parent_id = "KB_PT_emitter"
-    bl_space_type = 'PROPERTIES'
-    bl_region_type = 'WINDOW'
+    bl_space_type = "PROPERTIES"
+    bl_region_type = "WINDOW"
     bl_context = "object"
 
     @classmethod
@@ -281,8 +283,8 @@ class KB_PT_emitter_p2p(bpy.types.Panel):
 class KB_PT_emitter_control_points(bpy.types.Panel):
     bl_label = "Control Points"
     bl_parent_id = "KB_PT_emitter"
-    bl_space_type = 'PROPERTIES'
-    bl_region_type = 'WINDOW'
+    bl_space_type = "PROPERTIES"
+    bl_region_type = "WINDOW"
     bl_context = "object"
 
     @classmethod

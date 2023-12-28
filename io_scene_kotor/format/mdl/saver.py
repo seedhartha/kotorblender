@@ -22,7 +22,7 @@ from math import sqrt
 
 from mathutils import Vector
 
-from ...defines import NodeType
+from ...constants import NodeType
 
 from ... import aabb, utils
 

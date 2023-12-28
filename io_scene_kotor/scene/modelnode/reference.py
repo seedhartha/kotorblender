@@ -16,9 +16,7 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-from ...defines import DummyType, NodeType
-
-from ... import defines
+from ...constants import DummyType, NodeType, NULL
 
 from .base import BaseNode
 
@@ -28,7 +26,7 @@ class ReferenceNode(BaseNode):
         BaseNode.__init__(self, name)
         self.nodetype = NodeType.REFERENCE
         self.dummytype = DummyType.REFERENCE
-        self.refmodel = defines.NULL
+        self.refmodel = NULL
         self.reattachable = 0
 
     def set_object_data(self, obj, options):

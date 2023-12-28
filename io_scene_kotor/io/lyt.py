@@ -20,7 +20,7 @@ import os
 
 import bpy
 
-from ..defines import DummyType
+from ..constants import DummyType
 
 from .. import utils
 
@@ -28,7 +28,7 @@ from . import mdl
 
 
 def load_lyt(operator, filepath, options):
-    operator.report({'INFO'}, "Loading area layout from '{}'".format(filepath))
+    operator.report({"INFO"}, "Loading area layout from '{}'".format(filepath))
 
     # Read lines
     fp = os.fsencode(filepath)
@@ -58,28 +58,36 @@ def load_lyt(operator, filepath, options):
     for room in rooms:
         mdl_path = os.path.join(path, room[0] + ".mdl")
         if not os.path.exists(mdl_path):
-            operator.report({'WARNING'}, "Room model '{}' not found".format(mdl_path))
+            operator.report({"WARNING"}, "Room model '{}' not found".format(mdl_path))
             continue
         mdl.load_mdl(operator, mdl_path, options, room[1:])
 
 
 def save_lyt(operator, filepath):
-
     def describe_object(obj):
         parent = utils.get_object_root(obj)
         orientation = obj.rotation_euler.to_quaternion()
-        return "{} {} {:.7g} {:.7g} {:.7g} {:.7g} {:.7g} {:.7g} {:.7g}".format(parent.name if parent else "NULL", obj.name, *obj.matrix_world.translation, *orientation)
+        return "{} {} {:.7g} {:.7g} {:.7g} {:.7g} {:.7g} {:.7g} {:.7g}".format(
+            parent.name if parent else "NULL",
+            obj.name,
+            *obj.matrix_world.translation,
+            *orientation
+        )
 
-    operator.report({'INFO'}, "Saving area layout to '{}'".format(filepath))
+    operator.report({"INFO"}, "Saving area layout to '{}'".format(filepath))
 
     with open(filepath, "w") as f:
         rooms = []
         doors = []
         others = []
 
-        objects = bpy.context.selected_objects if len(bpy.context.selected_objects) > 0 else bpy.context.collection.objects
+        objects = (
+            bpy.context.selected_objects
+            if len(bpy.context.selected_objects) > 0
+            else bpy.context.collection.objects
+        )
         for obj in objects:
-            if obj.type == 'EMPTY':
+            if obj.type == "EMPTY":
                 if obj.kb.dummytype == DummyType.MDLROOT:
                     rooms.append(obj)
                 elif obj.name.lower().startswith("door"):

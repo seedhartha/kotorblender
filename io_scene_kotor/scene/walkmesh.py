@@ -16,7 +16,7 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-from ..defines import WalkmeshType
+from ..constants import WalkmeshType
 
 from .. import utils
 
@@ -25,7 +25,6 @@ from .modelnode.dummy import DummyNode
 
 
 class Walkmesh(Model):
-
     def __init__(self, walkmesh_type):
         Model.__init__(self)
         self.walkmesh_type = walkmesh_type
@@ -53,7 +52,9 @@ class Walkmesh(Model):
         elif utils.is_dwk_root(obj):
             walkmesh_type = WalkmeshType.DWK
         else:
-            raise ValueError("Cannot create walkmesh from root object '{}'".format(obj.name))
+            raise ValueError(
+                "Cannot create walkmesh from root object '{}'".format(obj.name)
+            )
 
         walkmesh = Walkmesh(walkmesh_type)
         walkmesh.root_node = cls.model_node_from_object(obj, options, exclude_xwk=False)

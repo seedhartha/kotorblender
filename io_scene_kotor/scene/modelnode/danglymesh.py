@@ -16,7 +16,7 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-from ...defines import MeshType, NodeType
+from ...constants import MeshType, NodeType
 from .trimesh import TrimeshNode
 
 CONSTRAINTS = "constraints"

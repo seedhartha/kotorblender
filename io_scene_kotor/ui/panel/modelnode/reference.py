@@ -18,7 +18,7 @@
 
 import bpy
 
-from ....defines import DummyType
+from ....constants import DummyType
 
 from .... import utils
 
@@ -26,8 +26,8 @@ from .... import utils
 class KB_PT_reference(bpy.types.Panel):
     bl_label = "Reference"
     bl_parent_id = "KB_PT_modelnode"
-    bl_space_type = 'PROPERTIES'
-    bl_region_type = 'WINDOW'
+    bl_space_type = "PROPERTIES"
+    bl_region_type = "WINDOW"
     bl_context = "object"
 
     @classmethod

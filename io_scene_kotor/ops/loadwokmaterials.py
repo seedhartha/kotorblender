@@ -18,7 +18,7 @@
 
 import bpy
 
-from .. import defines
+from io_scene_kotor.constants import WOK_MATERIALS
 
 
 class KB_OT_load_wok_materials(bpy.types.Operator):
@@ -27,7 +27,7 @@ class KB_OT_load_wok_materials(bpy.types.Operator):
 
     def execute(self, context):
         selected_object = context.object
-        if (selected_object) and (selected_object.type == 'MESH'):
+        if (selected_object) and (selected_object.type == "MESH"):
             object_mesh = selected_object.data
 
             # Remove all current material slots
@@ -35,7 +35,7 @@ class KB_OT_load_wok_materials(bpy.types.Operator):
                 bpy.ops.object.material_slot_remove()
 
             # Create materials
-            for matDef in defines.WOK_MATERIALS:
+            for matDef in WOK_MATERIALS:
                 mat_name = matDef[0]
 
                 # Walkmesh materials should be shared across multiple walkmeshes, as they always identical
@@ -50,7 +50,7 @@ class KB_OT_load_wok_materials(bpy.types.Operator):
 
                 object_mesh.materials.append(mat)
         else:
-            self.report({'INFO'}, "A mesh must be selected")
-            return {'CANCELLED'}
+            self.report({"INFO"}, "A mesh must be selected")
+            return {"CANCELLED"}
 
-        return {'FINISHED'}
+        return {"FINISHED"}

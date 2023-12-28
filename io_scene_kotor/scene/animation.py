@@ -19,33 +19,38 @@
 import math
 import re
 
-from ..defines import DummyType
+from ..constants import DummyType, FPS, ANIM_PADDING, NULL
 
-from .. import defines, utils
+from .. import utils
 
 from .animnode import AnimationNode
 
 
 class Animation:
-
     def __init__(self, name="UNNAMED"):
         self.name = name
         self.length = 1.0
         self.transtime = 0.25
-        self.animroot = defines.NULL
+        self.animroot = NULL
         self.root_node = None
 
         self.events = []
 
     def add_to_objects(self, mdl_root, animscale):
-        list_anim = Animation.append_to_object(mdl_root, self.name, self.length, self.transtime, self.animroot)
+        list_anim = Animation.append_to_object(
+            mdl_root, self.name, self.length, self.transtime, self.animroot
+        )
         for time, name in self.events:
             Animation.append_event_to_object_anim(list_anim, name, time)
 
         self.add_nodes_to_objects(list_anim, self.root_node, mdl_root, animscale)
 
-    def add_nodes_to_objects(self, anim, node, mdl_root, animscale, below_animroot=False):
-        obj = utils.find_object(mdl_root, lambda o: o.kb.node_number == node.node_number)
+    def add_nodes_to_objects(
+        self, anim, node, mdl_root, animscale, below_animroot=False
+    ):
+        obj = utils.find_object(
+            mdl_root, lambda o: o.kb.node_number == node.node_number
+        )
         if obj:
             if not below_animroot and obj.name.lower() == mdl_root.kb.animroot.lower():
                 below_animroot = True
@@ -56,7 +61,9 @@ class Animation:
             self.add_nodes_to_objects(anim, child, mdl_root, animscale, below_animroot)
 
     @classmethod
-    def append_to_object(cls, mdl_root, name, length=0.0, transtime=0.25, animroot=defines.NULL):
+    def append_to_object(
+        cls, mdl_root, name, length=0.0, transtime=0.25, animroot=NULL
+    ):
         anim = mdl_root.kb.anim_list.add()
         anim.name = name
         anim.root = animroot
@@ -73,17 +80,19 @@ class Animation:
 
     @classmethod
     def time_to_frame(cls, time):
-        return round(defines.FPS * time)
+        return round(FPS * time)
 
     @classmethod
     def get_next_frame(cls, mdl_root):
         last_frame = max([a.frame_end for a in mdl_root.kb.anim_list])
-        return int(math.ceil((last_frame + defines.ANIM_PADDING) / 10.0)) * 10
+        return int(math.ceil((last_frame + ANIM_PADDING) / 10.0)) * 10
 
     @classmethod
     def from_list_anim(cls, list_anim, mdl_root):
         anim = Animation(list_anim.name)
-        anim.length = Animation.frame_to_time(list_anim.frame_end - list_anim.frame_start)
+        anim.length = Animation.frame_to_time(
+            list_anim.frame_end - list_anim.frame_start
+        )
         anim.transtime = list_anim.transtime
         anim.animroot = list_anim.root
         anim.root_node = Animation.animation_node_from_object(list_anim, mdl_root)
@@ -106,12 +115,15 @@ class Animation:
         node.parent = parent
 
         node.load_keyframes_from_object(anim, obj)
-        if obj.type == 'LIGHT':
+        if obj.type == "LIGHT":
             node.load_keyframes_from_object(anim, obj.data)
         node.animated = bool(node.keyframes)
 
         for child_obj in sorted(obj.children, key=lambda o: o.kb.export_order):
-            if child_obj.type == 'EMPTY' and child_obj.kb.dummytype in [DummyType.PWKROOT, DummyType.DWKROOT]:
+            if child_obj.type == "EMPTY" and child_obj.kb.dummytype in [
+                DummyType.PWKROOT,
+                DummyType.DWKROOT,
+            ]:
                 continue
             child = Animation.animation_node_from_object(anim, child_obj, node)
             if not node.animated and child.animated:
@@ -122,4 +134,4 @@ class Animation:
 
     @classmethod
     def frame_to_time(cls, frame):
-        return frame / defines.FPS
+        return frame / FPS

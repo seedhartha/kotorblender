@@ -18,7 +18,7 @@
 
 from mathutils import Vector
 
-from ...defines import DummyType, WalkmeshMaterial, WalkmeshType
+from ...constants import DummyType, WalkmeshMaterial, WalkmeshType
 from ...scene.modelnode.aabb import AabbNode
 from ...scene.modelnode.dummy import DummyNode
 from ...scene.modelnode.trimesh import FaceList
@@ -36,7 +36,7 @@ MERGE_DISTANCE = 1e-4
 class BwmSaver:
     def __init__(self, path, walkmesh):
         self.path = path
-        self.bwm = BinaryWriter(path, 'little')
+        self.bwm = BinaryWriter(path, "little")
         self.walkmesh = walkmesh
 
         self.bwm_pos = 0
@@ -79,10 +79,22 @@ class BwmSaver:
         self.save_perimeters()
 
     def peek_walkmesh(self):
-        self.bwm_type = BWM_TYPE_WOK if self.walkmesh.walkmesh_type == WalkmeshType.WOK else BWM_TYPE_PWK_DWK
-        self.geom_node = self.walkmesh.root_node.find_node(lambda node: isinstance(node, AabbNode))
-        self.use_node1 = self.walkmesh.root_node.find_node(lambda node: isinstance(node, DummyNode) and node.dummytype == DummyType.USE1)
-        self.use_node2 = self.walkmesh.root_node.find_node(lambda node: isinstance(node, DummyNode) and node.dummytype == DummyType.USE2)
+        self.bwm_type = (
+            BWM_TYPE_WOK
+            if self.walkmesh.walkmesh_type == WalkmeshType.WOK
+            else BWM_TYPE_PWK_DWK
+        )
+        self.geom_node = self.walkmesh.root_node.find_node(
+            lambda node: isinstance(node, AabbNode)
+        )
+        self.use_node1 = self.walkmesh.root_node.find_node(
+            lambda node: isinstance(node, DummyNode)
+            and node.dummytype == DummyType.USE1
+        )
+        self.use_node2 = self.walkmesh.root_node.find_node(
+            lambda node: isinstance(node, DummyNode)
+            and node.dummytype == DummyType.USE2
+        )
 
         self.peek_vertices()
         self.peek_faces()
@@ -140,7 +152,7 @@ class BwmSaver:
         for vert_idx, vert in enumerate(self.geom_node.verts):
             if vert_idx in self.new_vert_by_old_vert:
                 continue
-            for other_vert_idx in range(vert_idx+1, num_verts):
+            for other_vert_idx in range(vert_idx + 1, num_verts):
                 if other_vert_idx in self.new_vert_by_old_vert:
                     continue
                 other_vert = self.geom_node.verts[other_vert_idx]
@@ -152,7 +164,10 @@ class BwmSaver:
 
         # Offset by node and LYT position
         for vert_idx, vert in enumerate(self.verts):
-            self.verts[vert_idx] = [vert[i] + self.geom_node.position[i] + self.geom_node.lytposition[i] for i in range(3)]
+            self.verts[vert_idx] = [
+                vert[i] + self.geom_node.position[i] + self.geom_node.lytposition[i]
+                for i in range(3)
+            ]
 
     def peek_faces(self):
         walkable_face_indices = []
@@ -166,7 +181,12 @@ class BwmSaver:
                 self.num_walkable_faces += 1
         face_indices = walkable_face_indices + non_walkable_face_indices
         for face_idx in face_indices:
-            self.facelist.vertices.append([self.new_vert_by_old_vert[vert_idx] for vert_idx in self.geom_node.facelist.vertices[face_idx]])
+            self.facelist.vertices.append(
+                [
+                    self.new_vert_by_old_vert[vert_idx]
+                    for vert_idx in self.geom_node.facelist.vertices[face_idx]
+                ]
+            )
             self.facelist.materials.append(self.geom_node.facelist.materials[face_idx])
             self.facelist.normals.append(self.geom_node.facelist.normals[face_idx])
 
@@ -201,11 +221,19 @@ class BwmSaver:
                 0: AABB_NO_CHILDREN,
                 1: AABB_POSITIVE_X,
                 2: AABB_POSITIVE_Y,
-                3: AABB_POSITIVE_Z
+                3: AABB_POSITIVE_Z,
             }
             most_significant_plane = switch[split_axis]
 
-            self.aabbs.append(AABB(aabb_node[:6], face_idx, most_significant_plane, child_idx1, child_idx2))
+            self.aabbs.append(
+                AABB(
+                    aabb_node[:6],
+                    face_idx,
+                    most_significant_plane,
+                    child_idx1,
+                    child_idx2,
+                )
+            )
 
     def peek_edges(self):
         # Adjacent Edges
@@ -213,10 +241,20 @@ class BwmSaver:
             self.adjacent_edges.append([-1, -1, -1])
         for face_idx in range(self.num_walkable_faces):
             face = self.facelist.vertices[face_idx]
-            edges = [tuple(sorted(edge)) for edge in [(face[0], face[1]), (face[1], face[2]), (face[2], face[0])]]
+            edges = [
+                tuple(sorted(edge))
+                for edge in [(face[0], face[1]), (face[1], face[2]), (face[2], face[0])]
+            ]
             for other_face_idx in range(face_idx + 1, self.num_walkable_faces):
                 other_face = self.facelist.vertices[other_face_idx]
-                other_edges = [tuple(sorted(edge)) for edge in [(other_face[0], other_face[1]), (other_face[1], other_face[2]), (other_face[2], other_face[0])]]
+                other_edges = [
+                    tuple(sorted(edge))
+                    for edge in [
+                        (other_face[0], other_face[1]),
+                        (other_face[1], other_face[2]),
+                        (other_face[2], other_face[0]),
+                    ]
+                ]
                 num_adj_edges = 0
                 for i in range(3):
                     if self.adjacent_edges[face_idx][i] != -1:
@@ -249,7 +287,11 @@ class BwmSaver:
                     if adj_edge_idx == -1:
                         edge_idx = 3 * next_face + next_edge
                         if not edge_idx in visited_edges:
-                            transition = self.geom_node.roomlinks[edge_idx] if edge_idx in self.geom_node.roomlinks else -1
+                            transition = (
+                                self.geom_node.roomlinks[edge_idx]
+                                if edge_idx in self.geom_node.roomlinks
+                                else -1
+                            )
                             self.outer_edges.append((edge_idx, transition))
                             visited_edges.add(edge_idx)
                             next_edge = (next_edge + 1) % 3

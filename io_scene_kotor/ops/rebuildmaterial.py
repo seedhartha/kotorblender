@@ -18,7 +18,7 @@
 
 import bpy
 
-from ..defines import MeshType
+from ..constants import MeshType
 from ..scene import material
 
 
@@ -29,8 +29,12 @@ class KB_OT_rebuild_material(bpy.types.Operator):
     @classmethod
     def poll(cls, context):
         obj = context.object
-        return obj and obj.type == 'MESH' and obj.kb.meshtype not in [MeshType.AABB, MeshType.EMITTER]
+        return (
+            obj
+            and obj.type == "MESH"
+            and obj.kb.meshtype not in [MeshType.AABB, MeshType.EMITTER]
+        )
 
     def execute(self, context):
         material.rebuild_object_material(context.object)
-        return {'FINISHED'}
+        return {"FINISHED"}

@@ -20,7 +20,7 @@ import os
 
 import bpy
 
-from ..defines import DummyType
+from ..constants import DummyType
 from ..format.gff.loader import GffLoader
 from ..format.gff.saver import GffSaver
 
@@ -28,7 +28,6 @@ from .. import utils
 
 
 def load_pth(operator, filepath):
-
     def get_point_name(idx):
         return "PathPoint{0:0>3}".format(idx)
 
@@ -41,7 +40,7 @@ def load_pth(operator, filepath):
         path_object.kb.dummytype = DummyType.PTHROOT
         bpy.context.collection.objects.link(path_object)
 
-    operator.report({'INFO'}, "Loading path from '{}'".format(filepath))
+    operator.report({"INFO"}, "Loading path from '{}'".format(filepath))
     loader = GffLoader(filepath, "PTH")
     tree = loader.load()
     points = []
@@ -80,20 +79,13 @@ def save_pth(operator, filepath):
         for object_connection in obj.kb.path_connection_list:
             conection = dict()
             conection["_type"] = 3
-            conection["_fields"] = {
-                "Destination": 4
-            }
+            conection["_fields"] = {"Destination": 4}
             conection["Destination"] = point_idx_by_name[object_connection.point]
             conections.append(conection)
 
         point = dict()
         point["_type"] = 2
-        point["_fields"] = {
-            "Conections": 4,
-            "First_Conection": 4,
-            "X": 8,
-            "Y": 8
-        }
+        point["_fields"] = {"Conections": 4, "First_Conection": 4, "X": 8, "Y": 8}
         point["Conections"] = len(obj.kb.path_connection_list)
         point["First_Conection"] = first_conection
         point["X"] = obj.location[0]
@@ -102,13 +94,10 @@ def save_pth(operator, filepath):
 
     tree = dict()
     tree["_type"] = 0xFFFFFFFF
-    tree["_fields"] = {
-        "Path_Points": 15,
-        "Path_Conections": 15
-    }
+    tree["_fields"] = {"Path_Points": 15, "Path_Conections": 15}
     tree["Path_Points"] = points
     tree["Path_Conections"] = conections
 
-    operator.report({'INFO'}, "Saving path to '{}'".format(filepath))
+    operator.report({"INFO"}, "Saving path to '{}'".format(filepath))
     saver = GffSaver(tree, filepath, "PTH")
     saver.save()

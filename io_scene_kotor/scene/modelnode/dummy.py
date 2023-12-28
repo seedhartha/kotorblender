@@ -16,7 +16,7 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-from ...defines import DummyType, NodeType
+from ...constants import DummyType, NodeType
 
 from .base import BaseNode
 

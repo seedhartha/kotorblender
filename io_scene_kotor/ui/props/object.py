@@ -18,10 +18,8 @@
 
 import bpy
 
-from ..defines import Classification, DummyType, MeshType
-from ..scene.modelnode.light import LightNode
-
-from .. import defines
+from ...constants import Classification, DummyType, MeshType, NULL
+from ...scene.modelnode.light import LightNode
 
 from .anim import AnimPropertyGroup
 from .lensflare import LensFlarePropertyGroup
@@ -53,7 +51,7 @@ class ObjectPropertyGroup(bpy.types.PropertyGroup):
     supermodel: bpy.props.StringProperty(
         name="Supermodel",
         description="Name of the model to inherit animations from",
-        default=defines.NULL,
+        default=NULL,
     )
     classification: bpy.props.EnumProperty(
         name="Classification",
@@ -78,7 +76,7 @@ class ObjectPropertyGroup(bpy.types.PropertyGroup):
     animroot: bpy.props.StringProperty(
         name="Animation Root",
         description="Animations should only affect children of selected object",
-        default=defines.NULL,
+        default=NULL,
     )
     animscale: bpy.props.FloatProperty(
         name="Animation Scale",
@@ -426,7 +424,7 @@ class ObjectPropertyGroup(bpy.types.PropertyGroup):
     renderorder: bpy.props.IntProperty(name="Render Order", min=0)
     frame_blending: bpy.props.BoolProperty(name="Frame Blending")
     depth_texture_name: bpy.props.StringProperty(
-        name="Depth Texture Name", default=defines.NULL, maxlen=32
+        name="Depth Texture Name", default=NULL, maxlen=32
     )
     p2p: bpy.props.BoolProperty(name="P2P")
     p2p_type: bpy.props.EnumProperty(

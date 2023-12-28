@@ -20,9 +20,9 @@ import bpy
 
 from mathutils import Matrix, Quaternion, Vector
 
-from ..defines import DummyType, MeshType
+from ..constants import DummyType, MeshType, ANIM_REST_POSE_OFFSET
 
-from .. import defines, utils
+from .. import utils
 
 from .animnode import AnimationNode
 
@@ -47,22 +47,22 @@ def rebuild_armature(mdl_root):
 
     # Create an armature and activate it
     armature = bpy.data.armatures.new(name)
-    armature.display_type = 'STICK'
+    armature.display_type = "STICK"
     armature_obj = bpy.data.objects.new(name, armature)
     armature_obj.show_in_front = True
     bpy.context.collection.objects.link(armature_obj)
     bpy.context.view_layer.objects.active = armature_obj
 
     # Create armature bones
-    bpy.ops.object.mode_set(mode='EDIT')
+    bpy.ops.object.mode_set(mode="EDIT")
     create_armature_bones(armature, mdl_root)
-    bpy.ops.object.mode_set(mode='OBJECT')
+    bpy.ops.object.mode_set(mode="OBJECT")
 
     # Copy object keyframes to armature
-    bpy.ops.object.mode_set(mode='POSE')
+    bpy.ops.object.mode_set(mode="POSE")
     for anim in mdl_root.kb.anim_list:
         copy_object_keyframes_to_armature(anim, mdl_root, armature_obj)
-    bpy.ops.object.mode_set(mode='OBJECT')
+    bpy.ops.object.mode_set(mode="OBJECT")
 
     # Add Armature modifier to all skinmeshes
     for mesh in skinmeshes:
@@ -85,15 +85,19 @@ def create_armature_bones(armature, obj, parent_bone=None):
     bone.matrix = obj.matrix_world
 
     for child in obj.children:
-        if child.type == 'EMPTY' and child.kb.dummytype != DummyType.NONE:
+        if child.type == "EMPTY" and child.kb.dummytype != DummyType.NONE:
             continue
-        if child.type == 'MESH' and child.kb.meshtype != MeshType.TRIMESH:
+        if child.type == "MESH" and child.kb.meshtype != MeshType.TRIMESH:
             continue
         create_armature_bones(armature, child, bone)
 
 
 def copy_object_keyframes_to_armature(anim, obj, armature_obj):
-    if obj.name in armature_obj.pose.bones and obj.animation_data and obj.animation_data.action:
+    if (
+        obj.name in armature_obj.pose.bones
+        and obj.animation_data
+        and obj.animation_data.action
+    ):
         bone = armature_obj.pose.bones[obj.name]
         action = obj.animation_data.action
 
@@ -105,7 +109,9 @@ def copy_object_keyframes_to_armature(anim, obj, armature_obj):
         rest_position, rest_orientation, _ = rel_rest_mat.decompose()
 
         # Extract position and orientation keyframes
-        keyframes = AnimationNode.get_keyframes_in_range(action, anim.frame_start, anim.frame_end)
+        keyframes = AnimationNode.get_keyframes_in_range(
+            action, anim.frame_start, anim.frame_end
+        )
         flat_keyframes = AnimationNode.flatten_keyframes(keyframes)
         positions = []
         orientations = []
@@ -113,10 +119,12 @@ def copy_object_keyframes_to_armature(anim, obj, armature_obj):
             if data_path == "location":
                 positions = [(values[0], Vector(values[1:])) for values in dp_keyframes]
             if data_path == "rotation_quaternion":
-                orientations = [(values[0], Quaternion(values[1:])) for values in dp_keyframes]
+                orientations = [
+                    (values[0], Quaternion(values[1:])) for values in dp_keyframes
+                ]
 
         # Insert rest pose keyframes
-        rest_frame = anim.frame_start - defines.ANIM_REST_POSE_OFFSET
+        rest_frame = anim.frame_start - ANIM_REST_POSE_OFFSET
         bone.matrix_basis = Matrix()
         bone.keyframe_insert("location", frame=rest_frame)
         bone.keyframe_insert("rotation_quaternion", frame=rest_frame)
@@ -131,7 +139,9 @@ def copy_object_keyframes_to_armature(anim, obj, armature_obj):
         for frame in frames:
             position = sample_position(positions, frame, rest_position)
             orientation = sample_orientation(orientations, frame, rest_orientation)
-            rel_pose_mat = Matrix.Translation(position) @ orientation.to_matrix().to_4x4()
+            rel_pose_mat = (
+                Matrix.Translation(position) @ orientation.to_matrix().to_4x4()
+            )
             if bone.parent:
                 bone.matrix_basis = rel_rest_mat_inv @ rel_pose_mat
             bone.keyframe_insert("location", frame=frame)

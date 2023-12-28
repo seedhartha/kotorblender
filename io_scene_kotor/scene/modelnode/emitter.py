@@ -20,9 +20,7 @@ import bpy
 
 from bpy_extras.io_utils import unpack_list
 
-from ...defines import MeshType, NodeType
-
-from ... import defines
+from ...constants import MeshType, NodeType, NULL
 
 from .base import BaseNode
 
@@ -130,7 +128,7 @@ class EmitterNode(BaseNode):
         self.loop = False
         self.renderorder = 0
         self.frame_blending = False
-        self.depth_texture_name = defines.NULL
+        self.depth_texture_name = NULL
         # flags
         self.p2p = False
         self.p2p_sel = False

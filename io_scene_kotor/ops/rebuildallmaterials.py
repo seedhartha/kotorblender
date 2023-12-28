@@ -20,7 +20,7 @@ import bpy
 
 from .. import utils
 
-from ..defines import DummyType, MeshType
+from ..constants import DummyType, MeshType
 from ..scene import material
 
 
@@ -31,10 +31,14 @@ class KB_OT_rebuild_all_materials(bpy.types.Operator):
     @classmethod
     def poll(cls, context):
         obj = context.object
-        return obj and obj.type == 'EMPTY' and obj.kb.dummytype == DummyType.MDLROOT
+        return obj and obj.type == "EMPTY" and obj.kb.dummytype == DummyType.MDLROOT
 
     def execute(self, context):
-        objects = utils.find_objects(context.object, lambda obj: obj.type == 'MESH' and obj.kb.meshtype not in [MeshType.AABB, MeshType.EMITTER])
+        objects = utils.find_objects(
+            context.object,
+            lambda obj: obj.type == "MESH"
+            and obj.kb.meshtype not in [MeshType.AABB, MeshType.EMITTER],
+        )
         for obj in objects:
             material.rebuild_object_material(obj)
-        return {'FINISHED'}
+        return {"FINISHED"}

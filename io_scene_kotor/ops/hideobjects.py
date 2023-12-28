@@ -18,7 +18,7 @@
 
 import bpy
 
-from ..defines import MeshType, DummyType, CHAR_DUMMY_NAMES, CHAR_BONE_NAMES
+from ..constants import MeshType, DummyType, CHAR_DUMMY_NAMES, CHAR_BONE_NAMES
 from .. import utils
 
 

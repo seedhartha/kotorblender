@@ -22,7 +22,7 @@ import bpy
 
 from bpy_extras.io_utils import ExportHelper
 
-from ...defines import ExportOptions
+from ...constants import ExportOptions
 from ...io import mdl
 
 

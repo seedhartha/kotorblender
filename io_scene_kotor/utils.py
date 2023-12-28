@@ -16,7 +16,7 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-from .defines import *
+from .constants import *
 
 
 def is_mdl_root(obj):
@@ -40,19 +40,23 @@ def is_skin_mesh(obj):
 
 
 def is_dummy_type(obj, dummytype):
-    return obj and obj.type == 'EMPTY' and obj.kb.dummytype == dummytype
+    return obj and obj.type == "EMPTY" and obj.kb.dummytype == dummytype
 
 
 def is_mesh_type(obj, meshtype):
-    return obj and obj.type == 'MESH' and obj.kb.meshtype == meshtype
+    return obj and obj.type == "MESH" and obj.kb.meshtype == meshtype
 
 
 def is_exported_to_mdl(obj):
     if not obj:
         return False
-    if obj.type in ['MESH', 'LIGHT']:
+    if obj.type in ["MESH", "LIGHT"]:
         return True
-    return obj.type == 'EMPTY' and obj.kb.dummytype in [DummyType.NONE, DummyType.MDLROOT, DummyType.REFERENCE]
+    return obj.type == "EMPTY" and obj.kb.dummytype in [
+        DummyType.NONE,
+        DummyType.MDLROOT,
+        DummyType.REFERENCE,
+    ]
 
 
 def get_object_root(obj):
@@ -91,7 +95,7 @@ def is_not_null(s):
 
 
 def is_close(a, b, rel_tol, abs_tol=0.0):
-    return abs(a-b) <= max(rel_tol * max(abs(a), abs(b)), abs_tol)
+    return abs(a - b) <= max(rel_tol * max(abs(a), abs(b)), abs_tol)
 
 
 def is_close_2(a, b, rel_tol):
@@ -99,16 +103,19 @@ def is_close_2(a, b, rel_tol):
 
 
 def is_close_3(a, b, rel_tol):
-    return (is_close(a[0], b[0], rel_tol) and
-            is_close(a[1], b[1], rel_tol) and
-            is_close(a[2], b[2], rel_tol))
+    return (
+        is_close(a[0], b[0], rel_tol)
+        and is_close(a[1], b[1], rel_tol)
+        and is_close(a[2], b[2], rel_tol)
+    )
 
 
 def color_to_hex(color):
     return "{}{}{}".format(
         int_to_hex(float_to_byte(color[0])),
         int_to_hex(float_to_byte(color[1])),
-        int_to_hex(float_to_byte(color[2])))
+        int_to_hex(float_to_byte(color[2])),
+    )
 
 
 def float_to_byte(val):
