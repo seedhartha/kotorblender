@@ -18,19 +18,19 @@
 
 import bpy
 
-from ... import utils
+from ...utils import is_mdl_root
 
 
 class KB_PT_animations(bpy.types.Panel):
     bl_label = "Animations"
     bl_parent_id = "KB_PT_model"
-    bl_space_type = 'PROPERTIES'
-    bl_region_type = 'WINDOW'
+    bl_space_type = "PROPERTIES"
+    bl_region_type = "WINDOW"
     bl_context = "object"
 
     @classmethod
     def poll(cls, context):
-        return utils.is_mdl_root(context.object)
+        return is_mdl_root(context.object)
 
     def draw(self, context):
         obj = context.object
@@ -39,15 +39,23 @@ class KB_PT_animations(bpy.types.Panel):
 
         # Animation List
         row = layout.row()
-        row.template_list("UI_UL_list", "animations", obj.kb, "anim_list", obj.kb, "anim_list_idx", rows=7)
+        row.template_list(
+            "UI_UL_list",
+            "animations",
+            obj.kb,
+            "anim_list",
+            obj.kb,
+            "anim_list_idx",
+            rows=7,
+        )
         col = row.column(align=True)
-        col.operator("kb.add_animation", icon='ADD', text="")
-        col.operator("kb.delete_animation", icon='REMOVE', text="")
+        col.operator("kb.add_animation", icon="ADD", text="")
+        col.operator("kb.delete_animation", icon="REMOVE", text="")
         col.separator()
-        col.operator("kb.move_animation", icon='TRIA_UP', text="").direction = "UP"
-        col.operator("kb.move_animation", icon='TRIA_DOWN', text="").direction = "DOWN"
+        col.operator("kb.move_animation", icon="TRIA_UP", text="").direction = "UP"
+        col.operator("kb.move_animation", icon="TRIA_DOWN", text="").direction = "DOWN"
         col.separator()
-        col.operator("kb.play_animation", icon='PLAY', text="")
+        col.operator("kb.play_animation", icon="PLAY", text="")
 
         # Selected Animation
         anim_list = obj.kb.anim_list
@@ -67,17 +75,19 @@ class KB_PT_animations(bpy.types.Panel):
 class KB_PT_anim_events(bpy.types.Panel):
     bl_label = "Events"
     bl_parent_id = "KB_PT_animations"
-    bl_space_type = 'PROPERTIES'
-    bl_region_type = 'WINDOW'
+    bl_space_type = "PROPERTIES"
+    bl_region_type = "WINDOW"
     bl_context = "object"
 
     @classmethod
     def poll(cls, context):
         obj = context.object
         anim_list_idx = obj.kb.anim_list_idx
-        return (utils.is_mdl_root(obj) and
-                anim_list_idx >= 0 and
-                anim_list_idx < len(obj.kb.anim_list))
+        return (
+            is_mdl_root(obj)
+            and anim_list_idx >= 0
+            and anim_list_idx < len(obj.kb.anim_list)
+        )
 
     def draw(self, context):
         obj = context.object
@@ -87,13 +97,15 @@ class KB_PT_anim_events(bpy.types.Panel):
         # Event List
         anim = obj.kb.anim_list[obj.kb.anim_list_idx]
         row = layout.row()
-        row.template_list("UI_UL_list", "anim_events", anim, "event_list", anim, "event_list_idx")
+        row.template_list(
+            "UI_UL_list", "anim_events", anim, "event_list", anim, "event_list_idx"
+        )
         col = row.column(align=True)
-        col.operator("kb.add_anim_event", text="", icon='ADD')
-        col.operator("kb.delete_anim_event", text="", icon='REMOVE')
+        col.operator("kb.add_anim_event", text="", icon="ADD")
+        col.operator("kb.delete_anim_event", text="", icon="REMOVE")
         col.separator()
-        col.operator("kb.move_anim_event", icon='TRIA_UP', text="").direction = "UP"
-        col.operator("kb.move_anim_event", icon='TRIA_DOWN', text="").direction = "DOWN"
+        col.operator("kb.move_anim_event", icon="TRIA_UP", text="").direction = "UP"
+        col.operator("kb.move_anim_event", icon="TRIA_DOWN", text="").direction = "DOWN"
 
         # Selected Animation
         event_list = anim.event_list

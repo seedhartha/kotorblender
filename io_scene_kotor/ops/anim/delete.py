@@ -18,7 +18,7 @@
 
 import bpy
 
-from ... import utils
+from ...utils import is_mdl_root
 
 
 class KB_OT_delete_animation(bpy.types.Operator):
@@ -28,7 +28,7 @@ class KB_OT_delete_animation(bpy.types.Operator):
     @classmethod
     def poll(cls, context):
         obj = context.object
-        if not utils.is_mdl_root(obj):
+        if not is_mdl_root(obj):
             return False
 
         anim_list = obj.kb.anim_list
@@ -46,4 +46,4 @@ class KB_OT_delete_animation(bpy.types.Operator):
 
         anim_list.remove(anim_list_idx)
 
-        return {'FINISHED'}
+        return {"FINISHED"}

@@ -23,8 +23,7 @@ import bpy
 from ..constants import DummyType
 from ..format.gff.loader import GffLoader
 from ..format.gff.saver import GffSaver
-
-from .. import utils
+from ..utils import is_path_point
 
 
 def load_pth(operator, filepath):
@@ -66,7 +65,7 @@ def load_pth(operator, filepath):
 
 
 def save_pth(operator, filepath):
-    point_objects = [obj for obj in bpy.data.objects if utils.is_path_point(obj)]
+    point_objects = [obj for obj in bpy.data.objects if is_path_point(obj)]
 
     point_idx_by_name = dict()
     for idx, obj in enumerate(point_objects):

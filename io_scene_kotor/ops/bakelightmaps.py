@@ -18,10 +18,9 @@
 
 import bpy
 
-from .. import utils
-
 from ..constants import MeshType
 from ..scene.material import ALPHA_NODE_NAME, DIFFUSE_BY_LIGHTMAP_NODE_NAME
+from ..utils import is_null
 
 UV_MAP_LIGHTMAP = "UVMap_lm"
 
@@ -68,7 +67,7 @@ class KB_OT_bake_lightmaps(bpy.types.Operator):
             return False
         if not obj.kb.lightmapped:
             return False
-        if utils.is_null(obj.kb.bitmap2):
+        if is_null(obj.kb.bitmap2):
             return False
 
         # Must contain lightmap UV map

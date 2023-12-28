@@ -22,9 +22,15 @@ import bpy
 
 from bpy_extras import image_utils
 
-from .. import utils
-
 from ..format.tpc.loader import TpcLoader
+from ..utils import (
+    is_null,
+    is_not_null,
+    color_to_hex,
+    int_to_hex,
+    float_to_byte,
+    is_close_3,
+)
 
 DIFFUSE_BY_LIGHTMAP_NODE_NAME = "Diffuse By Lightmap"
 ALPHA_NODE_NAME = "Multiply Alpha"
@@ -38,7 +44,7 @@ def rebuild_object_material(obj, texture_search_paths=[], lightmap_search_paths=
     mesh.materials.append(material)
 
     # Only use nodes when object has at least one texture
-    if utils.is_null(obj.kb.bitmap) and utils.is_null(obj.kb.bitmap2):
+    if is_null(obj.kb.bitmap) and is_null(obj.kb.bitmap2):
         rebuild_material_simple(material, obj)
     else:
         rebuild_material_nodes(
@@ -55,9 +61,9 @@ def get_or_create_material(obj):
 
 
 def get_material_name(obj):
-    if utils.is_null(obj.kb.bitmap) and utils.is_null(obj.kb.bitmap2):
-        diffuse = utils.color_to_hex(obj.kb.diffuse)
-        alpha = utils.int_to_hex(utils.float_to_byte(obj.kb.alpha))
+    if is_null(obj.kb.bitmap) and is_null(obj.kb.bitmap2):
+        diffuse = color_to_hex(obj.kb.diffuse)
+        alpha = int_to_hex(float_to_byte(obj.kb.alpha))
         name = "D{}__A{}".format(diffuse, alpha)
     else:
         name = obj.name
@@ -82,7 +88,7 @@ def rebuild_material_nodes(material, obj, texture_search_paths, lightmap_search_
     output.location = (1200, 0)
 
     # Shader node
-    selfillumed = not utils.is_close_3(obj.kb.selfillumcolor, [0.0] * 3, 0.1)
+    selfillumed = not is_close_3(obj.kb.selfillumcolor, [0.0] * 3, 0.1)
     if selfillumed:
         shader = nodes.new("ShaderNodeEmission")
     else:
@@ -106,7 +112,7 @@ def rebuild_material_nodes(material, obj, texture_search_paths, lightmap_search_
     mul_alpha.inputs[1].default_value = obj.kb.alpha
 
     # Diffuse map node
-    if utils.is_not_null(obj.kb.bitmap):
+    if is_not_null(obj.kb.bitmap):
         diffuse = nodes.new("ShaderNodeTexImage")
         diffuse.location = (300, 0)
         diffuse.image = get_or_create_texture(obj.kb.bitmap, texture_search_paths).image
@@ -114,7 +120,7 @@ def rebuild_material_nodes(material, obj, texture_search_paths, lightmap_search_
         links.new(mul_alpha.inputs[0], diffuse.outputs[1])
 
     # Lightmap node
-    if utils.is_not_null(obj.kb.bitmap2):
+    if is_not_null(obj.kb.bitmap2):
         lightmap_uv = nodes.new("ShaderNodeUVMap")
         lightmap_uv.location = (0, -300)
         lightmap_uv.uv_map = "UVMap_lm"

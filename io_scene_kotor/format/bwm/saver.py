@@ -22,12 +22,10 @@ from ...constants import DummyType, WalkmeshMaterial, WalkmeshType
 from ...scene.modelnode.aabb import AabbNode
 from ...scene.modelnode.dummy import DummyNode
 from ...scene.modelnode.trimesh import FaceList
-
-from ... import aabb, utils
-
+from ...utils import is_close_3
+from ... import aabb
 from ..binwriter import BinaryWriter
 from ..mdl.types import *
-
 from .types import *
 
 MERGE_DISTANCE = 1e-4
@@ -156,7 +154,7 @@ class BwmSaver:
                 if other_vert_idx in self.new_vert_by_old_vert:
                     continue
                 other_vert = self.geom_node.verts[other_vert_idx]
-                if utils.is_close_3(vert, other_vert, MERGE_DISTANCE):
+                if is_close_3(vert, other_vert, MERGE_DISTANCE):
                     self.new_vert_by_old_vert[other_vert_idx] = num_unique
             self.verts.append(vert)
             self.new_vert_by_old_vert[vert_idx] = num_unique

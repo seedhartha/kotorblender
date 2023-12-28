@@ -17,9 +17,7 @@
 # ##### END GPL LICENSE BLOCK #####
 
 from ..constants import WalkmeshType
-
-from .. import utils
-
+from ..utils import is_pwk_root, is_dwk_root
 from .model import Model
 from .modelnode.dummy import DummyNode
 
@@ -47,9 +45,9 @@ class Walkmesh(Model):
 
     @classmethod
     def from_root_object(cls, obj, options):
-        if utils.is_pwk_root(obj):
+        if is_pwk_root(obj):
             walkmesh_type = WalkmeshType.PWK
-        elif utils.is_dwk_root(obj):
+        elif is_dwk_root(obj):
             walkmesh_type = WalkmeshType.DWK
         else:
             raise ValueError(

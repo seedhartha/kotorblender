@@ -18,7 +18,7 @@
 
 from mathutils import Vector
 
-from . import utils
+from .utils import is_close
 
 
 class BoundingBox:
@@ -52,7 +52,9 @@ def generate_tree(aabb_tree, faces, depth=0):
         return
 
     split_axis = find_split_axis(bounding_box, faces)
-    left_faces, right_faces, actual_split_axis = split_faces(bounding_box, faces, split_axis)
+    left_faces, right_faces, actual_split_axis = split_faces(
+        bounding_box, faces, split_axis
+    )
 
     node = new_aabb_node(bounding_box, 0, 0, -1, 1 + actual_split_axis)
     aabb_tree.append(node)
@@ -87,7 +89,7 @@ def find_split_axis(bounding_box, faces):
     change = True
     for face in faces:
         face_center = face[2]
-        change = change and utils.is_close(face_center[axis], bounding_box.center[axis], 1e-4)
+        change = change and is_close(face_center[axis], bounding_box.center[axis], 1e-4)
     if change:
         axis += 1
         if axis == 3:
@@ -124,11 +126,14 @@ def split_faces(bounding_box, faces, split_axis):
     return (left_faces, right_faces, split_axis)
 
 
-def new_aabb_node(bounding_box, left_child_idx, right_child_idx, face_idx, most_significant_plane):
+def new_aabb_node(
+    bounding_box, left_child_idx, right_child_idx, face_idx, most_significant_plane
+):
     return [
         *bounding_box.min[:3],
         *bounding_box.max[:3],
         left_child_idx,
         right_child_idx,
         face_idx,
-        most_significant_plane]
+        most_significant_plane,
+    ]

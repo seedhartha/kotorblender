@@ -18,18 +18,18 @@
 
 import bpy
 
-from .... import utils
+from ....utils import is_mdl_root
 
 
 class KB_OT_delete_anim_event(bpy.types.Operator):
     bl_idname = "kb.delete_anim_event"
     bl_label = "Delete event from the animation"
-    bl_options = {'UNDO'}
+    bl_options = {"UNDO"}
 
     @classmethod
     def poll(cls, context):
         obj = context.object
-        if not utils.is_mdl_root(obj):
+        if not is_mdl_root(obj):
             return False
 
         anim_list = obj.kb.anim_list
@@ -49,4 +49,4 @@ class KB_OT_delete_anim_event(bpy.types.Operator):
 
         anim.event_list.remove(anim.event_list_idx)
 
-        return {'FINISHED'}
+        return {"FINISHED"}

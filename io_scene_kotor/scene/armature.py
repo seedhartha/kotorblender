@@ -21,8 +21,7 @@ import bpy
 from mathutils import Matrix, Quaternion, Vector
 
 from ..constants import DummyType, MeshType, ANIM_REST_POSE_OFFSET
-
-from .. import utils
+from ..utils import find_objects, is_skin_mesh
 
 from .animnode import AnimationNode
 
@@ -32,7 +31,7 @@ def rebuild_armature(mdl_root):
     bpy.context.scene.frame_set(0)
 
     # MDL root must have at least one skinmesh
-    skinmeshes = utils.find_objects(mdl_root, utils.is_skin_mesh)
+    skinmeshes = find_objects(mdl_root, is_skin_mesh)
     if not skinmeshes:
         return None
 

@@ -18,18 +18,18 @@
 
 import bpy
 
-from ... import utils
+from ...utils import is_mdl_root
 
 
 class KB_PT_model(bpy.types.Panel):
     bl_label = "KotOR Model"
-    bl_space_type = 'PROPERTIES'
-    bl_region_type = 'WINDOW'
+    bl_space_type = "PROPERTIES"
+    bl_region_type = "WINDOW"
     bl_context = "object"
 
     @classmethod
     def poll(cls, context):
-        return utils.is_mdl_root(context.object)
+        return is_mdl_root(context.object)
 
     def draw(self, context):
         obj = context.object

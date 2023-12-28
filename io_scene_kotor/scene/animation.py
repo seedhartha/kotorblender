@@ -20,8 +20,7 @@ import math
 import re
 
 from ..constants import DummyType, FPS, ANIM_PADDING, NULL
-
-from .. import utils
+from ..utils import find_object
 
 from .animnode import AnimationNode
 
@@ -48,9 +47,7 @@ class Animation:
     def add_nodes_to_objects(
         self, anim, node, mdl_root, animscale, below_animroot=False
     ):
-        obj = utils.find_object(
-            mdl_root, lambda o: o.kb.node_number == node.node_number
-        )
+        obj = find_object(mdl_root, lambda o: o.kb.node_number == node.node_number)
         if obj:
             if not below_animroot and obj.name.lower() == mdl_root.kb.animroot.lower():
                 below_animroot = True

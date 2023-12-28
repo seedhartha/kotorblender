@@ -18,21 +18,20 @@
 
 import bpy
 
-from .... import utils
+from ....utils import is_mdl_root
 
 
 class KB_OT_move_anim_event(bpy.types.Operator):
     bl_idname = "kb.move_anim_event"
     bl_label = "Move event within the list"
-    bl_options = {'UNDO'}
+    bl_options = {"UNDO"}
 
-    direction: bpy.props.EnumProperty(items=(("UP", "Up", ""),
-                                             ("DOWN", "Down", "")))
+    direction: bpy.props.EnumProperty(items=(("UP", "Up", ""), ("DOWN", "Down", "")))
 
     @classmethod
     def poll(cls, context):
         obj = context.object
-        if not utils.is_mdl_root(obj):
+        if not is_mdl_root(obj):
             return False
 
         anim_list = obj.kb.anim_list
@@ -43,7 +42,11 @@ class KB_OT_move_anim_event(bpy.types.Operator):
         anim = anim_list[anim_list_idx]
         num_events = len(anim.event_list)
 
-        return anim.event_list_idx >= 0 and anim.event_list_idx < num_events and num_events >= 2
+        return (
+            anim.event_list_idx >= 0
+            and anim.event_list_idx < num_events
+            and num_events >= 2
+        )
 
     def execute(self, context):
         mdl_root = context.object
@@ -52,17 +55,17 @@ class KB_OT_move_anim_event(bpy.types.Operator):
         anim = anim_list[anim_list_idx]
         prev_idx = anim.event_list_idx
 
-        if self.direction == 'DOWN':
+        if self.direction == "DOWN":
             new_idx = min(len(anim.event_list) - 1, prev_idx + 1)
-        elif self.direction == 'UP':
+        elif self.direction == "UP":
             new_idx = max(0, prev_idx - 1)
         else:
-            return {'CANCELLED'}
+            return {"CANCELLED"}
 
         if new_idx == prev_idx:
-            return {'CANCELLED'}
+            return {"CANCELLED"}
 
         anim.event_list.move(prev_idx, new_idx)
         anim.event_list_idx = new_idx
 
-        return {'FINISHED'}
+        return {"FINISHED"}

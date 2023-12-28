@@ -19,8 +19,7 @@
 import bpy
 
 from ..scene import armature
-
-from .. import utils
+from ..utils import is_mdl_root
 
 
 class KB_OT_rebuild_armature(bpy.types.Operator):
@@ -29,8 +28,8 @@ class KB_OT_rebuild_armature(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        return utils.is_mdl_root(context.object)
+        return is_mdl_root(context.object)
 
     def execute(self, context):
         armature.rebuild_armature(context.object)
-        return {'FINISHED'}
+        return {"FINISHED"}

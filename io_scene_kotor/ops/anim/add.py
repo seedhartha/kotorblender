@@ -18,9 +18,8 @@
 
 import bpy
 
-from ... import utils
-
 from ...scene.animation import Animation
+from ...utils import is_mdl_root
 
 
 class KB_OT_add_animation(bpy.types.Operator):
@@ -29,10 +28,10 @@ class KB_OT_add_animation(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        return utils.is_mdl_root(context.object)
+        return is_mdl_root(context.object)
 
     def execute(self, context):
         obj = context.object
         Animation.append_to_object(obj, "newanim", 0, 0.25, obj.name)
 
-        return {'FINISHED'}
+        return {"FINISHED"}

@@ -22,7 +22,7 @@ from bpy_extras.io_utils import unpack_list
 from mathutils import Vector
 
 from ...constants import NodeType, RootType, MeshType, NULL
-from ... import utils
+from ...utils import is_not_null
 from .. import material
 from .base import BaseNode
 
@@ -210,8 +210,8 @@ class TrimeshNode(BaseNode):
         BaseNode.set_object_data(self, obj, options)
 
         obj.kb.meshtype = self.meshtype
-        obj.kb.bitmap = self.bitmap if utils.is_not_null(self.bitmap) else ""
-        obj.kb.bitmap2 = self.bitmap2 if utils.is_not_null(self.bitmap2) else ""
+        obj.kb.bitmap = self.bitmap if is_not_null(self.bitmap) else ""
+        obj.kb.bitmap2 = self.bitmap2 if is_not_null(self.bitmap2) else ""
         obj.kb.alpha = self.alpha
         obj.kb.lightmapped = self.lightmapped == 1
         obj.kb.render = self.render == 1

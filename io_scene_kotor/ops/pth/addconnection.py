@@ -18,7 +18,7 @@
 
 import bpy
 
-from ... import utils
+from ...utils import is_path_point
 
 
 class KB_OT_add_path_connection(bpy.types.Operator):
@@ -27,8 +27,8 @@ class KB_OT_add_path_connection(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        return utils.is_path_point(context.object)
+        return is_path_point(context.object)
 
     def execute(self, context):
         context.object.kb.path_connection_list.add()
-        return {'FINISHED'}
+        return {"FINISHED"}

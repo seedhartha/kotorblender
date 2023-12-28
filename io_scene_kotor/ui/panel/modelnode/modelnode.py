@@ -18,13 +18,13 @@
 
 import bpy
 
-from .... import utils
+from ....utils import is_exported_to_mdl
 
 
 class KB_PT_modelnode(bpy.types.Panel):
     bl_label = "KotOR Model Node"
-    bl_space_type = 'PROPERTIES'
-    bl_region_type = 'WINDOW'
+    bl_space_type = "PROPERTIES"
+    bl_region_type = "WINDOW"
     bl_context = "object"
 
     @classmethod
@@ -36,13 +36,13 @@ class KB_PT_modelnode(bpy.types.Panel):
         layout = self.layout
         layout.use_property_split = True
 
-        if obj.type == 'EMPTY':
+        if obj.type == "EMPTY":
             row = layout.row()
             row.prop(obj.kb, "dummytype")
-        elif obj.type == 'MESH':
+        elif obj.type == "MESH":
             row = layout.row()
             row.prop(obj.kb, "meshtype")
 
-        if utils.is_exported_to_mdl(obj):
+        if is_exported_to_mdl(obj):
             row = layout.row()
             row.prop(obj.kb, "node_number")

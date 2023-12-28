@@ -19,7 +19,14 @@
 import bpy
 
 from ..constants import MeshType, DummyType, CHAR_DUMMY_NAMES, CHAR_BONE_NAMES
-from .. import utils
+from ..utils import (
+    is_mesh_type,
+    is_dwk_root,
+    is_pwk_root,
+    is_skin_mesh,
+    is_null,
+    is_dummy_type,
+)
 
 
 class KB_OT_hide_walkmeshes(bpy.types.Operator):
@@ -33,11 +40,7 @@ class KB_OT_hide_walkmeshes(bpy.types.Operator):
 
         # Loop through every object in the scene and hide it if it's a walkmesh.
         for obj in bpy.context.scene.objects:
-            if (
-                utils.is_mesh_type(obj, MeshType.AABB)
-                or utils.is_dwk_root(obj)
-                or utils.is_pwk_root(obj)
-            ):
+            if is_mesh_type(obj, MeshType.AABB) or is_dwk_root(obj) or is_pwk_root(obj):
                 obj.hide_set(True)
 
         return {"FINISHED"}
@@ -71,7 +74,7 @@ class KB_OT_hide_emitters(bpy.types.Operator):
 
         # Loop through every object in the scene and hide it if it's an emitter.
         for obj in bpy.context.scene.objects:
-            if utils.is_mesh_type(obj, MeshType.EMITTER):
+            if is_mesh_type(obj, MeshType.EMITTER):
                 obj.hide_set(True)
 
         return {"FINISHED"}
@@ -89,11 +92,11 @@ class KB_OT_hide_blockers(bpy.types.Operator):
         # Loop through every object in the scene and hide it if it's an untextured trimesh.
         for obj in bpy.context.scene.objects:
             if (
-                utils.is_mesh_type(obj, MeshType.TRIMESH)
-                and not utils.is_skin_mesh(obj)
+                is_mesh_type(obj, MeshType.TRIMESH)
+                and not is_skin_mesh(obj)
                 and obj.kb.render == 1
             ):
-                if utils.is_null(obj.kb.bitmap) and utils.is_null(obj.kb.bitmap2):
+                if is_null(obj.kb.bitmap) and is_null(obj.kb.bitmap2):
                     obj.hide_set(True)
 
         return {"FINISHED"}
@@ -111,8 +114,8 @@ class KB_OT_hide_charbones(bpy.types.Operator):
         # Loop through every object in the scene and hide it if it's a bone matching the name of those in a character rig.
         for obj in bpy.context.scene.objects:
             if (
-                utils.is_mesh_type(obj, MeshType.TRIMESH)
-                and not utils.is_skin_mesh(obj)
+                is_mesh_type(obj, MeshType.TRIMESH)
+                and not is_skin_mesh(obj)
                 and obj.kb.render == 0
             ):
                 if obj.name.lower() in CHAR_BONE_NAMES:
@@ -132,7 +135,7 @@ class KB_OT_hide_charnulls(bpy.types.Operator):
 
         # Loop through every object in the scene and hide it if it's a dummy/null matching the name of those in a character rig.
         for obj in bpy.context.scene.objects:
-            if utils.is_dummy_type(obj, DummyType.NONE):
+            if is_dummy_type(obj, DummyType.NONE):
                 if obj.name.lower() in CHAR_DUMMY_NAMES:
                     obj.hide_set(True)
 
@@ -150,11 +153,7 @@ class KB_OT_unhide_walkmeshes(bpy.types.Operator):
 
         # Loop through every object in the scene and unhide it if it's a walkmesh.
         for obj in bpy.context.scene.objects:
-            if (
-                utils.is_mesh_type(obj, MeshType.AABB)
-                or utils.is_dwk_root(obj)
-                or utils.is_pwk_root(obj)
-            ):
+            if is_mesh_type(obj, MeshType.AABB) or is_dwk_root(obj) or is_pwk_root(obj):
                 obj.hide_set(False)
 
         return {"FINISHED"}
@@ -188,7 +187,7 @@ class KB_OT_unhide_emitters(bpy.types.Operator):
 
         # Loop through every object in the scene and unhide it if it's an emitter.
         for obj in bpy.context.scene.objects:
-            if utils.is_mesh_type(obj, MeshType.EMITTER):
+            if is_mesh_type(obj, MeshType.EMITTER):
                 obj.hide_set(False)
 
         return {"FINISHED"}
@@ -206,11 +205,11 @@ class KB_OT_unhide_blockers(bpy.types.Operator):
         # Loop through every object in the scene and unhide it if it's an untextured trimesh.
         for obj in bpy.context.scene.objects:
             if (
-                utils.is_mesh_type(obj, MeshType.TRIMESH)
-                and not utils.is_skin_mesh(obj)
+                is_mesh_type(obj, MeshType.TRIMESH)
+                and not is_skin_mesh(obj)
                 and obj.kb.render == 1
             ):
-                if utils.is_null(obj.kb.bitmap) and utils.is_null(obj.kb.bitmap2):
+                if is_null(obj.kb.bitmap) and is_null(obj.kb.bitmap2):
                     obj.hide_set(False)
 
         return {"FINISHED"}
@@ -228,8 +227,8 @@ class KB_OT_unhide_charbones(bpy.types.Operator):
         # Loop through every object in the scene and unhide it if it's a bone matching the name of those in a character rig.
         for obj in bpy.context.scene.objects:
             if (
-                utils.is_mesh_type(obj, MeshType.TRIMESH)
-                and not utils.is_skin_mesh(obj)
+                is_mesh_type(obj, MeshType.TRIMESH)
+                and not is_skin_mesh(obj)
                 and obj.kb.render == 0
             ):
                 if obj.name.lower() in CHAR_BONE_NAMES:
@@ -249,7 +248,7 @@ class KB_OT_unhide_charnulls(bpy.types.Operator):
 
         # Loop through every object in the scene and unhide it if it's a dummy/null matching the name of those in a character rig.
         for obj in bpy.context.scene.objects:
-            if utils.is_dummy_type(obj, DummyType.NONE):
+            if is_dummy_type(obj, DummyType.NONE):
                 if obj.name.lower() in CHAR_DUMMY_NAMES:
                     obj.hide_set(False)
 

@@ -18,7 +18,7 @@
 
 import bpy
 
-from ... import utils
+from ...utils import is_mdl_root
 
 
 class KB_OT_play_animation(bpy.types.Operator):
@@ -28,7 +28,7 @@ class KB_OT_play_animation(bpy.types.Operator):
     @classmethod
     def poll(cls, context):
         obj = context.object
-        if not utils.is_mdl_root(obj):
+        if not is_mdl_root(obj):
             return False
 
         anim_list = obj.kb.anim_list
@@ -46,4 +46,4 @@ class KB_OT_play_animation(bpy.types.Operator):
         scene.frame_start = anim_list[anim_list_idx].frame_start
         scene.frame_end = anim_list[anim_list_idx].frame_end
 
-        return {'FINISHED'}
+        return {"FINISHED"}

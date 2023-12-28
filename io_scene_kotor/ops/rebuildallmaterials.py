@@ -18,10 +18,9 @@
 
 import bpy
 
-from .. import utils
-
 from ..constants import DummyType, MeshType
 from ..scene import material
+from ..utils import find_objects
 
 
 class KB_OT_rebuild_all_materials(bpy.types.Operator):
@@ -34,7 +33,7 @@ class KB_OT_rebuild_all_materials(bpy.types.Operator):
         return obj and obj.type == "EMPTY" and obj.kb.dummytype == DummyType.MDLROOT
 
     def execute(self, context):
-        objects = utils.find_objects(
+        objects = find_objects(
             context.object,
             lambda obj: obj.type == "MESH"
             and obj.kb.meshtype not in [MeshType.AABB, MeshType.EMITTER],

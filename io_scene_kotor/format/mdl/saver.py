@@ -23,11 +23,9 @@ from math import sqrt
 from mathutils import Vector
 
 from ...constants import NodeType
-
-from ... import aabb, utils
-
+from ...utils import is_not_null
+from ... import aabb
 from ..binwriter import BinaryWriter
-
 from .types import *
 
 
@@ -694,7 +692,7 @@ class MdlSaver:
         supermodel_name = self.model.supermodel.ljust(32, "\0")
 
         if (
-            utils.is_not_null(self.model.animroot)
+            is_not_null(self.model.animroot)
             and self.node_names.count(self.model.animroot) > 0
         ):
             off_anim_root = self.node_offsets[

@@ -19,8 +19,7 @@
 import bpy
 
 from ....constants import DummyType
-
-from .... import utils
+from ....utils import is_dummy_type
 
 
 class KB_PT_reference(bpy.types.Panel):
@@ -32,7 +31,7 @@ class KB_PT_reference(bpy.types.Panel):
 
     @classmethod
     def poll(cls, context):
-        return utils.is_dummy_type(context.object, DummyType.REFERENCE)
+        return is_dummy_type(context.object, DummyType.REFERENCE)
 
     def draw(self, context):
         obj = context.object

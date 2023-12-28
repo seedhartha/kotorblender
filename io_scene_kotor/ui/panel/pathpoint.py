@@ -18,18 +18,18 @@
 
 import bpy
 
-from ... import utils
+from ...utils import is_path_point
 
 
 class KB_PT_path_point(bpy.types.Panel):
     bl_label = "KotOR Path Point"
-    bl_space_type = 'PROPERTIES'
-    bl_region_type = 'WINDOW'
+    bl_space_type = "PROPERTIES"
+    bl_region_type = "WINDOW"
     bl_context = "object"
 
     @classmethod
     def poll(cls, context):
-        return utils.is_path_point(context.object)
+        return is_path_point(context.object)
 
     def draw(self, context):
         layout = self.layout
@@ -39,7 +39,14 @@ class KB_PT_path_point(bpy.types.Panel):
         box = row.box()
         box.label(text="Connections")
         row = box.row()
-        row.template_list("KB_UL_path_points", "path_points", context.object.kb, "path_connection_list", context.object.kb, "path_connection_idx")
+        row.template_list(
+            "KB_UL_path_points",
+            "path_points",
+            context.object.kb,
+            "path_connection_list",
+            context.object.kb,
+            "path_connection_idx",
+        )
         col = row.column(align=True)
-        col.operator("kb.add_path_connection", icon='ADD', text="")
-        col.operator("kb.remove_path_connection", icon='REMOVE', text="")
+        col.operator("kb.add_path_connection", icon="ADD", text="")
+        col.operator("kb.remove_path_connection", icon="REMOVE", text="")

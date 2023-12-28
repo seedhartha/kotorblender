@@ -23,9 +23,7 @@ import bpy
 from mathutils import Matrix
 
 from ..constants import DummyType, MeshType, NodeType, Classification, NULL
-
-from .. import utils
-
+from ..utils import is_mdl_root, is_pwk_root, is_dwk_root, is_exported_to_mdl
 from .animation import Animation
 from .modelnode.aabb import AabbNode
 from .modelnode.danglymesh import DanglymeshNode
@@ -76,11 +74,7 @@ class Model:
             )
         else:
             root_obj = next(
-                iter(
-                    obj
-                    for obj in bpy.context.selected_objects
-                    if utils.is_mdl_root(obj)
-                ),
+                iter(obj for obj in bpy.context.selected_objects if is_mdl_root(obj)),
                 None,
             )
             if not root_obj:
@@ -88,7 +82,7 @@ class Model:
                     iter(
                         obj
                         for obj in bpy.context.collection.objects
-                        if utils.is_mdl_root(obj)
+                        if is_mdl_root(obj)
                     ),
                     None,
                 )
@@ -142,7 +136,7 @@ class Model:
 
     @classmethod
     def model_node_from_object(cls, obj, options, parent=None, exclude_xwk=True):
-        if exclude_xwk and (utils.is_pwk_root(obj) or utils.is_dwk_root(obj)):
+        if exclude_xwk and (is_pwk_root(obj) or is_dwk_root(obj)):
             return None
 
         if obj.type == "EMPTY":
@@ -203,7 +197,7 @@ class Model:
 
     @classmethod
     def assign_node_numbers(cls, obj, number):
-        if not utils.is_exported_to_mdl(obj):
+        if not is_exported_to_mdl(obj):
             return
         obj.kb.node_number = number[0]
         number[0] += 1

@@ -27,8 +27,7 @@ from ..format.mdl.saver import MdlSaver
 from ..scene.modelnode.aabb import AabbNode
 from ..scene.model import Model
 from ..scene.walkmesh import Walkmesh
-
-from .. import utils
+from ..utils import is_mdl_root, is_pwk_root, is_dwk_root, find_objects
 
 
 def load_mdl(operator, filepath, options, position=(0.0, 0.0, 0.0)):
@@ -96,14 +95,12 @@ def save_mdl(operator, filepath, options):
 
     # Find MDL root
     mdl_root = next(
-        iter(obj for obj in bpy.context.selected_objects if utils.is_mdl_root(obj)),
+        iter(obj for obj in bpy.context.selected_objects if is_mdl_root(obj)),
         None,
     )
     if not mdl_root:
         mdl_root = next(
-            iter(
-                obj for obj in bpy.context.collection.objects if utils.is_mdl_root(obj)
-            ),
+            iter(obj for obj in bpy.context.collection.objects if is_mdl_root(obj)),
             None,
         )
     if not mdl_root:
@@ -132,12 +129,12 @@ def save_mdl(operator, filepath, options):
             bwm.save()
 
         # Export PWK or DWK
-        xwk_roots = utils.find_objects(
-            mdl_root, lambda obj: utils.is_pwk_root(obj) or utils.is_dwk_root(obj)
+        xwk_roots = find_objects(
+            mdl_root, lambda obj: is_pwk_root(obj) or is_dwk_root(obj)
         )
         for xwk_root in xwk_roots:
             base_path, _ = os.path.splitext(filepath)
-            if utils.is_pwk_root(xwk_root):
+            if is_pwk_root(xwk_root):
                 xwk_path = base_path + ".pwk"
             else:
                 if xwk_root.name.endswith("open1"):

@@ -19,8 +19,7 @@
 import bpy
 
 from ....constants import MeshType
-
-from .... import utils
+from ....utils import is_mesh_type
 
 
 class KB_PT_emitter(bpy.types.Panel):
@@ -32,7 +31,7 @@ class KB_PT_emitter(bpy.types.Panel):
 
     @classmethod
     def poll(cls, context):
-        return utils.is_mesh_type(context.object, MeshType.EMITTER)
+        return is_mesh_type(context.object, MeshType.EMITTER)
 
     def draw(self, context):
         obj = context.object
@@ -98,7 +97,7 @@ class KB_PT_emitter_particles(bpy.types.Panel):
 
     @classmethod
     def poll(cls, context):
-        return utils.is_mesh_type(context.object, MeshType.EMITTER)
+        return is_mesh_type(context.object, MeshType.EMITTER)
 
     def draw(self, context):
         obj = context.object
@@ -191,7 +190,7 @@ class KB_PT_emitter_texture_anim(bpy.types.Panel):
 
     @classmethod
     def poll(cls, context):
-        return utils.is_mesh_type(context.object, MeshType.EMITTER)
+        return is_mesh_type(context.object, MeshType.EMITTER)
 
     def draw(self, context):
         obj = context.object
@@ -227,9 +226,7 @@ class KB_PT_emitter_lighting(bpy.types.Panel):
     @classmethod
     def poll(cls, context):
         obj = context.object
-        return (
-            utils.is_mesh_type(obj, MeshType.EMITTER) and obj.kb.update == "Lightning"
-        )
+        return is_mesh_type(obj, MeshType.EMITTER) and obj.kb.update == "Lightning"
 
     def draw(self, context):
         obj = context.object
@@ -258,7 +255,7 @@ class KB_PT_emitter_p2p(bpy.types.Panel):
     @classmethod
     def poll(cls, context):
         obj = context.object
-        return utils.is_mesh_type(obj, MeshType.EMITTER) and obj.kb.p2p
+        return is_mesh_type(obj, MeshType.EMITTER) and obj.kb.p2p
 
     def draw(self, context):
         obj = context.object
@@ -290,7 +287,7 @@ class KB_PT_emitter_control_points(bpy.types.Panel):
     @classmethod
     def poll(cls, context):
         obj = context.object
-        return utils.is_mesh_type(obj, MeshType.EMITTER)
+        return is_mesh_type(obj, MeshType.EMITTER)
 
     def draw(self, context):
         obj = context.object

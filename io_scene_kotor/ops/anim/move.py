@@ -18,21 +18,20 @@
 
 import bpy
 
-from ... import utils
+from ...utils import is_mdl_root
 
 
 class KB_OT_move_animation(bpy.types.Operator):
     bl_idname = "kb.move_animation"
     bl_label = "Move an animation in the list, without affecting keyframes"
-    bl_options = {'UNDO'}
+    bl_options = {"UNDO"}
 
-    direction: bpy.props.EnumProperty(items=(("UP", "Up", ""),
-                                             ("DOWN", "Down", "")))
+    direction: bpy.props.EnumProperty(items=(("UP", "Up", ""), ("DOWN", "Down", "")))
 
     @classmethod
     def poll(cls, context):
         obj = context.object
-        if not utils.is_mdl_root(obj):
+        if not is_mdl_root(obj):
             return False
 
         anim_list = obj.kb.anim_list
@@ -46,17 +45,17 @@ class KB_OT_move_animation(bpy.types.Operator):
         anim_list = mdl_root.kb.anim_list
         prev_idx = mdl_root.kb.anim_list_idx
 
-        if self.direction == 'DOWN':
+        if self.direction == "DOWN":
             new_idx = min(len(anim_list) - 1, prev_idx + 1)
-        elif self.direction == 'UP':
+        elif self.direction == "UP":
             new_idx = max(0, prev_idx - 1)
         else:
-            return {'CANCELLED'}
+            return {"CANCELLED"}
 
         if new_idx == prev_idx:
-            return {'CANCELLED'}
+            return {"CANCELLED"}
 
         anim_list.move(prev_idx, new_idx)
         mdl_root.kb.anim_list_idx = new_idx
 
-        return {'FINISHED'}
+        return {"FINISHED"}

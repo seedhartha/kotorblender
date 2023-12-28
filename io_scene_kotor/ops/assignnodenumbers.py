@@ -19,8 +19,7 @@
 import bpy
 
 from ..scene.model import Model
-
-from .. import utils
+from ..utils import is_mdl_root
 
 
 class KB_OT_assign_node_numbers(bpy.types.Operator):
@@ -29,8 +28,8 @@ class KB_OT_assign_node_numbers(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        return utils.is_mdl_root(context.object)
+        return is_mdl_root(context.object)
 
     def execute(self, context):
         Model.assign_node_numbers(context.object, [0])
-        return {'FINISHED'}
+        return {"FINISHED"}

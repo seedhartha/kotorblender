@@ -18,7 +18,7 @@
 
 import bpy
 
-from ... import utils
+from ...utils import is_path_point
 
 
 class KB_OT_delete_path_connection(bpy.types.Operator):
@@ -27,8 +27,12 @@ class KB_OT_delete_path_connection(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        return utils.is_path_point(context.object) and (len(context.object.kb.path_connection_list) > 0)
+        return is_path_point(context.object) and (
+            len(context.object.kb.path_connection_list) > 0
+        )
 
     def execute(self, context):
-        context.object.kb.path_connection_list.remove(context.object.kb.path_connection_idx)
-        return {'FINISHED'}
+        context.object.kb.path_connection_list.remove(
+            context.object.kb.path_connection_idx
+        )
+        return {"FINISHED"}

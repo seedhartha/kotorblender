@@ -19,18 +19,17 @@
 import bpy
 
 from ....scene.animation import Animation
-
-from .... import utils
+from ....utils import is_mdl_root
 
 
 class KB_OT_add_anim_event(bpy.types.Operator):
     bl_idname = "kb.add_anim_event"
     bl_label = "Add event to the animation"
-    bl_options = {'UNDO'}
+    bl_options = {"UNDO"}
 
     @classmethod
     def poll(cls, context):
-        return utils.is_mdl_root(context.object)
+        return is_mdl_root(context.object)
 
     def execute(self, context):
         obj = context.object
@@ -38,9 +37,9 @@ class KB_OT_add_anim_event(bpy.types.Operator):
         anim_list_idx = obj.kb.anim_list_idx
 
         if anim_list_idx < 0 or anim_list_idx > len(anim_list):
-            return {'CANCELLED'}
+            return {"CANCELLED"}
 
         anim = anim_list[anim_list_idx]
         Animation.append_event_to_object_anim(anim, "newevent", 0)
 
-        return {'FINISHED'}
+        return {"FINISHED"}
