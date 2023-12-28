@@ -19,6 +19,10 @@
 from .constants import *
 
 
+def is_dummy_type(obj, dummytype):
+    return obj and obj.type == "EMPTY" and obj.kb.dummytype == dummytype
+
+
 def is_mdl_root(obj):
     return is_dummy_type(obj, DummyType.MDLROOT)
 
@@ -35,16 +39,26 @@ def is_path_point(obj):
     return is_dummy_type(obj, DummyType.PATHPOINT)
 
 
+def is_mesh_type(obj, meshtype):
+    return obj and obj.type == "MESH" and obj.kb.meshtype == meshtype
+
+
 def is_skin_mesh(obj):
     return is_mesh_type(obj, MeshType.SKIN)
 
 
-def is_dummy_type(obj, dummytype):
-    return obj and obj.type == "EMPTY" and obj.kb.dummytype == dummytype
+def is_char_dummy(obj):
+    lower_name = obj.name.lower()
+    return is_dummy_type(obj, DummyType.NONE) and any(
+        [lower_name.startswith(bone_name) for bone_name in CHAR_DUMMY_NAMES]
+    )
 
 
-def is_mesh_type(obj, meshtype):
-    return obj and obj.type == "MESH" and obj.kb.meshtype == meshtype
+def is_char_bone(obj):
+    lower_name = obj.name.lower()
+    return is_mesh_type(obj, MeshType.TRIMESH) and any(
+        [lower_name.startswith(bone_name) for bone_name in CHAR_BONE_NAMES]
+    )
 
 
 def is_exported_to_mdl(obj):

@@ -18,14 +18,16 @@
 
 import bpy
 
-from ..constants import MeshType, DummyType, CHAR_DUMMY_NAMES, CHAR_BONE_NAMES
+from ..constants import MeshType, DummyType
 from ..utils import (
-    is_mesh_type,
+    is_null,
     is_dwk_root,
     is_pwk_root,
-    is_skin_mesh,
-    is_null,
     is_dummy_type,
+    is_char_dummy,
+    is_char_bone,
+    is_mesh_type,
+    is_skin_mesh,
 )
 
 
@@ -113,13 +115,8 @@ class KB_OT_hide_charbones(bpy.types.Operator):
 
         # Loop through every object in the scene and hide it if it's a bone matching the name of those in a character rig.
         for obj in bpy.context.scene.objects:
-            if (
-                is_mesh_type(obj, MeshType.TRIMESH)
-                and not is_skin_mesh(obj)
-                and obj.kb.render == 0
-            ):
-                if obj.name.lower() in CHAR_BONE_NAMES:
-                    obj.hide_set(True)
+            if is_char_bone(obj):
+                obj.hide_set(True)
 
         return {"FINISHED"}
 
@@ -135,9 +132,8 @@ class KB_OT_hide_charnulls(bpy.types.Operator):
 
         # Loop through every object in the scene and hide it if it's a dummy/null matching the name of those in a character rig.
         for obj in bpy.context.scene.objects:
-            if is_dummy_type(obj, DummyType.NONE):
-                if obj.name.lower() in CHAR_DUMMY_NAMES:
-                    obj.hide_set(True)
+            if is_char_dummy(obj):
+                obj.hide_set(True)
 
         return {"FINISHED"}
 
@@ -226,13 +222,8 @@ class KB_OT_unhide_charbones(bpy.types.Operator):
 
         # Loop through every object in the scene and unhide it if it's a bone matching the name of those in a character rig.
         for obj in bpy.context.scene.objects:
-            if (
-                is_mesh_type(obj, MeshType.TRIMESH)
-                and not is_skin_mesh(obj)
-                and obj.kb.render == 0
-            ):
-                if obj.name.lower() in CHAR_BONE_NAMES:
-                    obj.hide_set(False)
+            if is_char_bone(obj):
+                obj.hide_set(False)
 
         return {"FINISHED"}
 
@@ -248,8 +239,7 @@ class KB_OT_unhide_charnulls(bpy.types.Operator):
 
         # Loop through every object in the scene and unhide it if it's a dummy/null matching the name of those in a character rig.
         for obj in bpy.context.scene.objects:
-            if is_dummy_type(obj, DummyType.NONE):
-                if obj.name.lower() in CHAR_DUMMY_NAMES:
-                    obj.hide_set(False)
+            if is_char_dummy(obj):
+                obj.hide_set(False)
 
         return {"FINISHED"}
