@@ -27,7 +27,7 @@ from .ops.anim.move import KB_OT_move_animation
 from .ops.anim.play import KB_OT_play_animation
 from .ops.assignnodenumbers import KB_OT_assign_node_numbers
 from .ops.bakelightmaps import KB_OT_bake_lightmaps
-from .ops.hideobjects import (
+from .ops.showhideobjects import (
     KB_OT_hide_walkmeshes,
     KB_OT_hide_lights,
     KB_OT_hide_emitters,
@@ -60,7 +60,6 @@ from .ui.list.lensflares import KB_UL_lens_flares
 from .ui.list.pathpoints import KB_UL_path_points
 from .ui.menu.kotor import KB_MT_kotor, KB_MT_kotor_showhide
 from .ui.panel.animations import KB_PT_animations, KB_PT_anim_events
-from .ui.panel.lightmaps import KB_PT_lightmaps
 from .ui.panel.modelnode.emitter import (
     KB_PT_emitter,
     KB_PT_emitter_particles,
@@ -192,7 +191,6 @@ classes = (
     KB_PT_emitter_lighting,
     KB_PT_emitter_p2p,
     KB_PT_emitter_control_points,
-    KB_PT_lightmaps,
     # UI Lists
     KB_UL_lens_flares,
     KB_UL_path_points,

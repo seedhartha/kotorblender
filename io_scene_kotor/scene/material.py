@@ -36,6 +36,7 @@ from ..utils import (
 class NodeName:
     DIFFUSE_TEX = "diffuse_tex"
     LIGHTMAP_TEX = "lightmap_tex"
+    WHITE = "white"
     MUL_DIFFUSE_LIGHTMAP = "mul_diffuse_lightmap"
     MUL_DIFFUSE_SELFILLUM = "mul_diffuse_selfillum"
     DIFFUSE_BSDF = "diffuse_bsdf"
@@ -127,6 +128,12 @@ def rebuild_material_nodes(material, obj, texture_search_paths, lightmap_search_
         links.new(lightmap_tex.inputs[0], lightmap_uv.outputs[0])
 
     x += 300
+
+    # White color
+    white = nodes.new("ShaderNodeRGB")
+    white.name = NodeName.WHITE
+    white.location = (x, 0)
+    white.outputs[0].default_value = [1.0] * 4
 
     # Multiply diffuse color by lightmap color
     mul_diffuse_lightmap = nodes.new("ShaderNodeVectorMath")

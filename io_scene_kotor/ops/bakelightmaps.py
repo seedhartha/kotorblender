@@ -19,211 +19,123 @@
 import bpy
 
 from ..constants import MeshType
+from ..scene.modelnode.trimesh import UV_MAP_LIGHTMAP
 from ..scene.material import NodeName
-from ..utils import is_null
-
-UV_MAP_LIGHTMAP = "UVMap_lm"
+from ..utils import is_null, is_mesh_type
 
 
 class KB_OT_bake_lightmaps(bpy.types.Operator):
     bl_idname = "kb.bake_lightmaps"
-    bl_label = "Bake"
+    bl_label = "Bake Lightmaps"
 
     def execute(self, context):
-        objects = (
+        # Find bake targets
+        targets = (
             context.selected_objects
-            if len(context.selected_objects) > 0
+            if context.selected_objects
             else context.collection.objects
         )
-
-        bakeable_objects = []
-        for obj in objects:
-            bakeable = self.is_bakeable_object(obj)
-            if bakeable:
-                bakeable_objects.append(obj)
-            self.preprocess_object(obj, bakeable)
-
-        # Select only bakeable objects
-        bpy.ops.object.select_all(action="DESELECT")
-        for obj in bakeable_objects:
-            obj.select_set(True)
-        if not bakeable_objects:
+        targets = [obj for obj in targets if self.is_bake_target(obj)]
+        if not targets:
             return {"CANCELLED"}
-        context.view_layer.objects.active = bakeable_objects[0]
 
-        # Bake lightmaps
-        context.scene.cycles.samples = context.scene.kb.bake_samples
-        bpy.ops.object.bake(margin=context.scene.kb.bake_margin, use_clear=True)
+        # Only enable targets and lights for rendering
+        target_names = set([obj.name for obj in targets])
+        for obj in context.collection.objects:
+            obj.hide_render = obj.type != "LIGHT" and not obj.name in target_names
 
-        for obj in bakeable_objects:
-            self.postprocess_bakeable_object(obj)
+        for obj in targets:
+            self.preprocess_target(obj)
+
+        # Select only bake targets
+        bpy.ops.object.select_all(action="DESELECT")
+        for obj in targets:
+            obj.select_set(True)
+        context.view_layer.objects.active = targets[0]
+
+        context.scene.render.engine = "CYCLES"
+        # context.scene.cycles.device = "GPU"
+        if context.scene.cycles.samples > 512:
+            context.scene.cycles.samples = 4
+        bpy.ops.object.bake(margin=2, use_clear=True, uv_layer=UV_MAP_LIGHTMAP)
+
+        for obj in targets:
+            self.postprocess_target(obj)
 
         return {"FINISHED"}
 
-    def is_bakeable_object(self, obj):
-        if obj.type != "MESH":
+    def is_bake_target(self, obj):
+        # TODO: support AABB (grass)
+        if not is_mesh_type(obj, MeshType.TRIMESH):
             return False
-        if obj.kb.meshtype in [MeshType.EMITTER, MeshType.AABB]:
+        if not obj.kb.render:
             return False
         if not obj.kb.lightmapped:
             return False
+        if is_null(obj.kb.bitmap):
+            return False
         if is_null(obj.kb.bitmap2):
             return False
-
-        # Must contain lightmap UV map
         if not UV_MAP_LIGHTMAP in obj.data.uv_layers:
-            self.report(
-                {"WARNING"},
-                "Object '{}' does not contain lightmap UV map".format(obj.name),
-            )
             return False
-
-        # Must contain certain material nodes
-        if not obj.active_material.use_nodes:
-            self.report(
-                {"WARNING"}, "Object '{}' material is not using nodes".format(obj.name)
-            )
+        material = obj.active_material
+        if not material or not material.use_nodes:
             return False
-        node_tree = obj.active_material.node_tree
-        nodes = node_tree.nodes
-        output_node = next(
-            (node for node in nodes if node.type == "OUTPUT_MATERIAL"), None
-        )
-        if not output_node:
-            self.report(
-                {"WARNING"},
-                "Object '{}' material does not contain output material node".format(
-                    obj.name
-                ),
-            )
+        nodes = obj.active_material.node_tree.nodes
+        if not NodeName.DIFFUSE_TEX in nodes:
             return False
-        bsdf_node = next(
-            (node for node in nodes if node.type == "BSDF_PRINCIPLED"), None
-        )
-        if not bsdf_node:
-            self.report(
-                {"WARNING"},
-                "Object '{}' material does not contain BSDF node".format(obj.name),
-            )
+        if not NodeName.LIGHTMAP_TEX in nodes:
             return False
-        diffuse_by_lightmap_node = next(
-            (node for node in nodes if node.name == NodeName.MUL_DIFFUSE_LIGHTMAP), None
-        )
-        if not diffuse_by_lightmap_node:
-            self.report(
-                {"WARNING"},
-                "Object '{}' material does not contain diffuse by lightmap node".format(
-                    obj.name
-                ),
-            )
+        if not NodeName.WHITE in nodes:
             return False
-        alpha_node = next(
-            (node for node in nodes if node.name == NodeName.MUL_DIFFUSE_OBJECT_ALPHA),
-            None,
-        )
-        if not alpha_node:
-            self.report(
-                {"WARNING"},
-                "Object '{}' material does not contain alpha node".format(obj.name),
-            )
+        if not NodeName.DIFFUSE_BSDF in nodes:
             return False
-        lightmap_node = next(
-            (
-                node
-                for node in nodes
-                if node.type == "TEX_IMAGE" and node.image.name == obj.kb.bitmap2
-            ),
-            None,
-        )
-        if not lightmap_node:
-            self.report(
-                {"WARNING"},
-                "Object '{}' material does not contain lightmap texture node".format(
-                    obj.name
-                ),
-            )
+        if not NodeName.DIFF_LM_EMISSION in nodes:
             return False
-
+        if not NodeName.ADD_DIFFUSE_EMISSION in nodes:
+            return False
         return True
 
-    def preprocess_object(self, obj, bakeable):
-        if bakeable:
-            # Activate lightmap UV map
-            uv_layer = obj.data.uv_layers[UV_MAP_LIGHTMAP]
-            uv_layer.active = True
+    def preprocess_target(self, obj):
+        material = obj.active_material
+        nodes = material.node_tree.nodes
+        links = material.node_tree.links
 
-            node_tree = obj.active_material.node_tree
-            nodes = node_tree.nodes
+        # Replace diffuse * lightmap shader by diffuse
+        add_diffuse_emission = nodes[NodeName.ADD_DIFFUSE_EMISSION]
+        if add_diffuse_emission.inputs[0].is_linked:
+            links.remove(add_diffuse_emission.inputs[0].links[0])
+        diffuse_bsdf = nodes[NodeName.DIFFUSE_BSDF]
+        links.new(add_diffuse_emission.inputs[0], diffuse_bsdf.outputs[0])
 
-            # Remove node links
-            bsdf_node = next(
-                (node for node in nodes if node.type == "BSDF_PRINCIPLED"), None
-            )
-            diffuse_by_lightmap_node = next(
-                (node for node in nodes if node.name == NodeName.MUL_DIFFUSE_LIGHTMAP),
-                None,
-            )
-            alpha_node = next(
-                (
-                    node
-                    for node in nodes
-                    if node.name == NodeName.MUL_DIFFUSE_OBJECT_ALPHA
-                ),
-                None,
-            )
-            links = node_tree.links
-            base_color_link = next(
-                (
-                    link
-                    for link in links
-                    if link.from_node == diffuse_by_lightmap_node
-                    and link.to_node == bsdf_node
-                ),
-                None,
-            )
-            if base_color_link:
-                links.remove(base_color_link)
-            alpha_link = next(
-                (
-                    link
-                    for link in links
-                    if link.from_node == alpha_node and link.to_node == bsdf_node
-                ),
-                None,
-            )
-            if alpha_link:
-                links.remove(alpha_link)
+        # Replace diffuse color by white
+        if diffuse_bsdf.inputs[0].is_linked:
+            links.remove(diffuse_bsdf.inputs[0].links[0])
+        white = nodes[NodeName.WHITE]
+        links.new(diffuse_bsdf.inputs[0], white.outputs[0])
 
-            # Activate lightmap material node
-            lightmap_node = next(
-                (
-                    node
-                    for node in nodes
-                    if node.type == "TEX_IMAGE" and node.image.name == obj.kb.bitmap2
-                ),
-                None,
-            )
-            nodes.active = lightmap_node
+        # Select only lightmap texture node and make it active
+        for node in nodes:
+            node.select = False
+        lightmap_tex = nodes[NodeName.LIGHTMAP_TEX]
+        lightmap_tex.select = True
+        nodes.active = lightmap_tex
 
-        if obj.type == "MESH" and obj.kb.meshtype in [MeshType.EMITTER, MeshType.AABB]:
-            obj.hide_render = True
+    def postprocess_target(self, obj):
+        material = obj.active_material
+        nodes = material.node_tree.nodes
+        links = material.node_tree.links
 
-        return True
+        # Replace diffuse shader by diffuse * lightmap
+        add_diffuse_emission = nodes[NodeName.ADD_DIFFUSE_EMISSION]
+        diff_lm_emission = nodes[NodeName.DIFF_LM_EMISSION]
+        if add_diffuse_emission.inputs[0].is_linked:
+            links.remove(add_diffuse_emission.inputs[0].links[0])
+        links.new(add_diffuse_emission.inputs[0], diff_lm_emission.outputs[0])
 
-    def postprocess_bakeable_object(self, obj):
-        # Restore node links
-        node_tree = obj.active_material.node_tree
-        nodes = node_tree.nodes
-        links = node_tree.links
-        bsdf_node = next(
-            (node for node in nodes if node.type == "BSDF_PRINCIPLED"), None
-        )
-        diffuse_by_lightmap_node = next(
-            (node for node in nodes if node.name == NodeName.MUL_DIFFUSE_LIGHTMAP), None
-        )
-        alpha_node = next(
-            (node for node in nodes if node.name == NodeName.MUL_DIFFUSE_OBJECT_ALPHA),
-            None,
-        )
-        links.new(bsdf_node.inputs["Base Color"], diffuse_by_lightmap_node.outputs[0])
-        links.new(bsdf_node.inputs["Alpha"], alpha_node.outputs[0])
+        # Replace white by diffuse color
+        diffuse_bsdf = nodes[NodeName.DIFFUSE_BSDF]
+        if diffuse_bsdf.inputs[0].is_linked:
+            links.remove(diffuse_bsdf.inputs[0].links[0])
+        diffuse_tex = nodes[NodeName.DIFFUSE_TEX]
+        links.new(diffuse_bsdf.inputs[0], diffuse_tex.outputs[0])

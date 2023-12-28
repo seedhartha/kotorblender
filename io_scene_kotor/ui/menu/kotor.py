@@ -45,4 +45,6 @@ class KB_MT_kotor(Menu):
 
     def draw(self, context):
         layout = self.layout
+        layout.operator("kb.bake_lightmaps")
+        layout.separator()
         layout.menu("KB_MT_kotor_showhide")

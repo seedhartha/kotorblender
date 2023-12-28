@@ -18,12 +18,11 @@
 
 import bpy
 
-from ..constants import MeshType, DummyType
+from ..constants import MeshType
 from ..utils import (
     is_null,
     is_dwk_root,
     is_pwk_root,
-    is_dummy_type,
     is_char_dummy,
     is_char_bone,
     is_mesh_type,
