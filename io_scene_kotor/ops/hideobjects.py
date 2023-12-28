@@ -138,9 +138,9 @@ class KB_OT_hide_charnulls(bpy.types.Operator):
         return {"FINISHED"}
 
 
-class KB_OT_unhide_walkmeshes(bpy.types.Operator):
-    bl_idname = "kb.unhide_walkmeshes"
-    bl_label = "Unhide Walkmeshes"
+class KB_OT_show_walkmeshes(bpy.types.Operator):
+    bl_idname = "kb.show__walkmeshes"
+    bl_label = "Show Walkmeshes"
     bl_description = "Unhides all walkmeshes in the scene"
 
     def execute(self, context):
@@ -155,9 +155,9 @@ class KB_OT_unhide_walkmeshes(bpy.types.Operator):
         return {"FINISHED"}
 
 
-class KB_OT_unhide_lights(bpy.types.Operator):
-    bl_idname = "kb.unhide_lights"
-    bl_label = "Unhide Lights"
+class KB_OT_show_lights(bpy.types.Operator):
+    bl_idname = "kb.show__lights"
+    bl_label = "Show Lights"
     bl_description = "Unhides all lights in the scene"
 
     def execute(self, context):
@@ -172,9 +172,9 @@ class KB_OT_unhide_lights(bpy.types.Operator):
         return {"FINISHED"}
 
 
-class KB_OT_unhide_emitters(bpy.types.Operator):
-    bl_idname = "kb.unhide_emitters"
-    bl_label = "Unhide Emitters"
+class KB_OT_show_emitters(bpy.types.Operator):
+    bl_idname = "kb.show__emitters"
+    bl_label = "Show Emitters"
     bl_description = "Unhides all emitters in the scene"
 
     def execute(self, context):
@@ -189,9 +189,9 @@ class KB_OT_unhide_emitters(bpy.types.Operator):
         return {"FINISHED"}
 
 
-class KB_OT_unhide_blockers(bpy.types.Operator):
-    bl_idname = "kb.unhide_blockers"
-    bl_label = "Unhide Blockers"
+class KB_OT_show_blockers(bpy.types.Operator):
+    bl_idname = "kb.show__blockers"
+    bl_label = "Show Blockers"
     bl_description = "Unhides all untextured blocker trimeshes in the scene"
 
     def execute(self, context):
@@ -211,9 +211,9 @@ class KB_OT_unhide_blockers(bpy.types.Operator):
         return {"FINISHED"}
 
 
-class KB_OT_unhide_charbones(bpy.types.Operator):
-    bl_idname = "kb.unhide_charbones"
-    bl_label = "Unhide Character Bones"
+class KB_OT_show_charbones(bpy.types.Operator):
+    bl_idname = "kb.show__charbones"
+    bl_label = "Show Character Bones"
     bl_description = "Unhides all humanoid rig bones in the scene"
 
     def execute(self, context):
@@ -228,9 +228,9 @@ class KB_OT_unhide_charbones(bpy.types.Operator):
         return {"FINISHED"}
 
 
-class KB_OT_unhide_charnulls(bpy.types.Operator):
-    bl_idname = "kb.unhide_charnulls"
-    bl_label = "Unhide Character Dummies"
+class KB_OT_show_charnulls(bpy.types.Operator):
+    bl_idname = "kb.show__charnulls"
+    bl_label = "Show Character Dummies"
     bl_description = "Unhides all humanoid rig dummy/null objects in the scene"
 
     def execute(self, context):

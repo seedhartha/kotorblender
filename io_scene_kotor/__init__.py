@@ -34,12 +34,12 @@ from .ops.hideobjects import (
     KB_OT_hide_blockers,
     KB_OT_hide_charbones,
     KB_OT_hide_charnulls,
-    KB_OT_unhide_walkmeshes,
-    KB_OT_unhide_lights,
-    KB_OT_unhide_emitters,
-    KB_OT_unhide_blockers,
-    KB_OT_unhide_charbones,
-    KB_OT_unhide_charnulls,
+    KB_OT_show_walkmeshes,
+    KB_OT_show_lights,
+    KB_OT_show_emitters,
+    KB_OT_show_blockers,
+    KB_OT_show_charbones,
+    KB_OT_show_charnulls,
 )
 from .ops.lensflare.add import KB_OT_add_lens_flare
 from .ops.lensflare.delete import KB_OT_delete_lens_flare
@@ -58,7 +58,7 @@ from .ops.rebuildarmature import KB_OT_rebuild_armature
 from .ops.rebuildmaterial import KB_OT_rebuild_material
 from .ui.list.lensflares import KB_UL_lens_flares
 from .ui.list.pathpoints import KB_UL_path_points
-from .ui.menu.kotorblender import KB_MT_kotor
+from .ui.menu.kotor import KB_MT_kotor, KB_MT_kotor_showhide
 from .ui.panel.animations import KB_PT_animations, KB_PT_anim_events
 from .ui.panel.lightmaps import KB_PT_lightmaps
 from .ui.panel.modelnode.emitter import (
@@ -166,12 +166,12 @@ classes = (
     KB_OT_hide_blockers,
     KB_OT_hide_charbones,
     KB_OT_hide_charnulls,
-    KB_OT_unhide_walkmeshes,
-    KB_OT_unhide_lights,
-    KB_OT_unhide_emitters,
-    KB_OT_unhide_blockers,
-    KB_OT_unhide_charbones,
-    KB_OT_unhide_charnulls,
+    KB_OT_show_walkmeshes,
+    KB_OT_show_lights,
+    KB_OT_show_emitters,
+    KB_OT_show_blockers,
+    KB_OT_show_charbones,
+    KB_OT_show_charnulls,
     # Panels
     KB_PT_model,
     KB_PT_animations,  # child of KB_PT_model
@@ -198,6 +198,7 @@ classes = (
     KB_UL_path_points,
     # Menus
     KB_MT_kotor,
+    KB_MT_kotor_showhide,
 )
 
 
