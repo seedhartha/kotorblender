@@ -30,33 +30,33 @@ class BinaryWriter:
     def tell(self):
         return self.tell()
 
-    def put_int8(self, val):
+    def write_int8(self, val):
         self.file.write(val.to_bytes(1, byteorder=self.byteorder, signed=True))
 
-    def put_int16(self, val):
+    def write_int16(self, val):
         self.file.write(val.to_bytes(2, byteorder=self.byteorder, signed=True))
 
-    def put_int32(self, val):
+    def write_int32(self, val):
         self.file.write(val.to_bytes(4, byteorder=self.byteorder, signed=True))
 
-    def put_uint8(self, val):
+    def write_uint8(self, val):
         self.file.write(val.to_bytes(1, byteorder=self.byteorder, signed=False))
 
-    def put_uint16(self, val):
+    def write_uint16(self, val):
         self.file.write(val.to_bytes(2, byteorder=self.byteorder, signed=False))
 
-    def put_uint32(self, val):
+    def write_uint32(self, val):
         self.file.write(val.to_bytes(4, byteorder=self.byteorder, signed=False))
 
-    def put_float(self, val):
-        bo_literal = '>' if self.byteorder == 'big' else '<'
+    def write_float(self, val):
+        bo_literal = ">" if self.byteorder == "big" else "<"
         self.file.write(struct.pack(bo_literal + "f", val))
 
-    def put_string(self, val):
+    def write_string(self, val):
         self.file.write(val.encode("utf-8"))
 
-    def put_c_string(self, val):
-        self.file.write((val + '\0').encode("utf-8"))
+    def write_c_string(self, val):
+        self.file.write((val + "\0").encode("utf-8"))
 
-    def put_bytes(self, bytes):
+    def write_bytes(self, bytes):
         self.file.write(bytes)

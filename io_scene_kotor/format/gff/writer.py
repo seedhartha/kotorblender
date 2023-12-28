@@ -51,37 +51,37 @@ class GffWriter:
         off_list_indices = off_field_indices + num_field_indices
         num_list_indices = 4 * len(self.list_indices)
 
-        self.writer.put_string(self.file_type)
-        self.writer.put_string(FILE_VERSION)
-        self.writer.put_uint32(off_structs)
-        self.writer.put_uint32(num_structs)
-        self.writer.put_uint32(off_fields)
-        self.writer.put_uint32(num_fields)
-        self.writer.put_uint32(off_labels)
-        self.writer.put_uint32(num_labels)
-        self.writer.put_uint32(off_field_data)
-        self.writer.put_uint32(num_field_data)
-        self.writer.put_uint32(off_field_indices)
-        self.writer.put_uint32(num_field_indices)
-        self.writer.put_uint32(off_list_indices)
-        self.writer.put_uint32(num_list_indices)
+        self.writer.write_string(self.file_type)
+        self.writer.write_string(FILE_VERSION)
+        self.writer.write_uint32(off_structs)
+        self.writer.write_uint32(num_structs)
+        self.writer.write_uint32(off_fields)
+        self.writer.write_uint32(num_fields)
+        self.writer.write_uint32(off_labels)
+        self.writer.write_uint32(num_labels)
+        self.writer.write_uint32(off_field_data)
+        self.writer.write_uint32(num_field_data)
+        self.writer.write_uint32(off_field_indices)
+        self.writer.write_uint32(num_field_indices)
+        self.writer.write_uint32(off_list_indices)
+        self.writer.write_uint32(num_list_indices)
 
         for struct in self.structs:
-            self.writer.put_uint32(struct.type)
-            self.writer.put_uint32(struct.data_or_data_offset)
-            self.writer.put_uint32(struct.num_fields)
+            self.writer.write_uint32(struct.type)
+            self.writer.write_uint32(struct.data_or_data_offset)
+            self.writer.write_uint32(struct.num_fields)
         for field in self.fields:
-            self.writer.put_uint32(field.type)
-            self.writer.put_uint32(field.label_idx)
-            self.writer.put_uint32(field.data_or_data_offset)
+            self.writer.write_uint32(field.type)
+            self.writer.write_uint32(field.label_idx)
+            self.writer.write_uint32(field.data_or_data_offset)
         for label in self.labels:
-            self.writer.put_string(label.ljust(16, "\0"))
+            self.writer.write_string(label.ljust(16, "\0"))
         if len(self.field_data) > 0:
-            self.writer.put_bytes(bytearray(self.field_data))
+            self.writer.write_bytes(bytearray(self.field_data))
         for idx in self.field_indices:
-            self.writer.put_uint32(idx)
+            self.writer.write_uint32(idx)
         for idx in self.list_indices:
-            self.writer.put_uint32(idx)
+            self.writer.write_uint32(idx)
 
     def decompose_tree(self):
         num_structs = 0

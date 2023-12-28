@@ -29,8 +29,8 @@ class GffReader:
         self.file_type = file_type.ljust(4)
 
     def load(self):
-        file_type = self.reader.get_string(4)
-        file_version = self.reader.get_string(4)
+        file_type = self.reader.read_string(4)
+        file_version = self.reader.read_string(4)
 
         if file_type != self.file_type:
             raise RuntimeError(
@@ -45,18 +45,18 @@ class GffReader:
                 )
             )
 
-        self.off_structs = self.reader.get_uint32()
-        self.num_structs = self.reader.get_uint32()
-        self.off_fields = self.reader.get_uint32()
-        self.num_fields = self.reader.get_uint32()
-        self.off_labels = self.reader.get_uint32()
-        self.num_labels = self.reader.get_uint32()
-        self.off_field_data = self.reader.get_uint32()
-        self.num_field_data = self.reader.get_uint32()
-        self.off_field_indices = self.reader.get_uint32()
-        self.num_field_indices = self.reader.get_uint32()
-        self.off_list_indices = self.reader.get_uint32()
-        self.num_list_indices = self.reader.get_uint32()
+        self.off_structs = self.reader.read_uint32()
+        self.num_structs = self.reader.read_uint32()
+        self.off_fields = self.reader.read_uint32()
+        self.num_fields = self.reader.read_uint32()
+        self.off_labels = self.reader.read_uint32()
+        self.num_labels = self.reader.read_uint32()
+        self.off_field_data = self.reader.read_uint32()
+        self.num_field_data = self.reader.read_uint32()
+        self.off_field_indices = self.reader.read_uint32()
+        self.num_field_indices = self.reader.read_uint32()
+        self.off_list_indices = self.reader.read_uint32()
+        self.num_list_indices = self.reader.read_uint32()
 
         self.load_structs()
         self.load_fields()
@@ -71,9 +71,9 @@ class GffReader:
         self.reader.seek(self.off_structs)
         for _ in range(self.num_structs):
             struct = GffStruct(
-                self.reader.get_uint32(),
-                self.reader.get_uint32(),
-                self.reader.get_uint32(),
+                self.reader.read_uint32(),
+                self.reader.read_uint32(),
+                self.reader.read_uint32(),
             )
             self.structs.append(struct)
 
@@ -82,32 +82,32 @@ class GffReader:
         self.reader.seek(self.off_fields)
         for _ in range(self.num_fields):
             field = GffField(
-                self.reader.get_uint32(),
-                self.reader.get_uint32(),
-                self.reader.get_uint32(),
+                self.reader.read_uint32(),
+                self.reader.read_uint32(),
+                self.reader.read_uint32(),
             )
             self.fields.append(field)
 
     def load_labels(self):
         self.reader.seek(self.off_labels)
         self.labels = [
-            self.reader.get_string(16).rstrip("\0") for _ in range(self.num_labels)
+            self.reader.read_string(16).rstrip("\0") for _ in range(self.num_labels)
         ]
 
     def load_field_data(self):
         self.reader.seek(self.off_field_data)
-        self.field_data = self.reader.get_bytes(self.num_field_data)
+        self.field_data = self.reader.read_bytes(self.num_field_data)
 
     def load_field_indices(self):
         self.reader.seek(self.off_field_indices)
         self.field_indices = [
-            self.reader.get_uint32() for _ in range(self.num_field_indices // 4)
+            self.reader.read_uint32() for _ in range(self.num_field_indices // 4)
         ]
 
     def load_list_indices(self):
         self.reader.seek(self.off_list_indices)
         self.list_indices = [
-            self.reader.get_uint32() for _ in range(self.num_list_indices // 4)
+            self.reader.read_uint32() for _ in range(self.num_list_indices // 4)
         ]
 
     def new_tree_struct(self, structIdx):

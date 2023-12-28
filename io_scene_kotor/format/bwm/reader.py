@@ -50,7 +50,7 @@ class BwmReader:
         return self.new_walkmesh()
 
     def load_header(self):
-        file_type = self.bwm.get_string(4)
+        file_type = self.bwm.read_string(4)
         if file_type != "BWM ":
             raise RuntimeError(
                 "BWM file type is invalid: expected='BWM ', actual='{}'".format(
@@ -58,53 +58,53 @@ class BwmReader:
                 )
             )
 
-        version = self.bwm.get_string(4)
-        self.bwm_type = self.bwm.get_uint32()
-        self.rel_use_vec1 = [self.bwm.get_float() for _ in range(3)]
-        self.rel_use_vec2 = [self.bwm.get_float() for _ in range(3)]
-        abs_use_vec1 = [self.bwm.get_float() for _ in range(3)]
-        abs_use_vec2 = [self.bwm.get_float() for _ in range(3)]
-        self.position = [self.bwm.get_float() for _ in range(3)]
-        self.num_verts = self.bwm.get_uint32()
-        self.off_verts = self.bwm.get_uint32()
-        self.num_faces = self.bwm.get_uint32()
-        self.off_vert_indices = self.bwm.get_uint32()
-        self.off_material_ids = self.bwm.get_uint32()
-        self.off_normals = self.bwm.get_uint32()
-        self.off_distances = self.bwm.get_uint32()
-        self.num_aabbs = self.bwm.get_uint32()
-        self.off_aabbs = self.bwm.get_uint32()
+        version = self.bwm.read_string(4)
+        self.bwm_type = self.bwm.read_uint32()
+        self.rel_use_vec1 = [self.bwm.read_float() for _ in range(3)]
+        self.rel_use_vec2 = [self.bwm.read_float() for _ in range(3)]
+        abs_use_vec1 = [self.bwm.read_float() for _ in range(3)]
+        abs_use_vec2 = [self.bwm.read_float() for _ in range(3)]
+        self.position = [self.bwm.read_float() for _ in range(3)]
+        self.num_verts = self.bwm.read_uint32()
+        self.off_verts = self.bwm.read_uint32()
+        self.num_faces = self.bwm.read_uint32()
+        self.off_vert_indices = self.bwm.read_uint32()
+        self.off_material_ids = self.bwm.read_uint32()
+        self.off_normals = self.bwm.read_uint32()
+        self.off_distances = self.bwm.read_uint32()
+        self.num_aabbs = self.bwm.read_uint32()
+        self.off_aabbs = self.bwm.read_uint32()
         self.bwm.skip(4)  # unknown
-        self.num_adj_edges = self.bwm.get_uint32()
-        self.off_adj_edges = self.bwm.get_uint32()
-        self.num_outer_edges = self.bwm.get_uint32()
-        self.off_outer_edges = self.bwm.get_uint32()
-        self.num_perimeters = self.bwm.get_uint32()
-        self.off_perimeters = self.bwm.get_uint32()
+        self.num_adj_edges = self.bwm.read_uint32()
+        self.off_adj_edges = self.bwm.read_uint32()
+        self.num_outer_edges = self.bwm.read_uint32()
+        self.off_outer_edges = self.bwm.read_uint32()
+        self.num_perimeters = self.bwm.read_uint32()
+        self.off_perimeters = self.bwm.read_uint32()
 
     def load_vertices(self):
         self.bwm.seek(self.off_verts)
         for _ in range(self.num_verts):
-            vert = [self.bwm.get_float() - self.position[i] for i in range(3)]
+            vert = [self.bwm.read_float() - self.position[i] for i in range(3)]
             self.verts.append(vert)
 
     def load_faces(self):
         vert_indices = []
         self.bwm.seek(self.off_vert_indices)
         for _ in range(self.num_faces):
-            vert_indices.append([self.bwm.get_uint32() for _ in range(3)])
+            vert_indices.append([self.bwm.read_uint32() for _ in range(3)])
 
         self.bwm.seek(self.off_material_ids)
-        material_ids = [self.bwm.get_uint32() for _ in range(self.num_faces)]
+        material_ids = [self.bwm.read_uint32() for _ in range(self.num_faces)]
 
         normals = []
         self.bwm.seek(self.off_normals)
         for _ in range(self.num_faces):
-            normal = [self.bwm.get_float() for _ in range(3)]
+            normal = [self.bwm.read_float() for _ in range(3)]
             normals.append(normal)
 
         self.bwm.seek(self.off_distances)
-        distances = [self.bwm.get_float() for _ in range(self.num_faces)]
+        distances = [self.bwm.read_float() for _ in range(self.num_faces)]
 
         for i in range(self.num_faces):
             self.facelist.vertices.append(vert_indices[i])
@@ -115,12 +115,12 @@ class BwmReader:
         aabbs = []
         self.bwm.seek(self.off_aabbs)
         for _ in range(self.num_aabbs):
-            bounding_box = [self.bwm.get_float() for _ in range(6)]
-            face_idx = self.bwm.get_int32()
+            bounding_box = [self.bwm.read_float() for _ in range(6)]
+            face_idx = self.bwm.read_int32()
             self.bwm.skip(4)  # unknown
-            most_significant_plane = self.bwm.get_uint32()
-            child_idx1 = self.bwm.get_uint32()
-            child_idx2 = self.bwm.get_uint32()
+            most_significant_plane = self.bwm.read_uint32()
+            child_idx1 = self.bwm.read_uint32()
+            child_idx2 = self.bwm.read_uint32()
             aabbs.append(
                 AABB(
                     bounding_box,
@@ -135,18 +135,18 @@ class BwmReader:
         adj_edges = []
         self.bwm.seek(self.off_adj_edges)
         for _ in range(self.num_adj_edges):
-            adj_edges.append([self.bwm.get_int32() for _ in range(3)])
+            adj_edges.append([self.bwm.read_int32() for _ in range(3)])
 
     def load_outer_edges(self):
         self.bwm.seek(self.off_outer_edges)
         for _ in range(self.num_outer_edges):
-            index = self.bwm.get_uint32()
-            transition = self.bwm.get_int32()
+            index = self.bwm.read_uint32()
+            transition = self.bwm.read_int32()
             self.outer_edges.append((index, transition))
 
     def load_perimeters(self):
         self.bwm.seek(self.off_perimeters)
-        self.perimeters = [self.bwm.get_uint32() for _ in range(self.num_perimeters)]
+        self.perimeters = [self.bwm.read_uint32() for _ in range(self.num_perimeters)]
 
     def new_walkmesh(self):
         if self.bwm_type == BWM_TYPE_WOK:

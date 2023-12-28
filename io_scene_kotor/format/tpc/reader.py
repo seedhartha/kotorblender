@@ -47,13 +47,13 @@ class TpcReader:
         self.reader = BinaryReader(path)
 
     def load(self):
-        self.compressed_size = self.reader.get_uint32()
+        self.compressed_size = self.reader.read_uint32()
         self.compressed = self.compressed_size > 0
         self.reader.skip(4)
-        image_w = self.reader.get_uint16()
-        image_h = self.reader.get_uint16()
-        self.encoding = TpcEncoding(self.reader.get_uint8())
-        self.num_mips = self.reader.get_uint8()
+        image_w = self.reader.read_uint16()
+        image_h = self.reader.read_uint16()
+        self.encoding = TpcEncoding(self.reader.read_uint8())
+        self.num_mips = self.reader.read_uint8()
         self.reader.seek(128)
 
         cubemap = image_h // image_w == 6
@@ -83,7 +83,7 @@ class TpcReader:
 
     def read_mip(self, mip_w, mip_h, level):
         pixels_size = self.mip_pixels_size(level, mip_w, mip_h)
-        pixels = self.reader.get_bytes(pixels_size)
+        pixels = self.reader.read_bytes(pixels_size)
         return TpcMip(mip_w, mip_h, pixels)
 
     def mip_pixels_size(self, mip_level, mip_w, mip_h):

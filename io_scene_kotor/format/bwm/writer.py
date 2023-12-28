@@ -334,82 +334,82 @@ class BwmWriter:
             num_perimeters = 0
             off_perimeters = 0
 
-        self.bwm.put_string("BWM V1.0")
-        self.bwm.put_uint32(self.bwm_type)
+        self.bwm.write_string("BWM V1.0")
+        self.bwm.write_uint32(self.bwm_type)
         for val in rel_use_vec1:
-            self.bwm.put_float(val)
+            self.bwm.write_float(val)
         for val in rel_use_vec2:
-            self.bwm.put_float(val)
+            self.bwm.write_float(val)
         for val in abs_use_vec1:
-            self.bwm.put_float(val)
+            self.bwm.write_float(val)
         for val in abs_use_vec2:
-            self.bwm.put_float(val)
+            self.bwm.write_float(val)
         for val in position:
-            self.bwm.put_float(val)
-        self.bwm.put_uint32(num_verts)
-        self.bwm.put_uint32(self.off_verts)
-        self.bwm.put_uint32(num_faces)
-        self.bwm.put_uint32(self.off_vert_indices)
-        self.bwm.put_uint32(self.off_material_ids)
-        self.bwm.put_uint32(self.off_normals)
-        self.bwm.put_uint32(self.off_distances)
-        self.bwm.put_uint32(num_aabbs)
-        self.bwm.put_uint32(off_aabbs)
-        self.bwm.put_uint32(0)  # unknown
-        self.bwm.put_uint32(num_adj_edges)
-        self.bwm.put_uint32(off_adj_edges)
-        self.bwm.put_uint32(num_outer_edges)
-        self.bwm.put_uint32(off_outer_edges)
-        self.bwm.put_uint32(num_perimeters)
-        self.bwm.put_uint32(off_perimeters)
+            self.bwm.write_float(val)
+        self.bwm.write_uint32(num_verts)
+        self.bwm.write_uint32(self.off_verts)
+        self.bwm.write_uint32(num_faces)
+        self.bwm.write_uint32(self.off_vert_indices)
+        self.bwm.write_uint32(self.off_material_ids)
+        self.bwm.write_uint32(self.off_normals)
+        self.bwm.write_uint32(self.off_distances)
+        self.bwm.write_uint32(num_aabbs)
+        self.bwm.write_uint32(off_aabbs)
+        self.bwm.write_uint32(0)  # unknown
+        self.bwm.write_uint32(num_adj_edges)
+        self.bwm.write_uint32(off_adj_edges)
+        self.bwm.write_uint32(num_outer_edges)
+        self.bwm.write_uint32(off_outer_edges)
+        self.bwm.write_uint32(num_perimeters)
+        self.bwm.write_uint32(off_perimeters)
 
     def save_vertices(self):
         for vert in self.verts:
             for val in vert:
-                self.bwm.put_float(val)
+                self.bwm.write_float(val)
 
     def save_faces(self):
         # Vertex Indices
         for face in self.facelist.vertices:
             for val in face:
-                self.bwm.put_uint32(val)
+                self.bwm.write_uint32(val)
 
         # Material Ids
         for mat_id in self.facelist.materials:
-            self.bwm.put_uint32(mat_id)
+            self.bwm.write_uint32(mat_id)
 
         # Normals
         for normal in self.facelist.normals:
             for val in normal:
-                self.bwm.put_float(val)
+                self.bwm.write_float(val)
 
         # Distances
         for face_idx, face in enumerate(self.facelist.vertices):
             vert1 = Vector(self.verts[face[0]])
             normal = Vector(self.facelist.normals[face_idx])
             distance = -1.0 * (normal @ vert1)
-            self.bwm.put_float(distance)
+            self.bwm.write_float(distance)
 
     def save_aabbs(self):
         for aabb in self.aabbs:
             for val in aabb.bounding_box:
-                self.bwm.put_float(val)
-            self.bwm.put_int32(aabb.face_idx)
-            self.bwm.put_uint32(4)  # unknown
-            self.bwm.put_uint32(aabb.most_significant_plane)
-            self.bwm.put_int32(aabb.child_idx1)
-            self.bwm.put_int32(aabb.child_idx2)
+                self.bwm.write_float(val)
+            self.bwm.write_int32(aabb.face_idx)
+            self.bwm.write_uint32(4)  # unknown
+            self.bwm.write_uint32(aabb.most_significant_plane)
+            self.bwm.write_int32(aabb.child_idx1)
+            self.bwm.write_int32(aabb.child_idx2)
 
     def save_adjacent_edges(self):
         for edges in self.adjacent_edges:
             for val in edges:
-                self.bwm.put_int32(val)
+                self.bwm.write_int32(val)
 
     def save_outer_edges(self):
         for edge_idx, transition in self.outer_edges:
-            self.bwm.put_uint32(edge_idx)
-            self.bwm.put_int32(transition)
+            self.bwm.write_uint32(edge_idx)
+            self.bwm.write_int32(transition)
 
     def save_perimeters(self):
         for perimeter in self.perimeters:
-            self.bwm.put_uint32(perimeter)
+            self.bwm.write_uint32(perimeter)

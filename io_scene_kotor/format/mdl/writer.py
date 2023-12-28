@@ -636,9 +636,9 @@ class MdlWriter:
                 data_count = append_keyframes(key, ctrl_type, dim, data_count)
 
     def save_file_header(self):
-        self.mdl.put_uint32(0)  # pseudo signature
-        self.mdl.put_uint32(self.mdl_size)
-        self.mdl.put_uint32(self.mdx_size)
+        self.mdl.write_uint32(0)  # pseudo signature
+        self.mdl.write_uint32(self.mdl_size)
+        self.mdl.write_uint32(self.mdx_size)
 
     def save_geometry_header(self):
         if self.tsl:
@@ -662,17 +662,17 @@ class MdlWriter:
         ref_count = 0
         model_type = MODEL_MODEL
 
-        self.mdl.put_uint32(fn_ptr1)
-        self.mdl.put_uint32(fn_ptr2)
-        self.mdl.put_string(model_name)
-        self.mdl.put_uint32(off_root_node)
-        self.mdl.put_uint32(total_num_nodes)
+        self.mdl.write_uint32(fn_ptr1)
+        self.mdl.write_uint32(fn_ptr2)
+        self.mdl.write_string(model_name)
+        self.mdl.write_uint32(off_root_node)
+        self.mdl.write_uint32(total_num_nodes)
         self.put_array_def(0, 0)  # runtime array
         self.put_array_def(0, 0)  # runtime array
-        self.mdl.put_uint32(ref_count)
-        self.mdl.put_uint8(model_type)
+        self.mdl.write_uint32(ref_count)
+        self.mdl.write_uint8(model_type)
         for _ in range(3):
-            self.mdl.put_uint8(0)  # padding
+            self.mdl.write_uint8(0)  # padding
 
     def save_model_header(self):
         classification = next(
@@ -704,35 +704,35 @@ class MdlWriter:
         mdx_size = self.mdx_size
         mdx_offset = 0
 
-        self.mdl.put_uint8(classification)
-        self.mdl.put_uint8(subclassification)
-        self.mdl.put_uint8(0)  # unknown
-        self.mdl.put_uint8(affected_by_fog)
-        self.mdl.put_uint32(num_child_models)
+        self.mdl.write_uint8(classification)
+        self.mdl.write_uint8(subclassification)
+        self.mdl.write_uint8(0)  # unknown
+        self.mdl.write_uint8(affected_by_fog)
+        self.mdl.write_uint32(num_child_models)
         self.put_array_def(
             self.off_anim_offsets, len(self.model.animations)
         )  # animation offsets
-        self.mdl.put_uint32(supermodel_ref)
+        self.mdl.write_uint32(supermodel_ref)
         for val in bounding_box:
-            self.mdl.put_float(val)
-        self.mdl.put_float(radius)
-        self.mdl.put_float(scale)
-        self.mdl.put_string(supermodel_name)
-        self.mdl.put_uint32(off_anim_root)
-        self.mdl.put_uint32(0)  # unknown
-        self.mdl.put_uint32(mdx_size)
-        self.mdl.put_uint32(mdx_offset)
+            self.mdl.write_float(val)
+        self.mdl.write_float(radius)
+        self.mdl.write_float(scale)
+        self.mdl.write_string(supermodel_name)
+        self.mdl.write_uint32(off_anim_root)
+        self.mdl.write_uint32(0)  # unknown
+        self.mdl.write_uint32(mdx_size)
+        self.mdl.write_uint32(mdx_offset)
         self.put_array_def(self.off_name_offsets, len(self.nodes))  # name offsets
 
     def save_names(self):
         for offset in self.name_offsets:
-            self.mdl.put_uint32(offset)
+            self.mdl.write_uint32(offset)
         for node in self.nodes:
-            self.mdl.put_c_string(node.name)
+            self.mdl.write_c_string(node.name)
 
     def save_animations(self):
         for offset in self.anim_offsets:
-            self.mdl.put_uint32(offset)
+            self.mdl.write_uint32(offset)
 
         for anim_idx, anim in enumerate(self.model.animations):
             if self.tsl:
@@ -757,26 +757,26 @@ class MdlWriter:
             model_type = MODEL_ANIM
             anim_root = anim.animroot.ljust(32, "\0")
 
-            self.mdl.put_uint32(fn_ptr1)
-            self.mdl.put_uint32(fn_ptr2)
-            self.mdl.put_string(name)
-            self.mdl.put_uint32(off_root_node)
-            self.mdl.put_uint32(total_num_nodes)
+            self.mdl.write_uint32(fn_ptr1)
+            self.mdl.write_uint32(fn_ptr2)
+            self.mdl.write_string(name)
+            self.mdl.write_uint32(off_root_node)
+            self.mdl.write_uint32(total_num_nodes)
             self.put_array_def(0, 0)  # runtime array
             self.put_array_def(0, 0)  # runtime array
-            self.mdl.put_uint32(ref_count)
-            self.mdl.put_uint8(model_type)
+            self.mdl.write_uint32(ref_count)
+            self.mdl.write_uint8(model_type)
             for _ in range(3):
-                self.mdl.put_uint8(0)  # padding
-            self.mdl.put_float(anim.length)
-            self.mdl.put_float(anim.transtime)
-            self.mdl.put_string(anim_root)
+                self.mdl.write_uint8(0)  # padding
+            self.mdl.write_float(anim.length)
+            self.mdl.write_float(anim.transtime)
+            self.mdl.write_string(anim_root)
             self.put_array_def(self.anim_events_offsets[anim_idx], len(anim.events))
-            self.mdl.put_uint32(0)  # padding
+            self.mdl.write_uint32(0)  # padding
 
             for time, event in anim.events:
-                self.mdl.put_float(time)
-                self.mdl.put_string(event.ljust(32, "\0"))
+                self.mdl.write_float(time)
+                self.mdl.write_string(event.ljust(32, "\0"))
 
             self.save_anim_nodes(anim_idx)
 
@@ -797,16 +797,16 @@ class MdlWriter:
             orientation = [1.0, 0.0, 0.0, 0.0]
             child_indices = self.anim_child_indices[anim_idx][node_idx]
 
-            self.mdl.put_uint16(type_flags)
-            self.mdl.put_uint16(node.node_number)
-            self.mdl.put_uint16(name_index)
-            self.mdl.put_uint16(0)  # padding
-            self.mdl.put_uint32(off_root)
-            self.mdl.put_uint32(off_parent)
+            self.mdl.write_uint16(type_flags)
+            self.mdl.write_uint16(node.node_number)
+            self.mdl.write_uint16(name_index)
+            self.mdl.write_uint16(0)  # padding
+            self.mdl.write_uint32(off_root)
+            self.mdl.write_uint32(off_parent)
             for val in position:
-                self.mdl.put_float(val)
+                self.mdl.write_float(val)
             for val in orientation:
-                self.mdl.put_float(val)
+                self.mdl.write_float(val)
             self.put_array_def(
                 self.anim_children_offsets[anim_idx][node_idx], len(child_indices)
             )
@@ -822,7 +822,7 @@ class MdlWriter:
             # Children
 
             for child_idx in child_indices:
-                self.mdl.put_uint32(self.anim_node_offsets[anim_idx][child_idx])
+                self.mdl.write_uint32(self.anim_node_offsets[anim_idx][child_idx])
 
             # Controllers
 
@@ -832,20 +832,20 @@ class MdlWriter:
                 else:
                     unk1 = 0xFFFF
 
-                self.mdl.put_uint32(key.ctrl_type)
-                self.mdl.put_uint16(unk1)
-                self.mdl.put_uint16(key.num_rows)
-                self.mdl.put_uint16(key.timekeys_start)
-                self.mdl.put_uint16(key.values_start)
-                self.mdl.put_uint8(key.num_columns)
+                self.mdl.write_uint32(key.ctrl_type)
+                self.mdl.write_uint16(unk1)
+                self.mdl.write_uint16(key.num_rows)
+                self.mdl.write_uint16(key.timekeys_start)
+                self.mdl.write_uint16(key.values_start)
+                self.mdl.write_uint8(key.num_columns)
 
                 for _ in range(3):
-                    self.mdl.put_uint8(0)  # padding
+                    self.mdl.write_uint8(0)  # padding
 
             # Controller Data
 
             for val in self.anim_controller_data[anim_idx][node_idx]:
-                self.mdl.put_float(val)
+                self.mdl.write_float(val)
 
     def save_nodes(self):
         num_meshes = 0
@@ -863,16 +863,16 @@ class MdlWriter:
             orientation = node.orientation
             child_indices = self.child_indices[node_idx]
 
-            self.mdl.put_uint16(type_flags)
-            self.mdl.put_uint16(node_number)
-            self.mdl.put_uint16(name_index)
-            self.mdl.put_uint16(0)  # padding
-            self.mdl.put_uint32(off_root)
-            self.mdl.put_uint32(off_parent)
+            self.mdl.write_uint16(type_flags)
+            self.mdl.write_uint16(node_number)
+            self.mdl.write_uint16(name_index)
+            self.mdl.write_uint16(0)  # padding
+            self.mdl.write_uint32(off_root)
+            self.mdl.write_uint32(off_parent)
             for val in position:
-                self.mdl.put_float(val)
+                self.mdl.write_float(val)
             for val in orientation:
-                self.mdl.put_float(val)
+                self.mdl.write_float(val)
             self.put_array_def(self.children_offsets[node_idx], len(child_indices))
             self.put_array_def(
                 self.controller_offsets[node_idx], self.controller_counts[node_idx]
@@ -894,7 +894,7 @@ class MdlWriter:
                 flare = 0  # always 0
                 flare_radius = node.flareradius
 
-                self.mdl.put_float(flare_radius)
+                self.mdl.write_float(flare_radius)
                 self.put_array_def(0, 0)  # unknown
                 self.put_array_def(
                     self.flare_sizes_offsets[node_idx] if node.lensflares else 0,
@@ -914,28 +914,28 @@ class MdlWriter:
                     else 0,
                     len(node.flare_list.textures),
                 )
-                self.mdl.put_int32(light_priority)
-                self.mdl.put_uint32(ambient_only)
-                self.mdl.put_uint32(dynamic_type)
-                self.mdl.put_uint32(affect_dynamic)
-                self.mdl.put_uint32(shadow)
-                self.mdl.put_uint32(flare)
-                self.mdl.put_uint32(fading_light)
+                self.mdl.write_int32(light_priority)
+                self.mdl.write_uint32(ambient_only)
+                self.mdl.write_uint32(dynamic_type)
+                self.mdl.write_uint32(affect_dynamic)
+                self.mdl.write_uint32(shadow)
+                self.mdl.write_uint32(flare)
+                self.mdl.write_uint32(fading_light)
 
                 # Lens Flares
                 if node.lensflares:
                     for size in node.flare_list.sizes:
-                        self.mdl.put_float(size)
+                        self.mdl.write_float(size)
                     for position in node.flare_list.positions:
-                        self.mdl.put_float(position)
+                        self.mdl.write_float(position)
                     for colorshift in node.flare_list.colorshifts:
                         for val in colorshift:
-                            self.mdl.put_float(val)
+                            self.mdl.write_float(val)
                     for i in range(len(node.flare_list.textures)):
                         off_tex = self.flare_textures_offsets[node_idx][i]
-                        self.mdl.put_uint32(off_tex)
+                        self.mdl.write_uint32(off_tex)
                     for tex in node.flare_list.textures:
-                        self.mdl.put_c_string(tex)
+                        self.mdl.write_c_string(tex)
 
             # Emitter Header
 
@@ -976,26 +976,26 @@ class MdlWriter:
                 if node.depth_texture:
                     flags |= EMITTER_FLAG_DEPTH_TEXTURE
 
-                self.mdl.put_float(node.deadspace)
-                self.mdl.put_float(node.blastradius)
-                self.mdl.put_float(node.blastlength)
-                self.mdl.put_uint32(node.num_branches)
-                self.mdl.put_float(node.controlptsmoothing)
-                self.mdl.put_uint32(node.xgrid)
-                self.mdl.put_uint32(node.ygrid)
-                self.mdl.put_uint32(node.spawntype)
-                self.mdl.put_string(update)
-                self.mdl.put_string(render)
-                self.mdl.put_string(blend)
-                self.mdl.put_string(texture)
-                self.mdl.put_string(chunk_name)
-                self.mdl.put_uint32(twosided_tex)
-                self.mdl.put_uint32(loop)
-                self.mdl.put_uint16(node.renderorder)
-                self.mdl.put_uint8(frame_blending)
-                self.mdl.put_string(depth_texture_name)
-                self.mdl.put_uint8(0)  # padding
-                self.mdl.put_uint32(flags)
+                self.mdl.write_float(node.deadspace)
+                self.mdl.write_float(node.blastradius)
+                self.mdl.write_float(node.blastlength)
+                self.mdl.write_uint32(node.num_branches)
+                self.mdl.write_float(node.controlptsmoothing)
+                self.mdl.write_uint32(node.xgrid)
+                self.mdl.write_uint32(node.ygrid)
+                self.mdl.write_uint32(node.spawntype)
+                self.mdl.write_string(update)
+                self.mdl.write_string(render)
+                self.mdl.write_string(blend)
+                self.mdl.write_string(texture)
+                self.mdl.write_string(chunk_name)
+                self.mdl.write_uint32(twosided_tex)
+                self.mdl.write_uint32(loop)
+                self.mdl.write_uint16(node.renderorder)
+                self.mdl.write_uint8(frame_blending)
+                self.mdl.write_string(depth_texture_name)
+                self.mdl.write_uint8(0)  # padding
+                self.mdl.write_uint32(flags)
 
             # Reference Header
 
@@ -1003,8 +1003,8 @@ class MdlWriter:
                 ref_model = node.refmodel.ljust(32, "\0")
                 reattachable = node.reattachable
 
-                self.mdl.put_string(ref_model)
-                self.mdl.put_uint32(reattachable)
+                self.mdl.write_string(ref_model)
+                self.mdl.write_uint32(reattachable)
 
             # Mesh Header
 
@@ -1117,23 +1117,23 @@ class MdlWriter:
                 if not self.xbox:
                     off_vert_array = self.verts_offsets[node_idx]
 
-                self.mdl.put_uint32(fn_ptr1)
-                self.mdl.put_uint32(fn_ptr2)
+                self.mdl.write_uint32(fn_ptr1)
+                self.mdl.write_uint32(fn_ptr2)
                 self.put_array_def(self.faces_offsets[node_idx], num_faces)  # faces
                 for val in bounding_box:
-                    self.mdl.put_float(val)
-                self.mdl.put_float(radius)
+                    self.mdl.write_float(val)
+                self.mdl.write_float(radius)
                 for val in average:
-                    self.mdl.put_float(val)
+                    self.mdl.write_float(val)
                 for val in diffuse:
-                    self.mdl.put_float(val)
+                    self.mdl.write_float(val)
                 for val in ambient:
-                    self.mdl.put_float(val)
-                self.mdl.put_uint32(transparency_hint)
-                self.mdl.put_string(bitmap)
-                self.mdl.put_string(bitmap2)
-                self.mdl.put_string(bitmap3)
-                self.mdl.put_string(bitmap4)
+                    self.mdl.write_float(val)
+                self.mdl.write_uint32(transparency_hint)
+                self.mdl.write_string(bitmap)
+                self.mdl.write_string(bitmap2)
+                self.mdl.write_string(bitmap3)
+                self.mdl.write_string(bitmap4)
 
                 if type_flags & NODE_SABER:
                     self.put_array_def(
@@ -1156,53 +1156,53 @@ class MdlWriter:
                         self.inv_count_offsets[node_idx], 1
                     )  # inverted counter
 
-                self.mdl.put_uint32(0xFFFFFFFF)  # unknown
-                self.mdl.put_uint32(0xFFFFFFFF)  # unknown
-                self.mdl.put_uint32(0)  # unknown
-                self.mdl.put_uint8(3)  # saber unknown
+                self.mdl.write_uint32(0xFFFFFFFF)  # unknown
+                self.mdl.write_uint32(0xFFFFFFFF)  # unknown
+                self.mdl.write_uint32(0)  # unknown
+                self.mdl.write_uint8(3)  # saber unknown
                 for _ in range(7):
-                    self.mdl.put_uint8(0)  # saber unknown
-                self.mdl.put_uint32(animate_uv)
-                self.mdl.put_float(uv_dir_x)
-                self.mdl.put_float(uv_dir_y)
-                self.mdl.put_float(uv_jitter)
-                self.mdl.put_float(uv_jitter_speed)
-                self.mdl.put_uint32(mdx_data_size)
-                self.mdl.put_uint32(mdx_data_bitmap)
-                self.mdl.put_uint32(off_mdx_verts)
-                self.mdl.put_uint32(off_mdx_normals)
-                self.mdl.put_uint32(off_mdx_colors)
-                self.mdl.put_uint32(off_mdx_uv1)
-                self.mdl.put_uint32(off_mdx_uv2)
-                self.mdl.put_uint32(off_mdx_uv3)
-                self.mdl.put_uint32(off_mdx_uv4)
-                self.mdl.put_uint32(off_mdx_tan_space1)
-                self.mdl.put_uint32(off_mdx_tan_space2)
-                self.mdl.put_uint32(off_mdx_tan_space3)
-                self.mdl.put_uint32(off_mdx_tan_space4)
-                self.mdl.put_uint16(num_verts)
-                self.mdl.put_uint16(num_textures)
-                self.mdl.put_uint8(has_lightmap)
-                self.mdl.put_uint8(rotate_texture)
-                self.mdl.put_uint8(background_geometry)
-                self.mdl.put_uint8(shadow)
-                self.mdl.put_uint8(beaming)
-                self.mdl.put_uint8(render)
+                    self.mdl.write_uint8(0)  # saber unknown
+                self.mdl.write_uint32(animate_uv)
+                self.mdl.write_float(uv_dir_x)
+                self.mdl.write_float(uv_dir_y)
+                self.mdl.write_float(uv_jitter)
+                self.mdl.write_float(uv_jitter_speed)
+                self.mdl.write_uint32(mdx_data_size)
+                self.mdl.write_uint32(mdx_data_bitmap)
+                self.mdl.write_uint32(off_mdx_verts)
+                self.mdl.write_uint32(off_mdx_normals)
+                self.mdl.write_uint32(off_mdx_colors)
+                self.mdl.write_uint32(off_mdx_uv1)
+                self.mdl.write_uint32(off_mdx_uv2)
+                self.mdl.write_uint32(off_mdx_uv3)
+                self.mdl.write_uint32(off_mdx_uv4)
+                self.mdl.write_uint32(off_mdx_tan_space1)
+                self.mdl.write_uint32(off_mdx_tan_space2)
+                self.mdl.write_uint32(off_mdx_tan_space3)
+                self.mdl.write_uint32(off_mdx_tan_space4)
+                self.mdl.write_uint16(num_verts)
+                self.mdl.write_uint16(num_textures)
+                self.mdl.write_uint8(has_lightmap)
+                self.mdl.write_uint8(rotate_texture)
+                self.mdl.write_uint8(background_geometry)
+                self.mdl.write_uint8(shadow)
+                self.mdl.write_uint8(beaming)
+                self.mdl.write_uint8(render)
 
                 if self.tsl:
-                    self.mdl.put_uint8(dirt_enabled)
-                    self.mdl.put_uint8(0)  # padding
-                    self.mdl.put_uint16(dirt_texture)
-                    self.mdl.put_uint16(dirt_coord_space)
-                    self.mdl.put_uint8(hide_in_holograms)
-                    self.mdl.put_uint8(0)  # padding
+                    self.mdl.write_uint8(dirt_enabled)
+                    self.mdl.write_uint8(0)  # padding
+                    self.mdl.write_uint16(dirt_texture)
+                    self.mdl.write_uint16(dirt_coord_space)
+                    self.mdl.write_uint8(hide_in_holograms)
+                    self.mdl.write_uint8(0)  # padding
 
-                self.mdl.put_uint16(0)  # padding
-                self.mdl.put_float(total_area)
-                self.mdl.put_uint32(0)  # padding
-                self.mdl.put_uint32(mdx_offset)
+                self.mdl.write_uint16(0)  # padding
+                self.mdl.write_float(total_area)
+                self.mdl.write_uint32(0)  # padding
+                self.mdl.write_uint32(mdx_offset)
                 if not self.xbox:
-                    self.mdl.put_uint32(off_vert_array)
+                    self.mdl.write_uint32(off_vert_array)
 
             # Skin Header
 
@@ -1228,10 +1228,10 @@ class MdlWriter:
                 num_bones = len(self.nodes)
 
                 self.put_array_def(0, 0)  # unknown
-                self.mdl.put_uint32(off_mdx_bone_weights)
-                self.mdl.put_uint32(off_mdx_bone_indices)
-                self.mdl.put_uint32(off_bonemap)
-                self.mdl.put_uint32(num_bones)
+                self.mdl.write_uint32(off_mdx_bone_weights)
+                self.mdl.write_uint32(off_mdx_bone_indices)
+                self.mdl.write_uint32(off_bonemap)
+                self.mdl.write_uint32(num_bones)
                 self.put_array_def(self.qbone_offsets[node_idx], num_bones)  # QBones
                 self.put_array_def(self.tbone_offsets[node_idx], num_bones)  # TBones
                 self.put_array_def(
@@ -1239,10 +1239,10 @@ class MdlWriter:
                 )  # garbage
                 for i in range(16):
                     if i < len(bone_indices):
-                        self.mdl.put_uint16(bone_indices[i])
+                        self.mdl.write_uint16(bone_indices[i])
                     else:
-                        self.mdl.put_uint16(0xFFFF)
-                self.mdl.put_uint32(0)  # padding
+                        self.mdl.write_uint16(0xFFFF)
+                self.mdl.write_uint32(0)  # padding
 
             # Dangly Header
 
@@ -1255,15 +1255,15 @@ class MdlWriter:
                 self.put_array_def(
                     self.constraints_offsets[node_idx], len(node.constraints)
                 )
-                self.mdl.put_float(displacement)
-                self.mdl.put_float(tightness)
-                self.mdl.put_float(period)
-                self.mdl.put_uint32(off_vert_data)
+                self.mdl.write_float(displacement)
+                self.mdl.write_float(tightness)
+                self.mdl.write_float(period)
+                self.mdl.write_uint32(off_vert_data)
 
             # AABB Header
 
             if type_flags & NODE_AABB:
-                self.mdl.put_uint32(self.aabb_offsets[node_idx][0])
+                self.mdl.write_uint32(self.aabb_offsets[node_idx][0])
 
             # Saber Header
 
@@ -1272,11 +1272,11 @@ class MdlWriter:
                 saber_inv_count2 = self.get_inverted_counter(num_meshes + 2)
                 num_meshes += 2
 
-                self.mdl.put_uint32(self.saber_verts_offsets[node_idx])
-                self.mdl.put_uint32(self.saber_uv_offsets[node_idx])
-                self.mdl.put_uint32(self.saber_normals_offsets[node_idx])
-                self.mdl.put_uint32(saber_inv_count1)
-                self.mdl.put_uint32(saber_inv_count2)
+                self.mdl.write_uint32(self.saber_verts_offsets[node_idx])
+                self.mdl.write_uint32(self.saber_uv_offsets[node_idx])
+                self.mdl.write_uint32(self.saber_normals_offsets[node_idx])
+                self.mdl.write_uint32(saber_inv_count1)
+                self.mdl.write_uint32(saber_inv_count2)
 
             # Mesh Data
 
@@ -1326,82 +1326,82 @@ class MdlWriter:
                     material_id = node.facelist.materials[face_idx]
 
                     for val in normal:
-                        self.mdl.put_float(val)
-                    self.mdl.put_float(distance)
-                    self.mdl.put_uint32(material_id)
+                        self.mdl.write_float(val)
+                    self.mdl.write_float(distance)
+                    self.mdl.write_uint32(material_id)
                     for val in face_adjacencies[face_idx]:
-                        self.mdl.put_int16(val)
+                        self.mdl.write_int16(val)
                     for val in face:
-                        self.mdl.put_uint16(val)
+                        self.mdl.write_uint16(val)
 
                 # Vertex Indices Offset
                 if not type_flags & NODE_SABER:
-                    self.mdl.put_uint32(self.indices_offsets[node_idx])
+                    self.mdl.write_uint32(self.indices_offsets[node_idx])
 
                 # Vertices
                 if not self.xbox:
                     if type_flags & NODE_SABER:
                         for vert_idx in saber_vert_indices:
                             for val in node.verts[vert_idx]:
-                                self.mdl.put_float(val)
+                                self.mdl.write_float(val)
                     else:
                         for vert in node.verts:
                             for val in vert:
-                                self.mdl.put_float(val)
+                                self.mdl.write_float(val)
 
                 # Vertex Indices Count, Inverted Mesh Counter, Vertex Indices
                 if not type_flags & NODE_SABER:
                     num_meshes += 1
                     mesh_inv_count = self.get_inverted_counter(num_meshes)
 
-                    self.mdl.put_uint32(
+                    self.mdl.write_uint32(
                         3 * len(node.facelist.vertices)
                     )  # vertex index count
-                    self.mdl.put_uint32(mesh_inv_count)  # inverted mesh counter
+                    self.mdl.write_uint32(mesh_inv_count)  # inverted mesh counter
 
                     # Vertex Indices
                     for face in node.facelist.vertices:
                         for val in face:
-                            self.mdl.put_uint16(val)
+                            self.mdl.write_uint16(val)
 
                 # MDX data
                 if not type_flags & NODE_SABER:
                     for vert_idx, vert in enumerate(node.verts):
                         for val in vert:
-                            self.mdx.put_float(val)
+                            self.mdx.write_float(val)
                         if self.xbox:
                             comp = self.compress_vector_xbox(node.normals[vert_idx])
-                            self.mdx.put_uint32(comp)
+                            self.mdx.write_uint32(comp)
                         else:
                             for val in node.normals[vert_idx]:
-                                self.mdx.put_float(val)
+                                self.mdx.write_float(val)
                         if node.uv1:
                             for val in node.uv1[vert_idx]:
-                                self.mdx.put_float(val)
+                                self.mdx.write_float(val)
                         if node.uv2:
                             for val in node.uv2[vert_idx]:
-                                self.mdx.put_float(val)
+                                self.mdx.write_float(val)
                         if node.tangentspace:
                             if self.xbox:
                                 comp = self.compress_vector_xbox(
                                     node.bitangents[vert_idx]
                                 )
-                                self.mdx.put_uint32(comp)
+                                self.mdx.write_uint32(comp)
                                 comp = self.compress_vector_xbox(
                                     node.tangents[vert_idx]
                                 )
-                                self.mdx.put_uint32(comp)
+                                self.mdx.write_uint32(comp)
                                 comp = self.compress_vector_xbox(
                                     node.tangentspacenormals[vert_idx]
                                 )
-                                self.mdx.put_uint32(comp)
+                                self.mdx.write_uint32(comp)
                             else:
                                 for val in node.bitangents[vert_idx]:
-                                    self.mdx.put_float(val)
+                                    self.mdx.write_float(val)
                                 for val in node.tangents[vert_idx]:
-                                    self.mdx.put_float(val)
+                                    self.mdx.write_float(val)
                                 for val in node.tangentspacenormals[vert_idx]:
-                                    self.mdx.put_float(val)
+                                    self.mdx.write_float(val)
                         if type_flags & NODE_SKIN:
                             vert_weights = node.weights[vert_idx]
                             bone_weights = []
@@ -1411,52 +1411,52 @@ class MdlWriter:
                                 bone_weights.append((bone_idx, weight))
                             for i in range(4):
                                 if i < len(bone_weights):
-                                    self.mdx.put_float(bone_weights[i][1])
+                                    self.mdx.write_float(bone_weights[i][1])
                                 else:
-                                    self.mdx.put_float(0.0)
+                                    self.mdx.write_float(0.0)
                             if self.xbox:
                                 for i in range(4):
                                     if i < len(bone_weights):
-                                        self.mdx.put_uint16(bone_weights[i][0])
+                                        self.mdx.write_uint16(bone_weights[i][0])
                                     else:
-                                        self.mdx.put_uint16(0xFFFF)
+                                        self.mdx.write_uint16(0xFFFF)
                             else:
                                 for i in range(4):
                                     if i < len(bone_weights):
-                                        self.mdx.put_float(float(bone_weights[i][0]))
+                                        self.mdx.write_float(float(bone_weights[i][0]))
                                     else:
-                                        self.mdx.put_float(-1.0)
+                                        self.mdx.write_float(-1.0)
                     # Extra MDX data
                     for _ in range(3):
-                        self.mdx.put_float(1e7)
+                        self.mdx.write_float(1e7)
                     if self.xbox:
-                        self.mdx.put_uint32(0)
+                        self.mdx.write_uint32(0)
                     else:
                         for _ in range(3):
-                            self.mdx.put_float(0.0)
+                            self.mdx.write_float(0.0)
                     if node.uv1:
                         for _ in range(2):
-                            self.mdx.put_float(0.0)
+                            self.mdx.write_float(0.0)
                     if node.uv2:
                         for _ in range(2):
-                            self.mdx.put_float(0.0)
+                            self.mdx.write_float(0.0)
                     if node.tangentspace:
                         if self.xbox:
                             for _ in range(3):
-                                self.mdx.put_uint32(0)
+                                self.mdx.write_uint32(0)
                         else:
                             for _ in range(9):
-                                self.mdx.put_float(0.0)
+                                self.mdx.write_float(0.0)
                     if type_flags & NODE_SKIN:
                         weights = (1.0, 0.0, 0.0, 0.0)
                         for val in weights:
-                            self.mdx.put_float(val)
+                            self.mdx.write_float(val)
                         if self.xbox:
                             for _ in range(4):
-                                self.mdx.put_uint16(0)
+                                self.mdx.write_uint16(0)
                         else:
                             for _ in range(4):
-                                self.mdx.put_float(0.0)
+                                self.mdx.write_float(0.0)
 
             # Skin Data
 
@@ -1464,9 +1464,9 @@ class MdlWriter:
                 # Bonemap
                 for bone_idx in bonemap:
                     if self.xbox:
-                        self.mdl.put_uint16(bone_idx if bone_idx != -1 else 0xFFFF)
+                        self.mdl.write_uint16(bone_idx if bone_idx != -1 else 0xFFFF)
                     else:
-                        self.mdl.put_float(float(bone_idx))
+                        self.mdl.write_float(float(bone_idx))
 
                 num_bones = len(bonemap)
 
@@ -1478,28 +1478,28 @@ class MdlWriter:
                     tbones[i], qbones[i], _ = bone_trans.decompose()
                 for i in range(num_bones):
                     qbone = qbones[i]
-                    self.mdl.put_float(qbone.w)
-                    self.mdl.put_float(qbone.x)
-                    self.mdl.put_float(qbone.y)
-                    self.mdl.put_float(qbone.z)
+                    self.mdl.write_float(qbone.w)
+                    self.mdl.write_float(qbone.x)
+                    self.mdl.write_float(qbone.y)
+                    self.mdl.write_float(qbone.z)
                 for i in range(num_bones):
                     tbone = tbones[i]
-                    self.mdl.put_float(tbone.x)
-                    self.mdl.put_float(tbone.y)
-                    self.mdl.put_float(tbone.z)
+                    self.mdl.write_float(tbone.x)
+                    self.mdl.write_float(tbone.y)
+                    self.mdl.write_float(tbone.z)
 
                 # Garbage
                 for _ in range(num_bones):
-                    self.mdl.put_uint32(0)
+                    self.mdl.write_uint32(0)
 
             # Dangly Data
 
             if type_flags & NODE_DANGLY:
                 for val in node.constraints:
-                    self.mdl.put_float(val)
+                    self.mdl.write_float(val)
                 for vert in node.verts:
                     for val in vert:
-                        self.mdl.put_float(val)
+                        self.mdl.write_float(val)
 
             # AABB Data
 
@@ -1530,50 +1530,50 @@ class MdlWriter:
 
                     # Bounding Box
                     for val in aabb[:6]:
-                        self.mdl.put_float(val)
+                        self.mdl.write_float(val)
 
-                    self.mdl.put_uint32(off_child1)
-                    self.mdl.put_uint32(off_child2)
-                    self.mdl.put_int32(face_idx)
-                    self.mdl.put_uint32(most_significant_plane)
+                    self.mdl.write_uint32(off_child1)
+                    self.mdl.write_uint32(off_child2)
+                    self.mdl.write_int32(face_idx)
+                    self.mdl.write_uint32(most_significant_plane)
 
             # Saber Data
 
             if type_flags & NODE_SABER:
                 for vert_idx in saber_vert_indices:
                     for val in node.verts[vert_idx]:
-                        self.mdl.put_float(val)
+                        self.mdl.write_float(val)
                 for vert_idx in saber_vert_indices:
                     for val in node.uv1[vert_idx]:
-                        self.mdl.put_float(val)
+                        self.mdl.write_float(val)
                 for vert_idx in saber_vert_indices:
                     for val in node.normals[vert_idx]:
-                        self.mdl.put_float(val)
+                        self.mdl.write_float(val)
 
             # Children
 
             for child_idx in child_indices:
-                self.mdl.put_uint32(self.node_offsets[child_idx])
+                self.mdl.write_uint32(self.node_offsets[child_idx])
 
             # Controllers
 
             for key in self.controller_keys[node_idx]:
                 unk1 = 0xFFFF
 
-                self.mdl.put_uint32(key.ctrl_type)
-                self.mdl.put_uint16(unk1)
-                self.mdl.put_uint16(key.num_rows)
-                self.mdl.put_uint16(key.timekeys_start)
-                self.mdl.put_uint16(key.values_start)
-                self.mdl.put_uint8(key.num_columns)
+                self.mdl.write_uint32(key.ctrl_type)
+                self.mdl.write_uint16(unk1)
+                self.mdl.write_uint16(key.num_rows)
+                self.mdl.write_uint16(key.timekeys_start)
+                self.mdl.write_uint16(key.values_start)
+                self.mdl.write_uint8(key.num_columns)
 
                 for _ in range(3):
-                    self.mdl.put_uint8(0)  # padding
+                    self.mdl.write_uint8(0)  # padding
 
             # Controller Data
 
             for val in self.controller_data[node_idx]:
-                self.mdl.put_float(val)
+                self.mdl.write_float(val)
 
     def get_node_flags(self, node):
         switch = {
@@ -1677,9 +1677,9 @@ class MdlWriter:
         )
 
     def put_array_def(self, offset, count):
-        self.mdl.put_uint32(offset)
-        self.mdl.put_uint32(count)
-        self.mdl.put_uint32(count)
+        self.mdl.write_uint32(offset)
+        self.mdl.write_uint32(count)
+        self.mdl.write_uint32(count)
 
     def compress_vector_xbox(self, vec):
         x, y, z = vec
