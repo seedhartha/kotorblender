@@ -18,6 +18,8 @@
 
 import bpy
 
+from bpy.props import BoolProperty
+
 from ..constants import MeshType
 from ..scene.modelnode.trimesh import UV_MAP_LIGHTMAP
 from ..scene.material import NodeName
@@ -27,22 +29,34 @@ from ..utils import is_null, is_mesh_type
 class KB_OT_bake_lightmaps(bpy.types.Operator):
     bl_idname = "kb.bake_lightmaps"
     bl_label = "Bake Lightmaps"
+    bl_description = "Bakes lighting and shadows into lightmap textures, optionally hiding non-lightmapped objects from render"
+
+    lightmapped_only: BoolProperty(
+        name="Bake only lightmapped objects and lights", default=True
+    )
 
     def execute(self, context):
         # Find bake targets
-        targets = (
-            context.selected_objects
-            if context.selected_objects
-            else context.collection.objects
-        )
-        targets = [obj for obj in targets if self.is_bake_target(obj)]
+        targets = [
+            obj
+            for obj in (
+                context.selected_objects
+                if context.selected_objects
+                else context.collection.objects
+            )
+            if self.is_bake_target(obj)
+        ]
         if not targets:
             return {"CANCELLED"}
 
-        # Only enable targets and lights for rendering
-        target_names = set([obj.name for obj in targets])
-        for obj in context.collection.objects:
-            obj.hide_render = obj.type != "LIGHT" and not obj.name in target_names
+        # Only bake lightmapped objects and lights, if enabled
+        if self.lightmapped_only:
+            target_names = set([obj.name for obj in targets])
+            for obj in context.collection.objects:
+                obj.hide_render = obj.type != "LIGHT" and not obj.name in target_names
+        else:
+            for target in targets:
+                target.hide_render = False
 
         for obj in targets:
             self.preprocess_target(obj)

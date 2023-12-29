@@ -19,6 +19,15 @@
 from bpy.types import Menu
 
 
+class KB_MT_kotor_lightmaps(Menu):
+    bl_label = "Lightmaps"
+
+    def draw(self, context):
+        layout = self.layout
+        layout.operator("kb.bake_lightmaps", text="Bake").lightmapped_only = False
+        layout.operator("kb.bake_lightmaps", text="Bake lightmapped only")
+
+
 class KB_MT_kotor_showhide(Menu):
     bl_label = "Show/Hide"
 
@@ -45,6 +54,5 @@ class KB_MT_kotor(Menu):
 
     def draw(self, context):
         layout = self.layout
-        layout.operator("kb.bake_lightmaps")
-        layout.separator()
+        layout.menu("KB_MT_kotor_lightmaps")
         layout.menu("KB_MT_kotor_showhide")

@@ -58,7 +58,7 @@ from .ops.rebuildarmature import KB_OT_rebuild_armature
 from .ops.rebuildmaterial import KB_OT_rebuild_material
 from .ui.list.lensflares import KB_UL_lens_flares
 from .ui.list.pathpoints import KB_UL_path_points
-from .ui.menu.kotor import KB_MT_kotor, KB_MT_kotor_showhide
+from .ui.menu.kotor import KB_MT_kotor, KB_MT_kotor_lightmaps, KB_MT_kotor_showhide
 from .ui.panel.animations import KB_PT_animations, KB_PT_anim_events
 from .ui.panel.modelnode.emitter import (
     KB_PT_emitter,
@@ -198,6 +198,7 @@ classes = (
     KB_UL_path_points,
     # Menus
     KB_MT_kotor,
+    KB_MT_kotor_lightmaps,
     KB_MT_kotor_showhide,
 )
 
