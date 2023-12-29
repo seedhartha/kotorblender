@@ -18,22 +18,15 @@
 
 import bpy
 
-from bpy.props import BoolProperty
-
 from ..constants import MeshType
 from ..scene.modelnode.trimesh import UV_MAP_LIGHTMAP
 from ..scene.material import NodeName
 from ..utils import is_null, is_mesh_type
 
 
-class KB_OT_bake_lightmaps(bpy.types.Operator):
-    bl_idname = "kb.bake_lightmaps"
-    bl_label = "Bake Lightmaps"
-    bl_description = "Bakes lighting and shadows into lightmap textures, optionally hiding non-lightmapped objects from render"
-
-    lightmapped_only: BoolProperty(
-        name="Bake only lightmapped objects and lights", default=True
-    )
+class BakeLightmapsOperator(bpy.types.Operator):
+    def _init__(self):
+        self.lightmapped_only = True
 
     def execute(self, context):
         # Find bake targets
@@ -153,3 +146,21 @@ class KB_OT_bake_lightmaps(bpy.types.Operator):
             links.remove(diffuse_bsdf.inputs[0].links[0])
         diffuse_tex = nodes[NodeName.DIFFUSE_TEX]
         links.new(diffuse_bsdf.inputs[0], diffuse_tex.outputs[0])
+
+
+class KB_OT_bake_lightmaps(BakeLightmapsOperator):
+    bl_idname = "kb.bake_lightmaps"
+    bl_label = "Bake Lightmaps"
+    bl_description = "Bakes lighting and shadows into lightmap textures"
+
+    def __init__(self):
+        self.lightmapped_only = False
+
+
+class KB_OT_bake_lightmaps_lm_only(BakeLightmapsOperator):
+    bl_idname = "kb.bake_lightmaps_lm_only"
+    bl_label = "Bake Lightmaps (lightmapped only)"
+    bl_description = "Bakes lighting and shadows into lightmap textures, hiding non-lightmapped objects from render"
+
+    def __init__(self):
+        self.lightmapped_only = True

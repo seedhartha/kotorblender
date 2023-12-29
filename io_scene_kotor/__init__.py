@@ -26,7 +26,7 @@ from .ops.anim.add import KB_OT_add_animation
 from .ops.anim.move import KB_OT_move_animation
 from .ops.anim.play import KB_OT_play_animation
 from .ops.assignnodenumbers import KB_OT_assign_node_numbers
-from .ops.bakelightmaps import KB_OT_bake_lightmaps
+from .ops.bakelightmaps import KB_OT_bake_lightmaps, KB_OT_bake_lightmaps_lm_only
 from .ops.showhideobjects import (
     KB_OT_hide_walkmeshes,
     KB_OT_hide_lights,
@@ -161,6 +161,7 @@ classes = (
     KB_OT_add_path_connection,
     KB_OT_delete_path_connection,
     KB_OT_bake_lightmaps,
+    KB_OT_bake_lightmaps_lm_only,
     KB_OT_hide_walkmeshes,
     KB_OT_hide_lights,
     KB_OT_hide_emitters,
