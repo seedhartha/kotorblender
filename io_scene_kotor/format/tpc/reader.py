@@ -71,7 +71,8 @@ class TpcReader:
         image = self.mip_to_image(mip)
 
         current = self.reader.tell()
-        filesize = self.reader.seek(0, SeekOrigin.END)
+        self.reader.seek(0, SeekOrigin.END)
+        filesize = self.reader.tell()
         if filesize > current:
             self.reader.seek(current)
             image.txi_lines = (
