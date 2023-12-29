@@ -13,7 +13,8 @@ This add-on is a fork of KotorBlender, upgraded to support newer versions of Ble
 1. Clone this repository or download the latest release of KotorBlender from [Deadly Stream](https://deadlystream.com/files/file/1853-kotorblender-for-blender-293/)
 1. If you have cloned the repository, create a ZIP archive containing the **io_scene_kotor** directory
 1. From Edit → Preferences → Add-ons in Blender, install the add-on from the ZIP archive and enable it by ticking a box next to "Import-Export: KotorBlender"
-1. Alternatively, if you want to contribute to KotorBlender, you may want to create a symbolic link to the local repository in the Blender add-ons directory, typically located at `C:/Users/{user}/AppData/Roaming/Blender Foundation/Blender/{version}/scripts/addons`.
+1. Alternatively, if you want to contribute to KotorBlender, you may want to create a symbolic link to the local repository in the Blender add-ons directory, typically located at `C:/Users/{user}/AppData/Roaming/Blender Foundation/Blender/{version}/scripts/addons`:
+  1. `mklink /D io_scene_kotor {repo}/io_scene_kotor`
 
 ## Usage
 
@@ -42,6 +43,7 @@ If you plan to edit textures, batch-convert TPC to TGA / TXI files using **reone
 UV mapping:
 
 1. Select objects having the same lightmap texture and enter Edit mode
+1. For every object, ensure that `UVMap_lm` UV layer is active
 1. Select all faces and unwrap UVs via UV → Lightmap Pack, increase Margin to avoid face overlapping
 
 Fine-tuning:
