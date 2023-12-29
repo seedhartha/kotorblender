@@ -57,7 +57,7 @@ class KB_OT_bake_lightmaps(bpy.types.Operator):
         # context.scene.cycles.device = "GPU"
         if context.scene.cycles.samples > 512:
             context.scene.cycles.samples = 4
-        bpy.ops.object.bake(margin=2, use_clear=True, uv_layer=UV_MAP_LIGHTMAP)
+        bpy.ops.object.bake(margin=2, uv_layer=UV_MAP_LIGHTMAP)
 
         for obj in targets:
             self.postprocess_target(obj)
