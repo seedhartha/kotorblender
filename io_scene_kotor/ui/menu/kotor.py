@@ -24,8 +24,8 @@ class KB_MT_kotor_lightmaps(Menu):
 
     def draw(self, context):
         layout = self.layout
-        layout.operator("kb.bake_lightmaps", text="Bake")
-        layout.operator("kb.bake_lightmaps_lm_only", text="Bake lightmapped only")
+        layout.operator("kb.bake_lightmaps_auto", text="Bake (auto)")
+        layout.operator("kb.bake_lightmaps_manual", text="Bake (manual)")
 
 
 class KB_MT_kotor_showhide(Menu):

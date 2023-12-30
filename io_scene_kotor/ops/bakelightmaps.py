@@ -26,7 +26,7 @@ from ..utils import is_null, is_mesh_type
 
 class BakeLightmapsOperator(bpy.types.Operator):
     def _init__(self):
-        self.lightmapped_only = True
+        self.hide_non_lightmapped = True
 
     def execute(self, context):
         # Find bake targets
@@ -43,13 +43,10 @@ class BakeLightmapsOperator(bpy.types.Operator):
             return {"CANCELLED"}
 
         # Only bake lightmapped objects and lights, if enabled
-        if self.lightmapped_only:
+        if self.hide_non_lightmapped:
             target_names = set([obj.name for obj in targets])
             for obj in context.collection.objects:
                 obj.hide_render = obj.type != "LIGHT" and not obj.name in target_names
-        else:
-            for target in targets:
-                target.hide_render = False
 
         for obj in targets:
             self.preprocess_target(obj)
@@ -148,19 +145,19 @@ class BakeLightmapsOperator(bpy.types.Operator):
         links.new(diffuse_bsdf.inputs[0], diffuse_tex.outputs[0])
 
 
-class KB_OT_bake_lightmaps(BakeLightmapsOperator):
-    bl_idname = "kb.bake_lightmaps"
-    bl_label = "Bake Lightmaps"
-    bl_description = "Bakes lighting and shadows into lightmap textures"
+class KB_OT_bake_lightmaps_auto(BakeLightmapsOperator):
+    bl_idname = "kb.bake_lightmaps_auto"
+    bl_label = "Bake Lightmaps (auto)"
+    bl_description = "Bake lighting and shadows into lightmap textures, hiding non-lightmapped objects from render"
 
     def __init__(self):
-        self.lightmapped_only = False
+        self.hide_non_lightmapped = True
 
 
-class KB_OT_bake_lightmaps_lm_only(BakeLightmapsOperator):
-    bl_idname = "kb.bake_lightmaps_lm_only"
-    bl_label = "Bake Lightmaps (lightmapped only)"
-    bl_description = "Bakes lighting and shadows into lightmap textures, hiding non-lightmapped objects from render"
+class KB_OT_bake_lightmaps_manual(BakeLightmapsOperator):
+    bl_idname = "kb.bake_lightmaps_manual"
+    bl_label = "Bake Lightmaps (manual)"
+    bl_description = "Bake lighting and shadows into lightmap textures, user is responsible for setting object visibility"
 
     def __init__(self):
-        self.lightmapped_only = True
+        self.hide_non_lightmapped = False

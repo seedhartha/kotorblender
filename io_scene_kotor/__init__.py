@@ -28,7 +28,10 @@ from .ops.anim.play import KB_OT_play_animation
 from .ops.armatureapplykeyframes import KB_OT_armature_apply_keyframes
 from .ops.armatureunapplykeyframes import KB_OT_armature_unapply_keyframes
 from .ops.assignnodenumbers import KB_OT_assign_node_numbers
-from .ops.bakelightmaps import KB_OT_bake_lightmaps, KB_OT_bake_lightmaps_lm_only
+from .ops.bakelightmaps import (
+    KB_OT_bake_lightmaps_auto,
+    KB_OT_bake_lightmaps_manual,
+)
 from .ops.lensflare.add import KB_OT_add_lens_flare
 from .ops.lensflare.delete import KB_OT_delete_lens_flare
 from .ops.lensflare.move import KB_OT_move_lens_flare
@@ -150,8 +153,8 @@ classes = (
     KB_OT_armature_apply_keyframes,
     KB_OT_armature_unapply_keyframes,
     KB_OT_assign_node_numbers,
-    KB_OT_bake_lightmaps_lm_only,
-    KB_OT_bake_lightmaps,
+    KB_OT_bake_lightmaps_auto,
+    KB_OT_bake_lightmaps_manual,
     KB_OT_delete_anim_event,
     KB_OT_delete_animation,
     KB_OT_delete_lens_flare,
