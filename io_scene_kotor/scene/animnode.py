@@ -21,80 +21,95 @@ import bpy
 from ..constants import NodeType, ANIM_REST_POSE_OFFSET
 from ..utils import time_to_frame, frame_to_time
 
-DATA_PATH_BY_LABEL = {
-    "position": "location",
-    "orientation": "rotation_quaternion",
-    "scale": "scale",
+
+class Property:
+    def __init__(
+        self, label, data_path, bl_dim, mdl_to_bl_cvt=None, bl_to_mdl_cvt=None
+    ):
+        self.label = label
+        self.data_path = data_path
+        self.bl_dim = bl_dim
+        self.mdl_to_bl_cvt = mdl_to_bl_cvt
+        self.bl_to_mdl_cvt = bl_to_mdl_cvt
+
+
+PROPERTIES = [
+    Property(
+        "position",
+        "location",
+        3,
+        mdl_to_bl_cvt=lambda val, restloc, animscale: [
+            restloc[i] + animscale * val[i] for i in range(3)
+        ],
+        bl_to_mdl_cvt=lambda val, restloc: [val[i] - restloc[i] for i in range(3)],
+    ),
+    Property("orientation", "rotation_quaternion", 4),
+    Property(
+        "scale",
+        "scale",
+        3,
+        mdl_to_bl_cvt=lambda val, restloc: [val[0], val[0], val[0]],
+        bl_to_mdl_cvt=lambda val, restloc: [val[0]],
+    ),
     # Meshes
-    "alpha": "kb.alpha",
-    "selfillumcolor": "kb.selfillumcolor",
+    Property("alpha", "kb.alpha", 1),
+    Property("selfillumcolor", "kb.selfillumcolor", 3),
     # Lights
-    "color": "color",
-    "radius": "kb.radius",
-    "multiplier": "kb.multiplier",
+    Property("color", "color", 3),
+    Property("radius", "kb.radius", 1),
+    Property("multiplier", "kb.multiplier", 1),
     # Emitters
-    "alphastart": "kb.alphastart",
-    "alphamid": "kb.alphamid",
-    "alphaend": "kb.alphaend",
-    "birthrate": "kb.birthrate",
-    "randombirthrate": "kb.randombirthrate",
-    "bounce_co": "kb.bounce_co",
-    "combinetime": "kb.combinetime",
-    "drag": "kb.drag",
-    "fps": "kb.fps",
-    "frameend": "kb.frameend",
-    "framestart": "kb.framestart",
-    "grav": "kb.grav",
-    "lifeexp": "kb.lifeexp",
-    "mass": "kb.mass",
-    "p2p_bezier2": "kb.p2p_bezier2",
-    "p2p_bezier3": "kb.p2p_bezier3",
-    "particlerot": "kb.particlerot",
-    "randvel": "kb.randvel",
-    "sizestart": "kb.sizestart",
-    "sizemid": "kb.sizemid",
-    "sizeend": "kb.sizeend",
-    "sizestart_y": "kb.sizestart_y",
-    "sizemid_y": "kb.sizemid_y",
-    "sizeend_y": "kb.sizeend_y",
-    "spread": "kb.spread",
-    "threshold": "kb.threshold",
-    "velocity": "kb.velocity",
-    "xsize": "kb.xsize",
-    "ysize": "kb.ysize",
-    "blurlength": "kb.blurlength",
-    "lightningdelay": "kb.lightningdelay",
-    "lightningradius": "kb.lightningradius",
-    "lightningsubdiv": "kb.lightningsubdiv",
-    "lightningscale": "kb.lightningscale",
-    "lightningzigzag": "kb.lightningzigzag",
-    "percentstart": "kb.percentstart",
-    "percentmid": "kb.percentmid",
-    "percentend": "kb.percentend",
-    "targetsize": "kb.targetsize",
-    "numcontrolpts": "kb.numcontrolpts",
-    "controlptradius": "kb.controlptradius",
-    "controlptdelay": "kb.controlptdelay",
-    "tangentspread": "kb.tangentspread",
-    "tangentlength": "kb.tangentlength",
-    "colorstart": "kb.colorstart",
-    "colormid": "kb.colormid",
-    "colorend": "kb.colorend",
-}
+    Property("alphastart", "kb.alphastart", 1),
+    Property("alphamid", "kb.alphamid", 1),
+    Property("alphaend", "kb.alphaend", 1),
+    Property("birthrate", "kb.birthrate", 1),
+    Property("randombirthrate", "kb.randombirthrate", 1),
+    Property("bounce_co", "kb.bounce_co", 1),
+    Property("combinetime", "kb.combinetime", 1),
+    Property("drag", "kb.drag", 1),
+    Property("fps", "kb.fps", 1),
+    Property("frameend", "kb.frameend", 1),
+    Property("framestart", "kb.framestart", 1),
+    Property("grav", "kb.grav", 1),
+    Property("lifeexp", "kb.lifeexp", 1),
+    Property("mass", "kb.mass", 1),
+    Property("p2p_bezier2", "kb.p2p_bezier2", 1),
+    Property("p2p_bezier3", "kb.p2p_bezier3", 1),
+    Property("particlerot", "kb.particlerot", 1),
+    Property("randvel", "kb.randvel", 1),
+    Property("sizestart", "kb.sizestart", 1),
+    Property("sizemid", "kb.sizemid", 1),
+    Property("sizeend", "kb.sizeend", 1),
+    Property("sizestart_y", "kb.sizestart_y", 1),
+    Property("sizemid_y", "kb.sizemid_y", 1),
+    Property("sizeend_y", "kb.sizeend_y", 1),
+    Property("spread", "kb.spread", 1),
+    Property("threshold", "kb.threshold", 1),
+    Property("velocity", "kb.velocity", 1),
+    Property("xsize", "kb.xsize", 1),
+    Property("ysize", "kb.ysize", 1),
+    Property("blurlength", "kb.blurlength", 1),
+    Property("lightningdelay", "kb.lightningdelay", 1),
+    Property("lightningradius", "kb.lightningradius", 1),
+    Property("lightningsubdiv", "kb.lightningsubdiv", 1),
+    Property("lightningscale", "kb.lightningscale", 1),
+    Property("lightningzigzag", "kb.lightningzigzag", 1),
+    Property("percentstart", "kb.percentstart", 1),
+    Property("percentmid", "kb.percentmid", 1),
+    Property("percentend", "kb.percentend", 1),
+    Property("targetsize", "kb.targetsize", 1),
+    Property("numcontrolpts", "kb.numcontrolpts", 1),
+    Property("controlptradius", "kb.controlptradius", 1),
+    Property("controlptdelay", "kb.controlptdelay", 1),
+    Property("tangentspread", "kb.tangentspread", 1),
+    Property("tangentlength", "kb.tangentlength", 1),
+    Property("colorstart", "kb.colorstart", 3),
+    Property("colormid", "kb.colormid", 3),
+    Property("colorend", "kb.colorend", 3),
+]
 
-LABEL_BY_DATA_PATH = {value: key for key, value in DATA_PATH_BY_LABEL.items()}
-
-CONVERTER_BY_LABEL = {
-    "position": lambda val, obj, animscale: [
-        obj.location[i] + animscale * val[i] for i in range(3)
-    ],
-    "scale": lambda val, obj, animscale: [val[0], val[0], val[0]],
-}
-
-CONVERTER_BY_DATA_PATH = {
-    "location": lambda val, obj: [val[i] - obj.location[i] for i in range(3)],
-    "scale": lambda val, obj: [val[0]],
-}
+LABEL_TO_PROPERTY = {prop.label: prop for prop in PROPERTIES}
+DATA_PATH_TO_PROPERTY = {prop.data_path: prop for prop in PROPERTIES}
 
 
 class AnimationNode:
@@ -110,65 +125,61 @@ class AnimationNode:
 
     def add_keyframes_to_object(self, anim, obj, root_name, animscale):
         for label, data in self.keyframes.items():
-            if label not in DATA_PATH_BY_LABEL or not data:
+            if not data or not label in LABEL_TO_PROPERTY:
                 continue
-
-            # Action, Animation Data
+            prop = LABEL_TO_PROPERTY[label]
 
             if obj.type == "LIGHT" and label == "color":
-                target = obj.data
+                anim_subject = obj.data
                 action_name = "{}.{}.data".format(root_name, obj.name)
             else:
-                target = obj
+                anim_subject = obj
                 action_name = "{}.{}".format(root_name, obj.name)
 
+            anim_data = self.get_or_create_animation_data(anim_subject)
             action = self.get_or_create_action(action_name)
-            self.get_or_create_animation_data(target, action)
+            if not anim_data.action:
+                anim_data.action = action
 
-            # Convert keyframes to frames/values
-
-            frames = [anim.frame_start + time_to_frame(d[0]) for d in data]
-
-            if label in CONVERTER_BY_LABEL:
-                converter = CONVERTER_BY_LABEL[label]
-                values = [converter(d[1:], obj, animscale) for d in data]
-            else:
-                values = [d[1:] for d in data]
-
-            dim = len(values[0])
-
-            # Keyframe Points
-
-            data_path = DATA_PATH_BY_LABEL[label]
+            data_path = prop.data_path
             fcurves = [
-                self.get_or_create_fcurve(action, data_path, i) for i in range(dim)
+                self.get_or_create_fcurve(action, data_path, i)
+                for i in range(prop.bl_dim)
             ]
             keyframe_points = [fcurve.keyframe_points for fcurve in fcurves]
 
-            # Rest Pose Keyframes
+            # Add rest pose keyframes
 
             if data_path.startswith("kb."):
-                rest_values = getattr(target.kb, data_path[3:])
+                rest_values = getattr(anim_subject.kb, data_path[3:])
             else:
-                rest_values = getattr(target, data_path)
-            rest_frame = anim.frame_start - ANIM_REST_POSE_OFFSET
-            if dim == 1:
-                keyframe = keyframe_points[0].insert(
-                    rest_frame, rest_values, options={"FAST"}
-                )
-                keyframe.interpolation = "CONSTANT"
+                rest_values = getattr(anim_subject, data_path)
+            if hasattr(rest_values, "__len__"):
+                rest_dim = len(rest_values)
             else:
-                for i in range(dim):
+                rest_dim = 1
+                rest_values = [rest_values]
+            left_rest_frame = anim.frame_start - ANIM_REST_POSE_OFFSET
+            right_rest_frame = anim.frame_end + ANIM_REST_POSE_OFFSET
+            for frame in [left_rest_frame, right_rest_frame]:
+                for i in range(rest_dim):
                     keyframe = keyframe_points[i].insert(
-                        rest_frame, rest_values[i], options={"FAST"}
+                        frame, rest_values[i], options={"FAST"}
                     )
                     keyframe.interpolation = "CONSTANT"
 
-            # Animation Keyframes
+            # Add animation keyframes
 
-            last_keyframes = [None] * dim
+            frames = [anim.frame_start + time_to_frame(d[0]) for d in data]
+            if prop.mdl_to_bl_cvt:
+                values = [
+                    prop.mdl_to_bl_cvt(d[1:], obj.location, animscale) for d in data
+                ]
+            else:
+                values = [d[1:] for d in data]
+            last_keyframes = [None] * prop.bl_dim
             for frame, val in zip(frames, values):
-                for i in range(dim):
+                for i in range(prop.bl_dim):
                     keyframe = keyframe_points[i].insert(
                         frame, val[i], options={"FAST"}
                     )
@@ -185,12 +196,11 @@ class AnimationNode:
         else:
             return bpy.data.actions.new(name=name)
 
-    def get_or_create_animation_data(self, target, action):
-        anim_data = target.animation_data
-        if not anim_data:
-            anim_data = target.animation_data_create()
-            anim_data.action = action
-        return anim_data
+    def get_or_create_animation_data(self, subject):
+        if subject.animation_data:
+            return subject.animation_data
+        else:
+            return subject.animation_data_create()
 
     def get_or_create_fcurve(self, action, data_path, index):
         fcurve = action.fcurves.find(data_path, index=index)
@@ -198,8 +208,8 @@ class AnimationNode:
             fcurve = action.fcurves.new(data_path=data_path, index=index)
         return fcurve
 
-    def load_keyframes_from_object(self, anim, target):
-        anim_data = target.animation_data
+    def load_keyframes_from_object(self, anim, anim_subject):
+        anim_data = anim_subject.animation_data
         if not anim_data:
             return
 
@@ -213,20 +223,24 @@ class AnimationNode:
         flat_keyframes = self.flatten_keyframes(keyframes)
 
         for data_path, dp_keyframes in flat_keyframes.items():
-            if data_path not in LABEL_BY_DATA_PATH:
+            if not data_path in DATA_PATH_TO_PROPERTY:
                 continue
-
-            label = LABEL_BY_DATA_PATH[data_path]
+            prop = DATA_PATH_TO_PROPERTY[data_path]
+            label = prop.label
             self.keyframes[label] = []
 
             for point in dp_keyframes:
-                timekey = frame_to_time(point[0] - anim.frame_start)
-                if data_path in CONVERTER_BY_DATA_PATH:
-                    converter = CONVERTER_BY_DATA_PATH[data_path]
-                    values = converter(point[1:], target)
+                time = frame_to_time(point[0] - anim.frame_start)
+                if prop.bl_to_mdl_cvt:
+                    restloc = (
+                        anim_subject.location
+                        if hasattr(anim_subject, "location")
+                        else [0.0] * 3
+                    )
+                    values = prop.bl_to_mdl_cvt(point[1:], restloc)
                 else:
                     values = point[1:]
-                self.keyframes[label].append([timekey] + values)
+                self.keyframes[label].append([time] + values)
 
     @classmethod
     def get_keyframes_in_range(cls, action, start, end):

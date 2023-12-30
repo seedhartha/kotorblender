@@ -18,12 +18,8 @@
 
 NULL = "NULL"
 
-# Number of frames to the left of animation, where to create a rest pose
 ANIM_REST_POSE_OFFSET = 5
-
-# Number of frames between two consecutive animations
 ANIM_PADDING = 60
-
 ANIM_FPS = 30
 
 WOK_MATERIALS = [
