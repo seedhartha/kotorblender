@@ -35,16 +35,18 @@ class KB_MT_kotor_showhide(Menu):
         layout = self.layout
 
         layout.operator("kb.show_walkmeshes", icon="MESH_CUBE")
+        layout.operator("kb.show_untextured", icon="IMAGE_RGB")
+        layout.operator("kb.show_unlightmapped", icon="IMAGE_ALPHA")
         layout.operator("kb.show_lights", icon="OUTLINER_OB_LIGHT")
         layout.operator("kb.show_emitters", icon="PARTICLES")
-        layout.operator("kb.show_blockers", icon="MESH_PLANE")
         layout.operator("kb.show_char_bones", icon="BONE_DATA")
         layout.operator("kb.show_char_dummies", icon="OUTLINER_OB_EMPTY")
         layout.separator()
         layout.operator("kb.hide_walkmeshes", icon="MESH_CUBE")
+        layout.operator("kb.hide_untextured", icon="IMAGE_RGB")
+        layout.operator("kb.hide_unlightmapped", icon="IMAGE_ALPHA")
         layout.operator("kb.hide_lights", icon="OUTLINER_OB_LIGHT")
         layout.operator("kb.hide_emitters", icon="PARTICLES")
-        layout.operator("kb.hide_blockers", icon="MESH_PLANE")
         layout.operator("kb.hide_char_bones", icon="BONE_DATA")
         layout.operator("kb.hide_char_dummies", icon="OUTLINER_OB_EMPTY")
 

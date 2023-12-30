@@ -21,10 +21,10 @@ import bpy
 from ..constants import MeshType
 from ..utils import (
     is_null,
+    is_not_null,
     is_char_dummy,
     is_char_bone,
     is_mesh_type,
-    is_skin_mesh,
     is_walkmesh,
 )
 
@@ -35,12 +35,48 @@ class KB_OT_hide_walkmeshes(bpy.types.Operator):
     bl_description = "Hides all walkmeshes in the scene"
 
     def execute(self, context):
-        # Deselect everything in the scene first.
         bpy.ops.object.select_all(action="DESELECT")
 
-        # Loop through every object in the scene and hide it if it's a walkmesh.
         for obj in bpy.context.scene.objects:
             if is_walkmesh(obj):
+                obj.hide_viewport = True
+                obj.hide_render = True
+
+        return {"FINISHED"}
+
+
+class KB_OT_hide_untextured(bpy.types.Operator):
+    bl_idname = "kb.hide_untextured"
+    bl_label = "Hide Untextured"
+    bl_description = "Hides all untextured trimeshes in the scene"
+
+    def execute(self, context):
+        bpy.ops.object.select_all(action="DESELECT")
+
+        for obj in bpy.context.scene.objects:
+            if (
+                is_mesh_type(obj, MeshType.TRIMESH)
+                and is_null(obj.kb.bitmap)
+                and is_null(obj.kb.bitmap2)
+            ):
+                obj.hide_viewport = True
+                obj.hide_render = True
+
+        return {"FINISHED"}
+
+
+class KB_OT_hide_unlightmapped(bpy.types.Operator):
+    bl_idname = "kb.hide_unlightmapped"
+    bl_label = "Hide Unlightmapped"
+    bl_description = "Hides all unlightmapped meshes in the scene"
+
+    def execute(self, context):
+        bpy.ops.object.select_all(action="DESELECT")
+
+        for obj in bpy.context.scene.objects:
+            if obj.type == "MESH" and (
+                not obj.kb.lightmapped or is_null(obj.kb.bitmap2)
+            ):
                 obj.hide_viewport = True
                 obj.hide_render = True
 
@@ -53,10 +89,8 @@ class KB_OT_hide_lights(bpy.types.Operator):
     bl_description = "Hides all lights in the scene"
 
     def execute(self, context):
-        # Deselect everything in the scene first.
         bpy.ops.object.select_all(action="DESELECT")
 
-        # Loop through every object in the scene and hide it if it's a light.
         for obj in bpy.context.scene.objects:
             if obj.type == "LIGHT":
                 obj.hide_viewport = True
@@ -71,37 +105,12 @@ class KB_OT_hide_emitters(bpy.types.Operator):
     bl_description = "Hides all emitters in the scene"
 
     def execute(self, context):
-        # Deselect everything in the scene first.
         bpy.ops.object.select_all(action="DESELECT")
 
-        # Loop through every object in the scene and hide it if it's an emitter.
         for obj in bpy.context.scene.objects:
             if is_mesh_type(obj, MeshType.EMITTER):
                 obj.hide_viewport = True
                 obj.hide_render = True
-
-        return {"FINISHED"}
-
-
-class KB_OT_hide_blockers(bpy.types.Operator):
-    bl_idname = "kb.hide_blockers"
-    bl_label = "Hide Blockers"
-    bl_description = "Hides all untextured blocker trimeshes in the scene"
-
-    def execute(self, context):
-        # Deselect everything in the scene first.
-        bpy.ops.object.select_all(action="DESELECT")
-
-        # Loop through every object in the scene and hide it if it's an untextured trimesh.
-        for obj in bpy.context.scene.objects:
-            if (
-                is_mesh_type(obj, MeshType.TRIMESH)
-                and not is_skin_mesh(obj)
-                and obj.kb.render == 1
-            ):
-                if is_null(obj.kb.bitmap) and is_null(obj.kb.bitmap2):
-                    obj.hide_viewport = True
-                    obj.hide_render = True
 
         return {"FINISHED"}
 
@@ -112,10 +121,8 @@ class KB_OT_hide_char_bones(bpy.types.Operator):
     bl_description = "Hides all humanoid rig bones in the scene"
 
     def execute(self, context):
-        # Deselect everything in the scene first.
         bpy.ops.object.select_all(action="DESELECT")
 
-        # Loop through every object in the scene and hide it if it's a bone matching the name of those in a character rig.
         for obj in bpy.context.scene.objects:
             if is_char_bone(obj):
                 obj.hide_viewport = True
@@ -130,10 +137,8 @@ class KB_OT_hide_char_dummies(bpy.types.Operator):
     bl_description = "Hides all humanoid rig dummy/null objects in the scene"
 
     def execute(self, context):
-        # Deselect everything in the scene first.
         bpy.ops.object.select_all(action="DESELECT")
 
-        # Loop through every object in the scene and hide it if it's a dummy/null matching the name of those in a character rig.
         for obj in bpy.context.scene.objects:
             if is_char_dummy(obj):
                 obj.hide_viewport = True
@@ -145,15 +150,51 @@ class KB_OT_hide_char_dummies(bpy.types.Operator):
 class KB_OT_show_walkmeshes(bpy.types.Operator):
     bl_idname = "kb.show_walkmeshes"
     bl_label = "Show Walkmeshes"
-    bl_description = "Unhides all walkmeshes in the scene"
+    bl_description = "Reveals all walkmeshes in the scene"
 
     def execute(self, context):
-        # Deselect everything in the scene first.
         bpy.ops.object.select_all(action="DESELECT")
 
-        # Loop through every object in the scene and unhide it if it's a walkmesh.
         for obj in bpy.context.scene.objects:
             if is_walkmesh(obj):
+                obj.hide_viewport = False
+                obj.hide_render = False
+
+        return {"FINISHED"}
+
+
+class KB_OT_show_untextured(bpy.types.Operator):
+    bl_idname = "kb.show_untextured"
+    bl_label = "Show Untextured"
+    bl_description = "Reveals all untextured trimeshes in the scene"
+
+    def execute(self, context):
+        bpy.ops.object.select_all(action="DESELECT")
+
+        for obj in bpy.context.scene.objects:
+            if (
+                is_mesh_type(obj, MeshType.TRIMESH)
+                and is_null(obj.kb.bitmap)
+                and is_null(obj.kb.bitmap2)
+            ):
+                obj.hide_viewport = False
+                obj.hide_render = False
+
+        return {"FINISHED"}
+
+
+class KB_OT_show_unlightmapped(bpy.types.Operator):
+    bl_idname = "kb.show_unlightmapped"
+    bl_label = "Show Unlightmapped"
+    bl_description = "Reveals all unlightmapped meshes in the scene"
+
+    def execute(self, context):
+        bpy.ops.object.select_all(action="DESELECT")
+
+        for obj in bpy.context.scene.objects:
+            if obj.type == "MESH" and (
+                not obj.kb.lightmapped or is_null(obj.kb.bitmap2)
+            ):
                 obj.hide_viewport = False
                 obj.hide_render = False
 
@@ -163,13 +204,11 @@ class KB_OT_show_walkmeshes(bpy.types.Operator):
 class KB_OT_show_lights(bpy.types.Operator):
     bl_idname = "kb.show_lights"
     bl_label = "Show Lights"
-    bl_description = "Unhides all lights in the scene"
+    bl_description = "Reveals all lights in the scene"
 
     def execute(self, context):
-        # Deselect everything in the scene first.
         bpy.ops.object.select_all(action="DESELECT")
 
-        # Loop through every object in the scene and unhide it if it's a light.
         for obj in bpy.context.scene.objects:
             if obj.type == "LIGHT":
                 obj.hide_viewport = False
@@ -181,13 +220,11 @@ class KB_OT_show_lights(bpy.types.Operator):
 class KB_OT_show_emitters(bpy.types.Operator):
     bl_idname = "kb.show_emitters"
     bl_label = "Show Emitters"
-    bl_description = "Unhides all emitters in the scene"
+    bl_description = "Reveals all emitters in the scene"
 
     def execute(self, context):
-        # Deselect everything in the scene first.
         bpy.ops.object.select_all(action="DESELECT")
 
-        # Loop through every object in the scene and unhide it if it's an emitter.
         for obj in bpy.context.scene.objects:
             if is_mesh_type(obj, MeshType.EMITTER):
                 obj.hide_viewport = False
@@ -196,39 +233,14 @@ class KB_OT_show_emitters(bpy.types.Operator):
         return {"FINISHED"}
 
 
-class KB_OT_show_blockers(bpy.types.Operator):
-    bl_idname = "kb.show_blockers"
-    bl_label = "Show Blockers"
-    bl_description = "Unhides all untextured blocker trimeshes in the scene"
-
-    def execute(self, context):
-        # Deselect everything in the scene first.
-        bpy.ops.object.select_all(action="DESELECT")
-
-        # Loop through every object in the scene and unhide it if it's an untextured trimesh.
-        for obj in bpy.context.scene.objects:
-            if (
-                is_mesh_type(obj, MeshType.TRIMESH)
-                and not is_skin_mesh(obj)
-                and obj.kb.render == 1
-            ):
-                if is_null(obj.kb.bitmap) and is_null(obj.kb.bitmap2):
-                    obj.hide_viewport = False
-                    obj.hide_render = False
-
-        return {"FINISHED"}
-
-
 class KB_OT_show_char_bones(bpy.types.Operator):
     bl_idname = "kb.show_char_bones"
     bl_label = "Show Character Bones"
-    bl_description = "Unhides all humanoid rig bones in the scene"
+    bl_description = "Reveals all humanoid rig bones in the scene"
 
     def execute(self, context):
-        # Deselect everything in the scene first.
         bpy.ops.object.select_all(action="DESELECT")
 
-        # Loop through every object in the scene and unhide it if it's a bone matching the name of those in a character rig.
         for obj in bpy.context.scene.objects:
             if is_char_bone(obj):
                 obj.hide_viewport = False
@@ -240,13 +252,11 @@ class KB_OT_show_char_bones(bpy.types.Operator):
 class KB_OT_show_char_dummies(bpy.types.Operator):
     bl_idname = "kb.show_char_dummies"
     bl_label = "Show Character Dummies"
-    bl_description = "Unhides all humanoid rig dummy/null objects in the scene"
+    bl_description = "Reveals all humanoid rig dummy/null objects in the scene"
 
     def execute(self, context):
-        # Deselect everything in the scene first.
         bpy.ops.object.select_all(action="DESELECT")
 
-        # Loop through every object in the scene and unhide it if it's a dummy/null matching the name of those in a character rig.
         for obj in bpy.context.scene.objects:
             if is_char_dummy(obj):
                 obj.hide_viewport = False
