@@ -18,6 +18,7 @@
 
 import bpy
 
+from ..constants import Classification
 from ..scene import armature
 from ..utils import is_mdl_root
 
@@ -25,10 +26,14 @@ from ..utils import is_mdl_root
 class KB_OT_rebuild_armature(bpy.types.Operator):
     bl_idname = "kb.rebuild_armature"
     bl_label = "Rebuild Armature"
+    bl_description = "Create an armature from bone objects and copy keyframes into it"
 
     @classmethod
     def poll(cls, context):
-        return is_mdl_root(context.object)
+        return (
+            is_mdl_root(context.object)
+            and context.object.kb.classification == Classification.CHARACTER
+        )
 
     def execute(self, context):
         armature.rebuild_armature(context.object)

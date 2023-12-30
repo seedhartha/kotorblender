@@ -20,6 +20,7 @@ import os
 
 import bpy
 
+from ..constants import ANIM_FPS
 from ..format.bwm.reader import BwmReader
 from ..format.bwm.writer import BwmWriter
 from ..format.mdl.reader import MdlReader
@@ -84,6 +85,8 @@ def load_mdl(operator, filepath, options, position=(0.0, 0.0, 0.0)):
         dwk_walkmesh1.import_to_collection(model_root, collection, options)
         dwk_walkmesh2.import_to_collection(model_root, collection, options)
         dwk_walkmesh3.import_to_collection(model_root, collection, options)
+
+    bpy.context.scene.render.fps = ANIM_FPS
 
     # Reset Pose
     bpy.context.scene.frame_set(0)

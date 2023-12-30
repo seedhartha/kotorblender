@@ -18,15 +18,18 @@
 
 import bpy
 
-from mathutils import Matrix, Quaternion, Vector
+from mathutils import Quaternion, Vector
 
-from ..constants import DummyType, MeshType, ANIM_REST_POSE_OFFSET
+from ..constants import Classification, DummyType, MeshType, ANIM_REST_POSE_OFFSET
 from ..utils import find_objects, is_skin_mesh
 
 from .animnode import AnimationNode
 
 
 def rebuild_armature(mdl_root):
+    if mdl_root.kb.classification != Classification.CHARACTER:
+        return
+
     # Reset Pose
     bpy.context.scene.frame_set(0)
 
