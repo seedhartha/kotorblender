@@ -20,21 +20,39 @@ import bpy
 
 from ..constants import Classification
 from ..scene import armature
-from ..utils import is_mdl_root
+from ..utils import is_mdl_root, is_skin_mesh, find_objects
 
 
-class KB_OT_rebuild_armature(bpy.types.Operator):
-    bl_idname = "kb.rebuild_armature"
-    bl_label = "Rebuild Armature"
-    bl_description = "Rebuild an armature from bone objects"
+class KB_OT_armature_unapply_keyframes(bpy.types.Operator):
+    bl_idname = "kb.armature_unapply_keyframes"
+    bl_label = "Unapply Object Keyframes"
+    bl_description = "Recreate bone object keyframes from armature"
 
     @classmethod
     def poll(cls, context):
         return (
             is_mdl_root(context.object)
             and context.object.kb.classification == Classification.CHARACTER
+            and find_objects(
+                context.object,
+                lambda obj: is_skin_mesh(obj)
+                and any(mod.type == "ARMATURE" for mod in obj.modifiers),
+            )
         )
 
     def execute(self, context):
-        armature.rebuild_armature(context.object)
+        stack = [context.object]
+        while stack:
+            obj = stack.pop()
+            if is_skin_mesh(obj):
+                armature_mod = next(
+                    iter(mod for mod in obj.modifiers if mod.type == "ARMATURE")
+                )
+                armature_obj = armature_mod.object
+                if not armature_obj:
+                    return {"CANCELLED"}
+                armature.unapply_object_keyframes(context.object, armature_obj)
+                break
+            for child in obj.children:
+                stack.insert(0, child)
         return {"FINISHED"}

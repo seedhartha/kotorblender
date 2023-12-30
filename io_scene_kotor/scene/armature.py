@@ -16,22 +16,21 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+import sys
+
 import bpy
 
 from mathutils import Quaternion, Vector
 
-from ..constants import Classification, DummyType, MeshType, ANIM_REST_POSE_OFFSET
-from ..utils import find_objects, is_skin_mesh
+from ..constants import Classification, DummyType, MeshType
+from ..utils import find_objects, is_skin_mesh, is_char_bone, is_char_dummy
 
 from .animnode import AnimationNode
 
 
 def rebuild_armature(mdl_root):
     if mdl_root.kb.classification != Classification.CHARACTER:
-        return
-
-    # Reset Pose
-    bpy.context.scene.frame_set(0)
+        return None
 
     # MDL root must have at least one skinmesh
     skinmeshes = find_objects(mdl_root, is_skin_mesh)
@@ -53,46 +52,62 @@ def rebuild_armature(mdl_root):
     armature_obj = bpy.data.objects.new(name, armature)
     armature_obj.show_in_front = True
     bpy.context.collection.objects.link(armature_obj)
-    bpy.context.view_layer.objects.active = armature_obj
 
     # Create armature bones
+    bpy.context.scene.frame_set(0)
+    bpy.context.view_layer.objects.active = armature_obj
     bpy.ops.object.mode_set(mode="EDIT")
     create_armature_bones(armature, mdl_root)
     bpy.ops.object.mode_set(mode="OBJECT")
 
-    # Copy object keyframes to armature
-    bpy.ops.object.mode_set(mode="POSE")
-    copy_object_keyframes_to_armature(mdl_root, armature_obj)
-    bpy.ops.object.mode_set(mode="OBJECT")
-
     # Add Armature modifier to all skinmeshes
     for mesh in skinmeshes:
-        modifier = mesh.modifiers.new(name="Armature", type="ARMATURE")
+        modifier = None
+        for mod in mesh.modifiers:
+            if mod.type == "ARMATURE":
+                modifier = mod
+                break
+        if not modifier:
+            modifier = mesh.modifiers.new(name="Armature", type="ARMATURE")
         modifier.object = armature_obj
 
     bpy.context.view_layer.objects.active = mdl_root
-
-    # Reset Pose
-    bpy.context.scene.frame_set(0)
 
     return armature_obj
 
 
 def create_armature_bones(armature, obj, parent_bone=None):
+    if not is_char_dummy(obj) and not is_char_bone(obj):
+        for child in obj.children:
+            create_armature_bones(armature, child, parent_bone)
+        return
     bone = armature.edit_bones.new(obj.name)
+    bone.use_relative_parent = True
+    bone.use_local_location = True
+    bone.use_inherit_rotation = True
     bone.parent = parent_bone
     bone.length = 1e-3
     bone.matrix = obj.matrix_world
-
     for child in obj.children:
-        if child.type == "EMPTY" and child.kb.dummytype != DummyType.NONE:
-            continue
-        if child.type == "MESH" and child.kb.meshtype != MeshType.TRIMESH:
-            continue
         create_armature_bones(armature, child, bone)
 
 
-def copy_object_keyframes_to_armature(obj, armature_obj):
+def apply_object_keyframes(mdl_root, armature_obj):
+    bpy.context.scene.frame_set(0)
+    bpy.context.view_layer.objects.active = armature_obj
+    bpy.ops.object.mode_set(mode="POSE")
+    apply_object_keyframes_to_armature(mdl_root, armature_obj)
+    bpy.ops.object.mode_set(mode="OBJECT")
+
+
+def unapply_object_keyframes(mdl_root, armature_obj):
+    bpy.context.scene.frame_set(0)
+    bpy.context.view_layer.objects.active = mdl_root
+    bpy.ops.object.mode_set(mode="OBJECT")
+    unapply_object_keyframes_from_armature(mdl_root, armature_obj)
+
+
+def apply_object_keyframes_to_armature(obj, armature_obj):
     if (
         obj.name in armature_obj.pose.bones
         and obj.animation_data
@@ -105,9 +120,7 @@ def copy_object_keyframes_to_armature(obj, armature_obj):
         rest_location = obj.location
         rest_rotation = obj.rotation_quaternion
 
-        keyframes = AnimationNode.get_keyframes_in_range(
-            action, 0, action.curve_frame_range[1]
-        )
+        keyframes = AnimationNode.get_keyframes(action)
         nested_keyframes = AnimationNode.nest_keyframes(keyframes)
         locations = []
         rotations = []
@@ -126,4 +139,43 @@ def copy_object_keyframes_to_armature(obj, armature_obj):
             bone.keyframe_insert("rotation_quaternion", frame=frame)
 
     for child in obj.children:
-        copy_object_keyframes_to_armature(child, armature_obj)
+        apply_object_keyframes_to_armature(child, armature_obj)
+
+
+def unapply_object_keyframes_from_armature(obj, armature_obj):
+    if not armature_obj.animation_data:
+        return
+    armature_action = armature_obj.animation_data.action
+    if not armature_action:
+        return
+
+    if obj.name in armature_obj.pose.bones:
+        action = obj.animation_data.action
+        action.fcurves.clear()
+
+        assert bpy.context.scene.frame_current == 0
+        rest_location = obj.location.copy()
+        rest_rotation = obj.rotation_quaternion.copy()
+
+        keyframes = AnimationNode.get_keyframes(
+            armature_action, 0, sys.maxsize, 'pose.bones["{}"].'.format(obj.name)
+        )
+        nested_keyframes = AnimationNode.nest_keyframes(keyframes)
+        locations = []
+        rotations = []
+        for data_path, dp_keyframes in nested_keyframes.items():
+            if data_path == "location":
+                locations = [(values[0], Vector(values[1])) for values in dp_keyframes]
+            if data_path == "rotation_quaternion":
+                rotations = [
+                    (values[0], Quaternion(values[1])) for values in dp_keyframes
+                ]
+        for frame, location in locations:
+            obj.location = rest_location + location
+            obj.keyframe_insert("location", frame=frame)
+        for frame, rotation in rotations:
+            obj.rotation_quaternion = rest_rotation @ rotation
+            obj.keyframe_insert("rotation_quaternion", frame=frame)
+
+    for child in obj.children:
+        unapply_object_keyframes_from_armature(child, armature_obj)

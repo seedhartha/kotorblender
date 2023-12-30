@@ -59,28 +59,21 @@ def is_walkmesh(obj):
 
 
 def is_char_dummy(obj):
-    dummy = obj and obj.type == "EMPTY"
+    dummy = obj and is_dummy_type(obj, DummyType.NONE)
     if not dummy:
         return False
     root = find_mdl_root_of(obj)
-    if not root or root.kb.classification != Classification.CHARACTER:
-        return False
-    return True
+    return root and root.kb.classification == Classification.CHARACTER
 
 
 def is_char_bone(obj):
-    dummy = is_dummy_type(obj, DummyType.NONE)
-    mesh = is_mesh_type(obj, MeshType.TRIMESH)
-    if not dummy and not mesh:
+    mesh = obj and is_mesh_type(obj, MeshType.TRIMESH)
+    if not mesh:
         return False
     root = find_mdl_root_of(obj)
     if not root or root.kb.classification != Classification.CHARACTER:
         return False
-    if obj.name.lower().endswith("_g"):
-        return True
-    if mesh and ((not obj.kb.render) or (obj.kb.render and is_null(obj.kb.bitmap))):
-        return True
-    return False
+    return mesh and ((not obj.kb.render) or (obj.kb.render and is_null(obj.kb.bitmap)))
 
 
 def is_exported_to_mdl(obj):

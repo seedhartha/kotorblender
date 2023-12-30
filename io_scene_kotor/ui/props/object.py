@@ -74,12 +74,12 @@ class ObjectPropertyGroup(bpy.types.PropertyGroup):
         default=True,
     )
     animroot: bpy.props.StringProperty(
-        name="Animation Root",
+        name="Anim Root",
         description="Animations should only affect children of selected object",
         default=NULL,
     )
     animscale: bpy.props.FloatProperty(
-        name="Animation Scale",
+        name="Anim Scale",
         description="Scale of this model relative to its supermodel",
         default=1.0,
         min=0.0,

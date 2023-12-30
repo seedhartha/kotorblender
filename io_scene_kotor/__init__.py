@@ -18,29 +18,17 @@
 
 import bpy
 
+from .ops.anim.add import KB_OT_add_animation
 from .ops.anim.delete import KB_OT_delete_animation
 from .ops.anim.event.add import KB_OT_add_anim_event
 from .ops.anim.event.delete import KB_OT_delete_anim_event
 from .ops.anim.event.move import KB_OT_move_anim_event
-from .ops.anim.add import KB_OT_add_animation
 from .ops.anim.move import KB_OT_move_animation
 from .ops.anim.play import KB_OT_play_animation
+from .ops.armatureapplykeyframes import KB_OT_armature_apply_keyframes
+from .ops.armatureunapplykeyframes import KB_OT_armature_unapply_keyframes
 from .ops.assignnodenumbers import KB_OT_assign_node_numbers
 from .ops.bakelightmaps import KB_OT_bake_lightmaps, KB_OT_bake_lightmaps_lm_only
-from .ops.showhideobjects import (
-    KB_OT_hide_walkmeshes,
-    KB_OT_hide_lights,
-    KB_OT_hide_emitters,
-    KB_OT_hide_blockers,
-    KB_OT_hide_char_bones,
-    KB_OT_hide_char_dummies,
-    KB_OT_show_walkmeshes,
-    KB_OT_show_lights,
-    KB_OT_show_emitters,
-    KB_OT_show_blockers,
-    KB_OT_show_char_bones,
-    KB_OT_show_char_dummies,
-)
 from .ops.lensflare.add import KB_OT_add_lens_flare
 from .ops.lensflare.delete import KB_OT_delete_lens_flare
 from .ops.lensflare.move import KB_OT_move_lens_flare
@@ -56,10 +44,28 @@ from .ops.pth.removeconnection import KB_OT_delete_path_connection
 from .ops.rebuildallmaterials import KB_OT_rebuild_all_materials
 from .ops.rebuildarmature import KB_OT_rebuild_armature
 from .ops.rebuildmaterial import KB_OT_rebuild_material
+from .ops.showhideobjects import (
+    KB_OT_hide_walkmeshes,
+    KB_OT_hide_lights,
+    KB_OT_hide_emitters,
+    KB_OT_hide_blockers,
+    KB_OT_hide_char_bones,
+    KB_OT_hide_char_dummies,
+    KB_OT_show_walkmeshes,
+    KB_OT_show_lights,
+    KB_OT_show_emitters,
+    KB_OT_show_blockers,
+    KB_OT_show_char_bones,
+    KB_OT_show_char_dummies,
+)
 from .ui.list.lensflares import KB_UL_lens_flares
 from .ui.list.pathpoints import KB_UL_path_points
 from .ui.menu.kotor import KB_MT_kotor, KB_MT_kotor_lightmaps, KB_MT_kotor_showhide
-from .ui.panel.animations import KB_PT_animations, KB_PT_anim_events
+from .ui.panel.animations import (
+    KB_PT_animations,
+    KB_PT_animations_events,
+    KB_PT_animations_armature,
+)
 from .ui.panel.modelnode.emitter import (
     KB_PT_emitter,
     KB_PT_emitter_particles,
@@ -137,47 +143,50 @@ classes = (
     ScenePropertyGroup,
     ImagePropertyGroup,
     # Operators
+    KB_OT_add_anim_event,
+    KB_OT_add_animation,
+    KB_OT_add_lens_flare,
+    KB_OT_add_path_connection,
+    KB_OT_armature_apply_keyframes,
+    KB_OT_armature_unapply_keyframes,
     KB_OT_assign_node_numbers,
+    KB_OT_bake_lightmaps_lm_only,
+    KB_OT_bake_lightmaps,
+    KB_OT_delete_anim_event,
+    KB_OT_delete_animation,
+    KB_OT_delete_lens_flare,
+    KB_OT_delete_path_connection,
     KB_OT_export_lyt,
     KB_OT_export_mdl,
     KB_OT_export_pth,
+    KB_OT_hide_blockers,
+    KB_OT_hide_char_bones,
+    KB_OT_hide_char_dummies,
+    KB_OT_hide_emitters,
+    KB_OT_hide_lights,
+    KB_OT_hide_walkmeshes,
     KB_OT_import_lyt,
     KB_OT_import_mdl,
     KB_OT_import_pth,
     KB_OT_load_wok_materials,
+    KB_OT_move_anim_event,
+    KB_OT_move_animation,
+    KB_OT_move_lens_flare,
+    KB_OT_play_animation,
     KB_OT_rebuild_all_materials,
     KB_OT_rebuild_armature,
     KB_OT_rebuild_material,
-    KB_OT_add_anim_event,
-    KB_OT_move_anim_event,
-    KB_OT_delete_anim_event,
-    KB_OT_add_animation,
-    KB_OT_move_animation,
-    KB_OT_delete_animation,
-    KB_OT_play_animation,
-    KB_OT_add_lens_flare,
-    KB_OT_move_lens_flare,
-    KB_OT_delete_lens_flare,
-    KB_OT_add_path_connection,
-    KB_OT_delete_path_connection,
-    KB_OT_bake_lightmaps,
-    KB_OT_bake_lightmaps_lm_only,
-    KB_OT_hide_walkmeshes,
-    KB_OT_hide_lights,
-    KB_OT_hide_emitters,
-    KB_OT_hide_blockers,
-    KB_OT_hide_char_bones,
-    KB_OT_hide_char_dummies,
-    KB_OT_show_walkmeshes,
-    KB_OT_show_lights,
-    KB_OT_show_emitters,
     KB_OT_show_blockers,
     KB_OT_show_char_bones,
     KB_OT_show_char_dummies,
+    KB_OT_show_emitters,
+    KB_OT_show_lights,
+    KB_OT_show_walkmeshes,
     # Panels
     KB_PT_model,
-    KB_PT_animations,  # child of KB_PT_model
-    KB_PT_anim_events,
+    KB_PT_animations,
+    KB_PT_animations_events,
+    KB_PT_animations_armature,
     KB_PT_modelnode,
     KB_PT_reference,  # child of KB_PT_modelnode
     KB_PT_path_point,  # child of KB_PT_modelnode

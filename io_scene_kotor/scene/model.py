@@ -95,7 +95,9 @@ class Model:
             self.create_animations(root_obj, animscale)
 
         if options.build_armature:
-            armature.rebuild_armature(root_obj)
+            armature_obj = armature.rebuild_armature(root_obj)
+            if armature_obj:
+                armature.apply_object_keyframes(root_obj, armature_obj)
 
         return root_obj
 

@@ -16,6 +16,8 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+import sys
+
 import bpy
 
 from ..constants import NodeType, ANIM_REST_POSE_OFFSET
@@ -217,9 +219,7 @@ class AnimationNode:
         if not action:
             return
 
-        keyframes = self.get_keyframes_in_range(
-            action, anim.frame_start, anim.frame_end
-        )
+        keyframes = self.get_keyframes(action, anim.frame_start, anim.frame_end)
         nested_keyframes = self.nest_keyframes(keyframes)
 
         for data_path, dp_keyframes in nested_keyframes.items():
@@ -243,10 +243,13 @@ class AnimationNode:
                 self.keyframes[label].append([time] + values)
 
     @classmethod
-    def get_keyframes_in_range(cls, action, start, end):
+    def get_keyframes(cls, action, frame_start=0, frame_end=sys.maxsize, dp_prefix=""):
         keyframes = dict()
         for fcurve in action.fcurves:
             data_path = fcurve.data_path
+            if dp_prefix and data_path.startswith(dp_prefix):
+                prefix_len = len(dp_prefix)
+                data_path = data_path[prefix_len:]
             array_index = fcurve.array_index
             if not data_path in DATA_PATH_TO_PROPERTY:
                 continue
@@ -254,7 +257,7 @@ class AnimationNode:
             assert array_index >= 0 and array_index < prop.bl_dim
             for kp in fcurve.keyframe_points:
                 frame = round(kp.co[0])
-                if frame < start or frame > end:
+                if frame < frame_start or frame > frame_end:
                     continue
                 if not data_path in keyframes:
                     keyframes[data_path] = [[] for _ in range(prop.bl_dim)]

@@ -18,12 +18,11 @@
 
 import bpy
 
-from ...utils import is_mdl_root
+from ...utils import is_mdl_root, is_skin_mesh, find_objects
 
 
 class KB_PT_animations(bpy.types.Panel):
-    bl_label = "Animations"
-    bl_parent_id = "KB_PT_model"
+    bl_label = "KotOR Animations"
     bl_space_type = "PROPERTIES"
     bl_region_type = "WINDOW"
     bl_context = "object"
@@ -37,7 +36,6 @@ class KB_PT_animations(bpy.types.Panel):
         layout = self.layout
         layout.use_property_split = True
 
-        # Animation List
         row = layout.row()
         row.template_list(
             "UI_UL_list",
@@ -57,10 +55,9 @@ class KB_PT_animations(bpy.types.Panel):
         col.separator()
         col.operator("kb.play_animation", icon="PLAY", text="")
 
-        # Selected Animation
         anim_list = obj.kb.anim_list
         anim_list_idx = obj.kb.anim_list_idx
-        if anim_list_idx >= 0 and anim_list_idx < len(anim_list):
+        if anim_list_idx >= 0 or anim_list_idx < len(anim_list):
             anim = anim_list[anim_list_idx]
             row = layout.row()
             col = row.column(align=True)
@@ -72,7 +69,7 @@ class KB_PT_animations(bpy.types.Panel):
             row.prop_search(anim, "root", context.collection, "objects")
 
 
-class KB_PT_anim_events(bpy.types.Panel):
+class KB_PT_animations_events(bpy.types.Panel):
     bl_label = "Events"
     bl_parent_id = "KB_PT_animations"
     bl_space_type = "PROPERTIES"
@@ -107,10 +104,35 @@ class KB_PT_anim_events(bpy.types.Panel):
         col.operator("kb.move_anim_event", icon="TRIA_UP", text="").direction = "UP"
         col.operator("kb.move_anim_event", icon="TRIA_DOWN", text="").direction = "DOWN"
 
-        # Selected Animation
+        # Selected Event
         event_list = anim.event_list
         event_list_idx = anim.event_list_idx
         if event_list_idx >= 0 and event_list_idx < len(event_list):
             event = event_list[event_list_idx]
             row = layout.row()
             row.prop(event, "frame")
+
+
+class KB_PT_animations_armature(bpy.types.Panel):
+    bl_label = "Armature"
+    bl_parent_id = "KB_PT_animations"
+    bl_space_type = "PROPERTIES"
+    bl_region_type = "WINDOW"
+    bl_context = "object"
+
+    @classmethod
+    def poll(cls, context):
+        mdl_root = context.object
+        return is_mdl_root(mdl_root) and find_objects(
+            mdl_root, lambda obj: is_skin_mesh(obj)
+        )
+
+    def draw(self, context):
+        layout = self.layout
+
+        row = layout.row()
+        row.operator("kb.rebuild_armature")
+        row = layout.row()
+        row.operator("kb.armature_apply_keyframes")
+        row = layout.row()
+        row.operator("kb.armature_unapply_keyframes")
