@@ -18,7 +18,8 @@
 
 import bpy
 
-from ..constants import NodeType, FPS, ANIM_REST_POSE_OFFSET
+from ..constants import NodeType, ANIM_REST_POSE_OFFSET
+from ..utils import time_to_frame, frame_to_time
 
 DATA_PATH_BY_LABEL = {
     "position": "location",
@@ -126,7 +127,7 @@ class AnimationNode:
 
             # Convert keyframes to frames/values
 
-            frames = [anim.frame_start + FPS * d[0] for d in data]
+            frames = [anim.frame_start + time_to_frame(d[0]) for d in data]
 
             if label in CONVERTER_BY_LABEL:
                 converter = CONVERTER_BY_LABEL[label]
@@ -152,18 +153,29 @@ class AnimationNode:
                 rest_values = getattr(target, data_path)
             rest_frame = anim.frame_start - ANIM_REST_POSE_OFFSET
             if dim == 1:
-                keyframe_points[0].insert(rest_frame, rest_values, options={"FAST"})
+                keyframe = keyframe_points[0].insert(
+                    rest_frame, rest_values, options={"FAST"}
+                )
+                keyframe.interpolation = "CONSTANT"
             else:
                 for i in range(dim):
-                    keyframe_points[i].insert(
+                    keyframe = keyframe_points[i].insert(
                         rest_frame, rest_values[i], options={"FAST"}
                     )
+                    keyframe.interpolation = "CONSTANT"
 
             # Animation Keyframes
 
+            last_keyframes = [None] * dim
             for frame, val in zip(frames, values):
                 for i in range(dim):
-                    keyframe_points[i].insert(frame, val[i], options={"FAST"})
+                    keyframe = keyframe_points[i].insert(
+                        frame, val[i], options={"FAST"}
+                    )
+                    keyframe.interpolation = "LINEAR"
+                    last_keyframes[i] = keyframe
+            for keyframe in last_keyframes:
+                keyframe.interpolation = "CONSTANT"
             for kfp in keyframe_points:
                 kfp.update()
 
@@ -208,7 +220,7 @@ class AnimationNode:
             self.keyframes[label] = []
 
             for point in dp_keyframes:
-                timekey = (point[0] - anim.frame_start) / FPS
+                timekey = frame_to_time(point[0] - anim.frame_start)
                 if data_path in CONVERTER_BY_DATA_PATH:
                     converter = CONVERTER_BY_DATA_PATH[data_path]
                     values = converter(point[1:], target)

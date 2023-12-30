@@ -24,7 +24,7 @@ ANIM_REST_POSE_OFFSET = 5
 # Number of frames between two consecutive animations
 ANIM_PADDING = 60
 
-FPS = 30
+ANIM_FPS = 30
 
 WOK_MATERIALS = [
     ["wok_NotDefined", (0.400, 0.400, 0.400), 0.0],

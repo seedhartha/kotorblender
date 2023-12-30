@@ -19,8 +19,8 @@
 import math
 import re
 
-from ..constants import DummyType, FPS, ANIM_PADDING, NULL
-from ..utils import find_object
+from ..constants import DummyType, ANIM_PADDING, NULL
+from ..utils import find_object, time_to_frame, frame_to_time
 
 from .animnode import AnimationNode
 
@@ -66,18 +66,14 @@ class Animation:
         anim.root = animroot
         anim.transtime = transtime
         anim.frame_start = Animation.get_next_frame(mdl_root)
-        anim.frame_end = anim.frame_start + Animation.time_to_frame(length)
+        anim.frame_end = anim.frame_start + time_to_frame(length)
         return anim
 
     @classmethod
     def append_event_to_object_anim(cls, list_anim, name, time):
         event = list_anim.event_list.add()
         event.name = name
-        event.frame = list_anim.frame_start + Animation.time_to_frame(time)
-
-    @classmethod
-    def time_to_frame(cls, time):
-        return round(FPS * time)
+        event.frame = list_anim.frame_start + time_to_frame(time)
 
     @classmethod
     def get_next_frame(cls, mdl_root):
@@ -87,15 +83,13 @@ class Animation:
     @classmethod
     def from_list_anim(cls, list_anim, mdl_root):
         anim = Animation(list_anim.name)
-        anim.length = Animation.frame_to_time(
-            list_anim.frame_end - list_anim.frame_start
-        )
+        anim.length = frame_to_time(list_anim.frame_end - list_anim.frame_start)
         anim.transtime = list_anim.transtime
         anim.animroot = list_anim.root
         anim.root_node = Animation.animation_node_from_object(list_anim, mdl_root)
 
         for event in list_anim.event_list:
-            time = Animation.frame_to_time(event.frame - list_anim.frame_start)
+            time = frame_to_time(event.frame - list_anim.frame_start)
             name = event.name
             anim.events.append((time, name))
 
@@ -128,7 +122,3 @@ class Animation:
             node.children.append(child)
 
         return node
-
-    @classmethod
-    def frame_to_time(cls, frame):
-        return frame / FPS

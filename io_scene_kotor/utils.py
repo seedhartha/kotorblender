@@ -122,6 +122,14 @@ def find_objects(obj, test=lambda _: True):
     return nodes
 
 
+def time_to_frame(time):
+    return round(ANIM_FPS * time)
+
+
+def frame_to_time(frame):
+    return frame / ANIM_FPS
+
+
 def is_null(s):
     return not s or s.lower() == NULL.lower()
 
