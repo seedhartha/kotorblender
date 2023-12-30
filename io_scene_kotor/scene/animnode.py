@@ -220,26 +220,26 @@ class AnimationNode:
         keyframes = self.get_keyframes_in_range(
             action, anim.frame_start, anim.frame_end
         )
-        flat_keyframes = self.flatten_keyframes(keyframes)
+        nested_keyframes = self.nest_keyframes(keyframes)
 
-        for data_path, dp_keyframes in flat_keyframes.items():
+        for data_path, dp_keyframes in nested_keyframes.items():
             if not data_path in DATA_PATH_TO_PROPERTY:
                 continue
             prop = DATA_PATH_TO_PROPERTY[data_path]
             label = prop.label
             self.keyframes[label] = []
 
-            for point in dp_keyframes:
-                time = frame_to_time(point[0] - anim.frame_start)
+            for keyframe in dp_keyframes:
+                time = frame_to_time(keyframe[0] - anim.frame_start)
                 if prop.bl_to_mdl_cvt:
                     restloc = (
                         anim_subject.location
                         if hasattr(anim_subject, "location")
                         else [0.0] * 3
                     )
-                    values = prop.bl_to_mdl_cvt(point[1:], restloc)
+                    values = prop.bl_to_mdl_cvt(keyframe[1], restloc)
                 else:
-                    values = point[1:]
+                    values = keyframe[1]
                 self.keyframes[label].append([time] + values)
 
     @classmethod
@@ -248,34 +248,36 @@ class AnimationNode:
         for fcurve in action.fcurves:
             data_path = fcurve.data_path
             array_index = fcurve.array_index
-            keyframe_points = fcurve.keyframe_points
-            for kp in keyframe_points:
+            if not data_path in DATA_PATH_TO_PROPERTY:
+                continue
+            prop = DATA_PATH_TO_PROPERTY[data_path]
+            assert array_index >= 0 and array_index < prop.bl_dim
+            for kp in fcurve.keyframe_points:
                 frame = round(kp.co[0])
                 if frame < start or frame > end:
                     continue
-                if data_path not in keyframes:
-                    keyframes[data_path] = []
-                dim = len(keyframes[data_path])
-                while dim <= array_index:
-                    keyframes[data_path].append([])
-                    dim += 1
+                if not data_path in keyframes:
+                    keyframes[data_path] = [[] for _ in range(prop.bl_dim)]
                 keyframes[data_path][array_index].append((frame, kp.co[1]))
-
         return keyframes
 
     @classmethod
-    def flatten_keyframes(cls, keyframes):
-        flat_keyframes = dict()
+    def nest_keyframes(cls, keyframes):
+        nested = dict()
         for data_path, dp_keyframes in keyframes.items():
-            dim = len(dp_keyframes)
-            assert dim > 0
-            num_points = len(dp_keyframes[0])
-            assert all([len(x) == num_points for x in dp_keyframes[1:]])
-            flat_keyframes[data_path] = []
-            for i in range(num_points):
-                flat_keyframes[data_path].append(
-                    [dp_keyframes[0][i][0]]
-                    + [dp_keyframes[j][i][1] for j in range(dim)]
-                )
-
-        return flat_keyframes
+            assert data_path in DATA_PATH_TO_PROPERTY
+            prop = DATA_PATH_TO_PROPERTY[data_path]
+            assert prop.bl_dim > 0 and len(dp_keyframes) == prop.bl_dim
+            num_frames = len(dp_keyframes[0])
+            assert all(len(dpk) == num_frames for dpk in dp_keyframes[1:])
+            for i in range(num_frames):
+                frame = dp_keyframes[0][i][0]
+                values = [0.0] * prop.bl_dim
+                values[0] = dp_keyframes[0][i][1]
+                for j in range(1, prop.bl_dim):
+                    assert dp_keyframes[j][i][0] == frame
+                    values[j] = dp_keyframes[j][i][1]
+                if not data_path in nested:
+                    nested[data_path] = []
+                nested[data_path].append((frame, values))
+        return nested
