@@ -41,7 +41,8 @@ class KB_OT_hide_walkmeshes(bpy.types.Operator):
         # Loop through every object in the scene and hide it if it's a walkmesh.
         for obj in bpy.context.scene.objects:
             if is_walkmesh(obj):
-                obj.hide_set(True)
+                obj.hide_viewport = True
+                obj.hide_render = True
 
         return {"FINISHED"}
 
@@ -58,7 +59,8 @@ class KB_OT_hide_lights(bpy.types.Operator):
         # Loop through every object in the scene and hide it if it's a light.
         for obj in bpy.context.scene.objects:
             if obj.type == "LIGHT":
-                obj.hide_set(True)
+                obj.hide_viewport = True
+                obj.hide_render = True
 
         return {"FINISHED"}
 
@@ -75,7 +77,8 @@ class KB_OT_hide_emitters(bpy.types.Operator):
         # Loop through every object in the scene and hide it if it's an emitter.
         for obj in bpy.context.scene.objects:
             if is_mesh_type(obj, MeshType.EMITTER):
-                obj.hide_set(True)
+                obj.hide_viewport = True
+                obj.hide_render = True
 
         return {"FINISHED"}
 
@@ -97,7 +100,8 @@ class KB_OT_hide_blockers(bpy.types.Operator):
                 and obj.kb.render == 1
             ):
                 if is_null(obj.kb.bitmap) and is_null(obj.kb.bitmap2):
-                    obj.hide_set(True)
+                    obj.hide_viewport = True
+                    obj.hide_render = True
 
         return {"FINISHED"}
 
@@ -114,7 +118,8 @@ class KB_OT_hide_char_bones(bpy.types.Operator):
         # Loop through every object in the scene and hide it if it's a bone matching the name of those in a character rig.
         for obj in bpy.context.scene.objects:
             if is_char_bone(obj):
-                obj.hide_set(True)
+                obj.hide_viewport = True
+                obj.hide_render = True
 
         return {"FINISHED"}
 
@@ -131,7 +136,8 @@ class KB_OT_hide_char_dummies(bpy.types.Operator):
         # Loop through every object in the scene and hide it if it's a dummy/null matching the name of those in a character rig.
         for obj in bpy.context.scene.objects:
             if is_char_dummy(obj):
-                obj.hide_set(True)
+                obj.hide_viewport = True
+                obj.hide_render = True
 
         return {"FINISHED"}
 
@@ -148,7 +154,8 @@ class KB_OT_show_walkmeshes(bpy.types.Operator):
         # Loop through every object in the scene and unhide it if it's a walkmesh.
         for obj in bpy.context.scene.objects:
             if is_walkmesh(obj):
-                obj.hide_set(False)
+                obj.hide_viewport = False
+                obj.hide_render = False
 
         return {"FINISHED"}
 
@@ -165,7 +172,8 @@ class KB_OT_show_lights(bpy.types.Operator):
         # Loop through every object in the scene and unhide it if it's a light.
         for obj in bpy.context.scene.objects:
             if obj.type == "LIGHT":
-                obj.hide_set(False)
+                obj.hide_viewport = False
+                obj.hide_render = False
 
         return {"FINISHED"}
 
@@ -182,7 +190,8 @@ class KB_OT_show_emitters(bpy.types.Operator):
         # Loop through every object in the scene and unhide it if it's an emitter.
         for obj in bpy.context.scene.objects:
             if is_mesh_type(obj, MeshType.EMITTER):
-                obj.hide_set(False)
+                obj.hide_viewport = False
+                obj.hide_render = False
 
         return {"FINISHED"}
 
@@ -204,7 +213,8 @@ class KB_OT_show_blockers(bpy.types.Operator):
                 and obj.kb.render == 1
             ):
                 if is_null(obj.kb.bitmap) and is_null(obj.kb.bitmap2):
-                    obj.hide_set(False)
+                    obj.hide_viewport = False
+                    obj.hide_render = False
 
         return {"FINISHED"}
 
@@ -221,7 +231,8 @@ class KB_OT_show_char_bones(bpy.types.Operator):
         # Loop through every object in the scene and unhide it if it's a bone matching the name of those in a character rig.
         for obj in bpy.context.scene.objects:
             if is_char_bone(obj):
-                obj.hide_set(False)
+                obj.hide_viewport = False
+                obj.hide_render = False
 
         return {"FINISHED"}
 
@@ -238,6 +249,7 @@ class KB_OT_show_char_dummies(bpy.types.Operator):
         # Loop through every object in the scene and unhide it if it's a dummy/null matching the name of those in a character rig.
         for obj in bpy.context.scene.objects:
             if is_char_dummy(obj):
-                obj.hide_set(False)
+                obj.hide_viewport = False
+                obj.hide_render = False
 
         return {"FINISHED"}

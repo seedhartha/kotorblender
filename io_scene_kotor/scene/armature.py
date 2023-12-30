@@ -82,9 +82,6 @@ def create_armature_bones(armature, obj, parent_bone=None):
             create_armature_bones(armature, child, parent_bone)
         return
     bone = armature.edit_bones.new(obj.name)
-    bone.use_relative_parent = True
-    bone.use_local_location = True
-    bone.use_inherit_rotation = True
     bone.parent = parent_bone
     bone.length = 1e-3
     bone.matrix = obj.matrix_world
