@@ -29,7 +29,7 @@ class KB_PT_modelnode(bpy.types.Panel):
 
     @classmethod
     def poll(cls, context):
-        return context.object
+        return context.object and context.object.type in ["EMPTY", "MESH", "LIGHT"]
 
     def draw(self, context):
         obj = context.object
