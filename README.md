@@ -38,7 +38,7 @@ If you plan to edit textures, batch-convert TPC to TGA / TXI files using **reone
 ### Lightmapping
 
 1. Select objects for which you want lightmaps to be recreated, or unselect all objects to recreate all lightmaps
-1. Press KotOR → Bake Lightmaps
+1. Press KotOR → Lightmaps → Bake (auto)
 
 UV mapping:
 
@@ -50,6 +50,7 @@ Fine-tuning:
 
 1. Increase lightmap image size via UV Editing → Image → Resize
 1. Tweak ambient color via Scene → World → Surface → Color
+1. Manually toggle rendering of objects in Outliner and press KotOR → Lightmaps → Bake (manual)
 1. In Scene → Render, set Device to GPU Compute to improve performance, set Render Engine to Cycles if not already
 1. In Scene → Render → Sampling → Render increase Max Samples to improve quality
 
