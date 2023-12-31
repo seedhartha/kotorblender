@@ -21,7 +21,7 @@ import sys
 import bpy
 
 from ..constants import NodeType, ANIM_REST_POSE_OFFSET
-from ..utils import time_to_frame, frame_to_time
+from ..utils import time_to_frame, frame_to_time, is_close
 
 
 class Property:
@@ -35,15 +35,37 @@ class Property:
         self.bl_to_mdl_cvt = bl_to_mdl_cvt
 
 
+def convert_mdl_position_to_bl_location(val, restloc, animscale):
+    dim = len(val)
+    assert dim == 3 or dim == 9
+    if dim == 3:
+        return [restloc[i] + animscale * val[i] for i in range(3)]
+    else:
+        p1 = [restloc[i] + animscale * val[i] for i in range(3)]
+        p0 = [p1[i] + val[3 + i] for i in range(3)]
+        p2 = [p1[i] + val[6 + i] for i in range(3)]
+        return p1 + p0 + p2
+
+
+def convert_bl_location_to_mdl_position(val, restloc):
+    dim = len(val)
+    assert dim == 3 or dim == 9
+    if dim == 3:
+        return [val[i] - restloc[i] for i in range(3)]
+    else:
+        p1 = [val[i] - restloc[i] for i in range(3)]
+        p0 = [val[3 + i] - val[i] for i in range(3)]
+        p2 = [val[6 + i] - val[i] for i in range(3)]
+        return p1 + p0 + p2
+
+
 PROPERTIES = [
     Property(
         "position",
         "location",
         3,
-        mdl_to_bl_cvt=lambda val, restloc, animscale: [
-            restloc[i] + animscale * val[i] for i in range(3)
-        ],
-        bl_to_mdl_cvt=lambda val, restloc: [val[i] - restloc[i] for i in range(3)],
+        mdl_to_bl_cvt=convert_mdl_position_to_bl_location,
+        bl_to_mdl_cvt=convert_bl_location_to_mdl_position,
     ),
     Property("orientation", "rotation_quaternion", 4),
     Property(
@@ -180,11 +202,20 @@ class AnimationNode:
             else:
                 values = [d[1:] for d in data]
             for frame, val in zip(frames, values):
+                bezier = len(val) == 3 * prop.bl_dim
+                assert len(val) == prop.bl_dim or bezier
                 for i in range(prop.bl_dim):
                     keyframe = keyframe_points[i].insert(
                         frame, val[i], options={"FAST"}
                     )
-                    keyframe.interpolation = "LINEAR"
+                    if bezier:
+                        keyframe.interpolation = "BEZIER"
+                        keyframe.handle_left_type = "FREE"
+                        keyframe.handle_right_type = "FREE"
+                        keyframe.handle_left = (keyframe.co.x - 1, val[3 + i])
+                        keyframe.handle_right = (keyframe.co.x + 1, val[6 + i])
+                    else:
+                        keyframe.interpolation = "LINEAR"
             for kfp in keyframe_points:
                 kfp.update()
 
@@ -260,7 +291,11 @@ class AnimationNode:
                     continue
                 if not data_path in keyframes:
                     keyframes[data_path] = [[] for _ in range(prop.bl_dim)]
-                keyframes[data_path][array_index].append((frame, kp.co[1]))
+                if kp.interpolation == "BEZIER":
+                    values = (frame, kp.co[1], kp.handle_left[1], kp.handle_right[1])
+                else:
+                    values = (frame, kp.co[1], kp.co[1], kp.co[1])
+                keyframes[data_path][array_index].append(values)
         return keyframes
 
     @classmethod
@@ -272,13 +307,22 @@ class AnimationNode:
             assert prop.bl_dim > 0 and len(dp_keyframes) == prop.bl_dim
             num_frames = len(dp_keyframes[0])
             assert all(len(dpk) == num_frames for dpk in dp_keyframes[1:])
+            bezier = False
+            for i in range(num_frames):
+                bezier = bezier or any(
+                    not is_close(dpk[i][2], dpk[i][1])
+                    or not is_close(dpk[i][3], dpk[i][1])
+                    for dpk in dp_keyframes
+                )
             for i in range(num_frames):
                 frame = dp_keyframes[0][i][0]
-                values = [0.0] * prop.bl_dim
-                values[0] = dp_keyframes[0][i][1]
-                for j in range(1, prop.bl_dim):
+                values = [0.0] * ((3 * prop.bl_dim) if bezier else prop.bl_dim)
+                for j in range(prop.bl_dim):
                     assert dp_keyframes[j][i][0] == frame
                     values[j] = dp_keyframes[j][i][1]
+                    if bezier:
+                        values[prop.bl_dim + j] = dp_keyframes[j][i][2]
+                        values[2 * prop.bl_dim + j] = dp_keyframes[j][i][3]
                 if not data_path in nested:
                     nested[data_path] = []
                 nested[data_path].append((frame, values))

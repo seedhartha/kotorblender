@@ -576,9 +576,20 @@ class MdlWriter:
 
     def peek_anim_controllers(self, node, type_flags, out_keys, out_data):
         def append_keyframes(key, ctrl_type, num_columns, data_count, converter=None):
-            if key not in node.keyframes:
+            if not key in node.keyframes:
                 return data_count
             keyframes = node.keyframes[key]
+            if not keyframes:
+                return data_count
+
+            keyframe_columns = len(keyframes[0]) - 1
+            assert (
+                keyframe_columns == num_columns or keyframe_columns == 3 * num_columns
+            )
+            bezier = keyframe_columns == 3 * num_columns
+            if bezier:
+                num_columns |= CTRL_FLAG_BEZIER
+
             num_rows = len(keyframes)
             out_keys.append(
                 ControllerKey(
@@ -588,12 +599,12 @@ class MdlWriter:
             for i in range(num_rows):
                 out_data.append(keyframes[i][0])  # timekey
             for i in range(num_rows):
-                values = keyframes[i][1 : 1 + num_columns]
+                values = keyframes[i][1 : 1 + keyframe_columns]
                 if converter:
                     values = converter(values)
                 for val in values:
                     out_data.append(val)
-            return data_count + (1 + num_columns) * num_rows
+            return data_count + (1 + keyframe_columns) * num_rows
 
         if not node.parent:
             return

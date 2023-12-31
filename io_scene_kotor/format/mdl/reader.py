@@ -718,7 +718,7 @@ class MdlReader:
             controllers = self.load_controllers(controller_arr, controller_data_arr)
             if CTRL_BASE_POSITION in controllers:
                 node.keyframes["position"] = [
-                    row[:4] for row in controllers[CTRL_BASE_POSITION]
+                    row for row in controllers[CTRL_BASE_POSITION]
                 ]
             if CTRL_BASE_ORIENTATION in controllers:
                 orientations = [
