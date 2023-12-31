@@ -22,7 +22,7 @@ import bpy
 
 from mathutils import Quaternion, Vector
 
-from ..constants import Classification, DummyType, MeshType
+from ..constants import Classification
 from ..utils import find_objects, is_skin_mesh, is_char_bone, is_char_dummy
 
 from .animnode import AnimationNode
@@ -122,11 +122,9 @@ def apply_object_keyframes_to_armature(obj, armature_obj):
         rotations = []
         for data_path, dp_keyframes in nested_keyframes.items():
             if data_path == "location":
-                locations = [(values[0], Vector(values[1])) for values in dp_keyframes]
+                locations = [(values[0], values[1]) for values in dp_keyframes]
             if data_path == "rotation_quaternion":
-                rotations = [
-                    (values[0], Quaternion(values[1])) for values in dp_keyframes
-                ]
+                rotations = [(values[0], values[1]) for values in dp_keyframes]
 
         armature_anim_data = AnimationNode.get_or_create_animation_data(armature_obj)
         armature_action = AnimationNode.get_or_create_action(armature_obj.name)
@@ -142,12 +140,27 @@ def apply_object_keyframes_to_armature(obj, armature_obj):
             ]
             keyframe_points = [fcurve.keyframe_points for fcurve in fcurves]
             for frame, location in locations:
-                location_delta = location - rest_location
+                location_delta = Vector(location[:3]) - rest_location
+                dim = 3
+                bezier = len(location) == 3 * dim
                 for i in range(3):
                     keyframe = keyframe_points[i].insert(
                         frame, location_delta[i], options={"FAST"}
                     )
-                    keyframe.interpolation = "LINEAR"
+                    if bezier:
+                        keyframe.interpolation = "BEZIER"
+                        keyframe.handle_left_type = "FREE"
+                        keyframe.handle_right_type = "FREE"
+                        keyframe.handle_left = (
+                            keyframe.co.x - 1,
+                            location[dim + i] - rest_location[i],
+                        )
+                        keyframe.handle_right = (
+                            keyframe.co.x + 1,
+                            location[2 * dim + i] - rest_location[i],
+                        )
+                    else:
+                        keyframe.interpolation = "LINEAR"
             for kfp in keyframe_points:
                 kfp.update()
         if rotations:
@@ -161,7 +174,7 @@ def apply_object_keyframes_to_armature(obj, armature_obj):
             ]
             keyframe_points = [fcurve.keyframe_points for fcurve in fcurves]
             for frame, rotation in rotations:
-                rotation_delta = rest_rotation.inverted() @ rotation
+                rotation_delta = rest_rotation.inverted() @ Quaternion(rotation[:4])
                 for i in range(4):
                     keyframe = keyframe_points[i].insert(
                         frame, rotation_delta[i], options={"FAST"}
@@ -199,11 +212,9 @@ def unapply_object_keyframes_from_armature(obj, root_name, armature_obj):
         rotations = []
         for data_path, dp_keyframes in nested_keyframes.items():
             if data_path == "location":
-                locations = [(values[0], Vector(values[1])) for values in dp_keyframes]
+                locations = [(values[0], values[1]) for values in dp_keyframes]
             if data_path == "rotation_quaternion":
-                rotations = [
-                    (values[0], Quaternion(values[1])) for values in dp_keyframes
-                ]
+                rotations = [(values[0], values[1]) for values in dp_keyframes]
         if locations:
             fcurves = [
                 AnimationNode.get_or_create_fcurve(action, "location", i)
@@ -211,12 +222,27 @@ def unapply_object_keyframes_from_armature(obj, root_name, armature_obj):
             ]
             keyframe_points = [fcurve.keyframe_points for fcurve in fcurves]
             for frame, location in locations:
-                abs_location = rest_location + location
+                abs_location = rest_location + Vector(location[:3])
+                dim = 3
+                bezier = len(location) == 3 * dim
                 for i in range(3):
                     keyframe = keyframe_points[i].insert(
                         frame, abs_location[i], options={"FAST"}
                     )
-                    keyframe.interpolation = "LINEAR"
+                    if bezier:
+                        keyframe.interpolation = "BEZIER"
+                        keyframe.handle_left_type = "FREE"
+                        keyframe.handle_right_type = "FREE"
+                        keyframe.handle_left = (
+                            keyframe.co.x - 1,
+                            location[dim + i] + rest_location[i],
+                        )
+                        keyframe.handle_right = (
+                            keyframe.co.x + 1,
+                            location[2 * dim + i] + rest_location[i],
+                        )
+                    else:
+                        keyframe.interpolation = "LINEAR"
             for kfp in keyframe_points:
                 kfp.update()
         if rotations:
@@ -226,7 +252,7 @@ def unapply_object_keyframes_from_armature(obj, root_name, armature_obj):
             ]
             keyframe_points = [fcurve.keyframe_points for fcurve in fcurves]
             for frame, rotation in rotations:
-                abs_rotation = rest_rotation @ rotation
+                abs_rotation = rest_rotation @ Quaternion(rotation[:4])
                 for i in range(4):
                     keyframe = keyframe_points[i].insert(
                         frame, abs_rotation[i], options={"FAST"}
