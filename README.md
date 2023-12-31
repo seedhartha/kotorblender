@@ -28,12 +28,15 @@ Extract models, textures, walkmeshes, LYT and PTH files into a working directory
 
 If you plan to edit textures, batch-convert TPC to TGA / TXI files using **reone toolkit**, although TPC textures are also supported by KotorBlender.
 
-### Modelling
+### Model Import and Export
 
-1. Import MDL via File → Import → KotOR Model (.mdl)
-1. Edit model
+1. Import via File → Import → KotOR Model (.mdl)
 1. Select top-level MDL root object to be exported
-1. Export MDL via File → Export → KotOR Model (.mdl)
+1. Export via File → Export → KotOR Model (.mdl)
+
+### Editing Animations
+
+To edit list of model animations and corresponding events, select MDL root object and navigate to Object → KotOR Animations. KotorBlender supports both object and armature-based edits. To create an armature from objects, navigate to KotOR Animations → Armature and press Rebuild Armature and Apply Object Keyframes. Before exporting a model, make sure to copy armature keyframes back to objects by pressing Unapply Object Keyframes.
 
 ### Lightmapping
 
@@ -54,7 +57,7 @@ Fine-tuning:
 1. In Scene → Render, set Device to GPU Compute to improve performance, set Render Engine to Cycles if not already
 1. In Scene → Render → Sampling → Render increase Max Samples to improve quality
 
-### Connecting Room Walkmeshes
+### Connecting Rooms
 
 1. Select a room walkmesh
 1. Enter Edit mode and select two vertices adjacent to another room

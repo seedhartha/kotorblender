@@ -93,7 +93,14 @@ def apply_object_keyframes(mdl_root, armature_obj):
     bpy.context.scene.frame_set(0)
     bpy.context.view_layer.objects.active = armature_obj
     bpy.ops.object.mode_set(mode="POSE")
-    apply_object_keyframes_to_armature(mdl_root, armature_obj)
+
+    armature_anim_data = AnimationNode.get_or_create_animation_data(armature_obj)
+    armature_action = AnimationNode.get_or_create_action(armature_obj.name)
+    if not armature_anim_data.action:
+        armature_anim_data.action = armature_action
+    armature_action.fcurves.clear()
+
+    apply_object_keyframes_to_armature(mdl_root, armature_obj, armature_action)
     bpy.ops.object.mode_set(mode="OBJECT")
 
 
@@ -104,7 +111,7 @@ def unapply_object_keyframes(mdl_root, armature_obj):
     unapply_object_keyframes_from_armature(mdl_root, mdl_root.name, armature_obj)
 
 
-def apply_object_keyframes_to_armature(obj, armature_obj):
+def apply_object_keyframes_to_armature(obj, armature_obj, armature_action):
     if (
         obj.name in armature_obj.pose.bones
         and obj.animation_data
@@ -125,11 +132,6 @@ def apply_object_keyframes_to_armature(obj, armature_obj):
                 locations = [(values[0], values[1]) for values in dp_keyframes]
             if data_path == "rotation_quaternion":
                 rotations = [(values[0], values[1]) for values in dp_keyframes]
-
-        armature_anim_data = AnimationNode.get_or_create_animation_data(armature_obj)
-        armature_action = AnimationNode.get_or_create_action(armature_obj.name)
-        if not armature_anim_data.action:
-            armature_anim_data.action = armature_action
 
         if locations:
             fcurves = [
@@ -184,7 +186,7 @@ def apply_object_keyframes_to_armature(obj, armature_obj):
                 kfp.update()
 
     for child in obj.children:
-        apply_object_keyframes_to_armature(child, armature_obj)
+        apply_object_keyframes_to_armature(child, armature_obj, armature_action)
 
 
 def unapply_object_keyframes_from_armature(obj, root_name, armature_obj):
@@ -199,6 +201,7 @@ def unapply_object_keyframes_from_armature(obj, root_name, armature_obj):
         action = AnimationNode.get_or_create_action("{}.{}".format(root_name, obj.name))
         if not anim_data.action:
             anim_data.action = action
+        action.fcurves.clear()
 
         assert bpy.context.scene.frame_current == 0
         rest_location = obj.location.copy()
