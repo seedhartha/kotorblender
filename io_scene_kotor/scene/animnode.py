@@ -36,27 +36,39 @@ class Property:
 
 
 def convert_mdl_position_to_bl_location(val, restloc, animscale):
-    dim = len(val)
-    assert dim == 3 or dim == 9
-    if dim == 3:
-        return [restloc[i] + animscale * val[i] for i in range(3)]
-    else:
-        p1 = [restloc[i] + animscale * val[i] for i in range(3)]
-        p0 = [p1[i] + val[3 + i] for i in range(3)]
-        p2 = [p1[i] + val[6 + i] for i in range(3)]
-        return p1 + p0 + p2
+    p1 = [restloc[i] + animscale * val[i] for i in range(3)]
+    bezier = len(val) == 9
+    if not bezier:
+        return p1
+    p0 = [val[3 + i] + p1[i] for i in range(3)]
+    p2 = [val[6 + i] + p1[i] for i in range(3)]
+    return p1 + p0 + p2
 
 
 def convert_bl_location_to_mdl_position(val, restloc):
-    dim = len(val)
-    assert dim == 3 or dim == 9
-    if dim == 3:
-        return [val[i] - restloc[i] for i in range(3)]
-    else:
-        p1 = [val[i] - restloc[i] for i in range(3)]
-        p0 = [val[3 + i] - val[i] for i in range(3)]
-        p2 = [val[6 + i] - val[i] for i in range(3)]
-        return p1 + p0 + p2
+    p1 = [val[i] - restloc[i] for i in range(3)]
+    bezier = len(val) == 9
+    if not bezier:
+        return p1
+    p0 = [val[3 + i] - val[i] for i in range(3)]
+    p2 = [val[6 + i] - val[i] for i in range(3)]
+    return p1 + p0 + p2
+
+
+def convert_mdl_orientation_to_bl_rotation(val, restloc, animscale):
+    return [val[3], *val[0:3]]
+
+
+def convert_bl_rotation_to_mdl_orientation(val, restloc):
+    return [*val[1:4], val[0]]
+
+
+def convert_mdl_scale_to_bl_scale(val, restloc, animscale):
+    return [val[0], val[0], val[0]]
+
+
+def convert_bl_scale_to_mdl_scale(val, restloc):
+    return [val[0]]
 
 
 PROPERTIES = [
@@ -67,13 +79,19 @@ PROPERTIES = [
         mdl_to_bl_cvt=convert_mdl_position_to_bl_location,
         bl_to_mdl_cvt=convert_bl_location_to_mdl_position,
     ),
-    Property("orientation", "rotation_quaternion", 4),
+    Property(
+        "orientation",
+        "rotation_quaternion",
+        4,
+        mdl_to_bl_cvt=convert_mdl_orientation_to_bl_rotation,
+        bl_to_mdl_cvt=convert_bl_rotation_to_mdl_orientation,
+    ),
     Property(
         "scale",
         "scale",
         3,
-        mdl_to_bl_cvt=lambda val, restloc: [val[0], val[0], val[0]],
-        bl_to_mdl_cvt=lambda val, restloc: [val[0]],
+        mdl_to_bl_cvt=convert_mdl_scale_to_bl_scale,
+        bl_to_mdl_cvt=convert_bl_scale_to_mdl_scale,
     ),
     # Meshes
     Property("alpha", "kb.alpha", 1),
@@ -200,10 +218,24 @@ class AnimationNode:
                     prop.mdl_to_bl_cvt(d[1:], obj.location, animscale) for d in data
                 ]
             else:
-                values = [d[1:] for d in data]
+                values = []
+                for row in data:
+                    row_values = row[1:]
+                    val_len = len(row_values)
+                    bezier = val_len == 3 * prop.bl_dim
+                    if not bezier:
+                        values.append(row_values)
+                        continue
+                    p1 = row_values[0 : prop.bl_dim]
+                    p0 = row_values[prop.bl_dim : 2 * prop.bl_dim]
+                    p2 = row_values[2 * prop.bl_dim : 3 * prop.bl_dim]
+                    for i in range(prop.bl_dim):
+                        p0[i] += p1[i]
+                        p2[i] += p1[i]
+                    values.append(p1 + p0 + p2)
+
             for frame, val in zip(frames, values):
                 bezier = len(val) == 3 * prop.bl_dim
-                assert len(val) == prop.bl_dim or bezier
                 for i in range(prop.bl_dim):
                     keyframe = keyframe_points[i].insert(
                         frame, val[i], options={"FAST"}
@@ -212,8 +244,11 @@ class AnimationNode:
                         keyframe.interpolation = "BEZIER"
                         keyframe.handle_left_type = "FREE"
                         keyframe.handle_right_type = "FREE"
-                        keyframe.handle_left = (keyframe.co.x - 1, val[3 + i])
-                        keyframe.handle_right = (keyframe.co.x + 1, val[6 + i])
+                        keyframe.handle_left = (keyframe.co.x - 1, val[prop.bl_dim + i])
+                        keyframe.handle_right = (
+                            keyframe.co.x + 1,
+                            val[2 * prop.bl_dim + i],
+                        )
                     else:
                         keyframe.interpolation = "LINEAR"
             for kfp in keyframe_points:
@@ -261,15 +296,25 @@ class AnimationNode:
 
             for keyframe in dp_keyframes:
                 time = frame_to_time(keyframe[0] - anim.frame_start)
+                values = keyframe[1]
                 if prop.bl_to_mdl_cvt:
                     restloc = (
                         anim_subject.location
                         if hasattr(anim_subject, "location")
                         else [0.0] * 3
                     )
-                    values = prop.bl_to_mdl_cvt(keyframe[1], restloc)
+                    values = prop.bl_to_mdl_cvt(values, restloc)
                 else:
-                    values = keyframe[1]
+                    val_len = len(values)
+                    bezier = val_len == 3 * prop.bl_dim
+                    if bezier:
+                        p1 = values[0 : prop.bl_dim]
+                        p0 = values[prop.bl_dim : 2 * prop.bl_dim]
+                        p2 = values[2 * prop.bl_dim : 3 * prop.bl_dim]
+                        for i in range(prop.bl_dim):
+                            p0[i] -= p1[i]
+                            p2[i] -= p1[i]
+                        values = p1 + p0 + p2
                 self.keyframes[label].append([time] + values)
 
     @classmethod
@@ -284,7 +329,11 @@ class AnimationNode:
             if not data_path in DATA_PATH_TO_PROPERTY:
                 continue
             prop = DATA_PATH_TO_PROPERTY[data_path]
-            assert array_index >= 0 and array_index < prop.bl_dim
+            assert (
+                array_index >= 0 and array_index < prop.bl_dim
+            ), "Array index must be between {} and {}, was {}".format(
+                0, prop.bl_dim, array_index
+            )
             for kp in fcurve.keyframe_points:
                 frame = round(kp.co[0])
                 if frame < frame_start or frame > frame_end:

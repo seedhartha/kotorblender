@@ -16,9 +16,8 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+import math
 import os
-
-from math import sqrt
 
 from mathutils import Vector
 
@@ -30,7 +29,7 @@ from .types import *
 
 
 class MdlWriter:
-    def __init__(self, path, model, tsl, xbox):
+    def __init__(self, path, model, tsl, xbox, compress_quaternions=False):
         self.path = path
         self.mdl = BinaryWriter(path, "little")
 
@@ -41,6 +40,7 @@ class MdlWriter:
         self.model = model
         self.tsl = tsl
         self.xbox = xbox
+        self.compress_quaternions = compress_quaternions
 
         # Model
         self.mdl_pos = 0
@@ -575,36 +575,73 @@ class MdlWriter:
                 data_count += 1 + dim
 
     def peek_anim_controllers(self, node, type_flags, out_keys, out_data):
-        def append_keyframes(key, ctrl_type, num_columns, data_count, converter=None):
+        def append_keyframes(key, ctrl_type, dim, data_count):
             if not key in node.keyframes:
                 return data_count
             keyframes = node.keyframes[key]
             if not keyframes:
                 return data_count
-
-            keyframe_columns = len(keyframes[0]) - 1
+            num_rows = len(keyframes)
+            row_lengths = {len(row) for row in keyframes}
+            assert len(row_lengths) == 1, "All rows must have the same size"
+            num_values = len(keyframes[0]) - 1
+            bezier = num_values == 3 * dim
             assert (
-                keyframe_columns == num_columns or keyframe_columns == 3 * num_columns
+                num_values == dim or bezier
+            ), "Expected {} or {} values, got {}".format(dim, 3 * dim, num_values)
+            out_keys.append(
+                ControllerKey(
+                    ctrl_type,
+                    num_rows,
+                    data_count,
+                    data_count + num_rows,
+                    (dim | CTRL_FLAG_BEZIER) if bezier else dim,
+                )
             )
-            bezier = keyframe_columns == 3 * num_columns
-            if bezier:
-                num_columns |= CTRL_FLAG_BEZIER
+            for i in range(num_rows):
+                out_data.append(keyframes[i][0])  # timekey
+            num_columns = 3 * dim if bezier else dim
+            for i in range(num_rows):
+                values = keyframes[i][1 : 1 + num_columns]
+                for val in values:
+                    out_data.append(val)
+            return data_count + (1 + num_columns) * num_rows
 
+        def append_orientation_keyframes(data_count):
+            if not self.compress_quaternions:
+                return append_keyframes(
+                    "orientation", CTRL_BASE_ORIENTATION, 4, data_count
+                )
+
+            if not "orientation" in node.keyframes:
+                return data_count
+            keyframes = node.keyframes["orientation"]
+            if not keyframes:
+                return data_count
             num_rows = len(keyframes)
             out_keys.append(
                 ControllerKey(
-                    ctrl_type, num_rows, data_count, data_count + num_rows, num_columns
+                    CTRL_BASE_ORIENTATION,
+                    num_rows,
+                    data_count,
+                    data_count + num_rows,
+                    2,
                 )
             )
             for i in range(num_rows):
                 out_data.append(keyframes[i][0])  # timekey
             for i in range(num_rows):
-                values = keyframes[i][1 : 1 + keyframe_columns]
-                if converter:
-                    values = converter(values)
-                for val in values:
-                    out_data.append(val)
-            return data_count + (1 + keyframe_columns) * num_rows
+                x, y, z, w = keyframes[i][1:]
+                if w < 0.0:
+                    x *= -1.0
+                    y *= -1.0
+                    z *= -1.0
+                ix = int((x + 1.0) * 1023.0)
+                iy = int((y + 1.0) * 1023.0)
+                iz = int((z + 1.0) * 511.0)
+                comp = ix | (iy << 11) | (iz << 22)
+                out_data.append(comp)
+            return data_count + 2 * num_rows
 
         if not node.parent:
             return
@@ -614,13 +651,7 @@ class MdlWriter:
         # Base Controllers
 
         data_count = append_keyframes("position", CTRL_BASE_POSITION, 3, data_count)
-        data_count = append_keyframes(
-            "orientation",
-            CTRL_BASE_ORIENTATION,
-            4,
-            data_count,
-            lambda values: [*values[1:4], values[0]],
-        )
+        data_count = append_orientation_keyframes(data_count)
 
         # Mesh Controllers
 
@@ -856,7 +887,10 @@ class MdlWriter:
             # Controller Data
 
             for val in self.anim_controller_data[anim_idx][node_idx]:
-                self.mdl.write_float(val)
+                if type(val) is int:
+                    self.mdl.write_uint32(val)
+                else:
+                    self.mdl.write_float(val)
 
     def save_nodes(self):
         num_meshes = 0
@@ -1661,7 +1695,7 @@ class MdlWriter:
         if a > b + c or b > a + c or c > a + b:
             return -1.0
         area2 = s * (s - a) * (s - b) * (s - c)
-        return sqrt(area2)
+        return math.sqrt(area2)
 
     def generate_aabb_tree(self, node):
         face_list = []

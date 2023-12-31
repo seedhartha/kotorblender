@@ -50,12 +50,17 @@ class KB_OT_export_mdl(bpy.types.Operator, ExportHelper):
         default=True,
     )
 
+    compress_quaternions: bpy.props.BoolProperty(
+        name="Compress Quaternions", default=False
+    )
+
     def execute(self, context):
         options = ExportOptions()
         options.export_for_tsl = self.export_for_tsl
         options.export_for_xbox = self.export_for_xbox
         options.export_animations = self.export_animations
         options.export_walkmeshes = self.export_walkmeshes
+        options.compress_quaternions = self.compress_quaternions
 
         try:
             mdl.save_mdl(self, self.filepath, options)

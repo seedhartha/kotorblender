@@ -147,3 +147,4 @@ class ExportOptions:
         self.export_for_xbox = False
         self.export_animations = True
         self.export_walkmeshes = True
+        self.compress_quaternions = False

@@ -732,37 +732,34 @@ class MdlReader:
             if isinstance(supernode, TrimeshNode):
                 if CTRL_MESH_ALPHA in controllers:
                     node.keyframes["alpha"] = [
-                        row[:2] for row in controllers[CTRL_MESH_ALPHA]
+                        row for row in controllers[CTRL_MESH_ALPHA]
                     ]
                 if CTRL_MESH_SCALE in controllers:
                     node.keyframes["scale"] = [
-                        row[:2] for row in controllers[CTRL_MESH_SCALE]
+                        row for row in controllers[CTRL_MESH_SCALE]
                     ]
                 if CTRL_MESH_SELFILLUMCOLOR in controllers:
                     node.keyframes["selfillumcolor"] = [
-                        row[:4] for row in controllers[CTRL_MESH_SELFILLUMCOLOR]
+                        row for row in controllers[CTRL_MESH_SELFILLUMCOLOR]
                     ]
             if isinstance(supernode, LightNode):
                 if CTRL_LIGHT_RADIUS in controllers:
                     node.keyframes["radius"] = [
-                        row[:2] for row in controllers[CTRL_LIGHT_RADIUS]
+                        row for row in controllers[CTRL_LIGHT_RADIUS]
                     ]
                 if CTRL_LIGHT_MULTIPLIER in controllers:
                     node.keyframes["multiplier"] = [
-                        row[:2] for row in controllers[CTRL_LIGHT_MULTIPLIER]
+                        row for row in controllers[CTRL_LIGHT_MULTIPLIER]
                     ]
                 if CTRL_LIGHT_COLOR in controllers:
                     node.keyframes["color"] = [
-                        row[:4] for row in controllers[CTRL_LIGHT_COLOR]
+                        row for row in controllers[CTRL_LIGHT_COLOR]
                     ]
             if isinstance(supernode, EmitterNode):
                 for key in EMITTER_CONTROLLER_KEYS:
                     if not key[0] in controllers:
                         continue
-                    num_columns = key[2]
-                    node.keyframes[key[1]] = [
-                        row[: num_columns + 1] for row in controllers[key[0]]
-                    ]
+                    node.keyframes[key[1]] = [row for row in controllers[key[0]]]
 
         self.mdl.seek(MDL_OFFSET + children_arr.offset)
         child_offsets = [self.mdl.read_uint32() for _ in range(children_arr.count)]
@@ -855,7 +852,7 @@ class MdlReader:
     def orientation_controller_to_quaternion(self, values):
         num_columns = len(values)
         if num_columns == 4:
-            return [values[3], *values[0:3]]
+            return values
         elif num_columns == 1:
             comp = values[0]
             x = ((comp & 0x7FF) / 1023.0) - 1.0
@@ -866,7 +863,7 @@ class MdlReader:
                 w = sqrt(1.0 - mag2)
             else:
                 w = 0.0
-            return [w, x, y, z]
+            return [x, y, z, w]
         else:
             raise RuntimeError(
                 "Unsupported number of orientation columns: " + str(num_columns)
