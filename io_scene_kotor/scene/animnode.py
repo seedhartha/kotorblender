@@ -138,14 +138,14 @@ class AnimationNode:
                 anim_subject = obj
                 action_name = "{}.{}".format(root_name, obj.name)
 
-            anim_data = self.get_or_create_animation_data(anim_subject)
-            action = self.get_or_create_action(action_name)
+            anim_data = AnimationNode.get_or_create_animation_data(anim_subject)
+            action = AnimationNode.get_or_create_action(action_name)
             if not anim_data.action:
                 anim_data.action = action
 
             data_path = prop.data_path
             fcurves = [
-                self.get_or_create_fcurve(action, data_path, i)
+                AnimationNode.get_or_create_fcurve(action, data_path, i)
                 for i in range(prop.bl_dim)
             ]
             keyframe_points = [fcurve.keyframe_points for fcurve in fcurves]
@@ -168,7 +168,7 @@ class AnimationNode:
                     keyframe = keyframe_points[i].insert(
                         frame, rest_values[i], options={"FAST"}
                     )
-                    keyframe.interpolation = "CONSTANT"
+                    keyframe.interpolation = "LINEAR"
 
             # Add animation keyframes
 
@@ -179,32 +179,31 @@ class AnimationNode:
                 ]
             else:
                 values = [d[1:] for d in data]
-            last_keyframes = [None] * prop.bl_dim
             for frame, val in zip(frames, values):
                 for i in range(prop.bl_dim):
                     keyframe = keyframe_points[i].insert(
                         frame, val[i], options={"FAST"}
                     )
                     keyframe.interpolation = "LINEAR"
-                    last_keyframes[i] = keyframe
-            for keyframe in last_keyframes:
-                keyframe.interpolation = "CONSTANT"
             for kfp in keyframe_points:
                 kfp.update()
 
-    def get_or_create_action(self, name):
+    @classmethod
+    def get_or_create_action(cls, name):
         if name in bpy.data.actions:
             return bpy.data.actions[name]
         else:
             return bpy.data.actions.new(name=name)
 
-    def get_or_create_animation_data(self, subject):
+    @classmethod
+    def get_or_create_animation_data(cls, subject):
         if subject.animation_data:
             return subject.animation_data
         else:
             return subject.animation_data_create()
 
-    def get_or_create_fcurve(self, action, data_path, index):
+    @classmethod
+    def get_or_create_fcurve(cls, action, data_path, index):
         fcurve = action.fcurves.find(data_path, index=index)
         if not fcurve:
             fcurve = action.fcurves.new(data_path=data_path, index=index)
