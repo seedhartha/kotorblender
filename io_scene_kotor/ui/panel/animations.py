@@ -57,7 +57,7 @@ class KB_PT_animations(bpy.types.Panel):
 
         anim_list = obj.kb.anim_list
         anim_list_idx = obj.kb.anim_list_idx
-        if anim_list_idx >= 0 or anim_list_idx < len(anim_list):
+        if anim_list_idx >= 0 and anim_list_idx < len(anim_list):
             anim = anim_list[anim_list_idx]
             row = layout.row()
             col = row.column(align=True)
