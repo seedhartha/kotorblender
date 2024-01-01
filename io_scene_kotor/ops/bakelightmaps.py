@@ -30,22 +30,19 @@ class BakeLightmapsOperator(bpy.types.Operator):
 
     def execute(self, context):
         # Find bake targets
-        targets = [
-            obj
-            for obj in (
-                context.selected_objects
-                if context.selected_objects
-                else context.collection.objects
-            )
-            if self.is_bake_target(obj)
-        ]
+        objects = (
+            context.selected_objects
+            if context.selected_objects
+            else context.scene.objects
+        )
+        targets = [obj for obj in objects if self.is_bake_target(obj)]
         if not targets:
             return {"CANCELLED"}
 
-        # Only bake lightmapped objects and lights, if enabled
+        # Optionally, hide everything except lightmapped objects and lights
         if self.hide_non_lightmapped:
             target_names = set([obj.name for obj in targets])
-            for obj in context.collection.objects:
+            for obj in context.scene.objects:
                 obj.hide_render = obj.type != "LIGHT" and not obj.name in target_names
 
         for obj in targets:
