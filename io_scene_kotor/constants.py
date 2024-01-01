@@ -16,6 +16,8 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+PACKAGE_NAME = __package__
+
 NULL = "NULL"
 
 ANIM_REST_POSE_OFFSET = 5
@@ -137,8 +139,6 @@ class ImportOptions:
         self.import_walkmeshes = True
         self.build_materials = True
         self.build_armature = False
-        self.texture_search_paths = []
-        self.lightmap_search_paths = []
 
 
 class ExportOptions:

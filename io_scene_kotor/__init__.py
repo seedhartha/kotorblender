@@ -18,6 +18,7 @@
 
 import bpy
 
+from .addonprefs import KotorBlenderAddonPreferences
 from .ops.anim.add import KB_OT_add_animation
 from .ops.anim.delete import KB_OT_delete_animation
 from .ops.anim.event.add import KB_OT_add_anim_event
@@ -139,6 +140,7 @@ def menu_func_kotor(self, context):
 
 
 classes = (
+    KotorBlenderAddonPreferences,
     # Property Groups
     PathConnectionPropertyGroup,
     AnimEventPropertyGroup,

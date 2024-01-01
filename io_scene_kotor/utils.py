@@ -16,6 +16,8 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+import os
+
 from .constants import *
 
 
@@ -161,3 +163,16 @@ def float_to_byte(val):
 
 def int_to_hex(val):
     return "{:02X}".format(val)
+
+
+def semicolon_separated_to_absolute_paths(paths_str, working_dir):
+    abs_paths = []
+    rel_paths = paths_str.split(";")
+    for rel_path in rel_paths:
+        abs_path = (
+            rel_path if os.path.isabs(rel_path) else os.path.join(working_dir, rel_path)
+        )
+        abs_paths.append(abs_path)
+    if working_dir not in abs_paths:
+        abs_paths.insert(0, working_dir)
+    return abs_paths

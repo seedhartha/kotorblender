@@ -19,15 +19,13 @@
 import os
 import traceback
 
-from math import radians
-
 import bpy
 
 from bpy_extras.io_utils import ImportHelper
 
-from ...constants import ImportOptions
-
+from ...constants import PACKAGE_NAME, ImportOptions
 from ...io import mdl
+from ...utils import semicolon_separated_to_absolute_paths
 
 
 class KB_OT_import_mdl(bpy.types.Operator, ImportHelper):
@@ -61,18 +59,6 @@ class KB_OT_import_mdl(bpy.types.Operator, ImportHelper):
         name="Build Armature", description="Build armature from MDL root"
     )
 
-    texture_search_paths: bpy.props.StringProperty(
-        name="Texture Search Paths",
-        description="Semi-colon-separated list of paths. Can be relative to the imported model or absolute.",
-        default="../texturepacks/swpc_tex_tpa",
-    )
-
-    lightmap_search_paths: bpy.props.StringProperty(
-        name="Lightmap Search Paths",
-        description="Semi-colon-separated list of paths. Can be relative to the imported model or absolute.",
-        default="../texturepacks/swpc_tex_tpa",
-    )
-
     def execute(self, context):
         options = ImportOptions()
         options.import_geometry = self.import_geometry
@@ -80,11 +66,14 @@ class KB_OT_import_mdl(bpy.types.Operator, ImportHelper):
         options.import_walkmeshes = self.import_walkmeshes
         options.build_materials = self.build_materials
         options.build_armature = self.build_armature
-        options.texture_search_paths = self.colon_separated_paths_to_absolute_paths(
-            self.texture_search_paths, os.path.dirname(self.filepath)
+
+        preferences = context.preferences
+        addon_preferences = preferences.addons[PACKAGE_NAME].preferences
+        options.texture_search_paths = semicolon_separated_to_absolute_paths(
+            addon_preferences.texture_search_paths, os.path.dirname(self.filepath)
         )
-        options.lightmap_search_paths = self.colon_separated_paths_to_absolute_paths(
-            self.lightmap_search_paths, os.path.dirname(self.filepath)
+        options.lightmap_search_paths = semicolon_separated_to_absolute_paths(
+            addon_preferences.lightmap_search_paths, os.path.dirname(self.filepath)
         )
 
         try:
@@ -94,17 +83,3 @@ class KB_OT_import_mdl(bpy.types.Operator, ImportHelper):
             self.report({"ERROR"}, str(e))
 
         return {"FINISHED"}
-
-    def colon_separated_paths_to_absolute_paths(self, paths_str, working_dir):
-        abs_paths = []
-        rel_paths = paths_str.split(";")
-        for rel_path in rel_paths:
-            abs_path = (
-                rel_path
-                if os.path.isabs(rel_path)
-                else os.path.join(working_dir, rel_path)
-            )
-            abs_paths.append(abs_path)
-        if working_dir not in abs_paths:
-            abs_paths.append(working_dir)
-        return abs_paths
