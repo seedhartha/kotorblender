@@ -116,7 +116,7 @@ class TrimeshNode(BaseNode):
         self.apply_edge_loop_mesh(mesh, obj)
         self.set_object_data(obj, options)
         if options.build_materials and self.roottype == RootType.MODEL:
-            material.rebuild_object_material(
+            material.rebuild_object_materials(
                 obj, options.texture_search_paths, options.lightmap_search_paths
             )
         collection.objects.link(obj)

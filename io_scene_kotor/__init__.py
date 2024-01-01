@@ -36,7 +36,6 @@ from .ops.bakelightmaps import (
 from .ops.lensflare.add import KB_OT_add_lens_flare
 from .ops.lensflare.delete import KB_OT_delete_lens_flare
 from .ops.lensflare.move import KB_OT_move_lens_flare
-from .ops.loadwokmaterials import KB_OT_load_wok_materials
 from .ops.lyt.export import KB_OT_export_lyt
 from .ops.lyt.importop import KB_OT_import_lyt
 from .ops.mdl.export import KB_OT_export_mdl
@@ -182,7 +181,6 @@ classes = (
     KB_OT_import_lyt,
     KB_OT_import_mdl,
     KB_OT_import_pth,
-    KB_OT_load_wok_materials,
     KB_OT_move_anim_event,
     KB_OT_move_animation,
     KB_OT_move_lens_flare,

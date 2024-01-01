@@ -18,9 +18,9 @@
 
 import bpy
 
-from ..constants import DummyType, MeshType
+from ..constants import MeshType
 from ..scene import material
-from ..utils import find_objects
+from ..utils import is_mdl_root, find_objects
 
 
 class KB_OT_rebuild_all_materials(bpy.types.Operator):
@@ -29,15 +29,14 @@ class KB_OT_rebuild_all_materials(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        obj = context.object
-        return obj and obj.type == "EMPTY" and obj.kb.dummytype == DummyType.MDLROOT
+        return is_mdl_root(context.object)
 
     def execute(self, context):
         objects = find_objects(
             context.object,
             lambda obj: obj.type == "MESH"
-            and obj.kb.meshtype not in [MeshType.AABB, MeshType.EMITTER],
+            and obj.kb.meshtype not in [MeshType.EMITTER],
         )
         for obj in objects:
-            material.rebuild_object_material(obj)
+            material.rebuild_object_materials(obj)
         return {"FINISHED"}

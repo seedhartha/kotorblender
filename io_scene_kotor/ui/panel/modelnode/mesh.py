@@ -180,5 +180,3 @@ class KB_PT_mesh_aabb(bpy.types.Panel):
 
         row = layout.row()
         row.prop(obj.kb, "lytposition")
-        row = layout.row()
-        row.operator("kb.load_wok_mats", icon="NONE")

@@ -27,6 +27,7 @@ from ..format.tpc.reader import TpcReader
 from ..utils import (
     is_null,
     is_not_null,
+    is_aabb_mesh,
     color_to_hex,
     int_to_hex,
     float_to_byte,
@@ -59,11 +60,17 @@ class WalkmeshNodeName:
     OPACITY = "opacity"
 
 
-def rebuild_object_material(obj, texture_search_paths=[], lightmap_search_paths=[]):
-    material = get_or_create_material(get_material_name(obj))
-
+def rebuild_object_materials(obj, texture_search_paths=[], lightmap_search_paths=[]):
     mesh = obj.data
+    polygon_materials = [polygon.material_index for polygon in mesh.polygons]
     mesh.materials.clear()
+
+    if is_aabb_mesh(obj):
+        rebuild_walkmesh_materials(obj)
+        mesh.polygons.foreach_set("material_index", polygon_materials)
+        return
+
+    material = get_or_create_material(get_material_name(obj))
     mesh.materials.append(material)
 
     if is_null(obj.kb.bitmap) and is_null(obj.kb.bitmap2):
@@ -75,19 +82,13 @@ def rebuild_object_material(obj, texture_search_paths=[], lightmap_search_paths=
 
 
 def rebuild_walkmesh_materials(obj):
-    obj.select_set(True)
-    bpy.context.view_layer.objects.active = obj
     mesh = obj.data
-
-    polygon_materials = [polygon.material_index for polygon in mesh.polygons]
-
-    for _ in range(len(obj.material_slots)):
-        bpy.ops.object.material_slot_remove()
 
     for name, color, _ in WALKMESH_MATERIALS:
         material = get_or_create_material(name)
         material.use_nodes = True
         material.blend_method = "BLEND"
+        material.shadow_method = "NONE"
 
         nodes = material.node_tree.nodes
         nodes.clear()
@@ -101,15 +102,15 @@ def rebuild_walkmesh_materials(obj):
         color_node.location = (x, 300)
         color_node.outputs[0].default_value = [*color, 4]
 
-        opacity = nodes.new("ShaderNodeValue")
-        opacity.name = WalkmeshNodeName.OPACITY
-        opacity.location = (x, 0)
-        opacity.outputs[0].default_value = 1.0
-
         x += 300
 
+        opacity = nodes.new("ShaderNodeValue")
+        opacity.name = WalkmeshNodeName.OPACITY
+        opacity.location = (x, 300)
+        opacity.outputs[0].default_value = 1.0
+
         transparent_bsdf = nodes.new("ShaderNodeBsdfTransparent")
-        transparent_bsdf.location = (x, 300)
+        transparent_bsdf.location = (x, 150)
         links.new(transparent_bsdf.inputs["Color"], color_node.outputs[0])
 
         emission = nodes.new("ShaderNodeEmission")
@@ -131,8 +132,6 @@ def rebuild_walkmesh_materials(obj):
         links.new(output.inputs[0], mix_shader.outputs[0])
 
         mesh.materials.append(material)
-
-    mesh.polygons.foreach_set("material_index", polygon_materials)
 
 
 def get_or_create_material(name):
