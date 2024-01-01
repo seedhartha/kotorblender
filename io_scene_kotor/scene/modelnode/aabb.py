@@ -21,8 +21,8 @@ import bpy
 from bpy_extras.io_utils import unpack_list
 from mathutils import Vector
 
-from ...constants import MeshType, NodeType, WalkmeshMaterial, WOK_MATERIALS
-
+from ...constants import NON_WALKABLE, MeshType, NodeType
+from ..material import rebuild_walkmesh_materials
 from .trimesh import TrimeshNode, UV_MAP_DIFFUSE, UV_MAP_LIGHTMAP
 
 ROOM_LINKS_COLORS = "RoomLinks"
@@ -57,6 +57,10 @@ class AabbNode(TrimeshNode):
         self.apply_room_links(mesh)
         collection.objects.link(obj)
 
+        rebuild_walkmesh_materials(obj)
+        for polygon_idx, polygon in enumerate(mesh.polygons):
+            polygon.material_index = self.facelist.materials[polygon_idx]
+
         return obj
 
     def create_blender_mesh(self, name):
@@ -70,23 +74,6 @@ class AabbNode(TrimeshNode):
         mesh.polygons.add(num_faces)
         mesh.polygons.foreach_set("loop_start", range(0, 3 * num_faces, 3))
         mesh.polygons.foreach_set("loop_total", (3,) * num_faces)
-
-        # Create materials
-        for wok_mat in WOK_MATERIALS:
-            mat_name = wok_mat[0]
-            # Walkmesh materials will be shared across multiple walkmesh objects
-            if mat_name in bpy.data.materials:
-                material = bpy.data.materials[mat_name]
-            else:
-                material = bpy.data.materials.new(mat_name)
-                material.diffuse_color = [*wok_mat[1], 1.0]
-                material.specular_color = (0.0, 0.0, 0.0)
-                material.specular_intensity = wok_mat[2]
-            mesh.materials.append(material)
-
-        # Apply the walkmesh materials to each face
-        for idx, polygon in enumerate(mesh.polygons):
-            polygon.material_index = self.facelist.materials[idx]
 
         # Create UV map
         if len(self.uv1) > 0:
@@ -118,11 +105,7 @@ class AabbNode(TrimeshNode):
             wok_face_idx = wok_edge_idx // 3
             aabb_face = None
             for walkable_idx, polygon in enumerate(
-                [
-                    p
-                    for p in mesh.polygons
-                    if p.material_index not in WalkmeshMaterial.NONWALKABLE
-                ]
+                [p for p in mesh.polygons if p.material_index not in NON_WALKABLE]
             ):
                 if walkable_idx == wok_face_idx:
                     aabb_face = polygon
@@ -140,11 +123,7 @@ class AabbNode(TrimeshNode):
             return
         colors = obj.data.vertex_colors[ROOM_LINKS_COLORS]
         for walkable_idx, tri in enumerate(
-            [
-                p
-                for p in obj.data.loop_triangles
-                if p.material_index not in WalkmeshMaterial.NONWALKABLE
-            ]
+            [p for p in obj.data.loop_triangles if p.material_index not in NON_WALKABLE]
         ):
             for edge, loop_idx in enumerate(tri.loops):
                 color = colors.data[loop_idx].color

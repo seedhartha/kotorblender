@@ -18,7 +18,7 @@
 
 import bpy
 
-from io_scene_kotor.constants import WOK_MATERIALS
+from ..scene.material import rebuild_walkmesh_materials
 
 
 class KB_OT_load_wok_materials(bpy.types.Operator):
@@ -26,29 +26,8 @@ class KB_OT_load_wok_materials(bpy.types.Operator):
     bl_label = "Load Walkmesh Materials"
 
     def execute(self, context):
-        selected_object = context.object
-        if (selected_object) and (selected_object.type == "MESH"):
-            object_mesh = selected_object.data
-
-            # Remove all current material slots
-            for _ in range(len(selected_object.material_slots)):
-                bpy.ops.object.material_slot_remove()
-
-            # Create materials
-            for matDef in WOK_MATERIALS:
-                mat_name = matDef[0]
-
-                # Walkmesh materials should be shared across multiple walkmeshes, as they always identical
-                if mat_name in bpy.data.materials.keys():
-                    mat = bpy.data.materials[mat_name]
-                else:
-                    mat = bpy.data.materials.new(mat_name)
-
-                    mat.diffuse_color = [*matDef[1], 1.0]
-                    mat.specular_color = (0.0, 0.0, 0.0)
-                    mat.specular_intensity = matDef[2]
-
-                object_mesh.materials.append(mat)
+        if (context.object) and (context.object.type == "MESH"):
+            rebuild_walkmesh_materials(context.object)
         else:
             self.report({"INFO"}, "A mesh must be selected")
             return {"CANCELLED"}

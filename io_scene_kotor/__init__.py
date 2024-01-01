@@ -48,6 +48,7 @@ from .ops.pth.removeconnection import KB_OT_delete_path_connection
 from .ops.rebuildallmaterials import KB_OT_rebuild_all_materials
 from .ops.rebuildarmature import KB_OT_rebuild_armature
 from .ops.rebuildmaterial import KB_OT_rebuild_material
+from .ops.renderminimap import KB_OT_render_minimap_auto, KB_OT_render_minimap_manual
 from .ops.showhideobjects import (
     KB_OT_hide_untextured,
     KB_OT_hide_char_bones,
@@ -66,7 +67,12 @@ from .ops.showhideobjects import (
 )
 from .ui.list.lensflares import KB_UL_lens_flares
 from .ui.list.pathpoints import KB_UL_path_points
-from .ui.menu.kotor import KB_MT_kotor, KB_MT_kotor_lightmaps, KB_MT_kotor_showhide
+from .ui.menu.kotor import (
+    KB_MT_kotor,
+    KB_MT_kotor_lightmaps,
+    KB_MT_kotor_minimap,
+    KB_MT_kotor_showhide,
+)
 from .ui.panel.animations import (
     KB_PT_animations,
     KB_PT_animations_events,
@@ -184,6 +190,8 @@ classes = (
     KB_OT_rebuild_all_materials,
     KB_OT_rebuild_armature,
     KB_OT_rebuild_material,
+    KB_OT_render_minimap_auto,
+    KB_OT_render_minimap_manual,
     KB_OT_show_untextured,
     KB_OT_show_char_bones,
     KB_OT_show_char_dummies,
@@ -218,6 +226,7 @@ classes = (
     # Menus
     KB_MT_kotor,
     KB_MT_kotor_lightmaps,
+    KB_MT_kotor_minimap,
     KB_MT_kotor_showhide,
 )
 

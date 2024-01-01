@@ -18,7 +18,7 @@
 
 from mathutils import Vector
 
-from ...constants import DummyType, WalkmeshMaterial, WalkmeshType
+from ...constants import NON_WALKABLE, DummyType, WalkmeshType
 from ...scene.modelnode.aabb import AabbNode
 from ...scene.modelnode.dummy import DummyNode
 from ...scene.modelnode.trimesh import FaceList
@@ -172,7 +172,7 @@ class BwmWriter:
         non_walkable_face_indices = []
         for face_idx, _ in enumerate(self.geom_node.facelist.vertices):
             mat_id = self.geom_node.facelist.materials[face_idx]
-            if mat_id in WalkmeshMaterial.NONWALKABLE:
+            if mat_id in NON_WALKABLE:
                 non_walkable_face_indices.append(face_idx)
             else:
                 walkable_face_indices.append(face_idx)

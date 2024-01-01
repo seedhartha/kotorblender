@@ -28,6 +28,15 @@ class KB_MT_kotor_lightmaps(Menu):
         layout.operator("kb.bake_lightmaps_manual", text="Bake (manual)")
 
 
+class KB_MT_kotor_minimap(Menu):
+    bl_label = "Mininmap"
+
+    def draw(self, context):
+        layout = self.layout
+        layout.operator("kb.render_minimap_auto", text="Render (auto)")
+        layout.operator("kb.render_minimap_manual", text="Render (manual)")
+
+
 class KB_MT_kotor_showhide(Menu):
     bl_label = "Show/Hide"
 
@@ -57,4 +66,5 @@ class KB_MT_kotor(Menu):
     def draw(self, context):
         layout = self.layout
         layout.menu("KB_MT_kotor_lightmaps")
+        layout.menu("KB_MT_kotor_minimap")
         layout.menu("KB_MT_kotor_showhide")

@@ -25,7 +25,7 @@ from ..utils import (
     is_char_dummy,
     is_char_bone,
     is_mesh_type,
-    is_walkmesh,
+    is_aabb_mesh,
 )
 
 
@@ -38,7 +38,7 @@ class KB_OT_hide_walkmeshes(bpy.types.Operator):
         bpy.ops.object.select_all(action="DESELECT")
 
         for obj in bpy.context.scene.objects:
-            if is_walkmesh(obj):
+            if is_aabb_mesh(obj):
                 obj.hide_viewport = True
                 obj.hide_render = True
 
@@ -156,7 +156,7 @@ class KB_OT_show_walkmeshes(bpy.types.Operator):
         bpy.ops.object.select_all(action="DESELECT")
 
         for obj in bpy.context.scene.objects:
-            if is_walkmesh(obj):
+            if is_aabb_mesh(obj):
                 obj.hide_viewport = False
                 obj.hide_render = False
 

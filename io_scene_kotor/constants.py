@@ -24,31 +24,33 @@ ANIM_REST_POSE_OFFSET = 5
 ANIM_PADDING = 60
 ANIM_FPS = 30
 
-WOK_MATERIALS = [
-    ["wok_NotDefined", (0.400, 0.400, 0.400), 0.0],
-    ["wok_Dirt", (0.610, 0.235, 0.050), 0.0],
-    ["wok_Obscuring", (0.100, 0.100, 0.100), 0.5],
-    ["wok_Grass", (0.000, 0.600, 0.000), 0.0],
-    ["wok_Stone", (0.162, 0.216, 0.279), 0.0],
-    ["wok_Wood", (0.258, 0.059, 0.007), 0.0],
-    ["wok_Water", (0.000, 0.000, 1.000), 0.0],
-    ["wok_Nonwalk", (1.000, 0.000, 0.000), 0.0],
-    ["wok_Transparent", (1.000, 1.000, 1.000), 1.0],
-    ["wok_Carpet", (1.000, 0.000, 1.000), 0.0],
-    ["wok_Metal", (0.434, 0.552, 0.730), 1.0],
-    ["wok_Puddles", (0.509, 0.474, 0.147), 0.0],
-    ["wok_Swamp", (0.216, 0.216, 0.000), 0.0],
-    ["wok_Mud", (0.091, 0.147, 0.028), 0.0],
-    ["wok_Leaves", (1.000, 0.262, 0.000), 0.0],
-    ["wok_Lava", (0.300, 0.000, 0.000), 0.3],
-    ["wok_BottomlessPit", (0.000, 0.000, 0.000), 0.0],
-    ["wok_DeepWater", (0.000, 0.000, 0.216), 0.0],
-    ["wok_Door", (0.000, 0.000, 0.000), 0.0],
-    ["wok_Snow", (0.800, 0.800, 0.800), 0.0],
-    ["wok_Sand", (1.000, 1.000, 0.000), 0.0],
-    ["wok_BareBones", (0.500, 0.500, 0.100), 0.0],
-    ["wok_StoneBridge", (0.081, 0.108, 0.139), 0.0],
+WALKMESH_MATERIALS = [
+    ["wok_NotDefined", (0.400, 0.400, 0.400), False],
+    ["wok_Dirt", (0.610, 0.235, 0.050), True],
+    ["wok_Obscuring", (0.100, 0.100, 0.100), False],
+    ["wok_Grass", (0.000, 0.600, 0.000), True],
+    ["wok_Stone", (0.162, 0.216, 0.279), True],
+    ["wok_Wood", (0.258, 0.059, 0.007), True],
+    ["wok_Water", (0.000, 0.000, 1.000), True],
+    ["wok_Nonwalk", (1.000, 0.000, 0.000), False],
+    ["wok_Transparent", (1.000, 1.000, 1.000), False],
+    ["wok_Carpet", (1.000, 0.000, 1.000), True],
+    ["wok_Metal", (0.434, 0.552, 0.730), True],
+    ["wok_Puddles", (0.509, 0.474, 0.147), True],
+    ["wok_Swamp", (0.216, 0.216, 0.000), True],
+    ["wok_Mud", (0.091, 0.147, 0.028), True],
+    ["wok_Leaves", (1.000, 0.262, 0.000), True],
+    ["wok_Lava", (0.300, 0.000, 0.000), False],
+    ["wok_BottomlessPit", (0.000, 0.000, 0.000), True],
+    ["wok_DeepWater", (0.000, 0.000, 0.216), False],
+    ["wok_Door", (0.000, 0.000, 0.000), True],
+    ["wok_Snow", (0.800, 0.800, 0.800), False],
+    ["wok_Sand", (1.000, 1.000, 0.000), True],
+    ["wok_BareBones", (0.500, 0.500, 0.100), True],
+    ["wok_StoneBridge", (0.081, 0.108, 0.139), True],
 ]
+NAME_TO_WALKMESH_MATERIAL = {mat[0]: mat for mat in WALKMESH_MATERIALS}
+NON_WALKABLE = [mat_idx for mat_idx, mat in enumerate(WALKMESH_MATERIALS) if not mat[2]]
 
 
 class Classification:
@@ -105,31 +107,6 @@ class WalkmeshType:
     WOK = "WOK"
     PWK = "PWK"
     DWK = "DWK"
-
-
-class WalkmeshMaterial:
-    DIRT = 1
-    OBSCURING = 2
-    GRASS = 3
-    STONE = 4
-    WOOD = 5
-    WATER = 6
-    NONWALK = 7
-    TRANSPARENT = 8
-    CARPET = 9
-    METAL = 10
-    PUDDLES = 11
-    SWAMP = 12
-    MUD = 13
-    LEAVES = 14
-    LAVA = 15
-    BOTTOMLESSPIT = 16
-    DEEPWATER = 17
-    DOOR = 18
-    SNOW = 19
-    SAND = 20
-
-    NONWALKABLE = [NONWALK, OBSCURING, SNOW, TRANSPARENT, DEEPWATER, LAVA]
 
 
 class ImportOptions:
