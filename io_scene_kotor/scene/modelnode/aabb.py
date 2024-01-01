@@ -18,12 +18,11 @@
 
 import bpy
 
-from bpy_extras.io_utils import unpack_list
 from mathutils import Vector
 
 from ...constants import NON_WALKABLE, MeshType, NodeType
 from ..material import rebuild_walkmesh_materials
-from .trimesh import TrimeshNode, UV_MAP_DIFFUSE, UV_MAP_LIGHTMAP
+from .trimesh import TrimeshNode
 
 ROOM_LINKS_COLORS = "RoomLinks"
 
@@ -33,7 +32,6 @@ class AabbNode(TrimeshNode):
         TrimeshNode.__init__(self, name)
         self.nodetype = NodeType.AABB
         self.meshtype = MeshType.AABB
-        self.compress = False
 
         self.lytposition = (0.0, 0.0, 0.0)
         self.roomlinks = dict()
@@ -51,49 +49,18 @@ class AabbNode(TrimeshNode):
                 break
 
     def add_to_collection(self, collection, options):
-        mesh = self.create_blender_mesh(self.name)
-        obj = bpy.data.objects.new(self.name, mesh)
+        mesh = self.mdl_to_edge_loop_mesh()
+        bl_mesh = self.create_blender_mesh(self.name, mesh)
+        obj = bpy.data.objects.new(self.name, bl_mesh)
         self.set_object_data(obj, options)
-        self.apply_room_links(mesh)
         collection.objects.link(obj)
 
         rebuild_walkmesh_materials(obj)
-        for polygon_idx, polygon in enumerate(mesh.polygons):
+        for polygon_idx, polygon in enumerate(bl_mesh.polygons):
             polygon.material_index = self.facelist.materials[polygon_idx]
+        self.apply_room_links(bl_mesh)
 
         return obj
-
-    def create_blender_mesh(self, name):
-        # Create the mesh itself
-        mesh = bpy.data.meshes.new(name)
-        mesh.vertices.add(len(self.verts))
-        mesh.vertices.foreach_set("co", unpack_list(self.verts))
-        num_faces = len(self.facelist.vertices)
-        mesh.loops.add(3 * num_faces)
-        mesh.loops.foreach_set("vertex_index", unpack_list(self.facelist.vertices))
-        mesh.polygons.add(num_faces)
-        mesh.polygons.foreach_set("loop_start", range(0, 3 * num_faces, 3))
-        mesh.polygons.foreach_set("loop_total", (3,) * num_faces)
-
-        # Create UV map
-        if len(self.uv1) > 0:
-            uv = unpack_list(
-                [self.uv1[i] for indices in self.facelist.uv for i in indices]
-            )
-            uv_layer = mesh.uv_layers.new(name=UV_MAP_DIFFUSE, do_init=False)
-            uv_layer.data.foreach_set("uv", uv)
-
-        # Create lightmap UV map
-        if len(self.uv2) > 0:
-            uv = unpack_list(
-                [self.uv2[i] for indices in self.facelist.uv for i in indices]
-            )
-            uv_layer = mesh.uv_layers.new(name=UV_MAP_LIGHTMAP, do_init=False)
-            uv_layer.data.foreach_set("uv", uv)
-
-        mesh.update()
-
-        return mesh
 
     def apply_room_links(self, mesh):
         if ROOM_LINKS_COLORS in mesh.vertex_colors:

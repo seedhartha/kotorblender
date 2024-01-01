@@ -27,7 +27,7 @@ class Walkmesh(Model):
         Model.__init__(self)
         self.walkmesh_type = walkmesh_type
 
-    def import_to_collection(self, parent_obj, collection, options):
+    def add_to_collection(self, parent_obj, collection, options):
         if type(self.root_node) != DummyNode or self.root_node.parent:
             raise RuntimeError("Root node has to be a dummy without a parent")
 

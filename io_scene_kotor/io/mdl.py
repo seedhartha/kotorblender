@@ -77,14 +77,14 @@ def load_mdl(operator, filepath, options, position=(0.0, 0.0, 0.0)):
             dwk_walkmesh3 = dwk3.load()
 
     collection = bpy.context.collection
-    model_root = model.import_to_collection(collection, options, position)
+    model_root = model.add_to_collection(collection, options, position)
 
     if pwk_walkmesh:
-        pwk_walkmesh.import_to_collection(model_root, collection, options)
+        pwk_walkmesh.add_to_collection(model_root, collection, options)
     if dwk_walkmesh1 and dwk_walkmesh2 and dwk_walkmesh3:
-        dwk_walkmesh1.import_to_collection(model_root, collection, options)
-        dwk_walkmesh2.import_to_collection(model_root, collection, options)
-        dwk_walkmesh3.import_to_collection(model_root, collection, options)
+        dwk_walkmesh1.add_to_collection(model_root, collection, options)
+        dwk_walkmesh2.add_to_collection(model_root, collection, options)
+        dwk_walkmesh3.add_to_collection(model_root, collection, options)
 
     bpy.context.scene.render.fps = ANIM_FPS
 

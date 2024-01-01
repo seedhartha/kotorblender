@@ -30,6 +30,11 @@ UV_MAP_DIFFUSE = "UVMap"
 UV_MAP_LIGHTMAP = "UVMap_lm"
 
 
+class Compression:
+    DISABLED = 0
+    ENABLED = 1
+
+
 class FaceList:
     def __init__(self):
         self.vertices = []  # vertex indices
@@ -64,11 +69,41 @@ class EdgeLoopMesh:
         return len(self.verts)
 
 
+class SimilarMdlVertex:
+    def __init__(self, coords):
+        self.coords = coords
+        self.value = tuple(int(val * 10000) for val in self.coords)
+
+    def __hash__(self):
+        return hash(self.value)
+
+    def __eq__(self, rhs):
+        return self.value == rhs.value
+
+
+class SimilarEdgeLoopMeshVertex:
+    def __init__(self, coords, normal, uv1, uv2):
+        self.coords = coords
+        self.normal = normal
+        self.uv1 = uv1
+        self.uv2 = uv2
+        self.value = tuple(
+            int(val * 10000)
+            for val in (*self.coords, *self.normal, *self.uv1, *self.uv2)
+        )
+
+    def __hash__(self):
+        return hash(self.value)
+
+    def __eq__(self, rhs):
+        return self.value == rhs.value
+
+
 class TrimeshNode(BaseNode):
     def __init__(self, name="UNNAMED"):
         BaseNode.__init__(self, name)
         self.nodetype = NodeType.TRIMESH
-        self.compress = True
+        self.compression = Compression.ENABLED
 
         # Properties
         self.meshtype = MeshType.TRIMESH
@@ -130,16 +165,15 @@ class TrimeshNode(BaseNode):
         mesh.loop_normals = [(0, 0, 1)] * num_loops
         mesh.loop_uv1 = [(0, 0)] * num_loops if self.uv1 else []
         mesh.loop_uv2 = [(0, 0)] * num_loops if self.uv2 else []
-        if self.compress:
+        if self.compression != Compression.DISABLED:
             attrs_to_vert_idx = dict()
             for face_idx in range(num_faces):
                 face_verts = self.facelist.vertices[face_idx]
                 for i in range(3):
                     loop_idx = 3 * face_idx + i
                     vert_idx = face_verts[i]
-                    vert = tuple(self.verts[vert_idx])
-                    # TODO: hash also by weights and constraint?
-                    attrs = (vert,)
+                    vert = self.verts[vert_idx]
+                    attrs = SimilarMdlVertex(vert)
                     if attrs in attrs_to_vert_idx:
                         mesh.loop_verts[loop_idx] = attrs_to_vert_idx[attrs]
                     else:
@@ -307,7 +341,7 @@ class TrimeshNode(BaseNode):
         self.constraints = []
         self.facelist = FaceList()
 
-        if self.compress:
+        if self.compression != Compression.DISABLED:
             attrs_to_vert_idx = dict()
             for face_idx in range(mesh.num_faces()):
                 vert_indices = [0] * 3
@@ -316,9 +350,9 @@ class TrimeshNode(BaseNode):
                     vert_idx = mesh.loop_verts[loop_idx]
                     vert = mesh.verts[vert_idx]
                     normal = mesh.loop_normals[loop_idx]
-                    uv1 = mesh.loop_uv1[loop_idx] if mesh.loop_uv1 else (0, 0)
-                    uv2 = mesh.loop_uv2[loop_idx] if mesh.loop_uv2 else (0, 0)
-                    attrs = (vert, normal, uv1, uv2)
+                    uv1 = mesh.loop_uv1[loop_idx] if mesh.loop_uv1 else (0.0, 0.0)
+                    uv2 = mesh.loop_uv2[loop_idx] if mesh.loop_uv2 else (0.0, 0.0)
+                    attrs = SimilarEdgeLoopMeshVertex(vert, normal, uv1, uv2)
                     if attrs in attrs_to_vert_idx:
                         vert_indices[i] = attrs_to_vert_idx[attrs]
                     else:

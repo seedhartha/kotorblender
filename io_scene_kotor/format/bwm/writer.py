@@ -18,17 +18,26 @@
 
 from mathutils import Vector
 
+from ...aabb import generate_tree
 from ...constants import NON_WALKABLE, DummyType, WalkmeshType
 from ...scene.modelnode.aabb import AabbNode
 from ...scene.modelnode.dummy import DummyNode
 from ...scene.modelnode.trimesh import FaceList
-from ...utils import is_close_3
-from ...aabb import generate_tree
 from ..binwriter import BinaryWriter
 from ..mdl.types import *
 from .types import *
 
-MERGE_DISTANCE = 1e-4
+
+class SimilarVertex:
+    def __init__(self, coords):
+        self.coords = coords
+        self.value = tuple(int(val * 10000) for val in self.coords)
+
+    def __hash__(self):
+        return hash(self.value)
+
+    def __eq__(self, rhs):
+        return self.value == rhs.value
 
 
 class BwmWriter:
@@ -58,7 +67,7 @@ class BwmWriter:
         self.use_node2 = None
 
         self.verts = []
-        self.new_vert_by_old_vert = dict()
+        self.old_to_new_vert_idx = dict()
         self.facelist = FaceList()
         self.aabbs = []
         self.adjacent_edges = []
@@ -144,21 +153,17 @@ class BwmWriter:
         self.bwm_size = self.bwm_pos
 
     def peek_vertices(self):
-        # Merge duplicates (fixes collision detection)
-        num_verts = len(self.geom_node.verts)
-        num_unique = 0
+        # Merge vertices by distance
+        similar_to_new_vert_idx = dict()
         for vert_idx, vert in enumerate(self.geom_node.verts):
-            if vert_idx in self.new_vert_by_old_vert:
-                continue
-            for other_vert_idx in range(vert_idx + 1, num_verts):
-                if other_vert_idx in self.new_vert_by_old_vert:
-                    continue
-                other_vert = self.geom_node.verts[other_vert_idx]
-                if is_close_3(vert, other_vert, MERGE_DISTANCE):
-                    self.new_vert_by_old_vert[other_vert_idx] = num_unique
-            self.verts.append(vert)
-            self.new_vert_by_old_vert[vert_idx] = num_unique
-            num_unique += 1
+            similar = SimilarVertex(vert)
+            if similar in similar_to_new_vert_idx:
+                self.old_to_new_vert_idx[vert_idx] = similar_to_new_vert_idx[similar]
+            else:
+                num_verts = len(self.verts)
+                similar_to_new_vert_idx[similar] = num_verts
+                self.old_to_new_vert_idx[vert_idx] = num_verts
+                self.verts.append(vert)
 
         # Offset by node and LYT position
         for vert_idx, vert in enumerate(self.verts):
@@ -181,7 +186,7 @@ class BwmWriter:
         for face_idx in face_indices:
             self.facelist.vertices.append(
                 [
-                    self.new_vert_by_old_vert[vert_idx]
+                    self.old_to_new_vert_idx[vert_idx]
                     for vert_idx in self.geom_node.facelist.vertices[face_idx]
                 ]
             )

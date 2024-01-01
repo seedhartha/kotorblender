@@ -51,7 +51,7 @@ class Model:
         self.root_node = None
         self.animations = []
 
-    def import_to_collection(self, collection, options, position=(0.0, 0.0, 0.0)):
+    def add_to_collection(self, collection, options, position=(0.0, 0.0, 0.0)):
         if type(self.root_node) != DummyNode or self.root_node.parent:
             raise RuntimeError("Root node has to be a dummy without a parent")
 

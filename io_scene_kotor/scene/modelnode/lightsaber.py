@@ -17,7 +17,7 @@
 # ##### END GPL LICENSE BLOCK #####
 
 from ...constants import MeshType, NodeType
-from .trimesh import TrimeshNode
+from .trimesh import Compression, TrimeshNode
 
 
 class LightsaberNode(TrimeshNode):
@@ -25,4 +25,4 @@ class LightsaberNode(TrimeshNode):
         TrimeshNode.__init__(self, name)
         self.nodetype = NodeType.LIGHTSABER
         self.meshtype = MeshType.LIGHTSABER
-        self.compress = False
+        self.compression = Compression.DISABLED
