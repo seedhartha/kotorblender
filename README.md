@@ -57,6 +57,17 @@ Fine-tuning:
 1. In Scene → Render, set Device to GPU Compute to improve performance, set Render Engine to Cycles if not already
 1. In Scene → Render → Sampling → Render increase Max Samples to improve quality
 
+### Minimap Rendering
+
+1. Press KotOR → Minimap → Render (auto)
+1. Open "Render Result" image in Image Editor and save it as "lbl_map{modulename}.tga"
+1. Open "MinimapCoords" text in Text Editor and copy-paste generated properties into module .ARE file using any GFF editor
+
+Fine-tuning:
+
+1. Tweak background color via Scene → World → Surface → Color
+1. Manually toggle rendering of objects in Outliner and press KotOR → Minimap → Render (manual)
+
 ### Connecting Rooms
 
 1. Select a room walkmesh
