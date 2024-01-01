@@ -185,7 +185,8 @@ class TrimeshNode(BaseNode):
                             mesh.constraints.append(self.constraints[vert_idx])
                         attrs_to_vert_idx[attrs] = num_verts
                         mesh.loop_verts[loop_idx] = num_verts
-                    mesh.loop_normals[loop_idx] = self.normals[vert_idx]
+                    if self.normals:
+                        mesh.loop_normals[loop_idx] = self.normals[vert_idx]
                     if self.uv1:
                         mesh.loop_uv1[loop_idx] = self.uv1[vert_idx]
                     if self.uv2:
