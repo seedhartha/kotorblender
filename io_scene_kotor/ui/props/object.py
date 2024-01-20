@@ -125,7 +125,7 @@ class ObjectPropertyGroup(bpy.types.PropertyGroup):
         ],
         default=MeshType.TRIMESH,
     )
-    bitmap: bpy.props.StringProperty(name="Diffuse Map")
+    bitmap: bpy.props.StringProperty(name="Main Texture")
     bitmap2: bpy.props.StringProperty(name="Lightmap")
     alpha: bpy.props.FloatProperty(name="Alpha", default=1.0, min=0.0, max=1.0)
     render: bpy.props.BoolProperty(
