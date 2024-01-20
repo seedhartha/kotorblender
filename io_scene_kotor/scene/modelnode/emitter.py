@@ -266,8 +266,8 @@ class EmitterNode(BaseNode):
                 continue
             setattr(obj.kb, attrname, value)
 
-    def load_object_data(self, obj, options):
-        BaseNode.load_object_data(self, obj, options)
+    def load_object_data(self, obj, eval_obj, options):
+        BaseNode.load_object_data(self, obj, eval_obj, options)
 
         for attrname in self.EMITTER_ATTRS:
             value = getattr(obj.kb, attrname, None)

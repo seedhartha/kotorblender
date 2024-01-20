@@ -117,6 +117,8 @@ class Model:
 
     @classmethod
     def from_mdl_root(cls, root_obj, options):
+        cls.sanitize_model(root_obj)
+
         model = Model()
         model.name = root_obj.name
         model.supermodel = root_obj.kb.supermodel
@@ -125,7 +127,6 @@ class Model:
         model.affected_by_fog = root_obj.kb.affected_by_fog
         model.animroot = root_obj.kb.animroot
         model.animscale = root_obj.kb.animscale
-
         model.root_node = cls.model_node_from_object(root_obj, options)
 
         if options.export_animations:
@@ -135,6 +136,36 @@ class Model:
             ]
 
         return model
+
+    @classmethod
+    def sanitize_model(cls, root_obj):
+        # Make a set of unique node numbers
+        node_numbers = set()
+        obj_stack = []
+        obj_stack.append(root_obj)
+        while obj_stack:
+            obj = obj_stack.pop()
+            if obj.kb.node_number in node_numbers:
+                raise RuntimeError(
+                    "Duplicate node number {} in object '{}'".format(
+                        obj.kb.node_number, obj.name
+                    )
+                )
+            node_numbers.add(obj.kb.node_number)
+            for child in obj.children:
+                obj_stack.append(child)
+        sorted_node_numbers = sorted(node_numbers)
+        next_node_number = sorted_node_numbers[-1] + 1
+
+        # Generate node numbers when undefined
+        obj_stack.append(root_obj)
+        while obj_stack:
+            obj = obj_stack.pop()
+            if obj.kb.node_number == -1:
+                obj.kb.node_number = next_node_number
+                next_node_number += 1
+            for child in obj.children:
+                obj_stack.append(child)
 
     @classmethod
     def model_node_from_object(cls, obj, options, parent=None, exclude_xwk=True):
@@ -180,9 +211,10 @@ class Model:
 
         node = switch[node_type](name)
         node.parent = parent
+
         depsgraph = bpy.context.evaluated_depsgraph_get()
         eval_obj = obj.evaluated_get(depsgraph)
-        node.load_object_data(eval_obj, options)
+        node.load_object_data(obj, eval_obj, options)
 
         # Ignore transformations up to MDL root
         if not parent:
@@ -196,12 +228,3 @@ class Model:
                 node.children.append(child)
 
         return node
-
-    @classmethod
-    def assign_node_numbers(cls, obj, number):
-        if not is_exported_to_mdl(obj):
-            return
-        obj.kb.node_number = number[0]
-        number[0] += 1
-        for child in obj.children:
-            cls.assign_node_numbers(child, number)

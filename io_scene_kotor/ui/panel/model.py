@@ -48,6 +48,4 @@ class KB_PT_model(bpy.types.Panel):
         row.prop(obj.kb, "affected_by_fog")
 
         row = layout.row()
-        row.operator("kb.assign_node_numbers")
-        row = layout.row()
         row.operator("kb.rebuild_all_materials")

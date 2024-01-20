@@ -36,8 +36,8 @@ class ReferenceNode(BaseNode):
         obj.kb.refmodel = self.refmodel
         obj.kb.reattachable = self.reattachable == 1
 
-    def load_object_data(self, obj, options):
-        BaseNode.load_object_data(self, obj, options)
+    def load_object_data(self, obj, eval_obj, options):
+        BaseNode.load_object_data(self, obj, eval_obj, options)
 
         self.refmodel = obj.kb.refmodel
         self.reattachable = 1 if obj.kb.reattachable else 0

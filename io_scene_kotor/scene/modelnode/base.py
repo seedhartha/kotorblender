@@ -28,7 +28,7 @@ class BaseNode:
         self.nodetype = "undefined"
         self.roottype = RootType.MODEL
 
-        self.node_number = 0
+        self.node_number = -1
         self.export_order = 0
         self.name = name
         self.position = (0.0, 0.0, 0.0)
@@ -53,14 +53,16 @@ class BaseNode:
         obj.rotation_quaternion = Quaternion(self.orientation)
         obj.scale = (self.scale, self.scale, self.scale)
 
-    def load_object_data(self, obj, options):
+    def load_object_data(self, obj, eval_obj, options):
+        if obj.kb.node_number == -1:
+            raise RuntimeError("Object '{}' node number is undefined".format(obj.name))
         self.node_number = obj.kb.node_number
         self.export_order = obj.kb.export_order
-        self.position = obj.location
-        self.orientation = obj.rotation_quaternion
-        self.scale = obj.scale[0]
+        self.position = eval_obj.location
+        self.orientation = eval_obj.rotation_quaternion
+        self.scale = eval_obj.scale[0]
 
-        self.from_root = obj.matrix_local
+        self.from_root = eval_obj.matrix_local
         if self.parent:
             self.from_root = self.parent.from_root @ self.from_root
 

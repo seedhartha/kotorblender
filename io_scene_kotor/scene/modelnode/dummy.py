@@ -33,7 +33,7 @@ class DummyNode(BaseNode):
 
         obj.kb.dummytype = self.dummytype
 
-    def load_object_data(self, obj, options):
-        BaseNode.load_object_data(self, obj, options)
+    def load_object_data(self, obj, eval_obj, options):
+        BaseNode.load_object_data(self, obj, eval_obj, options)
 
         self.dummytype = obj.kb.dummytype

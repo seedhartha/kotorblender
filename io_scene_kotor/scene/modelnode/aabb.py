@@ -105,9 +105,9 @@ class AabbNode(TrimeshNode):
 
         obj.kb.lytposition = self.lytposition
 
-    def load_object_data(self, obj, options):
-        TrimeshNode.load_object_data(self, obj, options)
+    def load_object_data(self, obj, eval_obj, options):
+        TrimeshNode.load_object_data(self, obj, eval_obj, options)
 
         self.lytposition = obj.kb.lytposition
 
-        self.unapply_room_links(obj)
+        self.unapply_room_links(eval_obj)

@@ -93,10 +93,10 @@ class LightNode(BaseNode):
 
         LightNode.calc_light_power(obj)
 
-    def load_object_data(self, obj, options):
-        BaseNode.load_object_data(self, obj, options)
+    def load_object_data(self, obj, eval_obj, options):
+        BaseNode.load_object_data(self, obj, eval_obj, options)
 
-        self.color = [(-c if obj.kb.negativelight else c) for c in obj.data.color]
+        self.color = [(-c if obj.kb.negativelight else c) for c in eval_obj.data.color]
         self.multiplier = obj.kb.multiplier
         self.radius = obj.kb.radius
         self.ambientonly = 1 if obj.kb.ambientonly else 0

@@ -273,8 +273,8 @@ class TrimeshNode(BaseNode):
         obj.kb.diffuse = self.diffuse
         obj.kb.ambient = self.ambient
 
-    def load_object_data(self, obj, options):
-        BaseNode.load_object_data(self, obj, options)
+    def load_object_data(self, obj, eval_obj, options):
+        BaseNode.load_object_data(self, obj, eval_obj, options)
 
         self.meshtype = obj.kb.meshtype
         self.bitmap = obj.kb.bitmap if obj.kb.bitmap else NULL
@@ -301,7 +301,7 @@ class TrimeshNode(BaseNode):
         self.diffuse = obj.kb.diffuse
         self.ambient = obj.kb.ambient
 
-        mesh = self.unapply_edge_loop_mesh(obj)
+        mesh = self.unapply_edge_loop_mesh(eval_obj)
         self.edge_loop_to_mdl_mesh(mesh)
 
     def unapply_edge_loop_mesh(self, obj):
@@ -325,7 +325,9 @@ class TrimeshNode(BaseNode):
                         mesh.loop_uv2.append(bl_mesh.uv_layers[1].data[loop_idx].uv[:2])
                     else:
                         raise RuntimeError(
-                            "Missing second UV map for a lightmapped object"
+                            "Lightmapped object '{}' is missing second UV map".format(
+                                obj.name
+                            )
                         )
                 if self.tangentspace:
                     loop = bl_mesh.loops[loop_idx]

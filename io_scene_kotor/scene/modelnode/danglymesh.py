@@ -48,8 +48,8 @@ class DanglymeshNode(TrimeshNode):
         obj.kb.tightness = self.tightness
         obj.kb.displacement = self.displacement
 
-    def load_object_data(self, obj, options):
-        TrimeshNode.load_object_data(self, obj, options)
+    def load_object_data(self, obj, eval_obj, options):
+        TrimeshNode.load_object_data(self, obj, eval_obj, options)
         self.period = obj.kb.period
         self.tightness = obj.kb.tightness
         self.displacement = obj.kb.displacement

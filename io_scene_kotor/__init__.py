@@ -28,7 +28,6 @@ from .ops.anim.move import KB_OT_move_animation
 from .ops.anim.play import KB_OT_play_animation
 from .ops.armatureapplykeyframes import KB_OT_armature_apply_keyframes
 from .ops.armatureunapplykeyframes import KB_OT_armature_unapply_keyframes
-from .ops.assignnodenumbers import KB_OT_assign_node_numbers
 from .ops.bakelightmaps import (
     KB_OT_bake_lightmaps_auto,
     KB_OT_bake_lightmaps_manual,
@@ -161,7 +160,6 @@ classes = (
     KB_OT_add_path_connection,
     KB_OT_armature_apply_keyframes,
     KB_OT_armature_unapply_keyframes,
-    KB_OT_assign_node_numbers,
     KB_OT_bake_lightmaps_auto,
     KB_OT_bake_lightmaps_manual,
     KB_OT_delete_anim_event,
