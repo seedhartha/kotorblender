@@ -52,6 +52,9 @@ WALKMESH_MATERIALS = [
 NAME_TO_WALKMESH_MATERIAL = {mat[0]: mat for mat in WALKMESH_MATERIALS}
 NON_WALKABLE = [mat_idx for mat_idx, mat in enumerate(WALKMESH_MATERIALS) if not mat[2]]
 
+UV_MAP_MAIN = "UVMap"
+UV_MAP_LIGHTMAP = "UVMap_lm"
+
 
 class Classification:
     OTHER = "OTHER"

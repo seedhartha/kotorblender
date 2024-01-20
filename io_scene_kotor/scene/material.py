@@ -22,7 +22,7 @@ import bpy
 
 from bpy_extras import image_utils
 
-from ..constants import WALKMESH_MATERIALS
+from ..constants import UV_MAP_LIGHTMAP, WALKMESH_MATERIALS
 from ..format.tpc.reader import TpcReader
 from ..utils import (
     is_null,
@@ -201,7 +201,7 @@ def rebuild_material_textured(
     if is_not_null(obj.kb.bitmap2):
         lightmap_uv = nodes.new("ShaderNodeUVMap")
         lightmap_uv.location = (x - 300, -300)
-        lightmap_uv.uv_map = "UVMap_lm"
+        lightmap_uv.uv_map = UV_MAP_LIGHTMAP
 
         lightmap_tex = nodes.new("ShaderNodeTexImage")
         lightmap_tex.name = NodeName.LIGHTMAP_TEX

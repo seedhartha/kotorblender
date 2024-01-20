@@ -21,13 +21,17 @@ import bpy
 from bpy_extras.io_utils import unpack_list
 from mathutils import Vector
 
-from ...constants import NodeType, RootType, MeshType, NULL
+from ...constants import (
+    NULL,
+    UV_MAP_MAIN,
+    UV_MAP_LIGHTMAP,
+    NodeType,
+    RootType,
+    MeshType,
+)
 from ...utils import is_not_null
 from .. import material
 from .base import BaseNode
-
-UV_MAP_DIFFUSE = "UVMap"
-UV_MAP_LIGHTMAP = "UVMap_lm"
 
 
 class Compression:
@@ -231,7 +235,7 @@ class TrimeshNode(BaseNode):
             bl_mesh.normals_split_custom_set(mesh.loop_normals)
             bl_mesh.use_auto_smooth = True
         if mesh.loop_uv1:
-            uv_layer = bl_mesh.uv_layers.new(name=UV_MAP_DIFFUSE, do_init=False)
+            uv_layer = bl_mesh.uv_layers.new(name=UV_MAP_MAIN, do_init=False)
             uv_layer.data.foreach_set("uv", unpack_list(mesh.loop_uv1))
         if mesh.loop_uv2:
             uv_layer = bl_mesh.uv_layers.new(name=UV_MAP_LIGHTMAP, do_init=False)
@@ -304,8 +308,8 @@ class TrimeshNode(BaseNode):
         bl_mesh = obj.data
         bl_mesh.calc_loop_triangles()
         bl_mesh.calc_normals_split()
-        if self.tangentspace and UV_MAP_DIFFUSE in bl_mesh.uv_layers:
-            bl_mesh.calc_tangents(uvmap=UV_MAP_DIFFUSE)
+        if self.tangentspace and bl_mesh.uv_layers:
+            bl_mesh.calc_tangents(uvmap=bl_mesh.uv_layers[0].name)
         mesh = EdgeLoopMesh()
         for vert in bl_mesh.vertices:
             mesh.verts.append(vert.co[:3])
@@ -314,14 +318,15 @@ class TrimeshNode(BaseNode):
                 mesh.loop_verts.append(face.vertices[i])
                 mesh.loop_normals.append(face.split_normals[i])
                 loop_idx = face.loops[i]
-                if UV_MAP_DIFFUSE in bl_mesh.uv_layers:
-                    mesh.loop_uv1.append(
-                        bl_mesh.uv_layers[UV_MAP_DIFFUSE].data[loop_idx].uv[:2]
-                    )
-                if UV_MAP_LIGHTMAP in bl_mesh.uv_layers:
-                    mesh.loop_uv2.append(
-                        bl_mesh.uv_layers[UV_MAP_LIGHTMAP].data[loop_idx].uv[:2]
-                    )
+                if len(bl_mesh.uv_layers) > 0:
+                    mesh.loop_uv1.append(bl_mesh.uv_layers[0].data[loop_idx].uv[:2])
+                if self.lightmapped:
+                    if len(bl_mesh.uv_layers) > 1:
+                        mesh.loop_uv2.append(bl_mesh.uv_layers[1].data[loop_idx].uv[:2])
+                    else:
+                        raise RuntimeError(
+                            "Missing second UV map for a lightmapped object"
+                        )
                 if self.tangentspace:
                     loop = bl_mesh.loops[loop_idx]
                     mesh.loop_tangents.append(loop.tangent)
@@ -369,7 +374,6 @@ class TrimeshNode(BaseNode):
                         if mesh.loop_tangents and mesh.loop_bitangents:
                             self.tangents.append(mesh.loop_tangents[loop_idx])
                             self.bitangents.append(mesh.loop_bitangents[loop_idx])
-                            # TODO: is this correct?
                             self.tangentspacenormals.append(mesh.loop_normals[loop_idx])
                         if mesh.weights:
                             self.weights.append(mesh.weights[vert_idx])
@@ -405,7 +409,6 @@ class TrimeshNode(BaseNode):
                     if mesh.loop_tangents and mesh.loop_bitangents:
                         tangents[vert_idx] += Vector(mesh.loop_tangents[loop_idx])
                         bitangents[vert_idx] += Vector(mesh.loop_bitangents[loop_idx])
-                        # TODO: is this correct?
                         tanspacenormals[vert_idx] += Vector(mesh.loop_normals[loop_idx])
                 self.facelist.vertices.append(face_verts)
                 self.facelist.uv.append(face_verts)
