@@ -59,6 +59,10 @@ class BaseNode:
         self.node_number = obj.kb.node_number
         self.export_order = obj.kb.export_order
         self.position = eval_obj.location
+        if eval_obj.rotation_mode != "QUATERNION":
+            raise RuntimeError(
+                "Object '{}' must have Quaternion rotation mode".format(eval_obj.name)
+            )
         self.orientation = eval_obj.rotation_quaternion
         self.scale = eval_obj.scale[0]
 
