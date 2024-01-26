@@ -151,11 +151,15 @@ class Model:
                         obj.kb.node_number, obj.name
                     )
                 )
-            node_numbers.add(obj.kb.node_number)
+            if obj.kb.node_number != -1:
+                node_numbers.add(obj.kb.node_number)
             for child in obj.children:
                 obj_stack.append(child)
         sorted_node_numbers = sorted(node_numbers)
-        next_node_number = sorted_node_numbers[-1] + 1
+        if sorted_node_numbers:
+            next_node_number = sorted_node_numbers[-1] + 1
+        else:
+            next_node_number = 0
 
         # Generate node numbers when undefined
         obj_stack.append(root_obj)

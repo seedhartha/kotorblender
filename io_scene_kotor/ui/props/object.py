@@ -37,6 +37,7 @@ class ObjectPropertyGroup(bpy.types.PropertyGroup):
     node_number: bpy.props.IntProperty(
         name="Node Number",
         description="Must be unique per model and equal to this node number in supermodel",
+        default=-1,
         min=-1,
         max=1000,
     )
