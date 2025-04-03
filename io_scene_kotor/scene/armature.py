@@ -89,18 +89,24 @@ def create_armature_bones(armature, obj, parent_bone=None):
         create_armature_bones(armature, child, bone)
 
 
-def apply_object_keyframes(mdl_root, armature_obj):
+def apply_object_keyframes(mdl_root, armature):
     bpy.context.scene.frame_set(0)
-    bpy.context.view_layer.objects.active = armature_obj
+    bpy.context.view_layer.objects.active = armature
     bpy.ops.object.mode_set(mode="POSE")
 
-    armature_anim_data = AnimationNode.get_or_create_animation_data(armature_obj)
-    armature_action = AnimationNode.get_or_create_action(armature_obj.name)
-    if not armature_anim_data.action:
-        armature_anim_data.action = armature_action
-    armature_action.fcurves.clear()
+    anim_data = AnimationNode.get_or_create_animation_data(armature)
+    action = AnimationNode.get_or_create_action(armature.name)
+    if not anim_data.action:
+        anim_data.action = action
+    if bpy.app.version >= (4, 4):
+        action_slot = AnimationNode.get_or_create_action_slot(
+            action, "OBJECT", armature.name
+        )
+        if not anim_data.action_slot:
+            anim_data.action_slot = action_slot
 
-    apply_object_keyframes_to_armature(mdl_root, armature_obj, armature_action)
+    action.fcurves.clear()
+    apply_object_keyframes_to_armature(mdl_root, armature, action)
     bpy.ops.object.mode_set(mode="OBJECT")
 
 
@@ -189,18 +195,25 @@ def apply_object_keyframes_to_armature(obj, armature_obj, armature_action):
         apply_object_keyframes_to_armature(child, armature_obj, armature_action)
 
 
-def unapply_object_keyframes_from_armature(obj, root_name, armature_obj):
-    if not armature_obj.animation_data:
+def unapply_object_keyframes_from_armature(obj, root_name, armature):
+    if not armature.animation_data:
         return
-    armature_action = armature_obj.animation_data.action
+    armature_action = armature.animation_data.action
     if not armature_action:
         return
 
-    if obj.name in armature_obj.pose.bones:
+    if obj.name in armature.pose.bones:
         anim_data = AnimationNode.get_or_create_animation_data(obj)
         action = AnimationNode.get_or_create_action("{}.{}".format(root_name, obj.name))
         if not anim_data.action:
             anim_data.action = action
+        if bpy.app.version >= (4, 4):
+            action_slot = AnimationNode.get_or_create_action_slot(
+                action, "OBJECT", obj.name
+            )
+            if not anim_data.action_slot:
+                anim_data.action_slot = action_slot
+
         action.fcurves.clear()
 
         assert bpy.context.scene.frame_current == 0
@@ -265,4 +278,4 @@ def unapply_object_keyframes_from_armature(obj, root_name, armature_obj):
                 kfp.update()
 
     for child in obj.children:
-        unapply_object_keyframes_from_armature(child, root_name, armature_obj)
+        unapply_object_keyframes_from_armature(child, root_name, armature)

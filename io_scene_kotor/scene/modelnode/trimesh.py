@@ -233,7 +233,6 @@ class TrimeshNode(BaseNode):
         bl_mesh.update()
         if mesh.loop_normals:
             bl_mesh.normals_split_custom_set(mesh.loop_normals)
-            bl_mesh.use_auto_smooth = True
         if mesh.loop_uv1:
             uv_layer = bl_mesh.uv_layers.new(name=UV_MAP_MAIN, do_init=False)
             uv_layer.data.foreach_set("uv", unpack_list(mesh.loop_uv1))
@@ -307,7 +306,6 @@ class TrimeshNode(BaseNode):
     def unapply_edge_loop_mesh(self, obj):
         bl_mesh = obj.data
         bl_mesh.calc_loop_triangles()
-        bl_mesh.calc_normals_split()
         if self.tangentspace and bl_mesh.uv_layers:
             bl_mesh.calc_tangents(uvmap=bl_mesh.uv_layers[0].name)
         mesh = EdgeLoopMesh()

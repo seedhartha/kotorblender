@@ -182,6 +182,15 @@ class AnimationNode:
             action = AnimationNode.get_or_create_action(action_name)
             if not anim_data.action:
                 anim_data.action = action
+            if bpy.app.version >= (4, 4):
+                id_type = (
+                    "LIGHT" if obj.type == "LIGHT" and label == "color" else "OBJECT"
+                )
+                action_slot = AnimationNode.get_or_create_action_slot(
+                    action, id_type, obj.name
+                )
+                if not anim_data.action_slot:
+                    anim_data.action_slot = action_slot
 
             data_path = prop.data_path
             fcurves = [
@@ -260,6 +269,13 @@ class AnimationNode:
             return bpy.data.actions[name]
         else:
             return bpy.data.actions.new(name=name)
+
+    @classmethod
+    def get_or_create_action_slot(cls, action, id_type, name):
+        if name in action.slots:
+            return action.slots[name]
+        else:
+            return action.slots.new(id_type=id_type, name=name)
 
     @classmethod
     def get_or_create_animation_data(cls, subject):

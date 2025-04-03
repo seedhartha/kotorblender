@@ -1,0 +1,14 @@
+schema_version = "1.0.0"
+
+id = "io_scene_kotor"
+version = "4.0.0"
+name = "KotorBlender"
+tagline = "Import, edit and export KotOR models"
+maintainer = "seedhartha <seedhartha.github@gmail.com>"
+type = "add-on"
+
+blender_version_min = "4.2.0"
+
+license = [
+  "SPDX:GPL-3.0-or-later",
+]

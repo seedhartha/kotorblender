@@ -88,7 +88,8 @@ def rebuild_walkmesh_materials(obj):
         material = get_or_create_material(name)
         material.use_nodes = True
         material.blend_method = "BLEND"
-        material.shadow_method = "NONE"
+        if bpy.app.version < (4, 3):
+            material.shadow_method = "NONE"
 
         nodes = material.node_tree.nodes
         nodes.clear()
@@ -393,6 +394,7 @@ def create_image(name, search_paths):
             image = bpy.data.images.new(name, tpc_image.w, tpc_image.h)
             image.pixels = tpc_image.pixels
             image.update()
+            image.pack()
             apply_txi_to_image(tpc_image.txi_lines, image)
             return image
 

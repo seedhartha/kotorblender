@@ -1,20 +1,35 @@
 # KotorBlender
 
-This add-on is a fork of KotorBlender, upgraded to support newer versions of Blender. KotorBlender is in turn based on NeverBlender, forked from version 1.23a.
+This add-on is a fork of KotORBlender 1.01 by Purifier and Ndix UR, upgraded to support Blender versions 2.80 and above, which are notable by a redesigned user interface and a new real-time render engine. KotORBlender is in turn based on NeverBlender by Symmetric, forked from version 1.23a.
+
+Significant changes have been introduced since KotORBlender 1.01, including, but not limited to, replacing ASCII model import/export with binary format, and ability to import/export layouts and path files.
 
 ## Features
 
-- Import & export MDL models, including walkmeshes
+- Import & export MDL models, including animations and walkmeshes
 - Import & export LYT files
 - Import & export PTH files
+- Lightmap texture baking
+- Area minimap rendering
+
+## Compatibility
+
+We aim to maintain compatibility with latest LTS versions of Blender. KotorBlender was last migrated to, and tested with Blender versions 4.2.8 and 4.4.0.
 
 ## Installation
 
-1. Clone this repository or download the latest release of KotorBlender from [Deadly Stream](https://deadlystream.com/files/file/1853-kotorblender-for-blender-293/)
-1. If you have cloned the repository, create a ZIP archive containing the **io_scene_kotor** directory
-1. From Edit → Preferences → Add-ons in Blender, install the add-on from the ZIP archive and enable it by ticking a box next to "Import-Export: KotorBlender"
-1. Alternatively, if you want to contribute to KotorBlender, you may want to create a symbolic link to the local repository in the Blender add-ons directory, typically located at `C:/Users/{user}/AppData/Roaming/Blender Foundation/Blender/{version}/scripts/addons`:
-  1. `mklink /D io_scene_kotor {repo}/io_scene_kotor`
+### From DeadlyStream
+
+1. Download latest release of KotorBlender from [Deadly Stream](https://deadlystream.com/files/file/1853-kotorblender-for-blender-293/)
+1. Install extension from disk as described in [Blender documentation](https://docs.blender.org/manual/en/4.2/editors/preferences/extensions.html#bpy-ops-extensions-package-install-files)
+
+### From GitHub
+
+1. Clone GitHub repository [https://github.com/seedhartha/kotorblender]
+1. Create a symlink to **io_scene_kotor** directory in current user's Blender extensions directory:
+  1. Set cloned repository as current directory
+  1. Create a symlink on Windows: `mklink /D "%APPDATA%\Blender Foundation\Blender\BLENDER_VERSION\extensions\user_default\io_scene_kotor" "%CD%/io_scene_kotor"`
+  1. Create a symlink on Linux: `ln -s $(pwd)/io_scene_kotor ~/.config/blender/BLENDER_VERSION/extensions/user_default/io_scene_kotor`
 
 ## Usage
 
@@ -42,6 +57,7 @@ To edit list of model animations and corresponding events, select MDL root objec
 
 1. Select objects for which you want lightmaps to be recreated, or unselect all objects to recreate all lightmaps
 1. Press KotOR → Lightmaps → Bake (auto)
+1. Open and save each individual lightmap image from UV Editing tab
 
 UV mapping:
 
@@ -60,8 +76,8 @@ Fine-tuning:
 ### Minimap Rendering
 
 1. Press KotOR → Minimap → Render (auto)
-1. Open "Render Result" image in Image Editor and save it as "lbl_map{modulename}.tga"
-1. Open "MinimapCoords" text in Text Editor and copy-paste generated properties into module .ARE file using any GFF editor
+1. Open "Render Result" image in UV Editing tab and save it as "lbl_map{modulename}.tga"
+1. Open "MinimapCoords" text in Scripting tab and copy-paste generated properties into module .ARE file using any GFF editor
 
 Fine-tuning:
 
@@ -83,10 +99,6 @@ Fine-tuning:
 1. Import PTH into Blender via File → Import → KotOR Path (.pth)
 1. Create/move path points, or modify path connections via Object Properties
 1. Export PTH via File → Export → KotOR Path (.pth)
-
-## Compatibility
-
-Known to work with Blender versions ranging from 3.3 to 4.0.
 
 ## License
 

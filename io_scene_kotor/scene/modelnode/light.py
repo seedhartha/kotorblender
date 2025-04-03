@@ -62,7 +62,7 @@ class LightNode(BaseNode):
         light = bpy.data.lights.new(name, "POINT")
         light.color = [(-c if negative else c) for c in self.color]
         light.use_shadow = self.shadow
-        if self.shadow:
+        if self.shadow and bpy.app.version < (4, 3):
             light.use_contact_shadow = True
             light.contact_shadow_distance = self.radius
         return light

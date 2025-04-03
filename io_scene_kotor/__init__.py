@@ -104,16 +104,6 @@ from .ui.props.object import ObjectPropertyGroup
 from .ui.props.pathconnection import PathConnectionPropertyGroup
 from .ui.props.scene import ScenePropertyGroup
 
-bl_info = {
-    "name": "KotorBlender",
-    "author": "Attila Gyoerkoes & J.W. Brandon & seedhartha",
-    "version": (3, 10, 4),
-    "blender": (3, 3, 0),
-    "location": "File > Import-Export, Object Properties",
-    "description": "Import, edit and export KotOR models",
-    "category": "Import-Export",
-}
-
 
 def menu_func_import_mdl(self, context):
     self.layout.operator(KB_OT_import_mdl.bl_idname, text="KotOR Model (.mdl)")
