@@ -79,15 +79,18 @@ def rebuild_object_materials0(obj, texture_search_paths=[], lightmap_search_path
         mesh.polygons.foreach_set("material_index", polygon_materials)
         return
 
-    material = get_or_create_material(get_material_name(obj))
-    mesh.materials.append(material)
-
-    if is_null(obj.kb.bitmap) and is_null(obj.kb.bitmap2):
-        rebuild_material_solid(material, obj)
-    else:
+    if is_not_null(obj.kb.bitmap):
+        material = get_or_create_material(obj.name)
+        mesh.materials.append(material)
         rebuild_material_textured(
             material, obj, texture_search_paths, lightmap_search_paths
         )
+    else:
+        diffuse = color_to_hex(obj.kb.diffuse)
+        alpha = int_to_hex(float_to_byte(obj.kb.alpha))
+        material = get_or_create_material(f"D{diffuse}__A{alpha}")
+        mesh.materials.append(material)
+        rebuild_material_solid(material, obj)
 
 
 def rebuild_walkmesh_materials(obj):
@@ -149,16 +152,6 @@ def get_or_create_material(name):
         return bpy.data.materials[name]
     else:
         return bpy.data.materials.new(name)
-
-
-def get_material_name(obj):
-    if is_null(obj.kb.bitmap) and is_null(obj.kb.bitmap2):
-        diffuse = color_to_hex(obj.kb.diffuse)
-        alpha = int_to_hex(float_to_byte(obj.kb.alpha))
-        name = "D{}__A{}".format(diffuse, alpha)
-    else:
-        name = obj.name
-    return name
 
 
 def rebuild_material_solid(material, obj):

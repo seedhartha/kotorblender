@@ -316,17 +316,18 @@ class TrimeshNode(BaseNode):
                 mesh.loop_verts.append(face.vertices[i])
                 mesh.loop_normals.append(face.split_normals[i])
                 loop_idx = face.loops[i]
-                if len(bl_mesh.uv_layers) > 0:
-                    mesh.loop_uv1.append(bl_mesh.uv_layers[0].data[loop_idx].uv[:2])
+                if UV_MAP_MAIN in bl_mesh.uv_layers:
+                    mesh.loop_uv1.append(
+                        bl_mesh.uv_layers[UV_MAP_MAIN].data[loop_idx].uv[:2]
+                    )
                 if self.lightmapped:
-                    if len(bl_mesh.uv_layers) > 1:
-                        mesh.loop_uv2.append(bl_mesh.uv_layers[1].data[loop_idx].uv[:2])
-                    else:
+                    if UV_MAP_LIGHTMAP not in bl_mesh.uv_layers:
                         raise RuntimeError(
-                            "Lightmapped object '{}' is missing second UV map".format(
-                                obj.name
-                            )
+                            f"Lightmapped object [{obj.name}] is missing UV map [${UV_MAP_LIGHTMAP}]"
                         )
+                    mesh.loop_uv2.append(
+                        bl_mesh.uv_layers[UV_MAP_LIGHTMAP].data[loop_idx].uv[:2]
+                    )
                 if self.tangentspace:
                     loop = bl_mesh.loops[loop_idx]
                     mesh.loop_tangents.append(loop.tangent)
