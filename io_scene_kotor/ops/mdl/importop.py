@@ -17,7 +17,6 @@
 # ##### END GPL LICENSE BLOCK #####
 
 import os
-import traceback
 
 import bpy
 
@@ -25,7 +24,7 @@ from bpy_extras.io_utils import ImportHelper
 
 from ...constants import PACKAGE_NAME, ImportOptions
 from ...io import mdl
-from ...utils import semicolon_separated_to_absolute_paths
+from ...utils import logger, semicolon_separated_to_absolute_paths
 
 
 class KB_OT_import_mdl(bpy.types.Operator, ImportHelper):
@@ -78,8 +77,8 @@ class KB_OT_import_mdl(bpy.types.Operator, ImportHelper):
 
         try:
             mdl.load_mdl(self, self.filepath, options)
-        except Exception as e:
-            print(traceback.format_exc())
-            self.report({"ERROR"}, str(e))
+        except Exception as ex:
+            logger().exception(f"Error loading MDL file [{self.filepath}]")
+            self.report({"ERROR"}, str(ex))
 
         return {"FINISHED"}

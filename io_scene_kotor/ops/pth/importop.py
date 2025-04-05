@@ -16,13 +16,12 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-import traceback
-
 import bpy
 
 from bpy_extras.io_utils import ImportHelper
 
 from ...io import pth
+from ...utils import logger
 
 
 class KB_OT_import_pth(bpy.types.Operator, ImportHelper):
@@ -31,15 +30,13 @@ class KB_OT_import_pth(bpy.types.Operator, ImportHelper):
 
     filename_ext = ".pth"
 
-    filter_glob: bpy.props.StringProperty(
-        default="*.pth",
-        options={'HIDDEN'})
+    filter_glob: bpy.props.StringProperty(default="*.pth", options={"HIDDEN"})
 
     def execute(self, context):
         try:
             pth.load_pth(self, self.filepath)
         except Exception as e:
-            print(traceback.format_exc())
-            self.report({'ERROR'}, str(e))
+            logger().exception(f"Error loading PTH file [{self.filepath}]")
+            self.report({"ERROR"}, str(e))
 
-        return {'FINISHED'}
+        return {"FINISHED"}

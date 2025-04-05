@@ -16,14 +16,13 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-import traceback
-
 import bpy
 
 from bpy_extras.io_utils import ExportHelper
 
 from ...constants import ExportOptions
 from ...io import mdl
+from ...utils import logger
 
 
 class KB_OT_export_mdl(bpy.types.Operator, ExportHelper):
@@ -64,8 +63,8 @@ class KB_OT_export_mdl(bpy.types.Operator, ExportHelper):
 
         try:
             mdl.save_mdl(self, self.filepath, options)
-        except Exception as e:
-            print(traceback.format_exc())
-            self.report({"ERROR"}, str(e))
+        except Exception as ex:
+            logger().exception(f"Error saving MDL file [{self.filepath}]")
+            self.report({"ERROR"}, str(ex))
 
         return {"FINISHED"}

@@ -16,13 +16,12 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-import traceback
-
 import bpy
 
 from bpy_extras.io_utils import ExportHelper
 
 from ...io import lyt
+from ...utils import logger
 
 
 class KB_OT_export_lyt(bpy.types.Operator, ExportHelper):
@@ -31,15 +30,13 @@ class KB_OT_export_lyt(bpy.types.Operator, ExportHelper):
 
     filename_ext = ".lyt"
 
-    filter_glob: bpy.props.StringProperty(
-        default="*.lyt",
-        options={'HIDDEN'})
+    filter_glob: bpy.props.StringProperty(default="*.lyt", options={"HIDDEN"})
 
     def execute(self, context):
         try:
             lyt.save_lyt(self, self.filepath)
-        except Exception as e:
-            print(traceback.format_exc())
-            self.report({'ERROR'}, str(e))
+        except Exception as ex:
+            logger().exception(f"Error saving LYT file [{self.filepath}]")
+            self.report({"ERROR"}, str(ex))
 
-        return {'FINISHED'}
+        return {"FINISHED"}

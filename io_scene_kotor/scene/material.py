@@ -16,7 +16,6 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-import logging
 import os
 
 import bpy
@@ -26,12 +25,12 @@ from bpy_extras import image_utils
 from ..constants import UV_MAP_LIGHTMAP, WALKMESH_MATERIALS
 from ..format.tpc.reader import TpcReader
 from ..utils import (
-    is_null,
-    is_not_null,
-    is_aabb_mesh,
     color_to_hex,
-    int_to_hex,
     float_to_byte,
+    int_to_hex,
+    is_aabb_mesh,
+    is_not_null,
+    logger,
 )
 
 
@@ -65,7 +64,7 @@ def rebuild_object_materials(obj, texture_search_paths=[], lightmap_search_paths
     try:
         rebuild_object_materials0(obj, texture_search_paths, lightmap_search_paths)
     except:
-        logging.exception(f"Error building object [{obj.name}] materials")
+        logger().exception(f"Error building object [{obj.name}] materials")
         obj.data.materials.clear()
 
 
@@ -381,17 +380,17 @@ def create_image(name, search_paths):
             elif lower_filename == tpc_filename:
                 tpc_path = os.path.join(search_path, filename)
         if tga_path:
-            print("Loading image: " + tga_path)
+            logger().debug(f"Loading TGA image [{tga_path}]")
             image = image_utils.load_image(tga_path)
             image.name = name
             if txi_path:
-                print("Loading TXI: " + txi_path)
+                logger().debug(f"Loading TXI file [{txi_path}]")
                 with open(txi_path) as txi:
                     txi_lines = txi.readlines()
                     apply_txi_to_image(txi_lines, image)
             return image
         elif tpc_path:
-            print("Loading image: " + tpc_path)
+            logger().debug(f"Loading TPC image [{tpc_path}]")
             tpc_image = TpcReader(tpc_path).load()
             image = bpy.data.images.new(name, tpc_image.w, tpc_image.h)
             image.pixels = tpc_image.pixels

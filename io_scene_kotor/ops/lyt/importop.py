@@ -17,7 +17,6 @@
 # ##### END GPL LICENSE BLOCK #####
 
 import os
-import traceback
 
 import bpy
 
@@ -25,7 +24,7 @@ from bpy_extras.io_utils import ImportHelper
 
 from ...constants import PACKAGE_NAME, ImportOptions
 from ...io import lyt
-from ...utils import semicolon_separated_to_absolute_paths
+from ...utils import logger, semicolon_separated_to_absolute_paths
 
 
 class KB_OT_import_lyt(bpy.types.Operator, ImportHelper):
@@ -67,7 +66,7 @@ class KB_OT_import_lyt(bpy.types.Operator, ImportHelper):
         try:
             lyt.load_lyt(self, self.filepath, options)
         except Exception as e:
-            print(traceback.format_exc())
+            logger().exception(f"Error loading LYT file [{self.filepath}]")
             self.report({"ERROR"}, str(e))
 
         return {"FINISHED"}

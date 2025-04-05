@@ -23,7 +23,7 @@ import bpy
 from mathutils import Matrix
 
 from ..constants import DummyType, MeshType, NodeType, Classification, NULL
-from ..utils import is_mdl_root, is_pwk_root, is_dwk_root, is_exported_to_mdl
+from ..utils import is_mdl_root, is_pwk_root, is_dwk_root, logger
 from .animation import Animation
 from .modelnode.aabb import AabbNode
 from .modelnode.danglymesh import DanglymeshNode
@@ -54,6 +54,8 @@ class Model:
     def add_to_collection(self, collection, options, position=(0.0, 0.0, 0.0)):
         if type(self.root_node) != DummyNode or self.root_node.parent:
             raise RuntimeError("Root node has to be a dummy without a parent")
+
+        logger().info(f"Adding model [{self.name}] to collection")
 
         if options.import_geometry:
             root_obj = self.root_node.add_to_collection(collection, options)
@@ -102,6 +104,8 @@ class Model:
         return root_obj
 
     def import_nodes_to_collection(self, node, parent_obj, collection, options):
+        logger().debug(f"Importing node [{node.name}] to collection")
+
         obj = node.add_to_collection(collection, options)
         obj.parent = parent_obj
 

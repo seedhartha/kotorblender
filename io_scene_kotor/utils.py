@@ -16,9 +16,21 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+import logging
 import os
 
 from .constants import *
+
+_logger = logging.getLogger(__name__)
+_logger.setLevel(logging.DEBUG)
+if not _logger.handlers:
+    handler = logging.StreamHandler()
+    handler.setFormatter(logging.Formatter("[%(levelname)s] %(message)s"))
+    _logger.addHandler(handler)
+
+
+def logger():
+    return _logger
 
 
 def is_dummy_type(obj, dummytype):
