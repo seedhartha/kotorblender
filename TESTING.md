@@ -11,6 +11,6 @@ In order to run the test suite, execute the following from a terminal on Linux o
 where:
 
 - `DATA_DIR` is path to a directory containing assets extracted from BIF archives
-- `TSL` is a flag for using the TSL model format (0 or 1)
-- `OFFSET` is offset into the list of models in the data directory (set to prevent Blender from crashing)
-- `LIMIT` is maximum number of models to process (set to prevent Blender from crashing)
+- `TSL` is a flag indicating use of TSL model format (0 or 1, defaults to 0)
+- `OFFSET` is an offset into the list of models in the data directory (defaults to 0)
+- `LIMIT` is the maximum number of models to process (defaults to 50)

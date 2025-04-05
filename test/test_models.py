@@ -2,7 +2,7 @@ import os
 import bpy
 
 offset = int(os.environ["OFFSET"]) if "OFFSET" in os.environ else 0
-limit = int(os.environ["LIMIT"]) if "LIMIT" in os.environ else 10000
+limit = int(os.environ["LIMIT"]) if "LIMIT" in os.environ else 50
 
 
 def list_model_names(dir):

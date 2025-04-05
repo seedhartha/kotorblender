@@ -166,19 +166,23 @@ class TrimeshNode(BaseNode):
         num_loops = 3 * num_faces
         mesh = EdgeLoopMesh()
         mesh.loop_verts = [-1] * num_loops
-        mesh.loop_normals = [(0, 0, 1)] * num_loops
+        mesh.loop_normals = [(0, 0, 0)] * num_loops
         mesh.loop_uv1 = [(0, 0)] * num_loops if self.uv1 else []
         mesh.loop_uv2 = [(0, 0)] * num_loops if self.uv2 else []
         if self.compression != Compression.DISABLED:
             attrs_to_vert_idx = dict()
             for face_idx in range(num_faces):
                 face_verts = self.facelist.vertices[face_idx]
+                uniq_loop_verts = set()
                 for i in range(3):
                     loop_idx = 3 * face_idx + i
                     vert_idx = face_verts[i]
                     vert = self.verts[vert_idx]
                     attrs = SimilarMdlVertex(vert)
-                    if attrs in attrs_to_vert_idx:
+                    if attrs in attrs_to_vert_idx and (
+                        attrs_to_vert_idx[attrs] not in uniq_loop_verts
+                    ):
+                        uniq_loop_verts.add(attrs_to_vert_idx[attrs])
                         mesh.loop_verts[loop_idx] = attrs_to_vert_idx[attrs]
                     else:
                         num_verts = len(mesh.verts)
@@ -187,7 +191,9 @@ class TrimeshNode(BaseNode):
                             mesh.weights.append(self.weights[vert_idx])
                         if self.constraints:
                             mesh.constraints.append(self.constraints[vert_idx])
-                        attrs_to_vert_idx[attrs] = num_verts
+                        if attrs not in attrs_to_vert_idx:
+                            attrs_to_vert_idx[attrs] = num_verts
+                        uniq_loop_verts.add(num_verts)
                         mesh.loop_verts[loop_idx] = num_verts
                     if self.normals:
                         mesh.loop_normals[loop_idx] = self.normals[vert_idx]
@@ -208,7 +214,8 @@ class TrimeshNode(BaseNode):
                     loop_idx = 3 * face_idx + i
                     vert_idx = face_verts[i]
                     mesh.loop_verts[loop_idx] = vert_idx
-                    mesh.loop_normals[loop_idx] = self.normals[vert_idx]
+                    if self.normals:
+                        mesh.loop_normals[loop_idx] = self.normals[vert_idx]
                     if self.uv1:
                         mesh.loop_uv1[loop_idx] = self.uv1[vert_idx]
                     if self.uv2:
