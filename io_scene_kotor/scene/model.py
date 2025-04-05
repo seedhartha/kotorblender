@@ -150,10 +150,8 @@ class Model:
         while obj_stack:
             obj = obj_stack.pop()
             if obj.kb.node_number in node_numbers:
-                raise RuntimeError(
-                    "Duplicate node number {} in object '{}'".format(
-                        obj.kb.node_number, obj.name
-                    )
+                logger().warning(
+                    f"Duplicate node number [{obj.kb.node_number}] in object [{obj.name}]"
                 )
             if obj.kb.node_number != -1:
                 node_numbers.add(obj.kb.node_number)
