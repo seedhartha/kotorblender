@@ -121,6 +121,8 @@ class Model:
 
     @classmethod
     def from_mdl_root(cls, root_obj, options):
+        logger().info(f"Loading model from object [{root_obj.name}]")
+
         cls.sanitize_model(root_obj)
 
         model = Model()
@@ -177,6 +179,8 @@ class Model:
     def model_node_from_object(cls, obj, options, parent=None, exclude_xwk=True):
         if exclude_xwk and (is_pwk_root(obj) or is_dwk_root(obj)):
             return None
+
+        logger().debug(f"Loading model node from object [{obj.name}]")
 
         if obj.type == "EMPTY":
             if obj.kb.dummytype == DummyType.REFERENCE:

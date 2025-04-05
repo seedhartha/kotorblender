@@ -376,23 +376,24 @@ class MdlWriter:
                 bb_max = Vector()
                 average = Vector()
                 total_area = 0.0
-                for face in node.facelist.vertices:
-                    verts = [Vector(node.verts[i]) for i in face]
-                    for vert in verts:
-                        bb_min.x = min(bb_min.x, vert.x)
-                        bb_min.y = min(bb_min.y, vert.y)
-                        bb_min.z = min(bb_min.z, vert.z)
-                        bb_max.x = max(bb_max.x, vert.x)
-                        bb_max.y = max(bb_max.y, vert.y)
-                        bb_max.z = max(bb_max.z, vert.z)
-                        average += vert
-                    edge1 = verts[1] - verts[0]
-                    edge2 = verts[2] - verts[0]
-                    edge3 = verts[2] - verts[1]
-                    area = self.calculate_face_area(edge1, edge2, edge3)
-                    if area != 1.0:
-                        total_area += area
-                average /= 3 * len(node.facelist.vertices)
+                if node.facelist.vertices:
+                    for face in node.facelist.vertices:
+                        verts = [Vector(node.verts[i]) for i in face]
+                        for vert in verts:
+                            bb_min.x = min(bb_min.x, vert.x)
+                            bb_min.y = min(bb_min.y, vert.y)
+                            bb_min.z = min(bb_min.z, vert.z)
+                            bb_max.x = max(bb_max.x, vert.x)
+                            bb_max.y = max(bb_max.y, vert.y)
+                            bb_max.z = max(bb_max.z, vert.z)
+                            average += vert
+                        edge1 = verts[1] - verts[0]
+                        edge2 = verts[2] - verts[0]
+                        edge3 = verts[2] - verts[1]
+                        area = self.calculate_face_area(edge1, edge2, edge3)
+                        if area != 1.0:
+                            total_area += area
+                    average /= 3 * len(node.facelist.vertices)
                 self.mesh_bounding_boxes[node_idx] = [*bb_min, *bb_max]
                 self.mesh_averages[node_idx] = [*average]
                 self.mesh_total_areas[node_idx] = total_area
@@ -954,9 +955,11 @@ class MdlWriter:
                     len(node.flare_list.colorshifts),
                 )
                 self.put_array_def(
-                    self.flare_texture_offset_offsets[node_idx]
-                    if node.lensflares
-                    else 0,
+                    (
+                        self.flare_texture_offset_offsets[node_idx]
+                        if node.lensflares
+                        else 0
+                    ),
                     len(node.flare_list.textures),
                 )
                 self.mdl.write_int32(light_priority)

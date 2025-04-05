@@ -35,6 +35,7 @@ from ...scene.modelnode.lightsaber import LightsaberNode
 from ...scene.modelnode.reference import ReferenceNode
 from ...scene.modelnode.skinmesh import SkinmeshNode
 from ...scene.modelnode.trimesh import FaceList, TrimeshNode
+from ...utils import logger
 
 from ..binreader import BinaryReader
 
@@ -710,56 +711,55 @@ class MdlReader:
         node.parent = parent
 
         if controller_arr.count > 0:
-            if not node_number in self.node_by_number:
-                raise RuntimeError(
-                    "Model node not found for animation node: " + str(name)
-                )
-            supernode = self.node_by_number[node_number]
-            controllers = self.load_controllers(controller_arr, controller_data_arr)
-            if CTRL_BASE_POSITION in controllers:
-                node.keyframes["position"] = [
-                    row for row in controllers[CTRL_BASE_POSITION]
-                ]
-            if CTRL_BASE_ORIENTATION in controllers:
-                orientations = [
-                    self.orientation_controller_to_quaternion(row[1:])
-                    for row in controllers[CTRL_BASE_ORIENTATION]
-                ]
-                node.keyframes["orientation"] = [
-                    [row[0]] + orientations[i]
-                    for i, row in enumerate(controllers[CTRL_BASE_ORIENTATION])
-                ]
-            if isinstance(supernode, TrimeshNode):
-                if CTRL_MESH_ALPHA in controllers:
-                    node.keyframes["alpha"] = [
-                        row for row in controllers[CTRL_MESH_ALPHA]
+            if node_number in self.node_by_number:
+                supernode = self.node_by_number[node_number]
+                controllers = self.load_controllers(controller_arr, controller_data_arr)
+                if CTRL_BASE_POSITION in controllers:
+                    node.keyframes["position"] = [
+                        row for row in controllers[CTRL_BASE_POSITION]
                     ]
-                if CTRL_MESH_SCALE in controllers:
-                    node.keyframes["scale"] = [
-                        row for row in controllers[CTRL_MESH_SCALE]
+                if CTRL_BASE_ORIENTATION in controllers:
+                    orientations = [
+                        self.orientation_controller_to_quaternion(row[1:])
+                        for row in controllers[CTRL_BASE_ORIENTATION]
                     ]
-                if CTRL_MESH_SELFILLUMCOLOR in controllers:
-                    node.keyframes["selfillumcolor"] = [
-                        row for row in controllers[CTRL_MESH_SELFILLUMCOLOR]
+                    node.keyframes["orientation"] = [
+                        [row[0]] + orientations[i]
+                        for i, row in enumerate(controllers[CTRL_BASE_ORIENTATION])
                     ]
-            if isinstance(supernode, LightNode):
-                if CTRL_LIGHT_RADIUS in controllers:
-                    node.keyframes["radius"] = [
-                        row for row in controllers[CTRL_LIGHT_RADIUS]
-                    ]
-                if CTRL_LIGHT_MULTIPLIER in controllers:
-                    node.keyframes["multiplier"] = [
-                        row for row in controllers[CTRL_LIGHT_MULTIPLIER]
-                    ]
-                if CTRL_LIGHT_COLOR in controllers:
-                    node.keyframes["color"] = [
-                        row for row in controllers[CTRL_LIGHT_COLOR]
-                    ]
-            if isinstance(supernode, EmitterNode):
-                for key in EMITTER_CONTROLLER_KEYS:
-                    if not key[0] in controllers:
-                        continue
-                    node.keyframes[key[1]] = [row for row in controllers[key[0]]]
+                if isinstance(supernode, TrimeshNode):
+                    if CTRL_MESH_ALPHA in controllers:
+                        node.keyframes["alpha"] = [
+                            row for row in controllers[CTRL_MESH_ALPHA]
+                        ]
+                    if CTRL_MESH_SCALE in controllers:
+                        node.keyframes["scale"] = [
+                            row for row in controllers[CTRL_MESH_SCALE]
+                        ]
+                    if CTRL_MESH_SELFILLUMCOLOR in controllers:
+                        node.keyframes["selfillumcolor"] = [
+                            row for row in controllers[CTRL_MESH_SELFILLUMCOLOR]
+                        ]
+                if isinstance(supernode, LightNode):
+                    if CTRL_LIGHT_RADIUS in controllers:
+                        node.keyframes["radius"] = [
+                            row for row in controllers[CTRL_LIGHT_RADIUS]
+                        ]
+                    if CTRL_LIGHT_MULTIPLIER in controllers:
+                        node.keyframes["multiplier"] = [
+                            row for row in controllers[CTRL_LIGHT_MULTIPLIER]
+                        ]
+                    if CTRL_LIGHT_COLOR in controllers:
+                        node.keyframes["color"] = [
+                            row for row in controllers[CTRL_LIGHT_COLOR]
+                        ]
+                if isinstance(supernode, EmitterNode):
+                    for key in EMITTER_CONTROLLER_KEYS:
+                        if not key[0] in controllers:
+                            continue
+                        node.keyframes[key[1]] = [row for row in controllers[key[0]]]
+            else:
+                logger().warning(f"Model node not found for animation node [{name}]")
 
         self.mdl.seek(MDL_OFFSET + children_arr.offset)
         child_offsets = [self.mdl.read_uint32() for _ in range(children_arr.count)]
