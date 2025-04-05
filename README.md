@@ -14,7 +14,9 @@ Significant changes have been introduced since KotORBlender 1.01, including, but
 
 ## Compatibility
 
-We aim to maintain compatibility with latest LTS versions of Blender. KotorBlender was last migrated to, and tested with Blender versions 4.2.8 and 4.4.0.
+We aim to maintain compatibility with latest LTS versions of Blender. KotorBlender was last migrated to, and tested with Blender versions 4.2 and 4.4.
+
+Those of you still using Blender 3.6 or 3.3 are advised to stay with version [3.10.3](https://github.com/seedhartha/kotorblender/tree/v3.10.3) of the addon.
 
 ## Installation
 
