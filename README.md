@@ -25,11 +25,11 @@ We aim to maintain compatibility with latest LTS versions of Blender. KotorBlend
 
 ### From GitHub
 
-1. Clone GitHub repository [https://github.com/seedhartha/kotorblender]
+1. Clone [GitHub repository](https://github.com/seedhartha/kotorblender)
 1. Create a symlink to **io_scene_kotor** directory in current user's Blender extensions directory:
-  1. Set cloned repository as current directory
-  1. Create a symlink on Windows: `mklink /D "%APPDATA%\Blender Foundation\Blender\BLENDER_VERSION\extensions\user_default\io_scene_kotor" "%CD%/io_scene_kotor"`
-  1. Create a symlink on Linux: `ln -s $(pwd)/io_scene_kotor ~/.config/blender/BLENDER_VERSION/extensions/user_default/io_scene_kotor`
+    1. Set cloned repository as current directory
+    1. Create a symlink on Windows: `mklink /D "%APPDATA%\Blender Foundation\Blender\BLENDER_VERSION\extensions\user_default\io_scene_kotor" "%CD%/io_scene_kotor"`
+    1. Create a symlink on Linux: `ln -s $(pwd)/io_scene_kotor ~/.config/blender/BLENDER_VERSION/extensions/user_default/io_scene_kotor`
 
 ## Usage
 
