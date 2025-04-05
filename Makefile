@@ -1,4 +1,4 @@
-.PHONY: build
+.PHONY: build test
 
 build:
 	mkdir -p ./build
@@ -6,5 +6,9 @@ build:
 		--source-dir ./io_scene_kotor \
 		--output-dir ./build
 
+test:
+	blender --background --python ./test/test_model_io.py
+
 clean:
-	rm -f build/*
+	rm -rf build/*
+	rm -rf test/out/*
