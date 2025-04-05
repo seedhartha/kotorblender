@@ -4,8 +4,13 @@ KotorBlender code is tightly coupled to Blender Python API, making it impractica
 
 We can achieve the above by executing test scripts in Blender in background mode. These scripts should invoke KotorBlender functionality and verify results, for example, import and export varying KotOR and TSL models and verify that exported models are equivalent to originals.
 
-In order to run the test suite, execute the following from terminal:
+In order to run the test suite, execute the following from a terminal on Linux or use MSYS on Windows:
 
-- Linux or using MSYS on Windows: `K1_DATA_DIR="k1/data" K2_DATA_DIR="k2/data" make test`
+1. `DATA_DIR=? [TSL=?] [OFFSET=?] [LIMIT=?] make test`
 
-where data directory contains assets extracted from the game's BIF archives.
+where:
+
+- `DATA_DIR` is path to a directory containing assets extracted from BIF archives
+- `TSL` is a flag for using the TSL model format (0 or 1)
+- `OFFSET` is offset into the list of models in the data directory (set to prevent Blender from crashing)
+- `LIMIT` is maximum number of models to process (set to prevent Blender from crashing)

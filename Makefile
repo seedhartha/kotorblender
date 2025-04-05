@@ -7,7 +7,7 @@ build:
 		--output-dir ./build
 
 test:
-	blender --background --python ./test/test_model_io.py
+	blender --background --python ./test/test_models.py
 
 clean:
 	rm -rf build/*
