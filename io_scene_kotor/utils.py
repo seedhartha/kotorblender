@@ -22,10 +22,10 @@ import os
 from .constants import *
 
 _logger = logging.getLogger(__name__)
-_logger.setLevel(logging.DEBUG)
+_logger.setLevel(logging.INFO)
 if not _logger.handlers:
     handler = logging.StreamHandler()
-    handler.setFormatter(logging.Formatter("[%(levelname)s] %(message)s"))
+    handler.setFormatter(logging.Formatter("[%(levelname)s] %(asctime)s %(message)s"))
     _logger.addHandler(handler)
 
 

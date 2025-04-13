@@ -14,9 +14,7 @@ Significant changes have been introduced since KotORBlender 1.01, including, but
 
 ## Compatibility
 
-We aim to maintain compatibility with latest LTS versions of Blender. KotorBlender was last migrated to, and tested with Blender versions 4.2 and 4.4.
-
-Those of you still using Blender 3.6 or 3.3 are advised to stay with version [3.10.3](https://github.com/seedhartha/kotorblender/tree/v3.10.3) of the addon.
+Current version of KotorBlender is fully compatible with Blender versions 3.6 and 4.2, and was tested with version 4.4. Blender development moves fast and is known to introduce breaking changes, therefore compatibility with any other version of Blender is not guaranteed.
 
 ## Installation
 
@@ -28,10 +26,14 @@ Those of you still using Blender 3.6 or 3.3 are advised to stay with version [3.
 ### From GitHub
 
 1. Clone [GitHub repository](https://github.com/seedhartha/kotorblender)
-1. Create a symlink to **io_scene_kotor** directory in current user's Blender extensions directory:
+1. When using Blender 4.2+, create a symlink to **io_scene_kotor** directory in current user's Blender extensions directory:
     1. Set cloned repository as current directory
-    1. Create a symlink on Windows: `mklink /D "%APPDATA%\Blender Foundation\Blender\BLENDER_VERSION\extensions\user_default\io_scene_kotor" "%CD%/io_scene_kotor"`
-    1. Create a symlink on Linux: `ln -s $(pwd)/io_scene_kotor ~/.config/blender/BLENDER_VERSION/extensions/user_default/io_scene_kotor`
+    1. Create a symlink on Windows: `mklink /D "%APPDATA%\Blender Foundation\Blender\4.2\extensions\user_default\io_scene_kotor" "%CD%/io_scene_kotor"`
+    1. Create a symlink on Linux: `ln -s $(pwd)/io_scene_kotor ~/.config/blender/4.2/extensions/user_default/io_scene_kotor`
+1. When using Blender 3.6, create a symlink to **io_scene_kotor** directory in current user's Blender addons directory:
+    1. Set cloned repository as current directory
+    1. Create a symlink on Windows: `mklink /D "%APPDATA%\Blender Foundation\Blender\3.6\scripts\addons\io_scene_kotor" "%CD%/io_scene_kotor"`
+    1. Create a symlink on Linux: `ln -s $(pwd)/io_scene_kotor ~/.config/blender/3.6/scripts/addons/io_scene_kotor`
 
 ## Usage
 
