@@ -59,4 +59,7 @@ class SkinmeshNode(TrimeshNode):
             vert_weights.sort(key=lambda x: x[1], reverse=True)
             if len(vert_weights) > 4:
                 vert_weights = vert_weights[0:3]
+            total_weight = sum([v[1] for v in vert_weights])
+            if total_weight != 0.0:
+                vert_weights = [(v[0], v[1] / total_weight) for v in vert_weights]
             mesh.weights[vert_idx] = vert_weights
